@@ -1,0 +1,58 @@
+* {
+    -fx-color-unfocus: #d3d3d3;
+    -fx-color-border: #d3d3d3;
+    -fx-color-dashboard: #f1f2f6;
+}
+
+.day-theme {
+    -fx-color-background: #fff;
+    -fx-color-text: #333;
+
+    -fx-background-color: -fx-color-background;
+    -fx-text-fill: -fx-color-text;
+}
+
+.night-theme {
+    -fx-color-background: #333;
+    -fx-color-text: #fff;
+
+    -fx-background-color: -fx-color-background;
+    -fx-text-fill: -fx-color-text;
+}
+
+.ikonli-font-icon {
+    -fx-icon-color: -fx-color-text;
+}
+
+.default-style {
+    -fx-background-color: -fx-color-text;
+    -fx-text-fill: -fx-color-background;
+}
+
+.sucess-style {
+    -fx-color-background: #20950E;
+    -fx-color-text: #EDF2F4;
+    -fx-color-border: #20950E;
+}
+
+.warn-style {
+    -fx-color-background: #F5AF00;
+    -fx-color-text: #423e3b;
+    -fx-color-border: #F5AF00;
+}
+
+.danger-style {
+    -fx-color-background: #D20F25;
+    -fx-color-text: #EDF2F4;
+    -fx-color-border: #D20F25;
+}
+
+.epic-style {
+    -fx-color-background: #00778F;
+    -fx-color-text: #EDF2F4;
+    -fx-color-border: #00778F;
+}
+
+.red-border-input-line .input-line {
+    -fx-background-color: red;
+}

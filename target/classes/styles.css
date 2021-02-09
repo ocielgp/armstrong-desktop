@@ -1,0 +1,11 @@
+/* Resources Section */
+@import "global.css";
+@import "colors.css";
+@import "controls.css";
+@import "sections.css";
+
+.context-menu {
+    -fx-background-color: -fx-color-background;
+    -fx-text-fill: -fx-color-text;
+    -fx-font: 0.8em "Roboto";
+}

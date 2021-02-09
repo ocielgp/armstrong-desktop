@@ -1,0 +1,47 @@
+@import "global.css";
+@import "colors.css";
+
+* {
+    -fx-font-size: 10px;
+    -fx-color-unfocus: #d3d3d3;
+}
+
+* .label, .jfx-text-field, .jfx-password-field, .jfx-button {
+    -fx-font: 2em "Roboto";
+}
+
+.notification-container {
+    -fx-background-color: -fx-color-background;
+    -fx-text-fill: -fx-color-text;
+    -fx-border-color: -fx-color-border;
+    -fx-cursor: hand;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+}
+
+.notification-container .label {
+    -fx-background-color: -fx-color-background;
+    -fx-text-fill: -fx-color-text;
+}
+
+.notification-icon-container {
+    -fx-padding: 20px;
+    -fx-background-radius: 50px;
+    -fx-border-radius: 50px;
+    -fx-font-size: 0px;
+    -fx-border-color: -fx-color-text;
+
+}
+
+.notification-container .ikonli-font-icon {
+    -fx-icon-size: 30px;
+}
+
+.notification-container .title {
+    -fx-font: 20px 'Roboto Bold';
+}
+
+.notification-container .content {
+    -fx-font: 14px 'Roboto';
+
+}
