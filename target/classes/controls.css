@@ -57,6 +57,12 @@
     -jfx-rippler-fill: -fx-color-text;
 }
 
+.jfx-toggle-button {
+    -fx-text-fill: -fx-color-text;
+    -fx-font: 1.5em "Roboto";
+    -jfx-toggle-color: -fx-color-text;
+}
+
 .jfx-combo-box {
     -fx-font: 2em "Roboto Thin";
 }
@@ -76,9 +82,4 @@
 
 .jfx-date-picker .date-picker-popup > .month-year-pane {
     -fx-background-color: #333;
-}
-
-.jfx-toggle-button {
-    -fx-text-fill: -fx-color-text;
-    -fx-font: 1.5em "Roboto";
 }
