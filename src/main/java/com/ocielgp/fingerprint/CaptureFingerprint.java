@@ -10,25 +10,28 @@ import com.digitalpersona.uareu.UareUException;
 import javafx.scene.layout.VBox;
 
 public class CaptureFingerprint
-        extends VBox
         implements ActionListener {
 
     private VBox fingerprintPane;
     private CaptureThread captureThread;
     private ImagePanel fingerprintImage;
     private final Reader reader;
-    private final boolean showImage;
 
-    private CaptureFingerprint(Reader reader, boolean showImage) {
+    private CaptureFingerprint(Reader reader) {
         this.reader = reader;
-        this.showImage = showImage;
         captureThread = new CaptureThread(this.reader, false, Fid.Format.ANSI_381_2004, Reader.ImageProcessing.IMG_PROC_DEFAULT);
-        if (showImage) {
-            fingerprintImage = new ImagePanel();
-            super.getChildren().add(fingerprintImage);
-            super.setPrefWidth(400);
-            super.setPrefHeight(400);
-        }
+        System.out.println("Captura creada");
+    }
+
+    private CaptureFingerprint(Reader reader, VBox fingerprintPane) {
+        this.reader = reader;
+        this.captureThread = new CaptureThread(this.reader, false, Fid.Format.ANSI_381_2004, Reader.ImageProcessing.IMG_PROC_DEFAULT);
+        this.fingerprintImage = new ImagePanel();
+        this.fingerprintPane = fingerprintPane;
+        this.fingerprintPane.getChildren().add(fingerprintImage);
+//            super.getChildren().add(fingerprintImage);
+//            super.setPrefWidth(400);
+//            super.setPrefHeight(400);
 
         System.out.println("Captura creada");
     }
@@ -54,7 +57,7 @@ public class CaptureFingerprint
 
             if (evt.capture_result != null) {
                 if (evt.capture_result.image != null && Reader.CaptureQuality.GOOD == evt.capture_result.quality) {
-                    if (this.showImage) {
+                    if (this.fingerprintPane != null) {
                         // Display image
                         fingerprintImage.showImage(evt.capture_result.image);
                     }
@@ -108,20 +111,20 @@ public class CaptureFingerprint
 
         StartCaptureThread();
 
-        fingerprintPane = pane;
-        fingerprintPane.getChildren().add(this);
-        fingerprintPane.toFront();
-        fingerprintPane.setVisible(true);
+//        fingerprintPane = pane;
+//        fingerprintPane.getChildren().add(this);
+//        fingerprintPane.toFront();
+//        fingerprintPane.setVisible(true);
 
     }
 
     public static void Run(Reader reader) { // Run in background
-        CaptureFingerprint capture = new CaptureFingerprint(reader, true);
+        CaptureFingerprint capture = new CaptureFingerprint(reader);
         capture.startCapture();
     }
 
     public static void Run(Reader reader, VBox pane) {
-        CaptureFingerprint capture = new CaptureFingerprint(reader, false);
+        CaptureFingerprint capture = new CaptureFingerprint(reader, pane);
         capture.startCapture(pane);
     }
 

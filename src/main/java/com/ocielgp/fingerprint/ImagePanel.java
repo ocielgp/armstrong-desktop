@@ -9,25 +9,20 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
 public class ImagePanel extends ImageView {
-    private BufferedImage bufferedImage;
 
     public void showImage(Fid image) {
+        super.setPreserveRatio(true);
         Fiv view = image.getViews()[0];
-        this.bufferedImage = new BufferedImage(view.getWidth(), view.getHeight(), BufferedImage.TYPE_BYTE_GRAY);
-        this.bufferedImage.getRaster().setDataElements(0, 0, view.getWidth(), view.getHeight(), view.getImageData());
+        System.out.println(view.getWidth());
+        System.out.println(view.getHeight());
+        BufferedImage bufferedImage = new BufferedImage(view.getWidth(), view.getHeight(), BufferedImage.TYPE_BYTE_GRAY);
+        bufferedImage.getRaster().setDataElements(0, 0, view.getWidth(), view.getHeight(), view.getImageData());
         Image toFXImage = SwingFXUtils.toFXImage(bufferedImage, null);
-        this.displayFXImage(toFXImage);
+        super.setImage(toFXImage);
         System.out.println("Pinto la IMG");
-
-//        repaint();
+        super.setFitWidth(150);
+        super.setFitHeight(150);
+        System.out.println(super.getFitWidth());
     }
-
-    public void displayFXImage(Image img) {
-        super.setImage(img);
-    }
-
-//    public void paint(Graphics g) {
-//        g.drawImage(bufferedImage, 0, 0, null);
-//    }
 
 }

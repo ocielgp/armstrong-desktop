@@ -3,6 +3,7 @@ package com.ocielgp.controller;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
@@ -30,7 +31,7 @@ public class MembersController implements Initializable {
                 Objects.requireNonNull(DashboardController.class.getClassLoader().getResource("member.fxml"))
         );
         try {
-            this.memberPane.getChildren().setAll((VBox) view.load());
+            this.memberPane.getChildren().setAll((ScrollPane) view.load());
         } catch (IOException e) {
             e.printStackTrace();
         }

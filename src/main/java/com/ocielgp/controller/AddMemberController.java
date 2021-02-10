@@ -1,7 +1,9 @@
 package com.ocielgp.controller;
 
+import animatefx.animation.*;
 import com.jfoenix.controls.*;
 import com.ocielgp.database.SocioData;
+import com.ocielgp.fingerprint.Fingerprint;
 import com.ocielgp.model.SociosPlanesModel;
 import com.ocielgp.utilities.Input;
 import com.ocielgp.utilities.InputDetails;
@@ -12,15 +14,11 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.ResourceBundle;
@@ -31,6 +29,8 @@ public class AddMemberController implements Initializable {
     private VBox addMemberPane;
     @FXML
     private VBox fingerprintPane;
+    @FXML
+    private VBox planPane;
 
     // Controls
     // -> Photo section [ph]
@@ -55,7 +55,7 @@ public class AddMemberController implements Initializable {
 
     // -> Fingerprint section [fp]
     @FXML
-    private ImageView fp_imgFingerprint;
+    private VBox fp_boxFingerprint;
     @FXML
     private Label fp_labelFingerprintCounter;
     @FXML
@@ -98,6 +98,8 @@ public class AddMemberController implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         this.sb_datePicker.focusedProperty().addListener((observableValue, oldValue, newValue) -> this.sb_datePicker.getStyleClass().remove("red-border-input-line"));
         this.sb_comboBoxSubscriptions.focusedProperty().addListener((observableValue, oldValue, newValue) -> this.sb_comboBoxSubscriptions.getStyleClass().remove("red-border-input-line"));
+        Fingerprint.FingerprintPane = this.fingerprintPane;
+        Fingerprint.RefreshDashboard();
 
         EventHandler<ActionEvent> registerEvent = actionEvent -> {
             LinkedList<InputDetails> nodesRequired = new LinkedList<>();
@@ -161,30 +163,42 @@ public class AddMemberController implements Initializable {
             });
         }
 
+        this.fp_buttonCapture.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                Fingerprint.StartCapture(fp_boxFingerprint);
+            }
+        });
         buttonRegister.addEventFilter(ActionEvent.ACTION, registerEvent);
     }
 
     private void subscriptionChanges(boolean visible) {
+        // Clear data Inputs
+        if (visible) {
+            Input.clearInputs(this.sb_comboBoxSubscriptions);
+            new FadeIn(this.sb_boxPersonalized).play();
+        } else {
+            Input.clearInputs(this.sb_datePicker, this.sb_fieldPrice, this.sb_fieldPriceNotes);
+            new FadeIn(this.sb_comboBoxSubscriptions).play();
+        }
+
         this.sb_comboBoxSubscriptions.setVisible(!visible);
         this.sb_comboBoxSubscriptions.setManaged(!visible);
 
         this.sb_boxPersonalized.setVisible(visible);
         this.sb_boxPersonalized.setManaged(visible);
 
-        // Clear data Inputs
-        if (visible) {
-            Input.clearInputs(this.sb_comboBoxSubscriptions);
-        } else {
-            Input.clearInputs(this.sb_datePicker, this.sb_fieldPrice, this.sb_fieldPriceNotes);
-        }
     }
 
     private void paymentChanges(boolean visible) {
-        this.pym_boxDebt.setVisible(!visible);
-        this.pym_boxDebt.setManaged(!visible);
         if (visible) {
             Input.clearInputs(this.pym_fieldDebt, this.pym_fieldDebtNotes);
+        } else {
+            new FadeIn(this.pym_boxDebt).play();
         }
+
+        this.pym_boxDebt.setVisible(!visible);
+        this.pym_boxDebt.setManaged(!visible);
     }
 
 
