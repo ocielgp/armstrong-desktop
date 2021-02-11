@@ -4,7 +4,6 @@ import com.digitalpersona.uareu.Reader;
 import com.digitalpersona.uareu.ReaderCollection;
 import com.digitalpersona.uareu.UareUGlobal;
 import com.ocielgp.utilities.NotificationHandler;
-import javafx.concurrent.ScheduledService;
 import javafx.event.EventHandler;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
@@ -26,10 +25,32 @@ public class Fingerprint {
             "CONECTADO",
             "CAPTURANDO"
     };
-    private static CaptureFingerprint captureFingerprint;
-    public static FontIcon FingerprintIcon; // Dashboard
-    public static Label FingerprintStatus; // Dashboard
-    public static VBox FingerprintPane;
+    private static Capture captureFingerprint;
+    private static FontIcon FingerprintIcon; // Dashboard
+    private static Label FingerprintStatus; // Dashboard
+    private static VBox FingerprintPane;
+
+    public static void setFingerprintIcon(FontIcon fingerprintIcon) {
+        FingerprintIcon = fingerprintIcon;
+        RefreshDashboard();
+    }
+
+    public static void setFingerprintStatus(Label fingerprintStatus) {
+        FingerprintStatus = fingerprintStatus;
+        RefreshDashboard();
+
+    }
+
+    public static void setFingerprintPane(VBox fingerprintPane) {
+        if (captureFingerprint != null) {
+            captureFingerprint.Stop();
+            captureFingerprint = null;
+            fingerprintStatus = 1;
+            RefreshDashboard();
+        }
+        FingerprintPane = fingerprintPane;
+        RefreshDashboard();
+    }
 
     private static final EventHandler<MouseEvent> fingerprintEvent = mouseEvent -> Fingerprint.Scanner();
 
@@ -67,12 +88,29 @@ public class Fingerprint {
         }
     }
 
-    public static void StartCapture(VBox pane) {
+    public static void ClearFingerprintPane() {
+        if (FingerprintPane != null) {
+            FingerprintPane.getChildren().removeAll();
+        }
+    }
+
+    public static void StartCapture(VBox pane, boolean verification) {
         if (fingerprintStatus > 0 && fingerprintStatus != 2) {
-            CaptureFingerprint.Run(reader, pane);
+            captureFingerprint = Capture.Run(reader, pane, verification);
             fingerprintStatus = 2;
             RefreshDashboard();
         }
+    }
+
+    public static void StopCapture() {
+        if (captureFingerprint != null) {
+            captureFingerprint.Stop();
+            captureFingerprint = null;
+            fingerprintStatus = 1;
+            RefreshDashboard();
+        }
+
+        ClearFingerprintPane();
     }
 
     public static void RefreshDashboard() {

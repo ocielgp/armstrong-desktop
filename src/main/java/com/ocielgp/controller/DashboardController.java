@@ -113,9 +113,8 @@ public class DashboardController implements Initializable {
         /* End Routing */
 
         // Fingerprint
-        Fingerprint.FingerprintIcon = this.fingerprintIcon;
-        Fingerprint.FingerprintStatus = this.fingerprintStatus;
-        Fingerprint.RefreshDashboard();
+        Fingerprint.setFingerprintIcon(this.fingerprintIcon);
+        Fingerprint.setFingerprintStatus(this.fingerprintStatus);
 
         Platform.runLater(() -> {
             Loading.stopLoad(new FadeIn(rootPane)); // Show rootPane after load

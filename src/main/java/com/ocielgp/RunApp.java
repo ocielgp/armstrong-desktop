@@ -48,6 +48,7 @@ public class RunApp extends Application {
         // Kill all threads when an event closing occur
         primaryStage.addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, evt -> {
             Platform.exit();
+            System.exit(0);
         });
     }
 }

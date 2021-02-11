@@ -11,7 +11,9 @@ import com.ocielgp.utilities.NotificationHandler;
 import com.ocielgp.utilities.Validator;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.event.EventHandler;
+import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
@@ -98,9 +100,9 @@ public class AddMemberController implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         this.sb_datePicker.focusedProperty().addListener((observableValue, oldValue, newValue) -> this.sb_datePicker.getStyleClass().remove("red-border-input-line"));
         this.sb_comboBoxSubscriptions.focusedProperty().addListener((observableValue, oldValue, newValue) -> this.sb_comboBoxSubscriptions.getStyleClass().remove("red-border-input-line"));
-        Fingerprint.FingerprintPane = this.fingerprintPane;
-        Fingerprint.RefreshDashboard();
+        Fingerprint.setFingerprintPane(this.fingerprintPane);
 
+        /* Events Handlers */
         EventHandler<ActionEvent> registerEvent = actionEvent -> {
             LinkedList<InputDetails> nodesRequired = new LinkedList<>();
             nodesRequired.add(new InputDetails(pi_fieldNames, pi_fieldNames.getText()));
@@ -136,6 +138,18 @@ public class AddMemberController implements Initializable {
                 NotificationHandler.danger("Error", "Los campos en rojo no pueden estar vacios.", 2);
             }
         };
+
+        EventHandler<ActionEvent> captureEvent = actionEvent -> {
+            if (fp_buttonCapture.getText().equals("Iniciar captura")) {
+                Fingerprint.StartCapture(this.fp_boxFingerprint, true);
+                this.fp_buttonCapture.setText("Cancelar captura");
+            } else {
+                Fingerprint.StopCapture();
+                this.fp_buttonCapture.setText("Iniciar captura");
+            }
+        };
+        /* End Events Handlers */
+
         this.sb_togglePersonalized.setOnAction(actionEvent -> {
             // Plan personalized
             subscriptionChanges(sb_togglePersonalized.isSelected());
@@ -163,13 +177,8 @@ public class AddMemberController implements Initializable {
             });
         }
 
-        this.fp_buttonCapture.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
-                Fingerprint.StartCapture(fp_boxFingerprint);
-            }
-        });
-        buttonRegister.addEventFilter(ActionEvent.ACTION, registerEvent);
+        this.fp_buttonCapture.setOnAction(captureEvent);
+        this.buttonRegister.setOnAction(registerEvent);
     }
 
     private void subscriptionChanges(boolean visible) {
