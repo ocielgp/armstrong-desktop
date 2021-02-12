@@ -17,7 +17,7 @@
 
 <ScrollPane xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ocielgp.controller.AddMemberController">
    <content>
-      <VBox fx:id="addMemberPane" maxWidth="-Infinity" prefWidth="410.0">
+      <VBox fx:id="addMemberPane" maxWidth="-Infinity" prefWidth="410.0" styleClass="member">
          <children>
             <HBox alignment="CENTER" styleClass="member-title">
                <children>
@@ -304,10 +304,6 @@
                </padding>
             </VBox>
          </children>
-         <styleClass>
-            <String fx:value="member" />
-            <String fx:value="day-theme" />
-         </styleClass>
       </VBox>
    </content>
 </ScrollPane>

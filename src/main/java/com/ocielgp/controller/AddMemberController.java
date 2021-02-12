@@ -11,9 +11,7 @@ import com.ocielgp.utilities.NotificationHandler;
 import com.ocielgp.utilities.Validator;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.event.Event;
 import javafx.event.EventHandler;
-import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
@@ -100,7 +98,7 @@ public class AddMemberController implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         this.sb_datePicker.focusedProperty().addListener((observableValue, oldValue, newValue) -> this.sb_datePicker.getStyleClass().remove("red-border-input-line"));
         this.sb_comboBoxSubscriptions.focusedProperty().addListener((observableValue, oldValue, newValue) -> this.sb_comboBoxSubscriptions.getStyleClass().remove("red-border-input-line"));
-        Fingerprint.setFingerprintPane(this.fingerprintPane);
+        Fingerprint.setFingerprintUI(this.fingerprintPane, this.fp_boxFingerprint, this.fp_labelFingerprintCounter, this.fp_buttonRestartCapture);
 
         /* Events Handlers */
         EventHandler<ActionEvent> registerEvent = actionEvent -> {
@@ -142,7 +140,10 @@ public class AddMemberController implements Initializable {
         EventHandler<ActionEvent> captureEvent = actionEvent -> {
             if (fp_buttonCapture.getText().equals("Iniciar captura")) {
                 Fingerprint.StartCapture(this.fp_boxFingerprint, true);
-                this.fp_buttonCapture.setText("Cancelar captura");
+                this.fp_buttonCapture.setText("Detener captura");
+                if (Integer.parseInt(this.fp_labelFingerprintCounter.getText()) > 0) {
+                    this.fp_buttonRestartCapture.setDisable(false);
+                }
             } else {
                 Fingerprint.StopCapture();
                 this.fp_buttonCapture.setText("Iniciar captura");
@@ -150,19 +151,27 @@ public class AddMemberController implements Initializable {
         };
         /* End Events Handlers */
 
-        this.sb_togglePersonalized.setOnAction(actionEvent -> {
+        this.sb_togglePersonalized.setOnAction(actionEvent ->
+
+        {
             // Plan personalized
             subscriptionChanges(sb_togglePersonalized.isSelected());
         });
 
-        this.pym_togglePayment.setOnAction(actionEvent -> {
+        this.pym_togglePayment.setOnAction(actionEvent ->
+
+        {
             // Have a debt
             paymentChanges(pym_togglePayment.isSelected());
         });
 
         // Initialize form
-        this.subscriptionChanges(sb_togglePersonalized.isSelected());
-        this.paymentChanges(pym_togglePayment.isSelected());
+        this.
+
+                subscriptionChanges(sb_togglePersonalized.isSelected());
+        this.
+
+                paymentChanges(pym_togglePayment.isSelected());
 
         // Load data plans to combobox
         ObservableList<SociosPlanesModel> planes = SocioData.getSociosPlanes();
@@ -178,6 +187,10 @@ public class AddMemberController implements Initializable {
         }
 
         this.fp_buttonCapture.setOnAction(captureEvent);
+        this.fp_buttonRestartCapture.setOnAction(actionEvent -> {
+            Fingerprint.RestartCapture();
+            this.fp_boxFingerprint.requestFocus();
+        });
         this.buttonRegister.setOnAction(registerEvent);
     }
 

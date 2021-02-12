@@ -3,10 +3,10 @@ package com.ocielgp.fingerprint;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Base64;
+import java.util.LinkedList;
 
 import com.digitalpersona.uareu.*;
 import com.ocielgp.utilities.NotificationHandler;
-import javafx.application.Platform;
 import javafx.scene.layout.VBox;
 
 public class Capture
@@ -85,7 +85,7 @@ public class Capture
                 // Exception during capture
                 System.out.println("Capture: " + evt.exception);
                 bCanceled = true;
-                Fingerprint.setFingerprintStatus(0); // Fingerprint Off
+                Fingerprint.setFingerprintStatusCode(0); // Fingerprint Off
             } else if (evt.reader_status != null) {
                 System.out.println(evt.reader_status);
                 bCanceled = true;
@@ -109,37 +109,43 @@ public class Capture
 
                 try {
                     Fmd fmd = engine.CreateFmd(evt.capture_result.image, Fmd.Format.ANSI_378_2004);
-                    if (null == m_fmds[0]) m_fmds[0] = fmd;
-                    else if (null == m_fmds[1]) m_fmds[1] = fmd;
+                    if (Fingerprint.compareFingerprint(fmd)) {
+                        if (null == m_fmds[0]) m_fmds[0] = fmd;
+                        else if (null == m_fmds[1]) m_fmds[1] = fmd;
+
+                        if (null != m_fmds[0] && null != m_fmds[1]) {
+                            //perform comparison
+                            try {
+                                int falsematch_rate = engine.Compare(m_fmds[0], 0, m_fmds[1], 0);
+
+                                int target_falsematch_rate = Engine.PROBABILITY_ONE / 100000; //target rate is 0.00001
+                                if (falsematch_rate < target_falsematch_rate) {
+                                    Fingerprint.AddFingerprint(m_fmds[0]);
+                                    NotificationHandler.sucess("Lector de Huellas", "Huellas coinciden.", 2);
+                                } else {
+                                    NotificationHandler.danger("Lector de huellas", "Las huellas no coinciden.", 2);
+                                }
+                            } catch (UareUException e) {
+                                System.out.println("Engine.CreateFmd()" + e);
+                            }
+
+                            //discard FMDs
+                            m_fmds[0] = null;
+                            m_fmds[1] = null;
+
+                            //the new loop starts
+                        } else {
+                            NotificationHandler.createNotification("gmi-fingerprint", "Lector de huellas", "Vuelve a colocar la huella sobre el lector.", 2, NotificationHandler.DEFAULT_STYLE);
+                            //the loop continues
+//                    m_text.append(m_strPrompt2);
+                        }
+                    } else {
+                        //discard FMDs
+                        m_fmds[0] = null;
+                        m_fmds[1] = null;
+                    }
                 } catch (UareUException e) {
                     System.out.println("Engine.CreateFmd()" + e);
-                }
-
-                if (null != m_fmds[0] && null != m_fmds[1]) {
-                    //perform comparison
-                    try {
-                        int falsematch_rate = engine.Compare(m_fmds[0], 0, m_fmds[1], 0);
-
-                        int target_falsematch_rate = Engine.PROBABILITY_ONE / 100000; //target rate is 0.00001
-                        if (falsematch_rate < target_falsematch_rate) {
-                            Fingerprint.ClearFingerprintPane();
-                            NotificationHandler.sucess("Lector de Huellas", "Huellas coinciden.", 2);
-                        } else {
-                            NotificationHandler.danger("Lector de huellas", "Las huellas no coinciden.", 2);
-                        }
-                    } catch (UareUException e) {
-                        System.out.println("Engine.CreateFmd()" + e);
-                    }
-
-                    //discard FMDs
-                    m_fmds[0] = null;
-                    m_fmds[1] = null;
-
-                    //the new loop starts
-                } else {
-                    NotificationHandler.createNotification("gmi-fingerprint", "Lector de huellas", "Vuelve a colocar la huella sobre el lector.", 2, NotificationHandler.DEFAULT_STYLE);
-                    //the loop continues
-//                    m_text.append(m_strPrompt2);
                 }
             } else if (Reader.CaptureQuality.CANCELED == evt.capture_result.quality) {
                 //capture or streaming was canceled, just quit

@@ -1,6 +1,7 @@
 package com.ocielgp.controller;
 
 import animatefx.animation.FadeIn;
+import com.ocielgp.fingerprint.FingerprintUI;
 import com.ocielgp.model.AdministradorModel;
 import com.ocielgp.fingerprint.Fingerprint;
 import com.ocielgp.utilities.Loading;
@@ -114,7 +115,7 @@ public class DashboardController implements Initializable {
 
         // Fingerprint
         Fingerprint.setFingerprintIcon(this.fingerprintIcon);
-        Fingerprint.setFingerprintStatus(this.fingerprintStatus);
+        Fingerprint.setFingerprintLabel(this.fingerprintStatus);
 
         Platform.runLater(() -> {
             Loading.stopLoad(new FadeIn(rootPane)); // Show rootPane after load
