@@ -16,11 +16,20 @@
     -fx-background-color: -fx-color-background;
 }
 
+.dashboard .aside {
+    -fx-border-width: 0 1px 0 0;
+    -fx-border-color: -fx-color-border;
+}
+
+.dashboard .aside-top {
+    -fx-border-width: 0 1px 1px 0;
+}
+
 .dashboard .aside .option {
     -fx-padding: 10px;
     -fx-cursor: hand;
+    -fx-border-width: 0 0 1px 0;
     -fx-border-color: -fx-color-border;
-    -fx-border-width: 1px 0 0 0;
 }
 
 .dashboard .aside .option:hover {
@@ -53,7 +62,7 @@
 
 .dashboard .top-bar {
     -fx-padding: 10px;
-    -fx-border-width: 0 0 0 1px;
+    -fx-border-width: 0 0 1px 0;
     -fx-border-color: -fx-color-border;
 }
 
@@ -88,11 +97,6 @@
 
 .fingerprint .status {
     -fx-font: 2em "Roboto Thin";
-}
-
-.dashboard .content {
-    -fx-background-color: -fx-color-border;
-    -fx-focus-color: transparent;
 }
 
 /* Summary */
@@ -160,7 +164,7 @@
 }
 
 .member {
-    -fx-border-width: 0 0 0 3px;
+    -fx-border-width: 0 0 0 1px;
     -fx-border-color: -fx-color-border;
     -fx-background-color: -fx-color-background;
 }

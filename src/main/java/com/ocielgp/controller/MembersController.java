@@ -1,11 +1,12 @@
 package com.ocielgp.controller;
 
+import com.ocielgp.utilities.Input;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.VBox;
 
 import java.io.IOException;
 import java.net.URL;
@@ -17,7 +18,7 @@ public class MembersController implements Initializable {
     @FXML
     private GridPane membersPane;
     @FXML
-    private VBox memberPane;
+    private ScrollPane memberPane;
 
     // Controls
     @FXML
@@ -25,12 +26,12 @@ public class MembersController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        System.out.println(memberPane.getChildren());
         FXMLLoader view = new FXMLLoader(
                 Objects.requireNonNull(DashboardController.class.getClassLoader().getResource("member.fxml"))
         );
         try {
-            this.memberPane.getChildren().setAll((VBox) view.load());
+            this.memberPane.setContent(view.load());
+            Input.getScrollEvent(this.memberPane);
         } catch (IOException e) {
             e.printStackTrace();
         }

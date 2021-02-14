@@ -1,39 +1,49 @@
 package com.ocielgp.fingerprint;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import com.digitalpersona.uareu.Fid;
-import com.digitalpersona.uareu.Reader;
-import com.digitalpersona.uareu.UareUException;
+import com.digitalpersona.uareu.*;
+import com.ocielgp.utilities.NotificationHandler;
 import javafx.scene.layout.VBox;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Base64;
+
 public class Capture
-        extends VBox
         implements ActionListener {
 
     private VBox fingerprintPane;
     private CaptureThread captureThread;
+    private ImagePanel fingerprintImage;
     private final Reader reader;
-    private final ImagePanel fingerprintImage;
-    private final boolean bStreaming;
+    private boolean verification;
+    private Fmd[] m_fmds;
 
-    private Capture(Reader reader, boolean bStreaming) {
+    private Capture(Reader reader) {
         this.reader = reader;
-        this.bStreaming = bStreaming;
+        captureThread = new CaptureThread(this.reader, false, Fid.Format.ANSI_381_2004, Reader.ImageProcessing.IMG_PROC_DEFAULT);
+        System.out.println("Captura creada");
+    }
 
-        captureThread = new CaptureThread(this.reader, this.bStreaming, Fid.Format.ANSI_381_2004, Reader.ImageProcessing.IMG_PROC_DEFAULT);
+    private Capture(Reader reader, VBox fingerprintPane, boolean verification) {
+        this.reader = reader;
+        this.captureThread = new CaptureThread(this.reader, false, Fid.Format.ANSI_381_2004, Reader.ImageProcessing.IMG_PROC_DEFAULT);
+        this.fingerprintImage = new ImagePanel();
+        this.fingerprintPane = fingerprintPane;
+        if (verification) {
+            this.verification = true;
+            this.m_fmds = new Fmd[2];
+            NotificationHandler.notify("gmi-fingerprint", "Lector de huellas", "Coloca la huella sobre el lector.", 2);
+        }
+        this.fingerprintPane.getChildren().setAll(fingerprintImage);
+//            super.getChildren().add(fingerprintImage);
+//            super.setPrefWidth(400);
+//            super.setPrefHeight(400);
 
-        fingerprintImage = new ImagePanel();
-        super.getChildren().add(fingerprintImage);
-        super.setPrefWidth(400);
-        super.setPrefHeight(400);
-
-        System.out.println("creado");
+        System.out.println("Captura creada");
     }
 
     private void StartCaptureThread() {
-        captureThread = new CaptureThread(reader, bStreaming, Fid.Format.ANSI_381_2004, Reader.ImageProcessing.IMG_PROC_DEFAULT);
+        captureThread = new CaptureThread(reader, false, Fid.Format.ANSI_381_2004, Reader.ImageProcessing.IMG_PROC_DEFAULT);
         captureThread.start(this);
     }
 
@@ -46,58 +56,118 @@ public class Capture
     }
 
     public void actionPerformed(ActionEvent e) {
-        System.out.println("disparado");
-
-        if (e.getActionCommand().equals("Hi")) {
-            //event from "back" button
-            //cancel capture
-            StopCaptureThread();
-        } else if (e.getActionCommand().equals(CaptureThread.ACT_CAPTURE)) {
-            System.out.println("captura");
-            //event from capture thread
+        if (e.getActionCommand().equals(CaptureThread.ACT_CAPTURE)) {
+            // Event from capture thread
             CaptureThread.CaptureEvent evt = (CaptureThread.CaptureEvent) e;
             boolean bCanceled = false;
 
-            if (null != evt.capture_result) {
-                if (null != evt.capture_result.image && Reader.CaptureQuality.GOOD == evt.capture_result.quality) {
-                    //display image
-                    fingerprintImage.showImage(evt.capture_result.image);
-                    System.out.println("data; " + evt.capture_result.image.getData());
+            if (evt.capture_result != null) {
+                if (evt.capture_result.image != null && Reader.CaptureQuality.GOOD == evt.capture_result.quality) {
+                    if (this.fingerprintPane != null) {
+                        // Display image
+                        fingerprintImage.showImage(evt.capture_result.image);
+
+                        if (verification) {
+                            ProcessCaptureResult(evt);
+                        }
+                    }
+                    byte[] bytes = Base64.getEncoder().encode(evt.capture_result.image.getData());
+                    System.out.println("[Data]: " + bytes);
                 } else if (Reader.CaptureQuality.CANCELED == evt.capture_result.quality) {
-                    //capture or streaming was canceled, just quit
+                    // Capture or streaming was canceled, just quit
                     bCanceled = true;
                 } else {
-                    //bad quality
+                    // Bad quality
                     System.out.println(evt.capture_result.quality);
-//                    MessageBox.BadQuality(evt.capture_result.quality);
                 }
-            } else if (null != evt.exception) {
-                //exception during capture
-                System.out.println("Capture");
-                System.out.println(evt.exception);
-//                MessageBox.DpError("Capture",  evt.exception);
+            } else if (evt.exception != null) {
+                // Exception during capture
+                System.out.println("Capture: " + evt.exception);
                 bCanceled = true;
-            } else if (null != evt.reader_status) {
+                Fingerprint.setFingerprintStatusCode(0); // Fingerprint Off
+            } else if (evt.reader_status != null) {
                 System.out.println(evt.reader_status);
-//                MessageBox.BadStatus(evt.reader_status);
                 bCanceled = true;
             }
 
             if (!bCanceled) {
-                if (!bStreaming) {
-                    //restart capture thread
-                    WaitForCaptureThread();
-                    StartCaptureThread();
-                }
-            } else {
-                //destroy dialog
-                fingerprintPane.setVisible(false);
+                // Restart capture thread
+                WaitForCaptureThread();
+                StartCaptureThread();
             }
         }
     }
 
-    private void startCapture(VBox dlgParent) {
-        //open reader
+    private boolean ProcessCaptureResult(CaptureThread.CaptureEvent evt) {
+        boolean bCanceled = false;
+
+        if (null != evt.capture_result) {
+            if (null != evt.capture_result.image && Reader.CaptureQuality.GOOD == evt.capture_result.quality) {
+                //extract features
+                Engine engine = UareUGlobal.GetEngine();
+
+                try {
+                    Fmd fmd = engine.CreateFmd(evt.capture_result.image, Fmd.Format.ANSI_378_2004);
+                    if (Fingerprint.compareFingerprint(fmd)) {
+                        if (null == m_fmds[0]) m_fmds[0] = fmd;
+                        else if (null == m_fmds[1]) m_fmds[1] = fmd;
+
+                        if (null != m_fmds[0] && null != m_fmds[1]) {
+                            //perform comparison
+                            try {
+                                int falsematch_rate = engine.Compare(m_fmds[0], 0, m_fmds[1], 0);
+
+                                int target_falsematch_rate = Engine.PROBABILITY_ONE / 100000; //target rate is 0.00001
+                                if (falsematch_rate < target_falsematch_rate) {
+                                    Fingerprint.AddFingerprint(m_fmds[0]);
+                                    NotificationHandler.sucess("Lector de Huellas", "Huellas coinciden.", 2);
+                                } else {
+                                    NotificationHandler.danger("Lector de huellas", "Las huellas no coinciden.", 2);
+                                }
+                            } catch (UareUException e) {
+                                System.out.println("Engine.CreateFmd()" + e);
+                            }
+
+                            //discard FMDs
+                            m_fmds[0] = null;
+                            m_fmds[1] = null;
+
+                            //the new loop starts
+                        } else {
+                            NotificationHandler.notify("gmi-fingerprint", "Lector de huellas", "Vuelve a colocar la huella sobre el lector.", 2);
+                            //the loop continues
+//                    m_text.append(m_strPrompt2);
+                        }
+                    } else {
+                        //discard FMDs
+                        m_fmds[0] = null;
+                        m_fmds[1] = null;
+                    }
+                } catch (UareUException e) {
+                    System.out.println("Engine.CreateFmd()" + e);
+                }
+            } else if (Reader.CaptureQuality.CANCELED == evt.capture_result.quality) {
+                //capture or streaming was canceled, just quit
+                bCanceled = true;
+            } else {
+                //bad quality
+                System.out.println("Bad Quality " + evt.capture_result.quality);
+            }
+        } else if (null != evt.exception) {
+            //exception during capture
+            System.out.println("Capture " + evt.exception);
+            bCanceled = true;
+        } else if (null != evt.reader_status) {
+            //reader failure
+            System.out.println("Bad Status " + evt.reader_status);
+            bCanceled = true;
+        }
+
+        return !bCanceled;
+    }
+
+    private void startCapture() {
+        // Open reader
         try {
             reader.Open(Reader.Priority.COOPERATIVE);
         } catch (UareUException e) {
@@ -105,50 +175,47 @@ public class Capture
             System.out.println(e);
         }
 
-        boolean bOk = true;
-        if (bStreaming) {
-            //check if streaming supported
-            Reader.Capabilities rc = reader.GetCapabilities();
-            if (!rc.can_stream) {
-                System.out.println("This reader does not support streaming");
-                bOk = false;
-            }
-        }
+        StartCaptureThread();
+    }
 
-        if (bOk) {
-            //start capture thread
-            StartCaptureThread();
-            System.out.println("hola");
-
-            //bring up modal dialog
-            fingerprintPane = dlgParent;
-            fingerprintPane.getChildren().add(this);
-//            m_dlgParent.setContentPane(this);
-//            m_dlgParent.pack();
-//            m_dlgParent.setLocationRelativeTo(null);
-            fingerprintPane.toFront();
-            fingerprintPane.setVisible(true);
-//            m_dlgParent.dispose();
-
-            //cancel capture
-//            StopCaptureThread();
-
-            //wait for capture thread to finish
-//            WaitForCaptureThread();
-            System.out.println("esperando");
-        }
-
-        //close reader
-        /*try {
-            m_reader.Close();
+    private void startCapture(VBox pane) {
+        // Open reader
+        try {
+            reader.Open(Reader.Priority.COOPERATIVE);
         } catch (UareUException e) {
-//            MessageBox.DpError("Reader.Close()", e);
-        }*/
+            System.out.println("Reader.Open()");
+            System.out.println(e);
+        }
+
+        StartCaptureThread();
+
     }
 
-    public static void Run(Reader reader, boolean bStreaming, VBox pane) {
-//        JDialog dlg = new JDialog((JDialog) null, "Put your finger on the reader", true);
-        Capture capture = new Capture(reader, bStreaming);
-        capture.startCapture(pane);
+    public static void Run(Reader reader) { // Run in background
+        Capture capture = new Capture(reader);
+        capture.startCapture();
     }
+
+    public static Capture Run(Reader reader, VBox pane, boolean verification) {
+        Capture capture = new Capture(reader, pane, verification);
+        capture.startCapture(pane);
+        return capture;
+    }
+
+    public void Stop() {
+        // Cancel capture
+        StopCaptureThread();
+
+        // Wait for capture thread to finish
+        WaitForCaptureThread();
+
+        // Close reader
+        try {
+            reader.Close();
+        } catch (UareUException e) {
+            System.out.println("Reader.Close()");
+            System.out.println(e);
+        }
+    }
+
 }

@@ -1,43 +1,41 @@
 package com.ocielgp.controller;
 
+import animatefx.animation.FadeIn;
 import com.jfoenix.controls.*;
 import com.ocielgp.database.SocioData;
+import com.ocielgp.fingerprint.Fingerprint;
 import com.ocielgp.model.SociosPlanesModel;
-import com.ocielgp.utilities.Input;
-import com.ocielgp.utilities.InputDetails;
-import com.ocielgp.utilities.NotificationHandler;
-import com.ocielgp.utilities.Validator;
+import com.ocielgp.utilities.*;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.ResourceBundle;
 
-public class AddMemberController implements Initializable {
+public class MemberController implements Initializable {
     // Containers
     @FXML
     private VBox addMemberPane;
     @FXML
     private VBox fingerprintPane;
+    @FXML
+    private VBox planPane;
 
     // Controls
     // -> Photo section [ph]
     @FXML
     private ImageView ph_imgMemberPhoto;
     @FXML
-    private JFXButton ph_buttonTakePhoto;
+    private JFXButton ph_buttonDeletePhoto;
     @FXML
     private JFXButton ph_buttonUploadPhoto;
 
@@ -47,6 +45,8 @@ public class AddMemberController implements Initializable {
     @FXML
     private JFXTextField pi_fieldLastName;
     @FXML
+    JFXComboBox<String> pi_comboBoxGender;
+    @FXML
     private JFXTextField pi_fieldPhone;
     @FXML
     private JFXTextField pi_fieldEmail;
@@ -55,7 +55,7 @@ public class AddMemberController implements Initializable {
 
     // -> Fingerprint section [fp]
     @FXML
-    private ImageView fp_imgFingerprint;
+    private VBox fp_boxFingerprint;
     @FXML
     private Label fp_labelFingerprintCounter;
     @FXML
@@ -96,25 +96,29 @@ public class AddMemberController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        this.pi_comboBoxGender.focusedProperty().addListener((observableValue, oldValue, newValue) -> this.sb_datePicker.getStyleClass().remove("red-border-input-line"));
         this.sb_datePicker.focusedProperty().addListener((observableValue, oldValue, newValue) -> this.sb_datePicker.getStyleClass().remove("red-border-input-line"));
         this.sb_comboBoxSubscriptions.focusedProperty().addListener((observableValue, oldValue, newValue) -> this.sb_comboBoxSubscriptions.getStyleClass().remove("red-border-input-line"));
+        Fingerprint.setFingerprintUI(this.fingerprintPane, this.fp_boxFingerprint, this.fp_labelFingerprintCounter, this.fp_buttonRestartCapture);
 
+        /* Events Handlers */
         EventHandler<ActionEvent> registerEvent = actionEvent -> {
             LinkedList<InputDetails> nodesRequired = new LinkedList<>();
-            nodesRequired.add(new InputDetails(pi_fieldNames, pi_fieldNames.getText()));
-            nodesRequired.add(new InputDetails(pi_fieldLastName, pi_fieldLastName.getText()));
+            nodesRequired.add(new InputDetails(this.pi_fieldNames, this.pi_fieldNames.getText()));
+            nodesRequired.add(new InputDetails(this.pi_fieldLastName, this.pi_fieldLastName.getText()));
+            nodesRequired.add(new InputDetails(this.pi_comboBoxGender, String.valueOf(this.pi_comboBoxGender.getSelectionModel().getSelectedIndex())));
 
             if (sb_togglePersonalized.isSelected()) { // Plan Section
-                nodesRequired.add(new InputDetails(sb_datePicker, (sb_datePicker.getValue() == null) ? "" : String.valueOf(sb_datePicker.getValue())));
-                nodesRequired.add(new InputDetails(sb_fieldPrice, sb_fieldPrice.getText()));
-                nodesRequired.add(new InputDetails(sb_fieldPriceNotes, sb_fieldPriceNotes.getText()));
+                nodesRequired.add(new InputDetails(this.sb_datePicker, (this.sb_datePicker.getValue() == null) ? "" : String.valueOf(sb_datePicker.getValue())));
+                nodesRequired.add(new InputDetails(this.sb_fieldPrice, this.sb_fieldPrice.getText()));
+                nodesRequired.add(new InputDetails(this.sb_fieldPriceNotes, this.sb_fieldPriceNotes.getText()));
             } else {
-                nodesRequired.add(new InputDetails(sb_comboBoxSubscriptions, String.valueOf(sb_comboBoxSubscriptions.getSelectionModel().getSelectedIndex())));
+                nodesRequired.add(new InputDetails(this.sb_comboBoxSubscriptions, String.valueOf(this.sb_comboBoxSubscriptions.getSelectionModel().getSelectedIndex())));
             }
 
             if (!pym_togglePayment.isSelected()) { // Payment section
-                nodesRequired.add(new InputDetails(pym_fieldDebt, pym_fieldDebt.getText()));
-                nodesRequired.add(new InputDetails(pym_fieldDebtNotes, pym_fieldDebtNotes.getText()));
+                nodesRequired.add(new InputDetails(this.pym_fieldDebt, this.pym_fieldDebt.getText()));
+                nodesRequired.add(new InputDetails(this.pym_fieldDebtNotes, this.pym_fieldDebtNotes.getText()));
             }
 
             boolean formValidated = true;
@@ -134,6 +138,22 @@ public class AddMemberController implements Initializable {
                 NotificationHandler.danger("Error", "Los campos en rojo no pueden estar vacios.", 2);
             }
         };
+
+        EventHandler<ActionEvent> captureEvent = actionEvent -> {
+            if (fp_buttonCapture.getText().equals("Iniciar captura")) {
+                this.fp_boxFingerprint.requestFocus();
+                Fingerprint.StartCapture(this.fp_boxFingerprint, true);
+                this.fp_buttonCapture.setText("Detener captura");
+                if (Integer.parseInt(this.fp_labelFingerprintCounter.getText()) > 0) {
+                    this.fp_buttonRestartCapture.setDisable(false);
+                }
+            } else {
+                Fingerprint.StopCapture();
+                this.fp_buttonCapture.setText("Iniciar captura");
+            }
+        };
+        /* End Events Handlers */
+
         this.sb_togglePersonalized.setOnAction(actionEvent -> {
             // Plan personalized
             subscriptionChanges(sb_togglePersonalized.isSelected());
@@ -148,43 +168,61 @@ public class AddMemberController implements Initializable {
         this.subscriptionChanges(sb_togglePersonalized.isSelected());
         this.paymentChanges(pym_togglePayment.isSelected());
 
+        // Load data genders
+        ObservableList<String> genders = FXCollections.observableArrayList("Hombre", "Mujer");
+        this.pi_comboBoxGender.setItems(genders);
+
         // Load data plans to combobox
         ObservableList<SociosPlanesModel> planes = SocioData.getSociosPlanes();
         if (planes != null && !planes.isEmpty()) {
             sb_comboBoxSubscriptions.setItems(planes);
-            sb_comboBoxSubscriptions.setOnAction(new EventHandler<ActionEvent>() {
-                @Override
-                public void handle(ActionEvent actionEvent) {
-                    if (sb_comboBoxSubscriptions.getSelectionModel().getSelectedIndex() != -1)
-                        System.out.println(sb_comboBoxSubscriptions.getSelectionModel().getSelectedItem().getIdPlan());
-                }
+            sb_comboBoxSubscriptions.setOnAction(actionEvent -> {
+                if (sb_comboBoxSubscriptions.getSelectionModel().getSelectedIndex() != -1)
+                    System.out.println(sb_comboBoxSubscriptions.getSelectionModel().getSelectedItem().getIdPlan());
             });
         }
 
-        buttonRegister.addEventFilter(ActionEvent.ACTION, registerEvent);
+        this.fp_buttonCapture.setOnAction(captureEvent);
+        this.fp_buttonRestartCapture.setOnAction(actionEvent -> {
+            Fingerprint.RestartCapture();
+            this.fp_boxFingerprint.requestFocus();
+        });
+        this.buttonRegister.setOnAction(registerEvent);
+
+        Photos photos = new Photos(this.ph_imgMemberPhoto, this.ph_buttonDeletePhoto);
+        this.ph_buttonUploadPhoto.setOnAction(photos.getUploadPhotoEvent());
+        this.ph_buttonDeletePhoto.setDisable(true);
+
+        this.ph_buttonDeletePhoto.setOnAction(photos.getDeletePhotoEvent());
     }
 
     private void subscriptionChanges(boolean visible) {
+        // Clear data Inputs
+        if (visible) {
+            Input.clearInputs(this.sb_comboBoxSubscriptions);
+            new FadeIn(this.sb_boxPersonalized).play();
+        } else {
+            Input.clearInputs(this.sb_datePicker, this.sb_fieldPrice, this.sb_fieldPriceNotes);
+            new FadeIn(this.sb_comboBoxSubscriptions).play();
+        }
+
         this.sb_comboBoxSubscriptions.setVisible(!visible);
         this.sb_comboBoxSubscriptions.setManaged(!visible);
 
         this.sb_boxPersonalized.setVisible(visible);
         this.sb_boxPersonalized.setManaged(visible);
 
-        // Clear data Inputs
-        if (visible) {
-            Input.clearInputs(this.sb_comboBoxSubscriptions);
-        } else {
-            Input.clearInputs(this.sb_datePicker, this.sb_fieldPrice, this.sb_fieldPriceNotes);
-        }
     }
 
     private void paymentChanges(boolean visible) {
-        this.pym_boxDebt.setVisible(!visible);
-        this.pym_boxDebt.setManaged(!visible);
         if (visible) {
             Input.clearInputs(this.pym_fieldDebt, this.pym_fieldDebtNotes);
+        } else {
+            new FadeIn(this.pym_boxDebt).play();
         }
+
+        this.pym_boxDebt.setVisible(!visible);
+        this.pym_boxDebt.setManaged(!visible);
     }
 
 

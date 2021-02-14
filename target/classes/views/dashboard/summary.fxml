@@ -1,97 +1,67 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.String?>
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Label?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
 <?import javafx.scene.effect.DropShadow?>
-<?import javafx.scene.layout.FlowPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.*?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
-
-<VBox fx:id="rootPane" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1">
-   <children>
-      <FlowPane fx:id="cards" hgap="5.0" vgap="5.0">
-         <children>
-            <HBox styleClass="card">
-               <children>
-                  <VBox>
-                     <children>
-                        <Label styleClass="title" text="500" />
-                        <Label styleClass="description" text="Socios nuevos" />
-                     </children>
-                  </VBox>
-                  <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
-                     <children>
-                        <FontIcon iconLiteral="gmi-person-add" />
-                     </children>
-                     <HBox.margin>
-                        <Insets left="50.0" />
-                     </HBox.margin>
-                  </HBox>
-               </children>
-               <FlowPane.margin>
-                  <Insets />
-               </FlowPane.margin>
-               <effect>
-                  <DropShadow blurType="GAUSSIAN" />
-               </effect>
-            </HBox>
-            <HBox styleClass="card">
-               <children>
-                  <VBox>
-                     <children>
-                        <Label styleClass="title" text="500" />
-                        <Label styleClass="description" text="Socios nuevos" />
-                     </children>
-                  </VBox>
-                  <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
-                     <children>
-                        <FontIcon iconLiteral="gmi-person-add" />
-                     </children>
-                     <HBox.margin>
-                        <Insets left="50.0" />
-                     </HBox.margin>
-                  </HBox>
-               </children>
-               <effect>
-                  <DropShadow />
-               </effect>
-            </HBox>
-            <HBox styleClass="card">
-               <children>
-                  <VBox>
-                     <children>
-                        <Label styleClass="title" text="500" />
-                        <Label styleClass="description" text="Socios nuevos" />
-                     </children>
-                  </VBox>
-                  <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
-                     <children>
-                        <FontIcon iconLiteral="gmi-person-add" />
-                     </children>
-                     <HBox.margin>
-                        <Insets left="50.0" />
-                     </HBox.margin>
-                  </HBox>
-               </children>
-               <effect>
-                  <DropShadow />
-               </effect>
-            </HBox>
-         </children>
-         <VBox.margin>
-            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-         </VBox.margin>
-      </FlowPane>
-      <FlowPane fx:id="charts" hgap="5.0" vgap="5.0">
-         <VBox.margin>
-            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-         </VBox.margin>
-      </FlowPane>
-   </children>
-   <styleClass>
-      <String fx:value="summary" />
-      <String fx:value="day-theme" />
-   </styleClass>
+<VBox fx:id="rootPane" styleClass="summary" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1">
+   <FlowPane fx:id="cards" hgap="5.0" vgap="5.0">
+      <VBox.margin>
+         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+      </VBox.margin>
+      <HBox styleClass="card">
+         <FlowPane.margin>
+            <Insets/>
+         </FlowPane.margin>
+         <effect>
+            <DropShadow blurType="GAUSSIAN"/>
+         </effect>
+         <VBox>
+            <Label styleClass="title" text="500"/>
+            <Label styleClass="description" text="Socios nuevos"/>
+         </VBox>
+         <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
+            <HBox.margin>
+               <Insets left="50.0"/>
+            </HBox.margin>
+            <FontIcon iconLiteral="gmi-person-add"/>
+         </HBox>
+      </HBox>
+      <HBox styleClass="card">
+         <effect>
+            <DropShadow/>
+         </effect>
+         <VBox>
+            <Label styleClass="title" text="500"/>
+            <Label styleClass="description" text="Socios nuevos"/>
+         </VBox>
+         <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
+            <HBox.margin>
+               <Insets left="50.0"/>
+            </HBox.margin>
+            <FontIcon iconLiteral="gmi-person-add"/>
+         </HBox>
+      </HBox>
+      <HBox styleClass="card">
+         <effect>
+            <DropShadow/>
+         </effect>
+         <VBox>
+            <Label styleClass="title" text="500"/>
+            <Label styleClass="description" text="Socios nuevos"/>
+         </VBox>
+         <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
+            <HBox.margin>
+               <Insets left="50.0"/>
+            </HBox.margin>
+            <FontIcon iconLiteral="gmi-person-add"/>
+         </HBox>
+      </HBox>
+   </FlowPane>
+   <FlowPane fx:id="charts" hgap="5.0" vgap="5.0">
+      <VBox.margin>
+         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+      </VBox.margin>
+   </FlowPane>
 </VBox>
