@@ -1,11 +1,12 @@
 package com.ocielgp.utilities;
 
-import animatefx.animation.*;
+import animatefx.animation.FadeInRight;
+import animatefx.animation.FadeOutRight;
 import com.ocielgp.RunApp;
 import com.ocielgp.controller.NotificationController;
 import com.ocielgp.model.NotificationModel;
-import javafx.animation.*;
-import javafx.event.ActionEvent;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
@@ -20,11 +21,12 @@ import javafx.stage.StageStyle;
 import javafx.util.Duration;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.LinkedList;
+import java.util.Objects;
 
 public class NotificationHandler {
     // Containers
-    private static Stage stage;
+    private static final Stage stage;
     public static Stage primaryStage;
 
     // Attributes
@@ -32,7 +34,7 @@ public class NotificationHandler {
     private static final LinkedList<NotificationModel> notifications = new LinkedList<>();
     private static final int margin = 20;
     private static Timeline threadHandler;
-    private static FadeIn fadeIn;
+    private static FadeInRight fadeInRight;
 
     // Styles
     public static final String DEFAULT_STYLE = "default-style";
@@ -69,13 +71,13 @@ public class NotificationHandler {
         }
 
         GridPane finalGridPane = gridPane;
-        gridPane.addEventHandler(EventType.ROOT, new EventHandler<Event>() {
+        gridPane.addEventHandler(EventType.ROOT, new EventHandler<>() {
             @Override
             public void handle(Event event) {
-                if (event.getEventType() == MouseEvent.MOUSE_RELEASED) {
-                    if (fadeIn != null) {
-                        fadeIn.stop();
-                        fadeIn = null;
+                if (event.getEventType() == MouseEvent.MOUSE_CLICKED) {
+                    if (fadeInRight != null) {
+                        fadeInRight.stop();
+                        fadeInRight = null;
                     }
                     threadHandler.stop();
                     hiddenNotification();
@@ -97,9 +99,7 @@ public class NotificationHandler {
         NotificationModel notificationController = notifications.getFirst();
         showNotification(notificationUI, notificationController);
 
-        return new KeyFrame(Duration.seconds(seconds), evt -> {
-            hiddenNotification();
-        });
+        return new KeyFrame(Duration.seconds(seconds), evt -> hiddenNotification());
     }
 
     private static void showNotification(GridPane notificationUI, NotificationModel notificationController) {
@@ -109,9 +109,8 @@ public class NotificationHandler {
         stage.setTitle(notificationController.getTitle());
         stage.setScene(scene);
         scene.setFill(Color.TRANSPARENT);
+        notificationUI.setOpacity(0);
         stage.show(); // Calculate UI pixels
-        fadeIn = new FadeIn(notificationUI);
-        fadeIn.play();
 
         if (primaryStage != null) {
             primaryStage.requestFocus();
@@ -124,22 +123,21 @@ public class NotificationHandler {
         stage.setY(
                 Screen.getPrimary().getVisualBounds().getHeight() - stage.getHeight() - margin
         );
+        fadeInRight = new FadeInRight(notificationUI);
+        fadeInRight.play();
     }
 
     public static void hiddenNotification() {
         notificationContainers.getFirst().setDisable(true);
         FadeOutRight fadeOutRight = new FadeOutRight(notificationContainers.getFirst());
-        fadeOutRight.setOnFinished(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
-                notificationContainers.pop();
-                notifications.pop();
-                stage.hide();
+        fadeOutRight.setOnFinished(actionEvent -> {
+            notificationContainers.pop();
+            notifications.pop();
+            stage.hide();
 
-                if (!notificationContainers.isEmpty()) {
-                    threadHandler = new Timeline(scheduleNotification(notifications.getFirst().getTime()));
-                    threadHandler.play(); // Run thread
-                }
+            if (!notificationContainers.isEmpty()) {
+                threadHandler = new Timeline(scheduleNotification(notifications.getFirst().getTime()));
+                threadHandler.play(); // Run thread
             }
         });
         fadeOutRight.play();

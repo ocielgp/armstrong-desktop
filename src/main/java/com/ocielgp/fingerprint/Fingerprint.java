@@ -95,6 +95,7 @@ public class Fingerprint {
             captureFingerprint.Stop();
             captureFingerprint = null;
             fingerprintStatusCode = 1;
+            RestartCapture();
             RefreshDashboard();
         }
     }
@@ -115,9 +116,9 @@ public class Fingerprint {
         if (fingerprintUI != null) {
             ArrayList<Fmd> fmds = fingerprintUI.getFmds();
             Engine engine = UareUGlobal.GetEngine();
-            for (int i = 0; i < fmds.size(); i++) {
+            for (Fmd value : fmds) {
                 try {
-                    int falsematch_rate = engine.Compare(fmds.get(i), 0, fmd, 0);
+                    int falsematch_rate = engine.Compare(value, 0, fmd, 0);
 
                     int target_falsematch_rate = Engine.PROBABILITY_ONE / 100000; //target rate is 0.00001
                     if (falsematch_rate < target_falsematch_rate) {

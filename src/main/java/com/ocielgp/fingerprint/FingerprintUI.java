@@ -3,16 +3,16 @@ package com.ocielgp.fingerprint;
 import com.digitalpersona.uareu.Fmd;
 import com.jfoenix.controls.JFXButton;
 import javafx.scene.control.Label;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 
 public class FingerprintUI {
-    private VBox fingerprintPane;
-    private VBox fingerprintFmd;
-    private Label fingerprintCounter;
-    private JFXButton restartButton;
+    private final VBox fingerprintPane;
+    private final VBox fingerprintFmd;
+    private final Label fingerprintCounter;
+    private final JFXButton restartButton;
     public ArrayList<Fmd> fmds;
 
     public FingerprintUI(VBox fingerprintPane, VBox fingerprintFmd, Label fingerprintCounter, JFXButton restartButton) {
@@ -40,6 +40,7 @@ public class FingerprintUI {
     }
 
     public void restartCapture() {
+        ((ImageView) this.fingerprintFmd.getChildren().get(0)).setImage(null);
         this.clearFingerprints();
         this.restartButton.setDisable(true);
         this.fingerprintCounter.setText("0");
@@ -56,6 +57,8 @@ public class FingerprintUI {
     }
 
     public void add(Fmd fmd) {
+        System.out.println(this.fingerprintFmd.getWidth());
+        System.out.println(this.fingerprintFmd.getHeight());
         this.fmds.add(fmd);
         this.fingerprintCounter.setText(String.valueOf(fmds.size()));
         this.enableRestart();

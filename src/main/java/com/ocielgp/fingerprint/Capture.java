@@ -1,13 +1,12 @@
 package com.ocielgp.fingerprint;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.Base64;
-import java.util.LinkedList;
-
 import com.digitalpersona.uareu.*;
 import com.ocielgp.utilities.NotificationHandler;
 import javafx.scene.layout.VBox;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Base64;
 
 public class Capture
         implements ActionListener {
@@ -33,7 +32,7 @@ public class Capture
         if (verification) {
             this.verification = true;
             this.m_fmds = new Fmd[2];
-            NotificationHandler.createNotification("gmi-fingerprint", "Lector de huellas", "Coloca la huella sobre el lector.", 2, NotificationHandler.DEFAULT_STYLE);
+            NotificationHandler.notify("gmi-fingerprint", "Lector de huellas", "Coloca la huella sobre el lector.", 2);
         }
         this.fingerprintPane.getChildren().setAll(fingerprintImage);
 //            super.getChildren().add(fingerprintImage);
@@ -135,7 +134,7 @@ public class Capture
 
                             //the new loop starts
                         } else {
-                            NotificationHandler.createNotification("gmi-fingerprint", "Lector de huellas", "Vuelve a colocar la huella sobre el lector.", 2, NotificationHandler.DEFAULT_STYLE);
+                            NotificationHandler.notify("gmi-fingerprint", "Lector de huellas", "Vuelve a colocar la huella sobre el lector.", 2);
                             //the loop continues
 //                    m_text.append(m_strPrompt2);
                         }

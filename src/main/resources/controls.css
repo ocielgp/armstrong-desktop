@@ -65,6 +65,17 @@
 
 .jfx-combo-box {
     -fx-font: 2em "Roboto Thin";
+    -jfx-unfocus-color: -fx-color-unfocus;
+    -jfx-focus-color: -fx-color-text;
+}
+
+.jfx-combo-box .cell {
+    -fx-background-color: -fx-color-background;
+    -fx-text-fill: -fx-color-text;
+}
+
+.jfx-combo-box .cell:hover {
+    -fx-opacity: 0.8;
 }
 
 .jfx-date-picker {
@@ -77,9 +88,26 @@
 
 .jfx-date-picker .text-field {
     -fx-font: 2em "Roboto Thin";
-    -fx-alignment: center-right;
+    -fx-alignment: center;
 }
 
 .jfx-date-picker .date-picker-popup > .month-year-pane {
     -fx-background-color: #333;
+}
+
+.jfx-date-picker .date-cell {
+    -fx-text-fill: #333;
+}
+
+.jfx-date-picker .today {
+    -fx-font-weight: bold;
+}
+
+.scroll-pane > .viewport {
+    -fx-background-color: transparent;
+}
+
+.scroll-pane, .table-view {
+    -fx-background-color: transparent;
+    -fx-border-width: 0;
 }

@@ -1,7 +1,6 @@
 package com.ocielgp;
 
 import com.ocielgp.controller.AppController;
-import com.ocielgp.database.DataServer;
 import com.ocielgp.utilities.NotificationHandler;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -31,7 +30,7 @@ public class RunApp extends Application {
         Parent root = view.load();
 
         // Place content on scene
-        Scene scene = new Scene(root, 1024, 720); // HD
+        Scene scene = new Scene(root, 1366, 768); // HD
 
         // Add stylesheets
         scene.getStylesheets().add(String.valueOf(RunApp.class.getClassLoader().getResource("styles.css")));

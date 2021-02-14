@@ -1,9 +1,9 @@
 package com.ocielgp.controller;
 
 import animatefx.animation.FadeIn;
-import com.ocielgp.fingerprint.FingerprintUI;
-import com.ocielgp.model.AdministradorModel;
 import com.ocielgp.fingerprint.Fingerprint;
+import com.ocielgp.model.AdministradorModel;
+import com.ocielgp.utilities.Input;
 import com.ocielgp.utilities.Loading;
 import com.ocielgp.utilities.NotificationHandler;
 import javafx.application.Platform;
@@ -64,11 +64,6 @@ public class DashboardController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         this.userImage.setImage(new Image(Objects.requireNonNull(LoginController.class.getClassLoader().getResourceAsStream("default-user.png"))));
-//        Ellipse ellipse = new Ellipse(36, 36);
-//        ellipse.setCenterX(36);
-//        ellipse.setCenterY(36);
-//        userImage.setClip(ellipse);
-
         this.logo.setImage(new Image(Objects.requireNonNull(LoginController.class.getClassLoader().getResourceAsStream("img.jpg"))));
 
         this.rootPane.setOpacity(0); // Hide rootPane
@@ -99,6 +94,7 @@ public class DashboardController implements Initializable {
                             Objects.requireNonNull(DashboardController.class.getClassLoader().getResource(routes.get(navOption)))
                     );
                     content.setContent(view.load());
+                    Input.getScrollEvent(content);
                 } catch (IOException e) {
                     e.printStackTrace();
                     NotificationHandler.danger("Error", "Hubo un problema al cargar " + routes.get(navOption), 5);

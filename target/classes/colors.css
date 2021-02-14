@@ -1,11 +1,11 @@
 * {
-    -fx-color-unfocus: #d3d3d3;
-    -fx-color-border: #d3d3d3;
-    -fx-color-dashboard: #f1f2f6;
+    -fx-color-unfocus: #D3D3D3;
+    -fx-color-border: #D3D3D3;
+    -fx-color-dashboard: -fx-color-background;
 }
 
 .day-theme {
-    -fx-color-background: #fff;
+    -fx-color-background: #FFF;
     -fx-color-text: #333;
 
     -fx-background-color: -fx-color-background;
@@ -13,8 +13,8 @@
 }
 
 .night-theme {
-    -fx-color-background: #333;
-    -fx-color-text: #fff;
+    -fx-color-background: #2D2B36;
+    -fx-color-text: #F2F2F2;
 
     -fx-background-color: -fx-color-background;
     -fx-text-fill: -fx-color-text;

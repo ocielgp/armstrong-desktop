@@ -49,7 +49,7 @@ public class DataServer {
                     "gmi-cloud-done",
                     "Conexión establecida",
                     "Conexión con el servidor establecida",
-                    4,
+                    2,
                     NotificationHandler.EPIC_STYLE
             );
             System.out.println("[DataServer]: Conectado a " + host);
