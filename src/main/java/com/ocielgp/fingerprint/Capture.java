@@ -1,6 +1,7 @@
 package com.ocielgp.fingerprint;
 
 import com.digitalpersona.uareu.*;
+import com.ocielgp.database.FingerprintData;
 import com.ocielgp.utilities.NotificationHandler;
 import javafx.scene.layout.VBox;
 
@@ -21,7 +22,7 @@ public class Capture
     private Capture(Reader reader) {
         this.reader = reader;
         captureThread = new CaptureThread(this.reader, false, Fid.Format.ANSI_381_2004, Reader.ImageProcessing.IMG_PROC_DEFAULT);
-        System.out.println("Captura creada");
+        System.out.println("Captura creada 1");
     }
 
     private Capture(Reader reader, VBox fingerprintPane, boolean verification) {
@@ -35,11 +36,7 @@ public class Capture
             NotificationHandler.notify("gmi-fingerprint", "Lector de huellas", "Coloca la huella sobre el lector.", 2);
         }
         this.fingerprintPane.getChildren().setAll(fingerprintImage);
-//            super.getChildren().add(fingerprintImage);
-//            super.setPrefWidth(400);
-//            super.setPrefHeight(400);
-
-        System.out.println("Captura creada");
+        System.out.println("Captura creada 2");
     }
 
     private void StartCaptureThread() {
@@ -70,9 +67,15 @@ public class Capture
                         if (verification) {
                             ProcessCaptureResult(evt);
                         }
+                    } else if (Fingerprint.getStatusCode() == 1) {
+                        try {
+                            System.out.println("convertido");
+                            FingerprintData.searchFingerprint(UareUGlobal.GetEngine().CreateFmd(evt.capture_result.image, Fmd.Format.ANSI_378_2004));
+                        } catch (UareUException uareUException) {
+                            uareUException.printStackTrace();
+                        }
                     }
-                    byte[] bytes = Base64.getEncoder().encode(evt.capture_result.image.getData());
-                    System.out.println("[Data]: " + bytes);
+                    System.out.println("[Data]: " + evt.capture_result.image.getData());
                 } else if (Reader.CaptureQuality.CANCELED == evt.capture_result.quality) {
                     // Capture or streaming was canceled, just quit
                     bCanceled = true;
@@ -191,9 +194,10 @@ public class Capture
 
     }
 
-    public static void Run(Reader reader) { // Run in background
+    public static Capture Run(Reader reader) { // Run in background
         Capture capture = new Capture(reader);
         capture.startCapture();
+        return capture;
     }
 
     public static Capture Run(Reader reader, VBox pane, boolean verification) {
@@ -215,6 +219,7 @@ public class Capture
         } catch (UareUException e) {
             System.out.println("Reader.Close()");
             System.out.println(e);
+            Fingerprint.RestartCapture();
         }
     }
 

@@ -26,6 +26,7 @@ public class MembersController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+
         FXMLLoader view = new FXMLLoader(
                 Objects.requireNonNull(DashboardController.class.getClassLoader().getResource("member.fxml"))
         );

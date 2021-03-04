@@ -1,29 +1,30 @@
 package com.ocielgp.controller;
 
+import animatefx.animation.FadeIn;
 import animatefx.animation.FadeInUp;
 import animatefx.animation.FadeOutDown;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXPasswordField;
 import com.jfoenix.controls.JFXTextField;
-import com.ocielgp.database.AdministradorData;
-import com.ocielgp.model.AdministradorModel;
+import com.ocielgp.app.AppController;
+import com.ocielgp.database.StaffUsersData;
+import com.ocielgp.model.StaffUsersModel;
 import com.ocielgp.utilities.InputDetails;
-import com.ocielgp.utilities.Loading;
-import com.ocielgp.utilities.NotificationHandler;
+import com.ocielgp.utilities.Loader;
 import com.ocielgp.utilities.Validator;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 
-import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
@@ -47,56 +48,47 @@ public class LoginController implements Initializable {
         this.loginPane.setOpacity(0); // Hide loginPane
 
         this.userImage.setImage(new Image(Objects.requireNonNull(LoginController.class.getClassLoader().getResourceAsStream("default-user.png"))));
-//        Ellipse ellipse = new Ellipse(75, 75);
-//        ellipse.setCenterX(65);
-//        ellipse.setCenterY(75);
-//        userImage.setClip(ellipse);
 
         this.loginButton.setOnAction(actionEvent -> {
-            if (
-                    Validator.emptyValidator(
-                            new InputDetails(userField, userField.getText()),
-                            new InputDetails(passwordField, passwordField.getText()))
-            ) {
-                loginPane.setDisable(true);
+            ArrayList<InputDetails> inputs = new ArrayList<>();
+            inputs.add(new InputDetails(this.userField, this.userField.getText()));
+            inputs.add(new InputDetails(this.passwordField, this.passwordField.getText()));
+            if (Validator.emptyValidator(inputs.listIterator())) {
+                this.loginPane.setDisable(true);
 
-                AdministradorModel administradorModel = AdministradorData.login(userField.getText(), passwordField.getText());
-                if (administradorModel != null) { // If administrador exists, do this
-                    FXMLLoader dashboard = new FXMLLoader(
-                            Objects.requireNonNull(AppController.class.getClassLoader().getResource("dashboard.fxml"))
+                StaffUsersModel staffUserModel = StaffUsersData.login(this.userField.getText(), this.passwordField.getText());
+                if (staffUserModel != null) { // If administrador isn't null, do this
+                    AppController.setStaffUserModel(staffUserModel);
+                    Node dashboardFXML = Loader.Load(
+                            "dashboard.fxml",
+                            "Login",
+                            false
                     );
-                    dashboard.setController(new DashboardController(administradorModel));
-                    FadeOutDown fadeOutDown = new FadeOutDown(AppController.root.getCenter());
-                    fadeOutDown.setOnFinished(evt -> {
-                        try {
-                            AppController.root.setCenter(dashboard.load());
-                        } catch (IOException e) {
-                            Loading.stopLoad();
-                            e.printStackTrace();
-                            NotificationHandler.danger("Error", "Hubo un problema al cargar el dashboard", 5);
-                        }
+                    FadeOutDown hideLoginPane = new FadeOutDown(this.loginPane);
+                    hideLoginPane.setOnFinished(evt -> {
+                        AppController.setCenter(dashboardFXML);
+                        new FadeIn(dashboardFXML).play();
                     });
-                    fadeOutDown.play();
-                    Loading.startLoad();
-                } else { // If administrador doesn't exists, do this
-                    loginPane.setDisable(false);
+                    hideLoginPane.play();
+                } else { // If administrador is null, do this
+                    this.loginPane.setDisable(false);
                 }
             }
         });
 
         EventHandler<KeyEvent> enterKey = keyEvent -> {
             if (keyEvent.getCode() == KeyCode.ENTER) {
-                loginButton.fire();
+                this.loginButton.fire();
             }
         };
         this.userField.addEventFilter(KeyEvent.KEY_PRESSED, enterKey);
         this.passwordField.addEventFilter(KeyEvent.KEY_PRESSED, enterKey);
         Platform.runLater(() -> {
             // Animation initial
-            new FadeInUp(loginPane).play();
-            userField.requestFocus();
-            userField.setText("ociel");
-            passwordField.setText("dos");
+            new FadeInUp(this.loginPane).play();
+            this.userField.requestFocus();
+            this.userField.setText("ociel");
+            this.passwordField.setText("dos");
         });
     }
 }

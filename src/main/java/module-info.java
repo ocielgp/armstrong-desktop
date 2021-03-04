@@ -19,9 +19,11 @@ module app {
     exports animatefx.animation;
     exports animatefx.util;
 
-    opens com.ocielgp.utilities;
+    opens com.ocielgp.app;
     opens com.ocielgp.controller;
     opens com.ocielgp.database;
+    opens com.ocielgp.fingerprint;
     opens com.ocielgp.model;
+    opens com.ocielgp.utilities;
     opens com.ocielgp;
 }

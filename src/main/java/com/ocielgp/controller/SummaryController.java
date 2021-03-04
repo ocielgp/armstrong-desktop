@@ -1,6 +1,8 @@
 package com.ocielgp.controller;
 
+import animatefx.animation.FadeIn;
 import com.ocielgp.utilities.Cards;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.layout.FlowPane;

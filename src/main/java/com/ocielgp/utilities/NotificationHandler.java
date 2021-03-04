@@ -3,7 +3,7 @@ package com.ocielgp.utilities;
 import animatefx.animation.FadeInRight;
 import animatefx.animation.FadeOutRight;
 import com.ocielgp.RunApp;
-import com.ocielgp.controller.NotificationController;
+import com.ocielgp.app.NotificationController;
 import com.ocielgp.model.NotificationModel;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;

@@ -1,12 +1,17 @@
 package com.ocielgp;
 
-import com.ocielgp.controller.AppController;
+import com.ocielgp.app.AppController;
+import com.ocielgp.controller.RootController;
+import com.ocielgp.model.StaffUsersModel;
+import com.ocielgp.utilities.Loader;
 import com.ocielgp.utilities.NotificationHandler;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
@@ -21,12 +26,10 @@ public class RunApp extends Application {
 
     @Override
     public void start(Stage primaryStage) throws IOException {
-        // Load fxml initial
+        // Load root parent
         FXMLLoader view = new FXMLLoader(
                 Objects.requireNonNull(RunApp.class.getClassLoader().getResource("app.fxml"))
         );
-        AppController appController = new AppController();
-        view.setController(appController);
         Parent root = view.load();
 
         // Place content on scene
@@ -49,5 +52,17 @@ public class RunApp extends Application {
             Platform.exit();
             System.exit(0);
         });
+
+
+        StaffUsersModel staffUserModel = new StaffUsersModel();
+        staffUserModel.setName("Ociel");
+        AppController.setStaffUserModel(staffUserModel);
+        Node dashboardFXML = Loader.Load(
+                "dashboard.fxml",
+                "Login",
+                true
+        );
+        BorderPane pane = (BorderPane) root;
+        pane.setCenter(dashboardFXML);
     }
 }

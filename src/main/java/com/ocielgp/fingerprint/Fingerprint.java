@@ -3,13 +3,16 @@ package com.ocielgp.fingerprint;
 import com.digitalpersona.uareu.*;
 import com.jfoenix.controls.JFXButton;
 import com.ocielgp.utilities.NotificationHandler;
+import javafx.application.Platform;
 import javafx.event.EventHandler;
+import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.util.ArrayList;
+import java.util.ListIterator;
 
 public class Fingerprint {
     private static Reader reader;
@@ -33,14 +36,9 @@ public class Fingerprint {
     private static Label fingerprintLabel; // Dashboard
     private static FingerprintUI fingerprintUI;
 
-    public static void setFingerprintUI(VBox fingerprintPane, VBox fingeprintFmd, Label fingerprintCounter, JFXButton restartButton) {
-        Fingerprint.fingerprintUI = new FingerprintUI(fingerprintPane, fingeprintFmd, fingerprintCounter, restartButton);
-        if (captureFingerprint != null) {
-            captureFingerprint.Stop();
-            captureFingerprint = null;
-            fingerprintStatusCode = 1;
-            RefreshDashboard();
-        }
+    public static void setFingerprintUI(VBox fingerprintPane, VBox fingeprintFmd, Label fingerprintCounter, JFXButton startCaptureButton, JFXButton restartCaptureButton) {
+        fingerprintUI = new FingerprintUI(fingerprintPane, fingeprintFmd, fingerprintCounter, startCaptureButton, restartCaptureButton);
+        RefreshDashboard();
     }
 
     public static void setFingerprintIcon(FontIcon fingerprintIcon) {
@@ -56,6 +54,10 @@ public class Fingerprint {
 
     private static final EventHandler<MouseEvent> fingerprintEvent = mouseEvent -> Fingerprint.Scanner();
 
+    public static int getStatusCode() {
+        return fingerprintStatusCode;
+    }
+
     public static String getStatusDescription() {
         return fingerprintStatusDescription[fingerprintStatusCode];
     }
@@ -64,6 +66,7 @@ public class Fingerprint {
         if (Scan()) {
             fingerprintStatusCode = 1;
             NotificationHandler.createNotification("gmi-fingerprint", "Lector de Huellas", "Lector de huellas conectado", 2, NotificationHandler.SUCESS_STYLE);
+            StartCapture();
         } else {
             fingerprintStatusCode = 0;
             NotificationHandler.createNotification("gmi-fingerprint", "Lector de Huellas", "Lector de huellas no detectado", 2, NotificationHandler.WARN_STYLE);
@@ -82,7 +85,18 @@ public class Fingerprint {
         }
     }
 
-    public static void StartCapture(VBox pane, boolean verification) {
+    public static void StartCapture() { // Background task
+        if (fingerprintStatusCode == 1) { // Background task
+            captureFingerprint = Capture.Run(reader);
+            RefreshDashboard();
+        }
+    }
+
+    public static void StartCapture(VBox pane, boolean verification) { // UI task
+        if (captureFingerprint != null) {
+            StopCapture();
+        }
+
         if (fingerprintStatusCode > 0 && fingerprintStatusCode != 2) {
             captureFingerprint = Capture.Run(reader, pane, verification);
             fingerprintStatusCode = 2;
@@ -94,9 +108,12 @@ public class Fingerprint {
         if (captureFingerprint != null) {
             captureFingerprint.Stop();
             captureFingerprint = null;
-            fingerprintStatusCode = 1;
-            RestartCapture();
+
             RefreshDashboard();
+        }
+
+        if (fingerprintStatusCode > 0 && fingerprintStatusCode != 1) {
+            Fingerprint.StartCapture();
         }
     }
 
@@ -112,13 +129,13 @@ public class Fingerprint {
         }
     }
 
-    public static boolean compareFingerprint(Fmd fmd) {
+    public static boolean compareFingerprint(Fmd fmdMember) {
         if (fingerprintUI != null) {
             ArrayList<Fmd> fmds = fingerprintUI.getFmds();
             Engine engine = UareUGlobal.GetEngine();
-            for (Fmd value : fmds) {
+            for (Fmd fmd : fmds) {
                 try {
-                    int falsematch_rate = engine.Compare(value, 0, fmd, 0);
+                    int falsematch_rate = engine.Compare(fmdMember, 0, fmd, 0);
 
                     int target_falsematch_rate = Engine.PROBABILITY_ONE / 100000; //target rate is 0.00001
                     if (falsematch_rate < target_falsematch_rate) {
@@ -131,6 +148,29 @@ public class Fingerprint {
             }
         }
         return true;
+    }
+
+    public static boolean compareFingerprint(Fmd fingerprint1, Fmd fingerprint2) {
+        Engine engine = UareUGlobal.GetEngine();
+        try {
+            int falsematch_rate = engine.Compare(fingerprint1, 0, fingerprint2, 0);
+
+            int target_falsematch_rate = Engine.PROBABILITY_ONE / 100000; //target rate is 0.00001
+            if (falsematch_rate < target_falsematch_rate) {
+                return true;
+            }
+        } catch (UareUException e) {
+            System.out.println("Engine.CreateFmd()" + e);
+        }
+        return false;
+    }
+
+    public static ListIterator<Fmd> getFingerprints() {
+        if (fingerprintUI != null) {
+            return fingerprintUI.getFingerprints();
+        } else {
+            return null;
+        }
     }
 
     public static void RefreshDashboard() {

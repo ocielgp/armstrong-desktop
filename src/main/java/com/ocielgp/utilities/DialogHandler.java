@@ -2,7 +2,7 @@ package com.ocielgp.utilities;
 
 import com.jfoenix.controls.JFXButton;
 import com.ocielgp.RunApp;
-import com.ocielgp.controller.DialogController;
+import com.ocielgp.app.DialogController;
 import com.ocielgp.model.CustomDialogModel;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;

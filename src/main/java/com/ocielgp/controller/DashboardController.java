@@ -1,16 +1,14 @@
 package com.ocielgp.controller;
 
-import animatefx.animation.FadeIn;
+import com.ocielgp.app.AppController;
 import com.ocielgp.fingerprint.Fingerprint;
-import com.ocielgp.model.AdministradorModel;
 import com.ocielgp.utilities.Input;
-import com.ocielgp.utilities.Loading;
-import com.ocielgp.utilities.NotificationHandler;
+import com.ocielgp.utilities.Loader;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
@@ -20,7 +18,6 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import org.kordamp.ikonli.javafx.FontIcon;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Objects;
@@ -55,21 +52,14 @@ public class DashboardController implements Initializable {
 
     private static EventHandler<MouseEvent> fingerprintEvent;
 
-    public static AdministradorModel administradorModel;
-
-    public DashboardController(AdministradorModel model) {
-        administradorModel = model;
-    }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         this.userImage.setImage(new Image(Objects.requireNonNull(LoginController.class.getClassLoader().getResourceAsStream("default-user.png"))));
         this.logo.setImage(new Image(Objects.requireNonNull(LoginController.class.getClassLoader().getResourceAsStream("img.jpg"))));
 
-        this.rootPane.setOpacity(0); // Hide rootPane
-
         // Update content
-        this.nombres.setText(administradorModel.getNombres());
+        this.nombres.setText(AppController.getStaffUserModel().getName());
 
         /* Routing */
         HashMap<HBox, String> routes = new HashMap<>();
@@ -89,17 +79,13 @@ public class DashboardController implements Initializable {
                 HBox navOption = (HBox) mouseEvent.getSource();
                 navOption.getStyleClass().add("selected");
                 navOption.removeEventFilter(MouseEvent.MOUSE_CLICKED, this);
-                try {
-                    FXMLLoader view = new FXMLLoader(
-                            Objects.requireNonNull(DashboardController.class.getClassLoader().getResource(routes.get(navOption)))
-                    );
-                    content.setContent(view.load());
-                    Input.getScrollEvent(content);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    NotificationHandler.danger("Error", "Hubo un problema al cargar " + routes.get(navOption), 5);
-                }
-
+                Node navFXML = Loader.Load(
+                        routes.get(navOption),
+                        "Dashboard",
+                        true
+                );
+                content.setContent(navFXML);
+                Input.getScrollEvent(content);
             }
         };
         for (HBox route : routes.keySet()) {
@@ -114,19 +100,12 @@ public class DashboardController implements Initializable {
         Fingerprint.setFingerprintLabel(this.fingerprintStatus);
 
         Platform.runLater(() -> {
-            Loading.stopLoad(new FadeIn(rootPane)); // Show rootPane after load
-
-            FXMLLoader summary = new FXMLLoader(
-                    Objects.requireNonNull(AppController.class.getClassLoader().getResource("summary.fxml"))
+            Node summaryFXML = Loader.Load(
+                    "summary.fxml",
+                    "Dashboard",
+                    true
             );
-            summary.setController(new SummaryController());
-            try {
-                content.setContent(summary.load());
-            } catch (IOException e) {
-                Loading.stopLoad();
-                NotificationHandler.danger("Error", "Hubo un problema al cargar el summary", 5);
-                e.printStackTrace();
-            }
+            this.content.setContent(summaryFXML);
         });
     }
 }

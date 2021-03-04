@@ -9,7 +9,7 @@ import javafx.application.Platform;
 public class CaptureThread extends Thread {
     public static final String ACT_CAPTURE = "capture_thread_captured";
 
-    public class CaptureEvent extends ActionEvent {
+    public static class CaptureEvent extends ActionEvent {
         private static final long serialVersionUID = 101;
 
         public Reader.CaptureResult capture_result;

@@ -3,27 +3,20 @@ package com.ocielgp.utilities;
 import javafx.scene.Node;
 
 public class InputDetails {
-    private Node node;
-    private String inputString;
+    private final Node node;
+    private final String metadata;
 
-    public InputDetails(Node node, String inputName) {
+    public InputDetails(Node node, String metadata) {
         this.node = node;
-        this.inputString = inputName;
+        this.metadata = metadata;
     }
 
     public Node getNode() {
         return node;
     }
 
-    public void setNode(Node node) {
-        this.node = node;
+    public String getMetadata() {
+        return metadata;
     }
 
-    public String getInputString() {
-        return inputString;
-    }
-
-    public void setInputString(String inputString) {
-        this.inputString = inputString;
-    }
 }

@@ -1,17 +1,25 @@
-* .label, .jfx-text-field, .jfx-password-field, .jfx-button {
+* .label, .jfx-text-field, .jfx-password-field, .jfx-button, .jfx-combo-box, .jfx-date-picker .text-field {
     -fx-font: 2em "Roboto";
+}
+
+.jfx-toggle-button {
+    -fx-font: 1.5em "Roboto";
 }
 
 .label {
     -fx-text-fill: -fx-color-text;
 }
 
-.bold {
-    -fx-font: 2em "Roboto Bold";
+.regular {
+    -fx-font: 2em "Roboto";
 }
 
 .thin {
     -fx-font: 2em "Roboto Thin";
+}
+
+.bold {
+    -fx-font: 2em "Roboto Bold";
 }
 
 .jfx-text-field, .jfx-password-field {
@@ -57,14 +65,17 @@
     -jfx-rippler-fill: -fx-color-text;
 }
 
+.upload-image {
+    -fx-cursor: hand;
+}
+
 .jfx-toggle-button {
     -fx-text-fill: -fx-color-text;
-    -fx-font: 1.5em "Roboto";
     -jfx-toggle-color: -fx-color-text;
 }
 
 .jfx-combo-box {
-    -fx-font: 2em "Roboto Thin";
+    -fx-prompt-text-fill: -fx-color-unfocus;
     -jfx-unfocus-color: -fx-color-unfocus;
     -jfx-focus-color: -fx-color-text;
 }
@@ -75,7 +86,7 @@
 }
 
 .jfx-combo-box .cell:hover {
-    -fx-opacity: 0.8;
+    -fx-opacity: 0.6;
 }
 
 .jfx-date-picker {
@@ -87,7 +98,6 @@
 }
 
 .jfx-date-picker .text-field {
-    -fx-font: 2em "Roboto Thin";
     -fx-alignment: center;
 }
 
@@ -95,12 +105,13 @@
     -fx-background-color: #333;
 }
 
-.jfx-date-picker .date-cell {
-    -fx-text-fill: #333;
+.jfx-date-picker .date-cell:selected, .jfx-date-picker .date-cell:focused, .jfx-date-picker .date-cell:hover, .jfx-date-picker .today:focused {
+    -fx-text-fill: #00B4D8;
+    -fx-font-weight: bold;
 }
 
 .jfx-date-picker .today {
-    -fx-font-weight: bold;
+    -fx-text-fill: #333;
 }
 
 .scroll-pane > .viewport {
