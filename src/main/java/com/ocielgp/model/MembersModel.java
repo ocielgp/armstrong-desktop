@@ -23,6 +23,9 @@ public class MembersModel {
     private final StringProperty registrationDate = new SimpleStringProperty();
     private byte[] photo;
 
+    private PaymentMembershipsModel paymentMembership;
+    private PaymentDebtsModel pendingPayment;
+
     public int getIdMember() {
         return idMember.get();
     }

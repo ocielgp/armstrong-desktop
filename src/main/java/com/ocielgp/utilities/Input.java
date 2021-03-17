@@ -44,9 +44,18 @@ public class Input {
         return text.trim().replaceAll(" +", " ");
     }
 
+    public static String capitalizeFirstLetter(String text) {
+        text = text.toLowerCase();
+        text = replaceWhitespaces(text);
+        if (!text.isEmpty()) {
+            text = text.substring(0, 1).toUpperCase() + text.substring(1);
+        }
+        return text;
+    }
 
     public static String capitalizeFirstLetterPerWord(String text) {
-        text = text.trim().replaceAll(" +", " ");
+        text = text.toLowerCase();
+        text = replaceWhitespaces(text);
         String[] words = text.split("\\s");
         StringBuilder capitalizeWord = new StringBuilder();
         for (String w : words) {

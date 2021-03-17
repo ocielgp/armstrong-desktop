@@ -96,16 +96,21 @@ public class DashboardController implements Initializable {
         /* End Routing */
 
         // Fingerprint
-        Fingerprint.setFingerprintIcon(this.fingerprintIcon);
-        Fingerprint.setFingerprintLabel(this.fingerprintStatus);
+        Fingerprint.initializeUI(this.fingerprintIcon, this.fingerprintStatus);
 
         Platform.runLater(() -> {
-            Node summaryFXML = Loader.Load(
-                    "summary.fxml",
+//            Node summaryFXML = Loader.Load(
+//                    "summary.fxml",
+//                    "Dashboard",
+//                    true
+//            );
+//            this.content.setContent(summaryFXML);
+            Node members = Loader.Load(
+                    "members.fxml",
                     "Dashboard",
                     true
             );
-            this.content.setContent(summaryFXML);
+            this.content.setContent(members);
         });
     }
 }

@@ -4,7 +4,11 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 
-public class PendingPaymentModel {
+public class PaymentDebtsModel {
+    // Max length
+    public static final byte oweLength = 10;
+    public static final byte notesLength = 80;
+
     private final SimpleIntegerProperty idPendingPayment = new SimpleIntegerProperty();
     private final SimpleStringProperty dateTime = new SimpleStringProperty();
     private final SimpleDoubleProperty paidOut = new SimpleDoubleProperty();

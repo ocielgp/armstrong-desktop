@@ -1,11 +1,15 @@
 package com.ocielgp.controller;
 
 import animatefx.animation.FadeInUp;
+import com.jfoenix.controls.JFXComboBox;
 import com.ocielgp.app.AppController;
 import com.ocielgp.database.DataServer;
+import com.ocielgp.database.GymsData;
 import com.ocielgp.fingerprint.Fingerprint;
+import com.ocielgp.model.GymsModel;
 import com.ocielgp.utilities.Loader;
 import javafx.application.Platform;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
@@ -26,6 +30,8 @@ public class RootController implements Initializable {
     private Button theme;
     @FXML
     private FontIcon iconTheme;
+    @FXML
+    private JFXComboBox<GymsModel> comboBoxGyms;
 
     // Attributes
     private String themeType = "night-theme"; // Initial theme
@@ -70,14 +76,30 @@ public class RootController implements Initializable {
         new FadeInUp(loginFXML);
 
         // Connect to data source
-        DataServer.getConnection();
+        if (DataServer.getConnection() != null) {
+            ObservableList<GymsModel> gyms = GymsData.getGyms();
+            if (gyms == null) {
+                this.comboBoxGyms.setDisable(true);
+            } else {
+                this.comboBoxGyms.setItems(GymsData.getGyms());
+                this.comboBoxGyms.focusedProperty().addListener((observableValue, oldValue, newValue) -> this.comboBoxGyms.getStyleClass().remove("red-border-input-line"));
+            }
+        }
 
         // Check if fingerprint scanner is connected
         Platform.runLater(Fingerprint::Scanner);
     }
 
+    public GymsModel getGym() {
+        return this.comboBoxGyms.getValue();
+    }
+
+    public JFXComboBox<GymsModel> getGymNode() {
+        return this.comboBoxGyms;
+    }
+
     public String getThemeType() {
-        return themeType;
+        return this.themeType;
     }
 
     public void setCenterContent(Node node) {

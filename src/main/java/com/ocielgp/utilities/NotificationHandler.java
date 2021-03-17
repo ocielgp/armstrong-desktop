@@ -3,6 +3,7 @@ package com.ocielgp.utilities;
 import animatefx.animation.FadeInRight;
 import animatefx.animation.FadeOutRight;
 import com.ocielgp.RunApp;
+import com.ocielgp.app.AppController;
 import com.ocielgp.app.NotificationController;
 import com.ocielgp.model.NotificationModel;
 import javafx.animation.KeyFrame;
@@ -27,7 +28,6 @@ import java.util.Objects;
 public class NotificationHandler {
     // Containers
     private static final Stage stage;
-    public static Stage primaryStage;
 
     // Attributes
     private static final LinkedList<GridPane> notificationContainers = new LinkedList<>();
@@ -112,8 +112,8 @@ public class NotificationHandler {
         notificationUI.setOpacity(0);
         stage.show(); // Calculate UI pixels
 
-        if (primaryStage != null) {
-            primaryStage.requestFocus();
+        if (AppController.getPrimaryStage() != null) {
+            AppController.getPrimaryStage().requestFocus();
         }
 
         // Set new position to Stage

@@ -22,14 +22,13 @@ public class FingerprintUI {
     private final EventHandler<ActionEvent> captureEvent = actionEvent -> {
         if (this.startCaptureButton.getText().equals("Iniciar captura")) {
             this.fingerprintFmd.requestFocus();
-            System.out.println("inicio captura");
-            Fingerprint.StartCapture(this.fingerprintFmd, true);
+            Fingerprint.StartCapture(this.fingerprintFmd);
             this.startCaptureButton.setText("Detener captura");
             if (Integer.parseInt(this.fingerprintCounter.getText()) > 0) {
                 this.restartCaptureButton.setDisable(false);
             }
         } else {
-            Fingerprint.StopCapture();
+            Fingerprint.StartCapture(); // Background reader
             this.startCaptureButton.setText("Iniciar captura");
         }
     };
@@ -44,17 +43,13 @@ public class FingerprintUI {
 
         this.startCaptureButton.setOnAction(captureEvent);
         this.restartCaptureButton.setOnAction(actionEvent -> {
-            Fingerprint.RestartCapture();
+            Fingerprint.RestartFingerprintUI();
             this.fingerprintFmd.requestFocus();
         });
     }
 
     public ArrayList<Fmd> getFmds() {
         return fmds;
-    }
-
-    public void clearFmd() {
-//        this.fingerprintFmd.getChildren().clear();
     }
 
     public void clearFingerprints() {
@@ -65,8 +60,21 @@ public class FingerprintUI {
         this.restartCaptureButton.setDisable(false);
     }
 
-    public void restartCapture() {
-        ((ImageView) this.fingerprintFmd.getChildren().get(0)).setImage(null);
+    public void resetUI() {
+        if (this.fingerprintFmd.getChildren().size() > 0) {
+            ((ImageView) this.fingerprintFmd.getChildren().get(0)).setImage(null);
+        }
+        if (this.fmds.size() == 0) {
+            this.restartCaptureButton.setDisable(true);
+        }
+        this.startCaptureButton.setText("Iniciar captura");
+        this.startCaptureButton.setOnAction(captureEvent);
+    }
+
+    public void restartUI() {
+        if (this.fingerprintFmd.getChildren().size() > 0) {
+            ((ImageView) this.fingerprintFmd.getChildren().get(0)).setImage(null);
+        }
         this.clearFingerprints();
         this.restartCaptureButton.setDisable(true);
         this.fingerprintCounter.setText("0");

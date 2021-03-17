@@ -3,6 +3,10 @@ package com.ocielgp.model;
 import javafx.beans.property.*;
 
 public class MembershipsModel {
+    // Max length
+    public static final byte priceLength = 10;
+    public static final byte descriptionLength = 60;
+
     private final IntegerProperty idMembership = new SimpleIntegerProperty();
     private final SimpleDoubleProperty price = new SimpleDoubleProperty();
     private final StringProperty description = new SimpleStringProperty();

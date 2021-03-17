@@ -45,7 +45,8 @@ public class RunApp extends Application {
         primaryStage.show();
 
         // Init notification system
-        NotificationHandler.primaryStage = primaryStage;
+        AppController.setPrimaryStage(primaryStage);
+//        NotificationHandler.primaryStage = primaryStage;
 
         // Kill all threads when an event closing occur
         primaryStage.addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, evt -> {
@@ -56,6 +57,7 @@ public class RunApp extends Application {
 
         StaffUsersModel staffUserModel = new StaffUsersModel();
         staffUserModel.setName("Ociel");
+        staffUserModel.setIdStaffUser(2);
         AppController.setStaffUserModel(staffUserModel);
         Node dashboardFXML = Loader.Load(
                 "dashboard.fxml",

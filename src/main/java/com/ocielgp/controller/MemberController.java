@@ -1,15 +1,14 @@
 package com.ocielgp.controller;
 
 import animatefx.animation.FadeIn;
-import com.digitalpersona.uareu.Fmd;
 import com.jfoenix.controls.*;
+import com.ocielgp.app.AppController;
 import com.ocielgp.database.MembersData;
 import com.ocielgp.database.MembershipsData;
 import com.ocielgp.fingerprint.Fingerprint;
-import com.ocielgp.fingerprint.FingerprintUI;
 import com.ocielgp.model.MembersModel;
 import com.ocielgp.model.MembershipsModel;
-import com.ocielgp.model.PendingPaymentModel;
+import com.ocielgp.model.PaymentDebtsModel;
 import com.ocielgp.utilities.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -27,7 +26,6 @@ import javafx.util.Callback;
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.ListIterator;
 import java.util.ResourceBundle;
 
 public class MemberController implements Initializable {
@@ -83,7 +81,7 @@ public class MemberController implements Initializable {
     @FXML
     private JFXTextField ms_fieldPrice;
     @FXML
-    private JFXTextField ms_fieldPriceNotes;
+    private JFXTextField ms_fieldDescription;
     @FXML
     private VBox ms_boxPersonalized;
 
@@ -113,6 +111,13 @@ public class MemberController implements Initializable {
         Input.createMaxLengthEvent(this.pi_fieldEmail, MembersModel.emailLength);
         Input.createMaxLengthEvent(this.pi_fieldNotes, MembersModel.notesLength);
 
+        Input.createMaxLengthEvent(this.ms_fieldPrice, MembershipsModel.priceLength);
+        Input.createMaxLengthEvent(this.ms_fieldDescription, MembershipsModel.descriptionLength);
+
+        Input.createMaxLengthEvent(this.pym_fieldOwe, PaymentDebtsModel.oweLength);
+        Input.createMaxLengthEvent(this.pym_fieldOweNotes, PaymentDebtsModel.notesLength);
+        // todo: ADD ALL MAX LENGTH LEFT
+
         // Remove red line when input is focused
         this.pi_comboBoxGender.focusedProperty().addListener((observableValue, oldValue, newValue) -> this.pi_comboBoxGender.getStyleClass().remove("red-border-input-line"));
         this.ms_datePicker.focusedProperty().addListener((observableValue, oldValue, newValue) -> this.ms_datePicker.getStyleClass().remove("red-border-input-line"));
@@ -127,7 +132,7 @@ public class MemberController implements Initializable {
         this.pi_comboBoxGender.setItems(genders);
 
         // Fingerprint section
-        Fingerprint.setFingerprintUI(this.fingerprintPane, this.fp_boxFingerprint, this.fp_labelFingerprintCounter, this.fp_buttonCapture, this.fp_buttonRestartCapture);
+        Fingerprint.setFingerprintBox(this.fingerprintPane, this.fp_boxFingerprint, this.fp_labelFingerprintCounter, this.fp_buttonCapture, this.fp_buttonRestartCapture);
 
         // Membership section
         this.ms_datePicker.getEditor().textProperty().addListener((observableValue, oldDate, newDate) -> {
@@ -169,12 +174,13 @@ public class MemberController implements Initializable {
             nodesRequired.add(new InputDetails(this.pi_fieldName, this.pi_fieldName.getText()));
             nodesRequired.add(new InputDetails(this.pi_fieldLastName, this.pi_fieldLastName.getText()));
             nodesRequired.add(new InputDetails(this.pi_comboBoxGender, String.valueOf(this.pi_comboBoxGender.getSelectionModel().getSelectedIndex())));
+            nodesRequired.add(new InputDetails(AppController.getCurrentGymNode(), String.valueOf(AppController.getCurrentGymNode().getSelectionModel().getSelectedIndex())));
 
             // Plan section
             if (ms_togglePersonalized.isSelected()) {
                 nodesRequired.add(new InputDetails(this.ms_datePicker, this.ms_datePicker.getEditor().getText()));
                 nodesRequired.add(new InputDetails(this.ms_fieldPrice, this.ms_fieldPrice.getText()));
-                nodesRequired.add(new InputDetails(this.ms_fieldPriceNotes, this.ms_fieldPriceNotes.getText()));
+                nodesRequired.add(new InputDetails(this.ms_fieldDescription, this.ms_fieldDescription.getText()));
             } else {
                 nodesRequired.add(new InputDetails(this.ms_comboBoxMemberships, String.valueOf(this.ms_comboBoxMemberships.getSelectionModel().getSelectedIndex())));
             }
@@ -223,20 +229,21 @@ public class MemberController implements Initializable {
 
                     memberModel.setPhone(Input.spaceRemover(this.pi_fieldPhone.getText()));
                     memberModel.setEmail(Input.spaceRemover(this.pi_fieldEmail.getText()));
-                    memberModel.setNotes(Input.replaceWhitespaces(this.pi_fieldNotes.getText()));
+                    memberModel.setNotes(Input.capitalizeFirstLetter(this.pi_fieldNotes.getText()));
 
                     // Membership
                     MembershipsModel membershipModel;
                     if (this.ms_togglePersonalized.isSelected()) {
                         membershipModel = new MembershipsModel();
                         membershipModel.setDays(DateFormatter.differenceBetweenDays(LocalDate.now(), this.ms_datePicker.getValue()));
-                        membershipModel.setDescription(this.ms_fieldPriceNotes.getText());
+                        membershipModel.setDescription(this.ms_fieldDescription.getText());
                         membershipModel.setPrice(Double.parseDouble(this.ms_fieldPrice.getText()));
                     } else {
                         membershipModel = this.ms_comboBoxMemberships.getSelectionModel().getSelectedItem();
                     }
 
                     // Payment
+                    PaymentDebtsModel pendingPaymentModel = null;
                     if (!this.pym_togglePayment.isSelected()) {
                         double oweAmount = Double.parseDouble(pym_fieldOwe.getText());
                         double membershipPrice;
@@ -246,7 +253,7 @@ public class MemberController implements Initializable {
                             membershipPrice = this.ms_comboBoxMemberships.getSelectionModel().getSelectedItem().getPrice();
                         }
 
-                        PendingPaymentModel pendingPaymentModel = new PendingPaymentModel();
+                        pendingPaymentModel = new PaymentDebtsModel();
                         if (oweAmount > membershipPrice) {
                             formValid = false;
                             NotificationHandler.danger("Error", "La deuda es mayor al total a pagar.", 2);
@@ -259,6 +266,8 @@ public class MemberController implements Initializable {
                             pendingPaymentModel.setPaidOut(membershipPrice - oweAmount);
                             pendingPaymentModel.setOwe(oweAmount);
                         }
+
+                        pendingPaymentModel.setNotes(Input.capitalizeFirstLetter(this.pym_fieldOweNotes.getText()));
                     }
 
                     if (formValid) { // Save into data server
@@ -270,6 +279,12 @@ public class MemberController implements Initializable {
                             // TODO AFTER MEMBER IS CREATED, DO THIS
                             MembersData.uploadPhoto(idMember, photoHandler.getPhoto());
                             MembersData.uploadFingerprints(idMember, Fingerprint.getFingerprints());
+
+                            MembersData.uploadMembership(idMember, membershipModel, Input.capitalizeFirstLetter(this.ms_fieldDescription.getText()));
+                            // TODO: CREATE PENDING PAYMENTS
+                            if (pendingPaymentModel != null) {
+                                MembersData.createDebt(idMember, pendingPaymentModel);
+                            }
                         }
                     }
                 }
@@ -285,7 +300,7 @@ public class MemberController implements Initializable {
             Input.clearInputs(this.ms_comboBoxMemberships);
             new FadeIn(this.ms_boxPersonalized).play();
         } else {
-            Input.clearInputs(this.ms_datePicker, this.ms_fieldPrice, this.ms_fieldPriceNotes);
+            Input.clearInputs(this.ms_datePicker, this.ms_fieldPrice, this.ms_fieldDescription);
             new FadeIn(this.ms_comboBoxMemberships).play();
         }
 

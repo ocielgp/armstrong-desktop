@@ -1,67 +1,74 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import com.jfoenix.controls.*?>
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXTextField?>
+<?import java.lang.String?>
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import org.kordamp.ikonli.javafx.*?>
-<?import java.lang.*?>
-<GridPane fx:id="membersPane" styleClass="members" xmlns="http://javafx.com/javafx/15.0.1"
-          xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ocielgp.controller.MembersController">
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<GridPane fx:id="membersPane" styleClass="members" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ocielgp.controller.MembersController">
     <columnConstraints>
-        <ColumnConstraints hgrow="SOMETIMES" prefWidth="700.0"/>
-        <ColumnConstraints fillWidth="false" minWidth="100.0"/>
+        <ColumnConstraints hgrow="SOMETIMES" prefWidth="700.0" />
+        <ColumnConstraints fillWidth="false" maxWidth="412.0" minWidth="412.0" />
     </columnConstraints>
     <rowConstraints>
-        <RowConstraints vgrow="SOMETIMES"/>
+        <RowConstraints vgrow="SOMETIMES" />
     </rowConstraints>
     <VBox alignment="TOP_CENTER">
         <FlowPane alignment="CENTER_LEFT" hgap="10.0" vgap="10.0">
             <VBox.margin>
-                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
             </VBox.margin>
             <JFXButton styleClass="btn-primary" text="Consultar">
                 <graphic>
-                    <FontIcon iconLiteral="gmi-group"/>
+                    <FontIcon iconLiteral="gmi-group" />
                 </graphic>
             </JFXButton>
             <JFXButton text="Socio nuevo">
                 <styleClass>
-                    <String fx:value="btn-primary"/>
-                    <String fx:value="sucess-style"/>
+                    <String fx:value="btn-primary" />
+                    <String fx:value="sucess-style" />
                 </styleClass>
                 <graphic>
-                    <FontIcon iconLiteral="gmi-person-add"/>
+                    <FontIcon iconLiteral="gmi-person-add" />
                 </graphic>
             </JFXButton>
             <JFXButton text="Visita nueva">
                 <styleClass>
-                    <String fx:value="btn-primary"/>
-                    <String fx:value="sucess-style"/>
+                    <String fx:value="btn-primary" />
+                    <String fx:value="sucess-style" />
                 </styleClass>
                 <graphic>
-                    <FontIcon iconLiteral="gmi-add"/>
+                    <FontIcon iconLiteral="gmi-add" />
                 </graphic>
             </JFXButton>
             <JFXButton text="Planes">
                 <styleClass>
-                    <String fx:value="btn-primary"/>
-                    <String fx:value="warn-style"/>
+                    <String fx:value="btn-primary" />
+                    <String fx:value="warn-style" />
                 </styleClass>
                 <graphic>
-                    <FontIcon iconLiteral="gmi-date-range"/>
+                    <FontIcon iconLiteral="gmi-date-range" />
                 </graphic>
             </JFXButton>
         </FlowPane>
         <VBox alignment="CENTER">
             <VBox alignment="CENTER" maxWidth="500.0" spacing="10.0">
                 <VBox.margin>
-                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                 </VBox.margin>
-                <JFXTextField alignment="CENTER" promptText="Buscar por nombres / ID"/>
+                <JFXTextField alignment="CENTER" promptText="Buscar por ID / Nombres / Apellidos" />
                 <JFXButton styleClass="btn-primary" text="Buscar">
                     <graphic>
-                        <FontIcon iconLiteral="gmi-search"/>
+                        <FontIcon iconLiteral="gmi-search" />
                     </graphic>
                 </JFXButton>
             </VBox>
@@ -69,16 +76,15 @@
         <ScrollPane fitToHeight="true" fitToWidth="true">
             <TableView fx:id="membersTable" tableMenuButtonVisible="true">
                 <columns>
-                    <TableColumn prefWidth="75.0" text="ID"/>
-                    <TableColumn prefWidth="75.0" text="Nombres"/>
-                    <TableColumn prefWidth="75.0" text="Apellidos"/>
-                    <TableColumn prefWidth="75.0" text="Días restantes"/>
+                    <TableColumn prefWidth="75.0" text="ID" />
+                    <TableColumn prefWidth="75.0" text="Nombres" />
+                    <TableColumn prefWidth="75.0" text="Apellidos" />
                 </columns>
                 <columnResizePolicy>
-                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                 </columnResizePolicy>
             </TableView>
         </ScrollPane>
     </VBox>
-    <ScrollPane fx:id="memberPane" fitToHeight="true" fitToWidth="true" prefWidth="420.0" GridPane.columnIndex="1"/>
+    <ScrollPane fx:id="memberPane" fitToHeight="true" fitToWidth="true" GridPane.columnIndex="1" />
 </GridPane>

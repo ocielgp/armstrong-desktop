@@ -1,6 +1,8 @@
 package com.ocielgp.utilities;
 
 import com.jfoenix.controls.JFXButton;
+import com.ocielgp.app.AppController;
+import com.ocielgp.fingerprint.Fingerprint;
 import javafx.event.ActionEvent;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -28,21 +30,28 @@ public class PhotoHandler {
     }
 
     private void browseImage() {
+        if (Fingerprint.getStatusCode() != 0) {
+            Fingerprint.StopCapture();
+            Fingerprint.ResetFingerprintUI();
+        }
         FileChooser fileChooser = new FileChooser();
         FileChooser.ExtensionFilter extensionFilter = new FileChooser.ExtensionFilter("Imágenes", "*.png", "*.jpg", "*.jpeg");
         fileChooser.getExtensionFilters().add(extensionFilter);
-        File file = fileChooser.showOpenDialog(Window.getWindows().get(0));
+        File file = fileChooser.showOpenDialog(AppController.getPrimaryStage());
         if (file != null) {
             this.imageViewPhoto.setImage(new Image(file.toURI().toString()));
             this.buttonDeletePhoto.setDisable(false);
             try {
                 this.bytes = Files.readAllBytes(file.toPath());
-            } catch (IOException e) {
+            } catch (Exception e) {
                 NotificationHandler.danger("PhotoHandler", "Error al guardar bytes de la foto.", 5);
                 e.printStackTrace();
             }
         }
 
+        if (Fingerprint.getStatusCode() != 0) {
+            Fingerprint.StartCapture();
+        }
     }
 
     private void deleteImage() {

@@ -3,9 +3,7 @@ package com.ocielgp.fingerprint;
 import com.digitalpersona.uareu.*;
 import com.jfoenix.controls.JFXButton;
 import com.ocielgp.utilities.NotificationHandler;
-import javafx.application.Platform;
 import javafx.event.EventHandler;
-import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
@@ -16,14 +14,12 @@ import java.util.ListIterator;
 
 public class Fingerprint {
     private static Reader reader;
-    private static ReaderCollection readerCollection;
-    private static ArrayList<Fmd> fingerprintArray;
 
     /**
      * status
-     * 0 = Fingerprint scanner isn't connected
-     * 1 = Fingerprint scanner is connected
-     * 2 = Fingerprint is capturing
+     * 0 = Disconnected
+     * 1 = Background task
+     * 2 = Capture task
      */
     private static int fingerprintStatusCode = 0;
     private static final String[] fingerprintStatusDescription = new String[]{
@@ -31,28 +27,33 @@ public class Fingerprint {
             "CONECTADO",
             "CAPTURANDO"
     };
+
     private static Capture captureFingerprint;
-    private static FontIcon FingerprintIcon; // Dashboard
+    private static FontIcon fingerprintIcon; // Dashboard
     private static Label fingerprintLabel; // Dashboard
-    private static FingerprintUI fingerprintUI;
-
-    public static void setFingerprintUI(VBox fingerprintPane, VBox fingeprintFmd, Label fingerprintCounter, JFXButton startCaptureButton, JFXButton restartCaptureButton) {
-        fingerprintUI = new FingerprintUI(fingerprintPane, fingeprintFmd, fingerprintCounter, startCaptureButton, restartCaptureButton);
-        RefreshDashboard();
-    }
-
-    public static void setFingerprintIcon(FontIcon fingerprintIcon) {
-        FingerprintIcon = fingerprintIcon;
-        RefreshDashboard();
-    }
-
-    public static void setFingerprintLabel(Label fingerprintLabel) {
-        Fingerprint.fingerprintLabel = fingerprintLabel;
-        RefreshDashboard();
-
-    }
-
+    private static FingerprintUI fingerprintUI; // Fingerprint Box Controller
     private static final EventHandler<MouseEvent> fingerprintEvent = mouseEvent -> Fingerprint.Scanner();
+
+    public static void initializeUI(FontIcon fontIconFingerprint, Label labelStatus) {
+        fingerprintIcon = fontIconFingerprint;
+        fingerprintLabel = labelStatus;
+        RefreshDashboard();
+    }
+
+    public static void setFingerprintBox(VBox container, VBox fmdContainer, Label labelCounter, JFXButton startCaptureButton, JFXButton restartCaptureButton) {
+        fingerprintUI = new FingerprintUI(container, fmdContainer, labelCounter, startCaptureButton, restartCaptureButton);
+        RefreshDashboard();
+    }
+
+    public static void setStatusCode(int statusCode) {
+        if (statusCode == 0) {
+            captureFingerprint.Stop();
+            captureFingerprint = null;
+            NotificationHandler.createNotification("gmi-fingerprint", "Lector de Huellas", "Lector de huellas desconectado", 2, NotificationHandler.WARN_STYLE);
+        }
+        fingerprintStatusCode = statusCode;
+        RefreshDashboard();
+    }
 
     public static int getStatusCode() {
         return fingerprintStatusCode;
@@ -62,21 +63,9 @@ public class Fingerprint {
         return fingerprintStatusDescription[fingerprintStatusCode];
     }
 
-    public static void Scanner() {
-        if (Scan()) {
-            fingerprintStatusCode = 1;
-            NotificationHandler.createNotification("gmi-fingerprint", "Lector de Huellas", "Lector de huellas conectado", 2, NotificationHandler.SUCESS_STYLE);
-            StartCapture();
-        } else {
-            fingerprintStatusCode = 0;
-            NotificationHandler.createNotification("gmi-fingerprint", "Lector de Huellas", "Lector de huellas no detectado", 2, NotificationHandler.WARN_STYLE);
-        }
-        RefreshDashboard(); // Update UI Fingerprint Dashboard
-    }
-
     private static boolean Scan() {
         try {
-            readerCollection = UareUGlobal.GetReaderCollection();
+            ReaderCollection readerCollection = UareUGlobal.GetReaderCollection();
             readerCollection.GetReaders();
             reader = readerCollection.get(0); // Fast test to get first lector
             return true;
@@ -85,23 +74,15 @@ public class Fingerprint {
         }
     }
 
-    public static void StartCapture() { // Background task
-        if (fingerprintStatusCode == 1) { // Background task
-            captureFingerprint = Capture.Run(reader);
-            RefreshDashboard();
+    public static void Scanner() {
+        if (Scan()) {
+            NotificationHandler.createNotification("gmi-fingerprint", "Lector de Huellas", "Lector de huellas conectado", 2, NotificationHandler.SUCESS_STYLE);
+            StartCapture();
+        } else {
+            fingerprintStatusCode = 0;
+            NotificationHandler.createNotification("gmi-fingerprint", "Lector de Huellas", "Lector de huellas no detectado", 2, NotificationHandler.WARN_STYLE);
         }
-    }
-
-    public static void StartCapture(VBox pane, boolean verification) { // UI task
-        if (captureFingerprint != null) {
-            StopCapture();
-        }
-
-        if (fingerprintStatusCode > 0 && fingerprintStatusCode != 2) {
-            captureFingerprint = Capture.Run(reader, pane, verification);
-            fingerprintStatusCode = 2;
-            RefreshDashboard();
-        }
+        RefreshDashboard();
     }
 
     public static void StopCapture() {
@@ -109,23 +90,72 @@ public class Fingerprint {
             captureFingerprint.Stop();
             captureFingerprint = null;
 
+            if (fingerprintUI != null) {
+                fingerprintUI.resetUI();
+            }
             RefreshDashboard();
         }
+    }
 
-        if (fingerprintStatusCode > 0 && fingerprintStatusCode != 1) {
-            Fingerprint.StartCapture();
+    public static void StartCapture() { // Background task
+        if (captureFingerprint != null) {
+            StopCapture();
+        }
+        captureFingerprint = Capture.Run(reader);
+        fingerprintStatusCode = 1;
+        RefreshDashboard();
+    }
+
+    public static void StartCapture(VBox pane) { // UI task
+        if (captureFingerprint != null) {
+            StopCapture();
+        }
+        if (fingerprintStatusCode > 0 && fingerprintStatusCode != 2) {
+            captureFingerprint = Capture.Run(reader, pane);
+            fingerprintStatusCode = 2;
+            RefreshDashboard();
+        }
+    }
+
+    public static void ResetFingerprintUI() {
+        if (fingerprintUI != null) {
+            fingerprintUI.resetUI();
+        }
+    }
+
+    public static void RestartFingerprintUI() {
+        if (fingerprintUI != null) {
+            fingerprintUI.restartUI();
+        }
+    }
+
+    public static void RefreshDashboard() {
+        if (fingerprintIcon != null && fingerprintLabel != null) {
+            String styleClass;
+            if (fingerprintStatusCode == 0) {
+                fingerprintIcon.addEventFilter(MouseEvent.MOUSE_CLICKED, fingerprintEvent);
+                styleClass = "off";
+            } else {
+                fingerprintIcon.removeEventFilter(MouseEvent.MOUSE_CLICKED, fingerprintEvent);
+                styleClass = "on";
+            }
+            fingerprintIcon.getStyleClass().set(2, styleClass);
+            fingerprintLabel.setText(Fingerprint.getStatusDescription());
+        }
+
+        if (fingerprintUI != null) {
+            if (fingerprintStatusCode == 0) {
+                fingerprintUI.restartUI();
+                fingerprintUI.hide();
+            } else {
+                fingerprintUI.show();
+            }
         }
     }
 
     public static void AddFingerprint(Fmd fmd) {
         if (fingerprintUI != null) {
             fingerprintUI.add(fmd);
-        }
-    }
-
-    public static void RestartCapture() {
-        if (fingerprintUI != null) {
-            fingerprintUI.restartCapture();
         }
     }
 
@@ -172,36 +202,4 @@ public class Fingerprint {
             return null;
         }
     }
-
-    public static void RefreshDashboard() {
-        if (FingerprintIcon != null && fingerprintLabel != null) {
-            String styleClass;
-            if (fingerprintStatusCode == 0) {
-                FingerprintIcon.addEventFilter(MouseEvent.MOUSE_CLICKED, fingerprintEvent);
-                styleClass = "off";
-            } else {
-                FingerprintIcon.removeEventFilter(MouseEvent.MOUSE_CLICKED, fingerprintEvent);
-                styleClass = "on";
-            }
-            FingerprintIcon.getStyleClass().set(2, styleClass);
-            fingerprintLabel.setText(Fingerprint.getStatusDescription());
-        }
-
-        if (fingerprintUI != null) {
-            if (fingerprintStatusCode == 0) {
-                fingerprintUI.hide();
-            } else {
-                fingerprintUI.show();
-            }
-        }
-    }
-
-    public static void setFingerprintStatusCode(int status) {
-        if (status == 0) {
-            NotificationHandler.createNotification("gmi-fingerprint", "Lector de Huellas", "Lector de huellas desconectado", 2, NotificationHandler.WARN_STYLE);
-        }
-        fingerprintStatusCode = status;
-        RefreshDashboard();
-    }
-
 }
