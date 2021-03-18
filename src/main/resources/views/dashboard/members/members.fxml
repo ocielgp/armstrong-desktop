@@ -74,11 +74,11 @@
             </VBox>
         </VBox>
         <ScrollPane fitToHeight="true" fitToWidth="true">
-            <TableView fx:id="membersTable" tableMenuButtonVisible="true">
+            <TableView fx:id="tableViewMembers" tableMenuButtonVisible="true">
                 <columns>
-                    <TableColumn prefWidth="75.0" text="ID" />
-                    <TableColumn prefWidth="75.0" text="Nombres" />
-                    <TableColumn prefWidth="75.0" text="Apellidos" />
+                    <TableColumn fx:id="tableColumnId" prefWidth="75.0" text="ID" />
+                    <TableColumn fx:id="tableColumnName" prefWidth="75.0" text="Nombres" />
+                    <TableColumn fx:id="tableColumnLastName" prefWidth="75.0" text="Apellidos" />
                 </columns>
                 <columnResizePolicy>
                     <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />

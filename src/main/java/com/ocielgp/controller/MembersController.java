@@ -1,11 +1,17 @@
 package com.ocielgp.controller;
 
+import com.ocielgp.database.MembersData;
+import com.ocielgp.model.MembersModel;
 import com.ocielgp.utilities.Input;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
 
 import java.io.IOException;
@@ -22,10 +28,23 @@ public class MembersController implements Initializable {
 
     // Controls
     @FXML
-    private TableView membersTable;
+    private TableView<MembersModel> tableViewMembers;
+    @FXML
+    private TableColumn<MembersModel, Integer> tableColumnId;
+    @FXML
+    private TableColumn<MembersModel, String> tableColumnName;
+    @FXML
+    private TableColumn<MembersModel, String> tableColumnLastName;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        this.tableColumnId.setCellValueFactory(new PropertyValueFactory<>("idMember"));
+        this.tableColumnName.setCellValueFactory(new PropertyValueFactory<>("name"));
+        this.tableColumnLastName.setCellValueFactory(new PropertyValueFactory<>("lastName"));
+        ObservableList<MembersModel> members = MembersData.getMembers();
+        if (members != null) {
+            this.tableViewMembers.getItems().addAll(members);
+        }
 
         FXMLLoader view = new FXMLLoader(
                 Objects.requireNonNull(DashboardController.class.getClassLoader().getResource("member.fxml"))

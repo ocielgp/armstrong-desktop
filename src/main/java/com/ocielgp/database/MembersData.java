@@ -6,9 +6,12 @@ import com.ocielgp.model.MembersModel;
 import com.ocielgp.model.MembershipsModel;
 import com.ocielgp.model.PaymentDebtsModel;
 import com.ocielgp.utilities.NotificationHandler;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 import java.sql.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.ListIterator;
 
 public class MembersData {
@@ -163,4 +166,30 @@ public class MembersData {
             return false;
         }
     }
+
+    public static ObservableList<MembersModel> getMembers() {
+        Connection con;
+        PreparedStatement ps;
+        ResultSet rs;
+        try {
+            con = DataServer.getConnection();
+            ps = con.prepareStatement("SELECT idMember, name, lastName FROM MEMBERS");
+            rs = ps.executeQuery();
+
+            ObservableList<MembersModel> members = FXCollections.observableArrayList();
+            while (rs.next()) {
+                MembersModel model = new MembersModel();
+                model.setIdMember(rs.getInt("idMember"));
+                model.setName(rs.getString("name"));
+                model.setLastName(rs.getString("lastName"));
+                members.add(model);
+            }
+            return members;
+        } catch (SQLException throwables) {
+            NotificationHandler.danger("Error", "[MembersData][getMembers]: Error al obtener socios.", 5);
+            throwables.printStackTrace();
+        }
+        return null;
+    }
+
 }
