@@ -130,27 +130,6 @@
 /* Members */
 /*.members*/
 
-.members .table-view {
-    -fx-background-color: transparent;
-}
-
-.members .table-view .column-header {
-    -fx-background-color: -fx-color-text;
-    -fx-border-width: 0 0 0 1px;
-    -fx-border-color: -fx-color-border;
-}
-
-.members .table-view .column-header .label {
-    -fx-text-fill: -fx-color-background;
-    -fx-font: 20px "Roboto Bold";
-}
-
-.members .table-view > .column-header-background > .show-hide-columns-button {
-    -fx-border-width: 0 0 0 1px;
-    -fx-border-color: -fx-color-border;
-    -fx-background-color: -fx-color-text;
-}
-
 /* Member */
 
 .member-title {

@@ -6,7 +6,6 @@
 <?import com.jfoenix.controls.JFXTextField?>
 <?import com.jfoenix.controls.JFXToggleButton?>
 <?import java.lang.String?>
-<?import java.net.URL?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.image.Image?>
@@ -250,8 +249,4 @@
          </JFXButton>
       </HBox>
    </VBox>
-   <stylesheets>
-      <URL value="@../../../styles.css" />
-      <URL value="@../../../controls.css" />
-   </stylesheets>
 </VBox>
