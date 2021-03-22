@@ -124,34 +124,40 @@
 }
 
 .table-view .column-header {
-    -fx-background-color: -fx-color-text;
+    -fx-background-color: #00778F;
     -fx-border-color: -fx-color-border;
-    -fx-border-width: 0 1px 0 0;
 }
 
 .table-view .column-header .label {
-    -fx-text-fill: -fx-color-background;
+    -fx-text-fill: #EDF2F4;
     -fx-font: 20px "Roboto Bold";
+    -fx-border-width: 0;
 }
 
-.table-view > .column-header-background > .show-hide-columns-button {
-    -fx-border-width: 0 0 0 1px;
+.table-view .table-cell {
     -fx-border-color: -fx-color-border;
-    -fx-background-color: -fx-color-text;
 }
-
 
 .table-view .table-row-cell:odd .table-cell {
-    -fx-background-color: -fx-color-text;
-    -fx-text-fill: -fx-color-background;
+    -fx-background-color: #E5E5E5;
+    -fx-text-fill: #333;
 }
 
 .table-view .table-row-cell:even .table-cell {
-    -fx-background-color: -fx-color-background;
-    -fx-text-fill: -fx-color-text;
+    -fx-background-color: #FFF;
+    -fx-text-fill: #333;
 }
 
 .table-row-cell {
-    -fx-border-color: -fx-color-border;
     -fx-font: 12px "Roboto";
+}
+
+.table-row-cell:selected {
+    -fx-background-insets: 0;
+}
+
+.table-row-cell:selected .table-cell {
+    -fx-background-color: #2D2B36 !important;
+    -fx-text-fill: #FFF !important;
+    -fx-font: 12px "Roboto Bold";
 }

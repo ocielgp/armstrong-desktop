@@ -285,6 +285,8 @@ public class MemberController implements Initializable {
                             if (pendingPaymentModel != null) {
                                 MembersData.createDebt(idMember, pendingPaymentModel);
                             }
+
+                            AppController.refreshTable();
                         }
                     }
                 }
@@ -322,6 +324,4 @@ public class MemberController implements Initializable {
         this.pym_boxOwe.setVisible(!visible);
         this.pym_boxOwe.setManaged(!visible);
     }
-
-
 }

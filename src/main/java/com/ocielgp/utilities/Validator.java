@@ -46,6 +46,21 @@ public class Validator {
         }
     }
 
+    public static boolean numberValidator(InputDetails input) {
+        String regex = "[0-9]+";
+        int inputsInvalid = 0;
+            if (!input.getMetadata().replace(" ", "").matches(regex)) {
+                shakeInput(input.getNode());
+                inputsInvalid++;
+            }
+        if (inputsInvalid == 0) {
+            return true;
+        } else {
+            NotificationHandler.danger("Error", "Los campos en rojo deben ser solo numéros.", 2);
+            return false;
+        }
+    }
+
     public static boolean numberValidator(ListIterator<InputDetails> inputs) {
         String regex = "[0-9]+";
         int inputsInvalid = 0;

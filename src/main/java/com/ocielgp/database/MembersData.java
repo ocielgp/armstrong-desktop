@@ -7,6 +7,7 @@ import com.ocielgp.model.MembershipsModel;
 import com.ocielgp.model.PaymentDebtsModel;
 import com.ocielgp.utilities.NotificationHandler;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 
 import java.sql.*;
@@ -167,13 +168,16 @@ public class MembersData {
         }
     }
 
-    public static ObservableList<MembersModel> getMembers() {
+    public static ObservableList<MembersModel> getMembers(int limit, int page) {
         Connection con;
         PreparedStatement ps;
         ResultSet rs;
         try {
             con = DataServer.getConnection();
-            ps = con.prepareStatement("SELECT idMember, name, lastName FROM MEMBERS");
+            ps = con.prepareStatement("SELECT idMember, name, lastName FROM MEMBERS WHERE flag = 1 AND idMember NOT IN ( SELECT idMember FROM STAFF_EMPLOYEES WHERE flag = 1 ) ORDER BY idMember DESC LIMIT ?,?");
+            int maxRegisters = limit * page;
+            ps.setInt(1, maxRegisters - limit);
+            ps.setInt(2, limit);
             rs = ps.executeQuery();
 
             ObservableList<MembersModel> members = FXCollections.observableArrayList();
@@ -183,7 +187,11 @@ public class MembersData {
                 model.setName(rs.getString("name"));
                 model.setLastName(rs.getString("lastName"));
                 members.add(model);
+
             }
+            members.addListener((ListChangeListener<MembersModel>) change -> {
+                System.out.println("clickoso");
+            });
             return members;
         } catch (SQLException throwables) {
             NotificationHandler.danger("Error", "[MembersData][getMembers]: Error al obtener socios.", 5);

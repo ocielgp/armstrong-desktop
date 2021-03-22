@@ -4,6 +4,7 @@ import com.jfoenix.controls.JFXComboBox;
 import com.ocielgp.controller.RootController;
 import com.ocielgp.model.GymsModel;
 import com.ocielgp.model.StaffUsersModel;
+import com.ocielgp.utilities.Pagination;
 import javafx.scene.Node;
 import javafx.stage.Stage;
 
@@ -13,6 +14,17 @@ public class AppController {
     private static RootController rootController;
     private static StaffUsersModel staffUserModel;
     private static Stage primaryStage;
+    private static Pagination pagination;
+
+    public static void setPagination(Pagination pagination) {
+        AppController.pagination = pagination;
+    }
+
+    public static void refreshTable() {
+        if (pagination != null) {
+            pagination.loadData(1);
+        }
+    }
 
     public static Stage getPrimaryStage() {
         return primaryStage;
