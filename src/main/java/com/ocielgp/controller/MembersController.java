@@ -41,6 +41,8 @@ public class MembersController implements Initializable {
     @FXML
     private TableColumn<MembersModel, String> tableColumnLastName;
     @FXML
+    private TableColumn<MembersModel, String> tableColumnEndDate;
+    @FXML
     private JFXTextField fieldRowsPerPage;
     @FXML
     private JFXButton buttonFilter;
@@ -56,6 +58,7 @@ public class MembersController implements Initializable {
         this.tableColumnId.setCellValueFactory(new PropertyValueFactory<>("idMember"));
         this.tableColumnName.setCellValueFactory(new PropertyValueFactory<>("name"));
         this.tableColumnLastName.setCellValueFactory(new PropertyValueFactory<>("lastName"));
+        this.tableColumnEndDate.setCellValueFactory(new PropertyValueFactory<>("endDate"));
 
         Pagination pagination = new Pagination(this.tableViewMembers, this.fieldRowsPerPage, this.buttonFilter, this.labelPreviousPage, this.labelPage, this.labelNextPage, Pagination.Sources.MEMBERS);
         AppController.setPagination(pagination);

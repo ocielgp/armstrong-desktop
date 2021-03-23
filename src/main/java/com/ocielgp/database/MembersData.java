@@ -5,6 +5,8 @@ import com.ocielgp.app.AppController;
 import com.ocielgp.model.MembersModel;
 import com.ocielgp.model.MembershipsModel;
 import com.ocielgp.model.PaymentDebtsModel;
+import com.ocielgp.model.PaymentMembershipsModel;
+import com.ocielgp.utilities.DateFormatter;
 import com.ocielgp.utilities.NotificationHandler;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
@@ -174,7 +176,7 @@ public class MembersData {
         ResultSet rs;
         try {
             con = DataServer.getConnection();
-            ps = con.prepareStatement("SELECT idMember, name, lastName FROM MEMBERS WHERE flag = 1 AND idMember NOT IN ( SELECT idMember FROM STAFF_EMPLOYEES WHERE flag = 1 ) ORDER BY idMember DESC LIMIT ?,?");
+            ps = con.prepareStatement("SELECT M.idMember, M.name, M.lastName, PM.endDate FROM MEMBERS M JOIN PAYMENT_MEMBERSHIPS PM on M.idMember = PM.idMember WHERE ( M.flag = 1 AND PM.flag = 1 ) AND M.idMember NOT IN ( SELECT idMember FROM STAFF_EMPLOYEES WHERE M.flag = 1 ) ORDER BY M.idMember DESC LIMIT ?,?");
             int maxRegisters = limit * page;
             ps.setInt(1, maxRegisters - limit);
             ps.setInt(2, limit);
@@ -182,16 +184,17 @@ public class MembersData {
 
             ObservableList<MembersModel> members = FXCollections.observableArrayList();
             while (rs.next()) {
-                MembersModel model = new MembersModel();
-                model.setIdMember(rs.getInt("idMember"));
-                model.setName(rs.getString("name"));
-                model.setLastName(rs.getString("lastName"));
-                members.add(model);
+                MembersModel member = new MembersModel();
+                member.setIdMember(rs.getInt("idMember"));
+                member.setName(rs.getString("name"));
+                member.setLastName(rs.getString("lastName"));
 
+                LocalDate endDate = LocalDate.parse(rs.getString("endDate"));
+                member.setEndDate(DateFormatter.getDayMonthYearComplete(endDate));
+                member.setDaysLeft(DateFormatter.daysDifferenceToday(endDate));
+
+                members.add(member);
             }
-            members.addListener((ListChangeListener<MembersModel>) change -> {
-                System.out.println("clickoso");
-            });
             return members;
         } catch (SQLException throwables) {
             NotificationHandler.danger("Error", "[MembersData][getMembers]: Error al obtener socios.", 5);

@@ -82,10 +82,11 @@
                        <TableColumn fx:id="tableColumnId" prefWidth="75.0" text="ID" />
                        <TableColumn fx:id="tableColumnName" prefWidth="75.0" text="Nombres" />
                        <TableColumn fx:id="tableColumnLastName" prefWidth="75.0" text="Apellidos" />
+                  <TableColumn fx:id="tableColumnEndDate" prefWidth="75.0" text="Termina" />
                    </columns>
-                   <columnResizePolicy>
-                       <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-                   </columnResizePolicy>
+               <columnResizePolicy>
+                  <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+               </columnResizePolicy>
                </TableView>
             <VBox alignment="BOTTOM_CENTER" VBox.vgrow="ALWAYS">
                <children>

@@ -1,9 +1,6 @@
 package com.ocielgp.model;
 
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.*;
 
 public class MembersModel {
     // Max length
@@ -22,6 +19,9 @@ public class MembersModel {
     private final StringProperty notes = new SimpleStringProperty();
     private final StringProperty registrationDate = new SimpleStringProperty();
     private byte[] photo;
+
+    private final LongProperty daysLeft = new SimpleLongProperty();
+    private final StringProperty endDate = new SimpleStringProperty();
 
     private PaymentMembershipsModel paymentMembership;
     private PaymentDebtsModel pendingPayment;
@@ -128,5 +128,45 @@ public class MembersModel {
 
     public void setPhoto(byte[] photo) {
         this.photo = photo;
+    }
+
+    public long getDaysLeft() {
+        return daysLeft.get();
+    }
+
+    public LongProperty daysLeftProperty() {
+        return daysLeft;
+    }
+
+    public void setDaysLeft(long daysLeft) {
+        this.daysLeft.set(daysLeft);
+    }
+
+    public String getEndDate() {
+        return endDate.get();
+    }
+
+    public StringProperty endDateProperty() {
+        return endDate;
+    }
+
+    public void setEndDate(String endDate) {
+        this.endDate.set(endDate);
+    }
+
+    public PaymentMembershipsModel getPaymentMembership() {
+        return paymentMembership;
+    }
+
+    public void setPaymentMembership(PaymentMembershipsModel paymentMembership) {
+        this.paymentMembership = paymentMembership;
+    }
+
+    public PaymentDebtsModel getPendingPayment() {
+        return pendingPayment;
+    }
+
+    public void setPendingPayment(PaymentDebtsModel pendingPayment) {
+        this.pendingPayment = pendingPayment;
     }
 }
