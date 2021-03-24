@@ -15,20 +15,25 @@ public class FingerprintData {
         PreparedStatement ps;
         ResultSet rs;
         try {
-            con = DataServer.getConnection();
-            ps = con.prepareStatement("SELECT fingerprint, idMember FROM MEMBER_FINGERPRINTS");
+            System.out.println("buscando huella...");
+            con = DataServer.getConnection(); // TODO: ENHANCE QUERY, ordenar por fecha de registro
+            ps = con.prepareStatement("SELECT MF.fingerprint, m.name, endDate FROM member_fingerprints MF JOIN payment_memberships pm on MF.idMember = pm.idMember JOIN members m on MF.idMember = m.idMember");
             rs = ps.executeQuery();
             while (rs.next()) {
                 try {
                     Fmd bdFingerprint = UareUGlobal.GetImporter().ImportFmd(rs.getBytes("fingerprint"), Fmd.Format.ANSI_378_2004, Fmd.Format.ANSI_378_2004);
                     boolean fingerprintMatch = Fingerprint.compareFingerprint(fingerprint, bdFingerprint);
-                    System.out.println(fingerprintMatch);
+                    if (fingerprintMatch) {
+                        NotificationHandler.sucess("Hola", rs.getString("name"), 3);
+                        break;
+                    }
                 } catch (UareUException e) {
                     e.printStackTrace();
                 }
             }
+            NotificationHandler.warn("Lector de Huellas", "Huella no encontrada", 2);
         } catch (SQLException throwables) {
-            NotificationHandler.danger("Error", "[MembersData]: Error al crear un nuevo miembro.", 5);
+            NotificationHandler.danger("Error", "[FingerprintData][searchFingerprint]: Error al buscar huella.", 5);
             throwables.printStackTrace();
         }
         return 0;

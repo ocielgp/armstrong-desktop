@@ -61,66 +61,9 @@ public class Pagination {
     public void itemSelected() {
         switch (source) {
             case MEMBERS: {
-                //TODO: INVALIDATE NULL REFERENCES
                 if (this.tableView.getSelectionModel().getSelectedItem() != null) {
                     MembersModel membersModel = (MembersModel) this.tableView.getSelectionModel().getSelectedItem();
                     System.out.println(membersModel.getIdMember());
-                }
-            }
-        }
-    }
-
-    public void loadData(int page) {
-        if (page > 0) {
-            if (!this.fieldRowsPerPage.getText().equals(String.valueOf(this.rows))) {
-                this.fieldRowsPerPage.setText(String.valueOf(this.rows));
-            }
-            switch (source) {
-                case MEMBERS: {
-                    ObservableList<MembersModel> data = MembersData.getMembers(this.rows, page);
-                    if (data != null && data.size() > 0) {
-                        this.tableView.setItems(data);
-                        this.labelPage.setText(String.valueOf(page));
-                        this.tableView.setRowFactory(row -> new TableRow<MembersModel>() {
-                            @Override
-                            public void updateItem(MembersModel member, boolean empty) {
-                                super.updateItem(member, empty);
-                                if (member != null) {
-                                    /* DATES
-                                     *  0 DAYS = DANGER
-                                     * 1-3 DAYS = WARN
-                                     * +3 DAYS = GREEN
-                                     */
-                                    // TODO: CENTER DATES
-                                    //TODO: FIX WIDTH PER COLUMN
-                                    if (member.getDaysLeft() <= 0) {
-                                        if (getStyleClass().size() == 5) {
-                                            getStyleClass().set(4, "danger-style"); // replace color style
-                                        } else {
-                                            getStyleClass().addAll("member-cell", "danger-style");
-                                        }
-                                    } else if (member.getDaysLeft() > 0 && member.getDaysLeft() <= 3) {
-                                        if (getStyleClass().size() == 5) {
-                                            getStyleClass().set(4, "warn-style"); // replace color style
-                                        } else {
-                                            getStyleClass().addAll("member-cell", "warn-style");
-                                        }
-                                    } else if (member.getDaysLeft() > 3) {
-                                        if (getStyleClass().size() == 5) {
-                                            getStyleClass().set(4, "sucess-style"); // replace color style
-                                        } else {
-                                            getStyleClass().addAll("member-cell", "sucess-style");
-                                        }
-                                    }
-                                } else {
-                                    if (getStyleClass().size() == 5) {
-                                        getStyleClass().remove(4); // remove member-cell
-                                        getStyleClass().remove(3); // remove color style
-                                    }
-                                }
-                            }
-                        });
-                    }
                 }
             }
         }
@@ -132,5 +75,65 @@ public class Pagination {
 
     public void nextPage() {
         this.loadData(Integer.parseInt(this.labelPage.getText()) + 1);
+    }
+
+    public void loadData(int page) {
+        if (page > 0) {
+            if (!this.fieldRowsPerPage.getText().equals(String.valueOf(this.rows))) {
+                this.fieldRowsPerPage.setText(String.valueOf(this.rows));
+            }
+            switch (source) {
+                case MEMBERS: {
+                    this.loadMembers(page);
+                }
+            }
+        }
+    }
+
+    private void loadMembers(int page) {
+        ObservableList<MembersModel> data = MembersData.getMembers(this.rows, page);
+        if (data != null && data.size() > 0) {
+            this.tableView.setItems(data);
+            this.labelPage.setText(String.valueOf(page));
+            this.tableView.setRowFactory(row -> new TableRow<MembersModel>() {
+                @Override
+                public void updateItem(MembersModel member, boolean empty) {
+                    super.updateItem(member, empty);
+                    if (member != null) {
+                        /* DATES
+                         *  - 0 DAYS = DANGER
+                         * 1-3 DAYS = WARN
+                         * + 3 DAYS = SUCESS
+                         */
+                        // TODO: CENTER DATES
+                        //TODO: FIX WIDTH PER COLUMN
+                        if (member.getDaysLeft() < 0) {
+                            if (getStyleClass().size() == 5) {
+                                getStyleClass().set(4, "danger-style"); // replace color style
+                            } else {
+                                getStyleClass().addAll("member-cell", "danger-style");
+                            }
+                        } else if (member.getDaysLeft() >= 0 && member.getDaysLeft() <= 3) {
+                            if (getStyleClass().size() == 5) {
+                                getStyleClass().set(4, "warn-style"); // replace color style
+                            } else {
+                                getStyleClass().addAll("member-cell", "warn-style");
+                            }
+                        } else if (member.getDaysLeft() > 3) {
+                            if (getStyleClass().size() == 5) {
+                                getStyleClass().set(4, "sucess-style"); // replace color style
+                            } else {
+                                getStyleClass().addAll("member-cell", "sucess-style");
+                            }
+                        }
+                    } else {
+                        if (getStyleClass().size() == 5) {
+                            getStyleClass().remove(4); // remove member-cell
+                            getStyleClass().remove(3); // remove color style
+                        }
+                    }
+                }
+            });
+        }
     }
 }
