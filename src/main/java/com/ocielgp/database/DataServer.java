@@ -1,5 +1,6 @@
 package com.ocielgp.database;
 
+import com.ocielgp.app.AppController;
 import com.ocielgp.utilities.NotificationHandler;
 
 import java.io.FileNotFoundException;
@@ -19,27 +20,11 @@ public class DataServer {
     private static Connection con;
 
     static {
-        Properties properties = new Properties();
-        InputStream inputStream = DataServer.class.getClassLoader().getResourceAsStream("dataSource.properties");
-        if (inputStream == null) {
-            try {
-                throw new FileNotFoundException("DataSource no encontrado");
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }
-        } else {
-            try {
-                properties.load(inputStream);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        // Get data from config file
-        host = properties.getProperty("host");
-        port = properties.getProperty("port");
-        user = properties.getProperty("user");
-        password = properties.getProperty("password");
-        database = properties.getProperty("database");
+        host = AppController.readProperty("dataSource.properties", "host");
+        port = AppController.readProperty("dataSource.properties", "port");
+        user = AppController.readProperty("dataSource.properties", "user");
+        password = AppController.readProperty("dataSource.properties", "password");
+        database = AppController.readProperty("dataSource.properties", "database");
     }
 
     private static void firstConnection() {

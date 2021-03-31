@@ -36,6 +36,10 @@ public class RootController implements Initializable {
     // Attributes
     private String themeType = "night-theme"; // Initial theme
 
+    public RootController() {
+        this.themeType = AppController.readProperty("app.properties", "theme");
+    }
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         // AppController Global
@@ -50,6 +54,8 @@ public class RootController implements Initializable {
                 rootPane.getStyleClass().set(1, "day-theme");
                 themeType = "day-theme";
             }
+            System.out.println(themeType);
+            AppController.saveProperty("app.properties", "theme", this.themeType);
             /*String resp = DialogHandler.createDialog(
                     "gmi-snooze",
                     "Hola",
