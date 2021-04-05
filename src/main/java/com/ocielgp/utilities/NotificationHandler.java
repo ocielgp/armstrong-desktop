@@ -183,4 +183,15 @@ public class NotificationHandler {
         );
     }
 
+    public static void catchError(String className, StackTraceElement exceptionMetaData, String body, Exception exception, String... icon) {
+        NotificationHandler.createNotification(
+                (icon.length > 0) ? icon[0] : "gmi-sync-problem",
+                className,
+                "[" + exceptionMetaData.getMethodName() + " : " + exceptionMetaData.getLineNumber() + " line]\n" + body,
+                20,
+                NotificationHandler.DANGER_STYLE
+        );
+        exception.printStackTrace();
+    }
+
 }

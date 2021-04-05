@@ -1,25 +1,21 @@
 package com.ocielgp.controller;
 
 import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXCheckBox;
+import com.jfoenix.controls.JFXRadioButton;
 import com.jfoenix.controls.JFXTextField;
-import com.ocielgp.app.AppController;
-import com.ocielgp.database.MembersData;
+import com.ocielgp.files.ConfigFiles;
 import com.ocielgp.model.MembersModel;
 import com.ocielgp.utilities.Input;
+import com.ocielgp.utilities.Loader;
 import com.ocielgp.utilities.Pagination;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.Node;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.Objects;
 import java.util.ResourceBundle;
@@ -33,6 +29,10 @@ public class MembersController implements Initializable {
 
     // Controls
     @FXML
+    private JFXTextField fieldSearch;
+    @FXML
+    private JFXButton buttonSearch;
+    @FXML
     private TableView<MembersModel> tableViewMembers;
     @FXML
     private TableColumn<MembersModel, Integer> tableColumnId;
@@ -45,13 +45,28 @@ public class MembersController implements Initializable {
     @FXML
     private JFXTextField fieldRowsPerPage;
     @FXML
-    private JFXButton buttonFilter;
-    @FXML
     private Label labelPreviousPage;
     @FXML
     private Label labelPage;
     @FXML
     private Label labelNextPage;
+
+    @FXML
+    private JFXCheckBox checkBoxAllGyms;
+    @FXML
+    private JFXCheckBox checkBoxOnlyActiveMembers;
+    @FXML
+    private JFXCheckBox checkBoxOnlyDebtors;
+    @FXML
+    private JFXRadioButton radioButtonGender0;
+    @FXML
+    private JFXRadioButton radioButtonGender1;
+    @FXML
+    private JFXRadioButton radioButtonGender2;
+    @FXML
+    private JFXRadioButton radioButtonOrderBy0;
+    @FXML
+    private JFXRadioButton radioButtonOrderBy1;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -60,22 +75,63 @@ public class MembersController implements Initializable {
         this.tableColumnLastName.setCellValueFactory(new PropertyValueFactory<>("lastName"));
         this.tableColumnEndDate.setCellValueFactory(new PropertyValueFactory<>("endDate"));
 
-        Pagination pagination = new Pagination(this.tableViewMembers, this.fieldRowsPerPage, this.buttonFilter, this.labelPreviousPage, this.labelPage, this.labelNextPage, Pagination.Sources.MEMBERS);
-        AppController.setPagination(pagination);
+        Pagination pagination = new Pagination(this.fieldSearch, this.buttonSearch, this.tableViewMembers, this.fieldRowsPerPage, this.labelPreviousPage, this.labelPage, this.labelNextPage, Pagination.Sources.MEMBERS);
 
-//        ObservableList<MembersModel> members = MembersData.getMembers(15, 1);
-//        if (members != null) {
-//            this.tableViewMembers.getItems().addAll(members);
-//        }
-
-        FXMLLoader view = new FXMLLoader(
-                Objects.requireNonNull(DashboardController.class.getClassLoader().getResource("member.fxml"))
+        Node memberFXML = Loader.Load(
+                "member.fxml",
+                "Members",
+                true,
+                new MemberController(pagination)
         );
-        try {
-            this.memberPane.setContent(view.load());
-            Input.getScrollEvent(this.memberPane);
-        } catch (IOException e) {
-            e.printStackTrace();
+        this.memberPane.setContent(memberFXML);
+        Input.getScrollEvent(this.memberPane);
+
+        this.checkBoxAllGyms.setSelected(Boolean.parseBoolean(ConfigFiles.readProperty(ConfigFiles.File.APP, "memberAllGyms")));
+        this.checkBoxOnlyActiveMembers.setSelected(Boolean.parseBoolean(ConfigFiles.readProperty(ConfigFiles.File.APP, "memberOnlyActiveMembers")));
+        this.checkBoxOnlyDebtors.setSelected(Boolean.parseBoolean(ConfigFiles.readProperty(ConfigFiles.File.APP, "memberOnlyDebtors")));
+
+        this.checkBoxAllGyms.selectedProperty().addListener(ConfigFiles.listenerSaver(ConfigFiles.File.APP, "memberAllGyms", pagination));
+        this.checkBoxOnlyActiveMembers.selectedProperty().addListener(ConfigFiles.listenerSaver(ConfigFiles.File.APP, "memberOnlyActiveMembers", pagination));
+        this.checkBoxOnlyDebtors.selectedProperty().addListener(ConfigFiles.listenerSaver(ConfigFiles.File.APP, "memberOnlyDebtors", pagination));
+
+        ToggleGroup toggleGender = new ToggleGroup();
+        this.radioButtonGender0.setToggleGroup(toggleGender);
+        this.radioButtonGender1.setToggleGroup(toggleGender);
+        this.radioButtonGender2.setToggleGroup(toggleGender);
+
+        //TODO: ENCAPSULE METHOD ON CONFIG FILES FOR AUTOMATITATION
+        toggleGender.selectedToggleProperty().addListener(((observable, oldValue, newValue) -> {
+            if (oldValue != null && oldValue != newValue) {
+                JFXRadioButton selected = (JFXRadioButton) newValue;
+                ConfigFiles.saveProperty(ConfigFiles.File.APP, "memberGender", String.valueOf(selected.getId().charAt(selected.getId().length() - 1)));
+                pagination.loadData(1);
+            }
+        }));
+        byte genderFilter = Byte.parseByte(Objects.requireNonNull(ConfigFiles.readProperty(ConfigFiles.File.APP, "memberGender")));
+        for (byte i = 0; i < toggleGender.getToggles().size(); i++) {
+            if (((JFXRadioButton) toggleGender.getToggles().get(i)).getId().equals("radioButtonGender" + genderFilter)) {
+                toggleGender.getToggles().get(i).setSelected(true);
+            }
         }
+
+        ToggleGroup toggleOrderBy = new ToggleGroup();
+        this.radioButtonOrderBy0.setToggleGroup(toggleOrderBy);
+        this.radioButtonOrderBy1.setToggleGroup(toggleOrderBy);
+
+        //TODO: ENCAPSULE METHOD ON CONFIG FILES FOR AUTOMATITATION
+        toggleOrderBy.selectedToggleProperty().addListener(((observable, oldValue, newValue) -> {
+            if (oldValue != null && oldValue != newValue) {
+                JFXRadioButton selected = (JFXRadioButton) newValue;
+                ConfigFiles.saveProperty(ConfigFiles.File.APP, "memberOrderBy", String.valueOf(selected.getId().charAt(selected.getId().length() - 1)));
+                pagination.loadData(1);
+            }
+        }));
+        byte orderByFilter = Byte.parseByte(Objects.requireNonNull(ConfigFiles.readProperty(ConfigFiles.File.APP, "memberOrderBy")));
+        for (byte i = 0; i < toggleOrderBy.getToggles().size(); i++) {
+            if (((JFXRadioButton) toggleOrderBy.getToggles().get(i)).getId().equals("radioButtonOrderBy" + orderByFilter)) {
+                toggleOrderBy.getToggles().get(i).setSelected(true);
+            }
+        }
+
     }
 }

@@ -2,60 +2,93 @@ package com.ocielgp.utilities;
 
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
+import com.ocielgp.app.AppController;
 import com.ocielgp.database.MembersData;
+import com.ocielgp.files.ConfigFiles;
 import com.ocielgp.model.MembersModel;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseEvent;
-import javafx.util.Callback;
 
-import java.time.LocalDate;
+import java.util.Objects;
 
 public class Pagination {
     public enum Sources {
         MEMBERS
     }
 
+    private final JFXTextField fieldSearch;
     private final TableView tableView;
     private final JFXTextField fieldRowsPerPage;
-    private JFXButton buttonFilter;
-    private Label labelPreviousPage;
-    private Label labelPage;
-    private Label labelNextPage;
+    private final Label labelPage;
 
     private int rows = 15;
     private final Sources source;
 
-    public Pagination(TableView tableView, JFXTextField fieldRegistersPerPage, JFXButton buttonFilter, Label labelPreviusPage, Label labelPageCounter, Label labelNextPage, Sources source) {
+    public Pagination(JFXTextField fieldSearch, JFXButton buttonSearch, TableView tableView, JFXTextField fieldRegistersPerPage, Label labelPreviusPage, Label labelPageCounter, Label labelNextPage, Sources source) {
+        this.fieldSearch = fieldSearch;
         this.tableView = tableView;
         this.fieldRowsPerPage = fieldRegistersPerPage;
-        this.buttonFilter = buttonFilter;
-        this.labelPreviousPage = labelPreviusPage;
         this.labelPage = labelPageCounter;
-        this.labelNextPage = labelNextPage;
         this.source = source;
 
-        this.buttonFilter.addEventFilter(ActionEvent.ACTION, actionEvent -> {
-            if (Validator.numberValidator(new InputDetails(this.fieldRowsPerPage, this.fieldRowsPerPage.getText()))) {
-                int newRowsPerPage = Integer.parseInt(this.fieldRowsPerPage.getText());
-                if (newRowsPerPage > 0) {
-                    this.rows = Integer.parseInt(this.fieldRowsPerPage.getText());
-                    this.loadData(1);
-                } else {
-                    NotificationHandler.danger("Error", "Cantidad de registros no válida.", 2);
-                    Validator.shakeInput(this.fieldRowsPerPage);
-                }
+        // Fieldsearch logic
+        this.fieldSearch.setOnKeyPressed((keyEvent -> {
+            if (keyEvent.getCode() == KeyCode.ENTER) {
+                this.loadData(1);
+            }
+        }));
+        buttonSearch.setOnAction(actionEvent -> this.loadData(1));
+
+        // Pagination logic
+        // TODO: ADD NUMBER OF ROWS, CURRENT SHOWING ROWS OF TOTAL
+        this.fieldRowsPerPage.setOnKeyPressed(keyEvent -> {
+            if (keyEvent.getCode().equals(KeyCode.ENTER)) {
+                this.updateRowsPerPage();
             }
         });
-        this.labelPreviousPage.addEventFilter(MouseEvent.MOUSE_CLICKED, mouseEvent -> this.previousPage());
-        this.labelNextPage.addEventFilter(MouseEvent.MOUSE_CLICKED, mouseEvent -> this.nextPage());
+        this.fieldRowsPerPage.focusedProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue) {
+                this.updateRowsPerPage();
+            }
+        });
+        labelPreviusPage.addEventFilter(MouseEvent.MOUSE_CLICKED, mouseEvent -> this.previousPage());
+        labelNextPage.addEventFilter(MouseEvent.MOUSE_CLICKED, mouseEvent -> this.nextPage());
         this.tableView.addEventFilter(MouseEvent.MOUSE_CLICKED, mouseEvent -> this.itemSelected());
-
+        this.rows = Integer.parseInt(Objects.requireNonNull(ConfigFiles.readProperty(ConfigFiles.File.APP, "paginationRows")));
         this.loadData(1); // Initial data
+
+        // Listener on ComboBox GymModel
+        EventHandler<ActionEvent> gymChange = actionEvent -> {
+            if (!Boolean.parseBoolean(ConfigFiles.readProperty(ConfigFiles.File.APP, "memberAllGyms"))) {
+                this.loadData(1);
+            }
+        };
+        AppController.getCurrentGymNode().addEventHandler(ActionEvent.ACTION, gymChange);
+        this.fieldSearch.sceneProperty().addListener((observable, oldScene, newScene) -> {
+            if (oldScene != null) {
+                AppController.getCurrentGymNode().removeEventHandler(ActionEvent.ACTION, gymChange);
+            }
+        });
+    }
+
+    private void updateRowsPerPage() {
+        if (Validator.numberValidator(new InputDetails(this.fieldRowsPerPage, this.fieldRowsPerPage.getText()))) {
+            int newRowsPerPage = Integer.parseInt(this.fieldRowsPerPage.getText());
+            if (newRowsPerPage > 0) {
+                this.rows = Integer.parseInt(this.fieldRowsPerPage.getText());
+                ConfigFiles.saveProperty(ConfigFiles.File.APP, "paginationRows", this.fieldRowsPerPage.getText());
+                this.loadData(1);
+            } else {
+                NotificationHandler.danger("Error", "Cantidad de registros no válida.", 2);
+                Validator.shakeInput(this.fieldRowsPerPage);
+            }
+        }
     }
 
     public void itemSelected() {
@@ -91,7 +124,7 @@ public class Pagination {
     }
 
     private void loadMembers(int page) {
-        ObservableList<MembersModel> data = MembersData.getMembers(this.rows, page);
+        ObservableList<MembersModel> data = MembersData.getMembers(this.rows, page, this.fieldSearch.getText());
         if (data != null && data.size() > 0) {
             this.tableView.setItems(data);
             this.labelPage.setText(String.valueOf(page));
@@ -134,6 +167,8 @@ public class Pagination {
                     }
                 }
             });
+        } else if (page == 1) {
+            this.tableView.setItems(null);
         }
     }
 }

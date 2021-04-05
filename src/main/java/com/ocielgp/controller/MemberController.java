@@ -101,6 +101,12 @@ public class MemberController implements Initializable {
     @FXML
     private JFXButton buttonCancel;
 
+    // Attributes
+    Pagination pagination;
+
+    public MemberController(Pagination pagination) {
+        this.pagination = pagination;
+    }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -286,7 +292,7 @@ public class MemberController implements Initializable {
                                 MembersData.createDebt(idMember, pendingPaymentModel);
                             }
 
-                            AppController.refreshTable();
+                            this.pagination.loadData(1); // Refresh table
                         }
                     }
                 }

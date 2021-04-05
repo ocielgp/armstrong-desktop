@@ -4,10 +4,13 @@ import com.digitalpersona.uareu.Fmd;
 import com.digitalpersona.uareu.UareUException;
 import com.digitalpersona.uareu.UareUGlobal;
 import com.ocielgp.fingerprint.Fingerprint;
-import com.ocielgp.model.MembersModel;
 import com.ocielgp.utilities.NotificationHandler;
 
-import java.sql.*;
+import java.lang.invoke.MethodHandles;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class FingerprintData {
     public static int searchFingerprint(Fmd fingerprint) {
@@ -27,14 +30,24 @@ public class FingerprintData {
                         NotificationHandler.sucess("Hola", rs.getString("name"), 3);
                         break;
                     }
-                } catch (UareUException e) {
-                    e.printStackTrace();
+                } catch (UareUException uareUException) {
+                    NotificationHandler.catchError(
+                            MethodHandles.lookup().lookupClass().getSimpleName(),
+                            Thread.currentThread().getStackTrace()[1],
+                            uareUException.getMessage(),
+                            uareUException
+                    );
+                    uareUException.printStackTrace();
                 }
             }
             NotificationHandler.warn("Lector de Huellas", "Huella no encontrada", 2);
-        } catch (SQLException throwables) {
-            NotificationHandler.danger("Error", "[FingerprintData][searchFingerprint]: Error al buscar huella.", 5);
-            throwables.printStackTrace();
+        } catch (SQLException sqlException) {
+            NotificationHandler.catchError(
+                    MethodHandles.lookup().lookupClass().getSimpleName(),
+                    Thread.currentThread().getStackTrace()[1],
+                    "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(),
+                    sqlException
+            );
         }
         return 0;
     }

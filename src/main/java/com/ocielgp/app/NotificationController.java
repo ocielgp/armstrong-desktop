@@ -1,6 +1,5 @@
 package com.ocielgp.app;
 
-import com.ocielgp.controller.RootController;
 import com.ocielgp.model.NotificationModel;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -25,7 +24,7 @@ public class NotificationController implements Initializable {
     private Label content;
 
     // Attributes
-    private NotificationModel notification;
+    private final NotificationModel notification;
 
     public NotificationController(NotificationModel notification) {
         this.notification = notification;

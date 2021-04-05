@@ -5,6 +5,7 @@ import com.jfoenix.controls.JFXComboBox;
 import com.ocielgp.app.AppController;
 import com.ocielgp.database.DataServer;
 import com.ocielgp.database.GymsData;
+import com.ocielgp.files.ConfigFiles;
 import com.ocielgp.fingerprint.Fingerprint;
 import com.ocielgp.model.GymsModel;
 import com.ocielgp.utilities.Loader;
@@ -18,6 +19,7 @@ import javafx.scene.layout.BorderPane;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.net.URL;
+import java.util.Objects;
 import java.util.ResourceBundle;
 
 public class RootController implements Initializable {
@@ -34,16 +36,18 @@ public class RootController implements Initializable {
     private JFXComboBox<GymsModel> comboBoxGyms;
 
     // Attributes
-    private String themeType = "night-theme"; // Initial theme
+    private String themeType; // Initial theme
 
     public RootController() {
-        this.themeType = AppController.readProperty("app.properties", "theme");
+        this.themeType = ConfigFiles.readProperty(ConfigFiles.File.APP, "theme");
     }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         // AppController Global
         AppController.startController(this);
+
+        this.comboBoxGyms.setOpacity(0); // Hide Gym's List
 
         this.rootPane.getStyleClass().add(themeType);
         theme.setOnAction(actionEvent -> {
@@ -54,8 +58,7 @@ public class RootController implements Initializable {
                 rootPane.getStyleClass().set(1, "day-theme");
                 themeType = "day-theme";
             }
-            System.out.println(themeType);
-            AppController.saveProperty("app.properties", "theme", this.themeType);
+            ConfigFiles.saveProperty(ConfigFiles.File.APP, "theme", this.themeType);
             /*String resp = DialogHandler.createDialog(
                     "gmi-snooze",
                     "Hola",
@@ -83,17 +86,25 @@ public class RootController implements Initializable {
 
         // Connect to data source
         if (DataServer.getConnection() != null) {
+            // Check if fingerprint scanner is connected
+            Platform.runLater(Fingerprint::Scanner);
+
             ObservableList<GymsModel> gyms = GymsData.getGyms();
             if (gyms == null) {
                 this.comboBoxGyms.setDisable(true);
             } else {
-                this.comboBoxGyms.setItems(GymsData.getGyms());
+                this.comboBoxGyms.setItems(gyms);
+                int previousIdGym = Integer.parseInt(Objects.requireNonNull(ConfigFiles.readProperty(ConfigFiles.File.APP, "idGym")));
+                for (GymsModel gym : gyms) {
+                    if (previousIdGym == gym.getIdGym()) {
+                        this.comboBoxGyms.getSelectionModel().select(gym);
+                        break;
+                    }
+                }
+                this.comboBoxGyms.valueProperty().addListener((observable, oldValue, newValue) -> ConfigFiles.saveProperty(ConfigFiles.File.APP, "idGym", String.valueOf(this.comboBoxGyms.getSelectionModel().getSelectedItem().getIdGym())));
                 this.comboBoxGyms.focusedProperty().addListener((observableValue, oldValue, newValue) -> this.comboBoxGyms.getStyleClass().remove("red-border-input-line"));
             }
         }
-
-        // Check if fingerprint scanner is connected
-        Platform.runLater(Fingerprint::Scanner);
     }
 
     public GymsModel getGym() {

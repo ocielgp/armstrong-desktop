@@ -1,5 +1,6 @@
 package com.ocielgp.controller;
 
+import animatefx.animation.FadeInUp;
 import com.ocielgp.app.AppController;
 import com.ocielgp.fingerprint.Fingerprint;
 import com.ocielgp.utilities.Input;
@@ -99,12 +100,14 @@ public class DashboardController implements Initializable {
         Fingerprint.initializeUI(this.fingerprintIcon, this.fingerprintStatus);
 
         Platform.runLater(() -> {
-//            Node summaryFXML = Loader.Load(
-//                    "summary.fxml",
-//                    "Dashboard",
-//                    true
-//            );
-//            this.content.setContent(summaryFXML);
+            /*Node summaryFXML = Loader.Load(
+                    "summary.fxml",
+                    "Dashboard",
+                    true
+            );
+            this.content.setContent(summaryFXML);*/
+            new FadeInUp(AppController.getCurrentGymNode()).play();
+
             Node members = Loader.Load(
                     "members.fxml",
                     "Dashboard",

@@ -2,20 +2,20 @@ package com.ocielgp.database;
 
 import com.digitalpersona.uareu.Fmd;
 import com.ocielgp.app.AppController;
+import com.ocielgp.files.ConfigFiles;
 import com.ocielgp.model.MembersModel;
 import com.ocielgp.model.MembershipsModel;
 import com.ocielgp.model.PaymentDebtsModel;
-import com.ocielgp.model.PaymentMembershipsModel;
 import com.ocielgp.utilities.DateFormatter;
 import com.ocielgp.utilities.NotificationHandler;
 import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 
+import java.lang.invoke.MethodHandles;
 import java.sql.*;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.ListIterator;
+import java.util.Objects;
 
 public class MembersData {
     public static int addMember(MembersModel memberModel) {
@@ -35,17 +35,18 @@ public class MembersData {
             if (memberModel.getNotes().equals("")) ps.setNull(6, Types.NULL);
             else ps.setString(6, memberModel.getNotes());
 
-            int affectedRows = ps.executeUpdate();
-            if (affectedRows > 0) {
-                rs = ps.getGeneratedKeys();
-                rs.next();
-                return rs.getInt(1); // Return new id member
-            } else {
-                throw new SQLException("[MembersData][addMember]: Filas afectadas = 0");
-            }
-        } catch (SQLException throwables) {
-            NotificationHandler.danger("Error", "[MembersData][addMember]: Error al crear un nuevo miembro.", 5);
-            throwables.printStackTrace();
+            ps.executeUpdate();
+            rs = ps.getGeneratedKeys();
+            rs.next();
+            return rs.getInt(1); // Return new id member
+
+        } catch (SQLException sqlException) {
+            NotificationHandler.catchError(
+                    MethodHandles.lookup().lookupClass().getSimpleName(),
+                    Thread.currentThread().getStackTrace()[1],
+                    "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(),
+                    sqlException
+            );
         }
         return 0;
     }
@@ -59,7 +60,7 @@ public class MembersData {
         ResultSet rs;
         try {
             con = DataServer.getConnection();
-            // Check if member already have a photo
+            // Check if member have an older photo
             ps = con.prepareStatement("SELECT idPhoto FROM MEMBER_PHOTOS WHERE idMember = ?");
             ps.setInt(1, idMember);
             rs = ps.executeQuery();
@@ -69,26 +70,20 @@ public class MembersData {
                 ps = con.prepareStatement("UPDATE MEMBER_PHOTOS SET photo = ? WHERE idPhoto = ?");
                 ps.setBytes(1, photoBytes);
                 ps.setInt(2, idPhoto);
-                int affectedRows = ps.executeUpdate();
-                if (affectedRows > 0) {
-                    return true;
-                } else {
-                    throw new SQLException("[MembersData][uploadPhoto]: Filas afectadas = 0");
-                }
-            }
-            ps = con.prepareStatement("INSERT INTO MEMBER_PHOTOS(photo, idMember) VALUE (?, ?)");
-            ps.setBytes(1, photoBytes);
-            ps.setInt(2, idMember);
-            int affectedRows = ps.executeUpdate();
-            if (affectedRows > 0) {
-                System.out.println("subida");
-                return true;
             } else {
-                throw new SQLException("[MembersData][uploadPhoto]: Filas afectadas = 0");
+                ps = con.prepareStatement("INSERT INTO MEMBER_PHOTOS(photo, idMember) VALUE (?, ?)");
+                ps.setBytes(1, photoBytes);
+                ps.setInt(2, idMember);
             }
-        } catch (SQLException throwables) {
-            NotificationHandler.danger("Error", "[MembersData][uploadPhoto]: Error al subir una foto.", 5);
-            throwables.printStackTrace();
+            ps.executeUpdate();
+            return true;
+        } catch (SQLException sqlException) {
+            NotificationHandler.catchError(
+                    MethodHandles.lookup().lookupClass().getSimpleName(),
+                    Thread.currentThread().getStackTrace()[1],
+                    "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(),
+                    sqlException
+            );
         }
         return false;
     }
@@ -101,7 +96,7 @@ public class MembersData {
         PreparedStatement ps;
         try {
             con = DataServer.getConnection();
-            // Remove all fingerprints if member have
+            // Remove all previous fingerprints if exists
             ps = con.prepareStatement("DELETE FROM MEMBER_FINGERPRINTS WHERE idMember = ?");
             ps.setInt(1, idMember);
             ps.executeUpdate();
@@ -114,9 +109,13 @@ public class MembersData {
                 ps.executeUpdate();
             }
             return true;
-        } catch (Exception throwables) {
-            NotificationHandler.danger("Error", "[MembersData][uploadFingerprints]: Error al subir huellas.", 5);
-            throwables.printStackTrace();
+        } catch (SQLException sqlException) {
+            NotificationHandler.catchError(
+                    MethodHandles.lookup().lookupClass().getSimpleName(),
+                    Thread.currentThread().getStackTrace()[1],
+                    "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(),
+                    sqlException
+            );
         }
         return false;
     }
@@ -143,11 +142,15 @@ public class MembersData {
 
             ps.executeUpdate();
             return true;
-        } catch (SQLException throwables) {
-            NotificationHandler.danger("Error", "[MembersData][uploadMembership]: Error al registrar membresía.", 5);
-            throwables.printStackTrace();
-            return false;
+        } catch (SQLException sqlException) {
+            NotificationHandler.catchError(
+                    MethodHandles.lookup().lookupClass().getSimpleName(),
+                    Thread.currentThread().getStackTrace()[1],
+                    "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(),
+                    sqlException
+            );
         }
+        return false;
     }
 
     public static boolean createDebt(int idMember, PaymentDebtsModel debt) {
@@ -163,25 +166,88 @@ public class MembersData {
             ps.setInt(5, AppController.getStaffUserModel().getIdStaffUser());
             ps.executeUpdate();
             return true;
-        } catch (SQLException throwables) {
-            NotificationHandler.danger("Error", "[MembersData][uploadMembership]: Error al registrar membresía.", 5);
-            throwables.printStackTrace();
-            return false;
+        } catch (SQLException sqlException) {
+            NotificationHandler.catchError(
+                    MethodHandles.lookup().lookupClass().getSimpleName(),
+                    Thread.currentThread().getStackTrace()[1],
+                    "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(),
+                    sqlException
+            );
         }
+        return false;
     }
 
-    public static ObservableList<MembersModel> getMembers(int limit, int page) {
+    public static ObservableList<MembersModel> getMembers(int limit, int page, String fieldSearchContent) {
         Connection con;
         PreparedStatement ps;
         ResultSet rs;
         try {
-            con = DataServer.getConnection();
-            ps = con.prepareStatement("SELECT M.idMember, M.name, M.lastName, PM.endDate FROM MEMBERS M JOIN PAYMENT_MEMBERSHIPS PM on M.idMember = PM.idMember WHERE ( M.flag = 1 AND PM.flag = 1 ) AND M.idMember NOT IN ( SELECT idMember FROM STAFF_EMPLOYEES WHERE M.flag = 1 ) ORDER BY M.idMember DESC LIMIT ?,?");
-            int maxRegisters = limit * page;
-            ps.setInt(1, maxRegisters - limit);
-            ps.setInt(2, limit);
-            rs = ps.executeQuery();
+            // Query initial
+            String query = "SELECT M.idMember, M.name, M.lastName, PM.endDate FROM MEMBERS M JOIN PAYMENT_MEMBERSHIPS PM on M.idMember = PM.idMember WHERE ( M.flag = 1 AND PM.flag = 1 ) AND M.idMember NOT IN ( SELECT idMember FROM STAFF_EMPLOYEES WHERE M.flag = 1 ) ";
 
+            // fieldSearchContent
+            if (fieldSearchContent.length() > 0) {
+                try {
+                    Integer.parseInt(fieldSearchContent);
+                    query += "AND M.idMember LIKE ? ";
+                } catch (NumberFormatException exception) {
+                    query += "AND ( M.name LIKE ? OR M.lastName LIKE ? ) ";
+                }
+            }
+
+            // Filters
+            boolean filterAllGyms = Boolean.parseBoolean(ConfigFiles.readProperty(ConfigFiles.File.APP, "memberAllGyms"));
+            boolean filterOnlyActiveMembers = Boolean.parseBoolean(ConfigFiles.readProperty(ConfigFiles.File.APP, "memberOnlyActiveMembers"));
+            // TODO DEBT LIST
+            boolean filterOnlyDebtors = Boolean.parseBoolean(ConfigFiles.readProperty(ConfigFiles.File.APP, "memberOnlyDebtors"));
+            if (!filterAllGyms) {
+                query += "AND PM.idGym = " + ConfigFiles.readProperty(ConfigFiles.File.APP, "idGym") + " ";
+            }
+            if (filterOnlyActiveMembers) {
+                query += "AND PM.endDate >= CURDATE() ";
+            }
+
+            // Gender filter
+            byte filterGender = Byte.parseByte(Objects.requireNonNull(ConfigFiles.readProperty(ConfigFiles.File.APP, "memberGender")));
+            if (filterGender == 1) {
+                query += "AND M.gender = 'H' ";
+            } else if (filterGender == 2) {
+                query += "AND M.gender = 'M' ";
+            }
+
+            // Order by filter
+            byte filterOrderBy = Byte.parseByte(Objects.requireNonNull(ConfigFiles.readProperty(ConfigFiles.File.APP, "memberOrderBy")));
+            if (filterOrderBy == 0) {
+                query += "ORDER BY M.idMember DESC ";
+            } else if (filterOrderBy == 1) {
+                query += "ORDER BY M.registrationDate DESC ";
+            }
+
+            // Limit query ( pagination purposes )
+            query += "LIMIT ?,?";
+
+            con = DataServer.getConnection();
+            ps = con.prepareStatement(query);
+
+            // Set params
+            ParameterMetaData parameters = ps.getParameterMetaData();
+            if (parameters != null) {
+                int maxRegisters = limit * page;
+                if (parameters.getParameterCount() == 2) {
+                    ps.setInt(1, maxRegisters - limit);
+                    ps.setInt(2, limit);
+                } else if (parameters.getParameterCount() == 3) {
+                    ps.setInt(1, Integer.parseInt(fieldSearchContent));
+                    ps.setInt(2, maxRegisters - limit);
+                    ps.setInt(3, limit);
+                } else if (parameters.getParameterCount() == 4) {
+                    ps.setString(1, "%" + fieldSearchContent + "%");
+                    ps.setString(2, "%" + fieldSearchContent + "%");
+                    ps.setInt(3, maxRegisters - limit);
+                    ps.setInt(4, limit);
+                }
+            }
+            rs = ps.executeQuery();
             ObservableList<MembersModel> members = FXCollections.observableArrayList();
             while (rs.next()) {
                 MembersModel member = new MembersModel();
@@ -196,11 +262,14 @@ public class MembersData {
                 members.add(member);
             }
             return members;
-        } catch (SQLException throwables) {
-            NotificationHandler.danger("Error", "[MembersData][getMembers]: Error al obtener socios.", 5);
-            throwables.printStackTrace();
+        } catch (SQLException sqlException) {
+            NotificationHandler.catchError(
+                    MethodHandles.lookup().lookupClass().getSimpleName(),
+                    Thread.currentThread().getStackTrace()[1],
+                    "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(),
+                    sqlException
+            );
         }
         return null;
     }
-
 }

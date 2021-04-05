@@ -2,7 +2,7 @@
     -fx-font: 2em "Roboto";
 }
 
-.jfx-toggle-button {
+.jfx-toggle-button, .jfx-check-box, .jfx-radio-button {
     -fx-font: 1.5em "Roboto";
 }
 
@@ -69,6 +69,23 @@
     -fx-cursor: hand;
 }
 
+.jfx-check-box {
+    -fx-text-fill: -fx-color-text;
+    -jfx-checked-color: -fx-color-text;
+    -jfx-unchecked-color: -fx-color-text;
+}
+
+.jfx-check-box .mark {
+    -fx-border-color: -fx-color-background;
+}
+
+.jfx-radio-button {
+    -fx-icon-color: red;
+    -fx-text-fill: -fx-color-text;
+    -jfx-selected-color: -fx-color-text;
+    -jfx-unselected-color: -fx-color-text;
+}
+
 .jfx-toggle-button {
     -fx-text-fill: -fx-color-text;
     -jfx-toggle-color: -fx-color-text;
@@ -112,6 +129,10 @@
 
 .jfx-date-picker .today {
     -fx-text-fill: #333;
+}
+
+.scroll-pane {
+    -fx-background-insets: 0;
 }
 
 .scroll-pane > .viewport {

@@ -38,9 +38,15 @@ public class StaffUsersData {
                 }
             }
         } catch (SQLException sqlException) {
-            NotificationHandler.danger("Error", "[RecepcionistData]: Error al iniciar sesión en el servidor", 5);
-            sqlException.printStackTrace();
-            return null;
+            System.out.println("hola");
+//            NotificationHandler.catchError(
+//                    MethodHandles.lookup().lookupClass().getSimpleName(),
+//                    Thread.currentThread().getStackTrace()[1],
+//                    "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(),
+//                    sqlException
+//            );
+//            NotificationHandler.danger("Error", "[RecepcionistData]: Error al iniciar sesión en el servidor", 5);
+//            sqlException.printStackTrace();
         }
         NotificationHandler.danger("Error", "Usuario / Contraseña incorrectos", 2);
         return null;

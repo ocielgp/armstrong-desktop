@@ -1,10 +1,8 @@
 package com.ocielgp;
 
 import com.ocielgp.app.AppController;
-import com.ocielgp.controller.RootController;
 import com.ocielgp.model.StaffUsersModel;
 import com.ocielgp.utilities.Loader;
-import com.ocielgp.utilities.NotificationHandler;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
@@ -53,7 +51,6 @@ public class RunApp extends Application {
             Platform.exit();
             System.exit(0);
         });
-
 
         StaffUsersModel staffUserModel = new StaffUsersModel();
         staffUserModel.setName("Ociel");
