@@ -227,7 +227,7 @@ public class MembersData {
             query += "LIMIT ?,?";
 
             con = DataServer.getConnection();
-            ps = con.prepareStatement(query);
+            ps = con.prepareStatement(query, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
 
             // Set params
             ParameterMetaData parameters = ps.getParameterMetaData();
@@ -247,6 +247,7 @@ public class MembersData {
                     ps.setInt(4, limit);
                 }
             }
+            countRows(ps);
             rs = ps.executeQuery();
             ObservableList<MembersModel> members = FXCollections.observableArrayList();
             while (rs.next()) {
@@ -271,5 +272,18 @@ public class MembersData {
             );
         }
         return null;
+    }
+
+    public static int countRows(PreparedStatement ps) {
+        Connection con = DataServer.getConnection();
+        try {
+            ResultSet rs = ps.executeQuery();
+            if (rs.last()) {
+                System.out.println(rs.getRow());
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return 0;
     }
 }
