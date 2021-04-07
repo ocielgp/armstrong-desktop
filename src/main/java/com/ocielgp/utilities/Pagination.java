@@ -4,6 +4,7 @@ import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
 import com.ocielgp.app.AppController;
 import com.ocielgp.database.MembersData;
+import com.ocielgp.database.QueryRows;
 import com.ocielgp.files.ConfigFiles;
 import com.ocielgp.model.MembersModel;
 import javafx.collections.ObservableList;
@@ -25,16 +26,18 @@ public class Pagination {
     private final JFXTextField fieldSearch;
     private final TableView tableView;
     private final JFXTextField fieldRowsPerPage;
-    private final Label labelPage;
+    private final Label labelCurrentPage;
+    private final Label labelTotalPages;
 
     private int rows = 15;
     private final Sources source;
 
-    public Pagination(JFXTextField fieldSearch, JFXButton buttonSearch, TableView tableView, JFXTextField fieldRegistersPerPage, Label labelPreviusPage, Label labelPageCounter, Label labelNextPage, Sources source) {
+    public Pagination(JFXTextField fieldSearch, JFXButton buttonSearch, TableView tableView, JFXTextField fieldRegistersPerPage, Label labelPreviusPage, Label labelCurrentPage, Label labelTotalPages, Label labelNextPage, Sources source) {
         this.fieldSearch = fieldSearch;
         this.tableView = tableView;
         this.fieldRowsPerPage = fieldRegistersPerPage;
-        this.labelPage = labelPageCounter;
+        this.labelCurrentPage = labelCurrentPage;
+        this.labelTotalPages = labelTotalPages;
         this.source = source;
 
         // Fieldsearch logic
@@ -103,11 +106,11 @@ public class Pagination {
     }
 
     public void previousPage() {
-        this.loadData(Integer.parseInt(this.labelPage.getText()) - 1);
+        this.loadData(Integer.parseInt(this.labelCurrentPage.getText()) - 1);
     }
 
     public void nextPage() {
-        this.loadData(Integer.parseInt(this.labelPage.getText()) + 1);
+        this.loadData(Integer.parseInt(this.labelCurrentPage.getText()) + 1);
     }
 
     public void loadData(int page) {
@@ -124,10 +127,11 @@ public class Pagination {
     }
 
     private void loadMembers(int page) {
-        ObservableList<MembersModel> data = MembersData.getMembers(this.rows, page, this.fieldSearch.getText());
-        if (data != null && data.size() > 0) {
-            this.tableView.setItems(data);
-            this.labelPage.setText(String.valueOf(page));
+        QueryRows queryRows = MembersData.getMembers(this.rows, page, this.fieldSearch.getText());
+        if (queryRows != null && queryRows.getData().size() > 0) {
+            this.labelTotalPages.setText(String.valueOf(queryRows.getRows()));
+            this.tableView.setItems(queryRows.getData());
+            this.labelCurrentPage.setText(String.valueOf(page));
             this.tableView.setRowFactory(row -> new TableRow<MembersModel>() {
                 @Override
                 public void updateItem(MembersModel member, boolean empty) {

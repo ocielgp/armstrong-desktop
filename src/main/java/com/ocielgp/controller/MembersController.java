@@ -47,7 +47,9 @@ public class MembersController implements Initializable {
     @FXML
     private Label labelPreviousPage;
     @FXML
-    private Label labelPage;
+    private Label labelCurrentPage;
+    @FXML
+    private Label labelTotalPages;
     @FXML
     private Label labelNextPage;
 
@@ -75,7 +77,7 @@ public class MembersController implements Initializable {
         this.tableColumnLastName.setCellValueFactory(new PropertyValueFactory<>("lastName"));
         this.tableColumnEndDate.setCellValueFactory(new PropertyValueFactory<>("endDate"));
 
-        Pagination pagination = new Pagination(this.fieldSearch, this.buttonSearch, this.tableViewMembers, this.fieldRowsPerPage, this.labelPreviousPage, this.labelPage, this.labelNextPage, Pagination.Sources.MEMBERS);
+        Pagination pagination = new Pagination(this.fieldSearch, this.buttonSearch, this.tableViewMembers, this.fieldRowsPerPage, this.labelPreviousPage, this.labelCurrentPage, this.labelTotalPages, this.labelNextPage, Pagination.Sources.MEMBERS);
 
         Node memberFXML = Loader.Load(
                 "member.fxml",

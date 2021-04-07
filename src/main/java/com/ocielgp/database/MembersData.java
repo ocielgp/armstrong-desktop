@@ -177,9 +177,9 @@ public class MembersData {
         return false;
     }
 
-    public static ObservableList<MembersModel> getMembers(int limit, int page, String fieldSearchContent) {
+    public static QueryRows getMembers(int limit, int page, String fieldSearchContent) {
         Connection con;
-        PreparedStatement ps;
+        PreparedStatement statementLimited, statement;
         ResultSet rs;
         try {
             // Query initial
@@ -223,32 +223,40 @@ public class MembersData {
                 query += "ORDER BY M.registrationDate DESC ";
             }
 
+            con = DataServer.getConnection();
+            statement = con.prepareStatement(query, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
             // Limit query ( pagination purposes )
             query += "LIMIT ?,?";
-
-            con = DataServer.getConnection();
-            ps = con.prepareStatement(query, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+            statementLimited = con.prepareStatement(query, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
 
             // Set params
-            ParameterMetaData parameters = ps.getParameterMetaData();
+            ParameterMetaData parameters = statementLimited.getParameterMetaData();
             if (parameters != null) {
                 int maxRegisters = limit * page;
                 if (parameters.getParameterCount() == 2) {
-                    ps.setInt(1, maxRegisters - limit);
-                    ps.setInt(2, limit);
+                    statementLimited.setInt(1, maxRegisters - limit);
+                    statementLimited.setInt(2, limit);
                 } else if (parameters.getParameterCount() == 3) {
-                    ps.setInt(1, Integer.parseInt(fieldSearchContent));
-                    ps.setInt(2, maxRegisters - limit);
-                    ps.setInt(3, limit);
+                    statementLimited.setInt(1, Integer.parseInt(fieldSearchContent));
+                    statementLimited.setInt(2, maxRegisters - limit);
+                    statementLimited.setInt(3, limit);
+
+                    statement.setInt(1, Integer.parseInt(fieldSearchContent));
                 } else if (parameters.getParameterCount() == 4) {
-                    ps.setString(1, "%" + fieldSearchContent + "%");
-                    ps.setString(2, "%" + fieldSearchContent + "%");
-                    ps.setInt(3, maxRegisters - limit);
-                    ps.setInt(4, limit);
+                    statementLimited.setString(1, "%" + fieldSearchContent + "%");
+                    statementLimited.setString(2, "%" + fieldSearchContent + "%");
+                    statementLimited.setInt(3, maxRegisters - limit);
+                    statementLimited.setInt(4, limit);
+
+                    statement.setString(1, "%" + fieldSearchContent + "%");
+                    statement.setString(2, "%" + fieldSearchContent + "%");
                 }
             }
-            countRows(ps);
-            rs = ps.executeQuery();
+
+            // TODO: OPTIMIZE CODE
+            // TODO: UTILITIES AND QUERY ROWS
+            int totalRows = (int) Math.ceil((double) Utilities.countRows(statement) / limit);
+            rs = statementLimited.executeQuery();
             ObservableList<MembersModel> members = FXCollections.observableArrayList();
             while (rs.next()) {
                 MembersModel member = new MembersModel();
@@ -262,7 +270,8 @@ public class MembersData {
 
                 members.add(member);
             }
-            return members;
+
+            return new QueryRows(members, totalRows);
         } catch (SQLException sqlException) {
             NotificationHandler.catchError(
                     MethodHandles.lookup().lookupClass().getSimpleName(),
@@ -272,18 +281,5 @@ public class MembersData {
             );
         }
         return null;
-    }
-
-    public static int countRows(PreparedStatement ps) {
-        Connection con = DataServer.getConnection();
-        try {
-            ResultSet rs = ps.executeQuery();
-            if (rs.last()) {
-                System.out.println(rs.getRow());
-            }
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
-        return 0;
     }
 }
