@@ -7,7 +7,6 @@ import com.ocielgp.database.MembersData;
 import com.ocielgp.database.QueryRows;
 import com.ocielgp.files.ConfigFiles;
 import com.ocielgp.model.MembersModel;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Label;
@@ -27,14 +26,16 @@ public class Pagination {
     private final TableView tableView;
     private final JFXTextField fieldRowsPerPage;
     private final Label labelCurrentPage;
+    private final Label labelTotalRows;
     private final Label labelTotalPages;
 
-    private int rows = 15;
+    private int rows;
     private final Sources source;
 
-    public Pagination(JFXTextField fieldSearch, JFXButton buttonSearch, TableView tableView, JFXTextField fieldRegistersPerPage, Label labelPreviusPage, Label labelCurrentPage, Label labelTotalPages, Label labelNextPage, Sources source) {
+    public Pagination(JFXTextField fieldSearch, JFXButton buttonSearch, Label labelTotalRows, TableView tableView, JFXTextField fieldRegistersPerPage, Label labelPreviusPage, Label labelCurrentPage, Label labelTotalPages, Label labelNextPage, Sources source) {
         this.fieldSearch = fieldSearch;
         this.tableView = tableView;
+        this.labelTotalRows = labelTotalRows;
         this.fieldRowsPerPage = fieldRegistersPerPage;
         this.labelCurrentPage = labelCurrentPage;
         this.labelTotalPages = labelTotalPages;
@@ -129,7 +130,8 @@ public class Pagination {
     private void loadMembers(int page) {
         QueryRows queryRows = MembersData.getMembers(this.rows, page, this.fieldSearch.getText());
         if (queryRows != null && queryRows.getData().size() > 0) {
-            this.labelTotalPages.setText(String.valueOf(queryRows.getRows()));
+            this.labelTotalPages.setText(String.valueOf(queryRows.getPages()));
+            this.labelTotalRows.setText(String.valueOf(queryRows.getRows()));
             this.tableView.setItems(queryRows.getData());
             this.labelCurrentPage.setText(String.valueOf(page));
             this.tableView.setRowFactory(row -> new TableRow<MembersModel>() {
@@ -172,7 +174,14 @@ public class Pagination {
                 }
             });
         } else if (page == 1) {
-            this.tableView.setItems(null);
+            this.restartCounters();
         }
+    }
+
+    public void restartCounters() {
+        this.tableView.setItems(null);
+        this.labelTotalRows.setText("0");
+        this.labelCurrentPage.setText("0");
+        this.labelTotalPages.setText("0");
     }
 }

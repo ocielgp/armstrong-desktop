@@ -33,6 +33,8 @@ public class MembersController implements Initializable {
     @FXML
     private JFXButton buttonSearch;
     @FXML
+    private Label labelTotalRows;
+    @FXML
     private TableView<MembersModel> tableViewMembers;
     @FXML
     private TableColumn<MembersModel, Integer> tableColumnId;
@@ -77,7 +79,7 @@ public class MembersController implements Initializable {
         this.tableColumnLastName.setCellValueFactory(new PropertyValueFactory<>("lastName"));
         this.tableColumnEndDate.setCellValueFactory(new PropertyValueFactory<>("endDate"));
 
-        Pagination pagination = new Pagination(this.fieldSearch, this.buttonSearch, this.tableViewMembers, this.fieldRowsPerPage, this.labelPreviousPage, this.labelCurrentPage, this.labelTotalPages, this.labelNextPage, Pagination.Sources.MEMBERS);
+        Pagination pagination = new Pagination(this.fieldSearch, this.buttonSearch, this.labelTotalRows, this.tableViewMembers, this.fieldRowsPerPage, this.labelPreviousPage, this.labelCurrentPage, this.labelTotalPages, this.labelNextPage, Pagination.Sources.MEMBERS);
 
         Node memberFXML = Loader.Load(
                 "member.fxml",

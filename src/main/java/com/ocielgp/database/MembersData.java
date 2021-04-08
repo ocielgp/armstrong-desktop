@@ -255,7 +255,8 @@ public class MembersData {
 
             // TODO: OPTIMIZE CODE
             // TODO: UTILITIES AND QUERY ROWS
-            int totalRows = (int) Math.ceil((double) Utilities.countRows(statement) / limit);
+            int totalRows = Utilities.countRows(statement);
+            int totalPages = (int) Math.ceil((double) totalRows / limit);
             rs = statementLimited.executeQuery();
             ObservableList<MembersModel> members = FXCollections.observableArrayList();
             while (rs.next()) {
@@ -271,7 +272,7 @@ public class MembersData {
                 members.add(member);
             }
 
-            return new QueryRows(members, totalRows);
+            return new QueryRows(members, totalRows, totalPages);
         } catch (SQLException sqlException) {
             NotificationHandler.catchError(
                     MethodHandles.lookup().lookupClass().getSimpleName(),
