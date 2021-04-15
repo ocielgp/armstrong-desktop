@@ -49,10 +49,10 @@ public class Validator {
     public static boolean numberValidator(InputDetails input) {
         String regex = "[0-9]+";
         int inputsInvalid = 0;
-            if (!input.getMetadata().replace(" ", "").matches(regex)) {
-                shakeInput(input.getNode());
-                inputsInvalid++;
-            }
+        if (!input.getMetadata().replace(" ", "").matches(regex)) {
+            shakeInput(input.getNode());
+            inputsInvalid++;
+        }
         if (inputsInvalid == 0) {
             return true;
         } else {
@@ -107,6 +107,20 @@ public class Validator {
             return false;
         }
     }
+
+    public static boolean moneyValidator(boolean notify, InputDetails input) {
+        try {
+            Double.parseDouble(input.getMetadata());
+            return true;
+        } catch (NumberFormatException ignored) {
+            shakeInput(input.getNode());
+        }
+        if (notify) {
+            NotificationHandler.danger("Error", "Cantidad no válida.", 2);
+        }
+        return false;
+    }
+
 
     public static boolean moneyValidator(ListIterator<InputDetails> inputs) {
         int inputsInvalid = 0;

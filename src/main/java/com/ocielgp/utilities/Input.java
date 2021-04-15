@@ -6,10 +6,7 @@ import com.jfoenix.controls.JFXPasswordField;
 import com.jfoenix.controls.JFXTextField;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TextInputControl;
+import javafx.scene.control.*;
 import javafx.scene.input.KeyEvent;
 
 import java.util.Locale;
@@ -80,6 +77,9 @@ public class Input {
             } else if (input.getClass() == JFXDatePicker.class) {
                 JFXDatePicker datePicker = (JFXDatePicker) input;
                 datePicker.getEditor().setText("");
+            } else if (input.getClass() == Label.class) {
+                Label label = (Label) input;
+                label.setText("");
             }
         }
     }

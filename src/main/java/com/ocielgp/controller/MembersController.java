@@ -82,10 +82,10 @@ public class MembersController implements Initializable {
         Pagination pagination = new Pagination(this.fieldSearch, this.buttonSearch, this.labelTotalRows, this.tableViewMembers, this.fieldRowsPerPage, this.labelPreviousPage, this.labelCurrentPage, this.labelTotalPages, this.labelNextPage, Pagination.Sources.MEMBERS);
 
         Node memberFXML = Loader.Load(
-                "member.fxml",
+                "memberDetail.fxml",
                 "Members",
                 true,
-                new MemberController(pagination)
+                new MemberDetailController(pagination)
         );
         this.memberPane.setContent(memberFXML);
         Input.getScrollEvent(this.memberPane);

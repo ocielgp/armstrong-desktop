@@ -10,6 +10,10 @@ public class DateFormatter {
     private static final String EEEE_dd_MMM_yyyy = "EEEE, dd/MMM/yyyy";
     private static final String yyyy_mm_dd = "yyyy-mm-dd";
 
+    public static LocalDate plusDaysToCurrentDate(int days) {
+        return LocalDate.now().plusDays(days);
+    }
+
     public static String getDateWithDayName(LocalDate date) {
         return date.format(DateTimeFormatter.ofPattern(EEEE_dd_MMM_yyyy));
     }
