@@ -1,27 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import com.jfoenix.controls.JFXButton?>
-<?import com.jfoenix.controls.JFXComboBox?>
-<?import com.jfoenix.controls.JFXDatePicker?>
-<?import com.jfoenix.controls.JFXTextField?>
-<?import com.jfoenix.controls.JFXToggleButton?>
-<?import java.lang.String?>
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Label?>
+<?import com.jfoenix.controls.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
-<?import org.kordamp.ikonli.javafx.FontIcon?>
-
-<VBox fx:id="addMemberPane" stylesheets="@../../../styles.css" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<?import javafx.scene.layout.*?>
+<?import org.kordamp.ikonli.javafx.*?>
+<?import java.lang.*?>
+<VBox xmlns:fx="http://javafx.com/fxml/1" fx:id="addMemberPane" styleClass="member"
+      xmlns="http://javafx.com/javafx/15.0.1">
    <HBox alignment="CENTER" styleClass="member-title">
       <VBox.margin>
-         <Insets />
+         <Insets/>
       </VBox.margin>
       <Label text="SOCIO NUEVO">
          <padding>
-            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
          </padding>
       </Label>
    </HBox>
@@ -248,7 +243,7 @@
          <JFXButton fx:id="buttonRegister" text="Registrar">
             <styleClass>
                <String fx:value="btn-secondary" />
-               <String fx:value="sucess-style" />
+               <String fx:value="success-style"/>
             </styleClass>
          </JFXButton>
          <JFXButton fx:id="buttonCancel" text="Cancelar">
@@ -259,8 +254,4 @@
          </JFXButton>
       </HBox>
    </VBox>
-   <styleClass>
-      <String fx:value="member" />
-      <String fx:value="day-theme" />
-   </styleClass>
 </VBox>

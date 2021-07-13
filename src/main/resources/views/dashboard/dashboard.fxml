@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
+<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 <?import org.kordamp.ikonli.javafx.*?>
 <?import java.lang.*?>
-<GridPane fx:id="rootPane" styleClass="dashboard" xmlns="http://javafx.com/javafx/15.0.1"
-          xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ocielgp.controller.DashboardController">
+<?import java.net.URL?>
+<GridPane xmlns:fx="http://javafx.com/fxml/1" fx:id="rootPane" prefHeight="768.0" prefWidth="1366.0"
+          xmlns="http://javafx.com/javafx/15.0.1" fx:controller="com.ocielgp.controller.DashboardController">
    <columnConstraints>
       <ColumnConstraints hgrow="SOMETIMES" maxWidth="200.0"/>
       <ColumnConstraints hgrow="SOMETIMES"/>
@@ -17,28 +17,29 @@
       <RowConstraints fillHeight="false" maxHeight="100.0" minHeight="100.0" prefHeight="100.0"/>
       <RowConstraints vgrow="SOMETIMES"/>
    </rowConstraints>
-   <HBox alignment="CENTER">
-      <styleClass>
-         <String fx:value="aside"/>
-         <String fx:value="aside-top"/>
-      </styleClass>
+   <HBox alignment="CENTER" style="-fx-border-color: -fx-color-border; -fx-border-width: 0px 1px 1px 0px;"
+         styleClass="aside">
       <ImageView fx:id="logo" fitHeight="75.0" pickOnBounds="true" preserveRatio="true">
          <HBox.margin>
-            <Insets bottom="10.0" top="10.0" />
+            <Insets bottom="10.0" top="10.0"/>
          </HBox.margin>
-         <Image url="@../../img.jpg" />
+         <Image url="@../../img.jpg"/>
       </ImageView>
+      <GridPane.margin>
+         <Insets bottom="-5.0"/>
+      </GridPane.margin>
    </HBox>
-   <VBox styleClass="aside" GridPane.rowIndex="1">
+   <VBox style="-fx-border-color: -fx-color-border; -fx-border-width: 0px 1px 0px 0px;" styleClass="aside"
+         GridPane.rowIndex="1">
       <VBox>
          <HBox fx:id="navSummary">
             <styleClass>
-               <String fx:value="option" />
-               <String fx:value="selected" />
+               <String fx:value="option"/>
+               <String fx:value="selected"/>
             </styleClass>
             <Label text="Resumen">
                <graphic>
-                  <FontIcon iconLiteral="gmi-insert-chart" />
+                  <FontIcon iconLiteral="gmi-insert-chart"/>
                </graphic>
             </Label>
          </HBox>
@@ -74,32 +75,110 @@
                   <FontIcon fx:id="fingerprintIcon" iconLiteral="gmi-fingerprint">
                      <styleClass>
                         <String fx:value="icon" />
-                        <String fx:value="off" />
+                        <String fx:value="off"/>
                      </styleClass>
                   </FontIcon>
                </graphic>
             </Label>
          </HBox>
          <HBox alignment="CENTER">
-            <Label fx:id="fingerprintStatus" styleClass="status" text="DESCONECTADO" />
+            <Label fx:id="fingerprintStatus" styleClass="status" text="DESCONECTADO"/>
          </HBox>
       </VBox>
+      <GridPane.margin>
+         <Insets/>
+      </GridPane.margin>
    </VBox>
-   <HBox alignment="CENTER_LEFT" styleClass="top-bar" GridPane.columnIndex="1">
-      <HBox alignment="CENTER" styleClass="section">
-         <Label fx:id="section" styleClass="section" text="Resumen" />
+   <HBox alignment="CENTER_LEFT" style="-fx-border-color: -fx-color-border; -fx-border-width: 0px 0px 1px 0px;"
+         styleClass="top-bar" GridPane.columnIndex="1">
+      <HBox alignment="CENTER_LEFT" styleClass="section">
+         <Label fx:id="section" styleClass="section" text="Resumen"/>
+         <padding>
+            <Insets bottom="-1.0"/>
+         </padding>
       </HBox>
-      <HBox alignment="CENTER_RIGHT" styleClass="user" HBox.hgrow="SOMETIMES">
+      <HBox fx:id="user_container" spacing="5.0" style="-fx-border-radius: 10px; -fx-background-radius: 10px;"
+            HBox.hgrow="ALWAYS">
+         <children>
+            <VBox>
+               <children>
+                  <ImageView fx:id="user_photo" fitHeight="75.0" fitWidth="75.0" pickOnBounds="true"
+                             preserveRatio="true">
+                     <image>
+                        <Image url="@../../img.jpg"/>
+                     </image>
+                  </ImageView>
+               </children>
+            </VBox>
+            <VBox alignment="CENTER" minWidth="100.0">
+               <children>
+                  <Label styleClass="bold" text="ID"/>
+                  <Label fx:id="user_id" text="1"/>
+               </children>
+               <padding>
+                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+               </padding>
+            </VBox>
+            <VBox>
+               <children>
+                  <HBox spacing="5.0">
+                     <children>
+                        <Label styleClass="bold" text="Nombre"/>
+                        <Label fx:id="user_name" text="Ociel Garcia Padilla"/>
+                     </children>
+                  </HBox>
+                  <HBox spacing="5.0">
+                     <children>
+                        <Label styleClass="bold" text="Gimnasio"/>
+                        <Label fx:id="user_gym" text="Ociel Garcia Padilla"/>
+                     </children>
+                  </HBox>
+                  <HBox spacing="5.0" VBox.vgrow="SOMETIMES">
+                     <children>
+                        <Label styleClass="bold" text="Membresia"/>
+                        <Label fx:id="user_membership" text="Nada"/>
+                     </children>
+                  </HBox>
+               </children>
+            </VBox>
+         </children>
          <HBox.margin>
-            <Insets right="20.0" />
+            <Insets left="10.0" right="10.0"/>
+         </HBox.margin>
+         <padding>
+            <Insets left="10.0" right="10.0"/>
+         </padding>
+         <styleClass>
+            <String fx:value="day-theme"/>
+            <String fx:value="success-style"/>
+         </styleClass>
+      </HBox>
+      <HBox alignment="CENTER_RIGHT" styleClass="user">
+         <HBox.margin>
+            <Insets right="20.0"/>
          </HBox.margin>
          <ImageView fx:id="userImage" fitHeight="75.0" fitWidth="100.0" pickOnBounds="true" preserveRatio="true">
             <HBox.margin>
-               <Insets right="10.0" />
+               <Insets right="10.0"/>
             </HBox.margin>
          </ImageView>
-         <Label fx:id="nombres" text="Ociel" />
+         <Label fx:id="nombres" text="Ociel"/>
       </HBox>
+      <GridPane.margin>
+         <Insets bottom="-5.0"/>
+      </GridPane.margin>
+      <padding>
+         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+      </padding>
    </HBox>
-   <ScrollPane fx:id="content" fitToHeight="true" fitToWidth="true" styleClass="content" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+   <ScrollPane fx:id="content" fitToHeight="true" fitToWidth="true" styleClass="content" GridPane.columnIndex="1"
+               GridPane.rowIndex="1"/>
+   <styleClass>
+      <String fx:value="dashboard"/>
+      <String fx:value="day-theme"/>
+   </styleClass>
+   <stylesheets>
+      <URL value="@../../styles.css"/>
+      <URL value="@../../colors.css"/>
+   </stylesheets>
 </GridPane>

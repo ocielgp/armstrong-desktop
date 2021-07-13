@@ -1,35 +1,12 @@
-/* Login */
-
-.login-container {
-    -fx-border-color: -fx-color-unfocus;
-    -fx-border-width: 1px;
-    -fx-border-radius: 10px;
-    -fx-background-radius: 10px;
-    -fx-padding: 40px;
-}
-
-/* End Login */
-
 /* Dashboard */
 
 .dashboard {
     -fx-background-color: -fx-color-background;
 }
 
-.dashboard .aside {
-    -fx-border-width: 0 1px 0 0;
-    -fx-border-color: -fx-color-border;
-}
-
-.dashboard .aside-top {
-    -fx-border-width: 0 1px 1px 0;
-}
-
 .dashboard .aside .option {
     -fx-padding: 10px;
     -fx-cursor: hand;
-    -fx-border-width: 0 0 1px 0;
-    -fx-border-color: -fx-color-border;
 }
 
 .dashboard .aside .option:hover {
@@ -58,12 +35,6 @@
 
 .dashboard .aside .selected .ikonli-font-icon {
     -fx-icon-color: -fx-color-background;
-}
-
-.dashboard .top-bar {
-    -fx-padding: 10px;
-    -fx-border-width: 0 0 1px 0;
-    -fx-border-color: -fx-color-border;
 }
 
 .dashboard .top-bar .section {
@@ -144,7 +115,6 @@
 /* Member */
 
 .member-title {
-    -fx-border-width: 0 0 3px 0;
     -fx-border-color: -fx-color-border;
     -fx-background-color: -fx-color-text;
 }
@@ -154,13 +124,11 @@
 }
 
 .member {
-    -fx-border-width: 0 0 0 1px;
     -fx-border-color: -fx-color-border;
     -fx-background-color: -fx-color-background;
 }
 
 .member-section {
-    -fx-border-width: 1px;
     -fx-border-color: -fx-color-border;
 }
 

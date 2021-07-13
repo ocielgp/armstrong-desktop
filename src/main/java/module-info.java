@@ -26,4 +26,5 @@ module app {
     opens com.ocielgp.model;
     opens com.ocielgp.utilities;
     opens com.ocielgp;
+    opens com.ocielgp.database.models;
 }

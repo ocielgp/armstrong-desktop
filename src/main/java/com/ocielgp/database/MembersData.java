@@ -2,12 +2,12 @@ package com.ocielgp.database;
 
 import com.digitalpersona.uareu.Fmd;
 import com.ocielgp.app.AppController;
+import com.ocielgp.database.models.MembersModel;
+import com.ocielgp.database.models.MembershipsModel;
+import com.ocielgp.database.models.PaymentDebtsModel;
 import com.ocielgp.files.ConfigFiles;
-import com.ocielgp.model.MembersModel;
-import com.ocielgp.model.MembershipsModel;
-import com.ocielgp.model.PaymentDebtsModel;
 import com.ocielgp.utilities.DateFormatter;
-import com.ocielgp.utilities.NotificationHandler;
+import com.ocielgp.utilities.Notifications;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -41,7 +41,7 @@ public class MembersData {
             return rs.getInt(1); // Return new id member
 
         } catch (SQLException sqlException) {
-            NotificationHandler.catchError(
+            Notifications.catchError(
                     MethodHandles.lookup().lookupClass().getSimpleName(),
                     Thread.currentThread().getStackTrace()[1],
                     "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(),
@@ -78,7 +78,7 @@ public class MembersData {
             ps.executeUpdate();
             return true;
         } catch (SQLException sqlException) {
-            NotificationHandler.catchError(
+            Notifications.catchError(
                     MethodHandles.lookup().lookupClass().getSimpleName(),
                     Thread.currentThread().getStackTrace()[1],
                     "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(),
@@ -110,7 +110,7 @@ public class MembersData {
             }
             return true;
         } catch (SQLException sqlException) {
-            NotificationHandler.catchError(
+            Notifications.catchError(
                     MethodHandles.lookup().lookupClass().getSimpleName(),
                     Thread.currentThread().getStackTrace()[1],
                     "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(),
@@ -143,7 +143,7 @@ public class MembersData {
             ps.executeUpdate();
             return true;
         } catch (SQLException sqlException) {
-            NotificationHandler.catchError(
+            Notifications.catchError(
                     MethodHandles.lookup().lookupClass().getSimpleName(),
                     Thread.currentThread().getStackTrace()[1],
                     "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(),
@@ -167,7 +167,7 @@ public class MembersData {
             ps.executeUpdate();
             return true;
         } catch (SQLException sqlException) {
-            NotificationHandler.catchError(
+            Notifications.catchError(
                     MethodHandles.lookup().lookupClass().getSimpleName(),
                     Thread.currentThread().getStackTrace()[1],
                     "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(),
@@ -183,7 +183,7 @@ public class MembersData {
         ResultSet rs;
         try {
             // Query initial
-            String query = "SELECT M.idMember, M.name, M.lastName, PM.endDate FROM MEMBERS M JOIN PAYMENT_MEMBERSHIPS PM on M.idMember = PM.idMember WHERE ( M.flag = 1 AND PM.flag = 1 ) AND M.idMember NOT IN ( SELECT idMember FROM STAFF_EMPLOYEES WHERE M.flag = 1 ) ";
+            String query = "SELECT M.idMember, M.name, M.lastName, PM.endDate, ( SELECT COUNT(idPaymentDebt) > 0 FROM PAYMENT_DEBTS WHERE flag = 1 AND idMember = M.idMember AND debtStatus = 1 ORDER BY dateTime DESC ) AS debtCount FROM MEMBERS M JOIN PAYMENT_MEMBERSHIPS PM on M.idMember = PM.idMember WHERE ( M.flag = 1 AND PM.flag = 1 ) AND M.idMember NOT IN ( SELECT idMember FROM STAFF_EMPLOYEES WHERE flag = 1 ) ";
 
             // fieldSearchContent
             if (fieldSearchContent.length() > 0) {
@@ -269,12 +269,14 @@ public class MembersData {
                 member.setEndDate(DateFormatter.getDayMonthYearComplete(endDate));
                 member.setDaysLeft(DateFormatter.daysDifferenceToday(endDate));
 
+                member.setDebtCount(rs.getInt("debtCount"));
+
                 members.add(member);
             }
 
             return new QueryRows(members, totalRows, totalPages);
         } catch (SQLException sqlException) {
-            NotificationHandler.catchError(
+            Notifications.catchError(
                     MethodHandles.lookup().lookupClass().getSimpleName(),
                     Thread.currentThread().getStackTrace()[1],
                     "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(),

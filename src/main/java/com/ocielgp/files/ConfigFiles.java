@@ -1,7 +1,7 @@
 package com.ocielgp.files;
 
 import com.ocielgp.app.AppController;
-import com.ocielgp.utilities.NotificationHandler;
+import com.ocielgp.utilities.Notifications;
 import com.ocielgp.utilities.Pagination;
 import javafx.beans.value.ChangeListener;
 
@@ -32,7 +32,7 @@ public class ConfigFiles {
             try {
                 throw new FileNotFoundException("[file]: " + fileName + " no encontrado.");
             } catch (FileNotFoundException fileNotFoundException) {
-                NotificationHandler.catchError(
+                Notifications.catchError(
                         MethodHandles.lookup().lookupClass().getSimpleName(),
                         Thread.currentThread().getStackTrace()[1],
                         fileNotFoundException.getMessage(),
@@ -45,7 +45,7 @@ public class ConfigFiles {
                 inputStream.close();
                 return properties;
             } catch (IOException ioException) {
-                NotificationHandler.catchError(
+                Notifications.catchError(
                         MethodHandles.lookup().lookupClass().getSimpleName(),
                         Thread.currentThread().getStackTrace()[1],
                         ioException.getMessage(),
@@ -66,7 +66,7 @@ public class ConfigFiles {
                 return propertyString;
             }
         } catch (IOException ioException) {
-            NotificationHandler.catchError(
+            Notifications.catchError(
                     MethodHandles.lookup().lookupClass().getSimpleName(),
                     Thread.currentThread().getStackTrace()[1],
                     ioException.getMessage(),

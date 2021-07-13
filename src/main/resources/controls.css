@@ -30,6 +30,7 @@
 }
 
 .jfx-button {
+    -fx-background-insets: 0;
     -fx-background-radius: 5px;
     -fx-border-radius: 5px;
     -fx-icon-color: #fff;
@@ -41,9 +42,9 @@
 
 .btn-primary {
     -fx-font: 20px "Roboto Bold";
-    -fx-border-color: -fx-color-text;
     -fx-background-color: -fx-color-text;
     -fx-text-fill: -fx-color-background;
+    -fx-border-color: -fx-color-text;
 }
 
 .btn-primary .ikonli-font-icon {
@@ -56,12 +57,23 @@
 
 .btn-secondary {
     -fx-font: 20px "Roboto";
-    -fx-border-color: -fx-color-text;
     -fx-background-color: -fx-color-background;
     -fx-text-fill: -fx-color-text;
+    -fx-border-color: -fx-color-text;
 }
 
 .btn-secondary .jfx-rippler {
+    -jfx-rippler-fill: -fx-color-text;
+}
+
+.btn-colorful {
+    -fx-font: 20px "Roboto";
+    -fx-background-color: -fx-color-background;
+    -fx-text-fill: -fx-color-text;
+    -fx-border-color: -fx-color-border;
+}
+
+.btn-colorful .jfx-rippler {
     -jfx-rippler-fill: -fx-color-text;
 }
 
@@ -133,10 +145,21 @@
 
 .scroll-pane {
     -fx-background-insets: 0;
+    -fx-background-color: transparent;
 }
 
 .scroll-pane > .viewport {
     -fx-background-color: transparent;
+}
+
+.table-label {
+    -fx-background-color: -fx-color-background;
+    -fx-text-fill: -fx-color-text;
+    -fx-border-color: -fx-color-border;
+    -fx-background-radius: 5px;
+    -fx-border-radius: 5px;
+    -fx-padding: 2px 2px 2px 2px;
+    /*-fx-opacity: 0.5;*/
 }
 
 .table-view {
@@ -145,12 +168,12 @@
 }
 
 .table-view .column-header {
-    -fx-background-color: #00778F;
+    -fx-background-color: #F0FFF1;
     -fx-border-color: -fx-color-border;
 }
 
 .table-view .column-header .label {
-    -fx-text-fill: #EDF2F4;
+    -fx-text-fill: #333;
     -fx-font: 20px "Roboto Bold";
     -fx-border-width: 0;
 }

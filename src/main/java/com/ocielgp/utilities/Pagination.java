@@ -5,8 +5,8 @@ import com.jfoenix.controls.JFXTextField;
 import com.ocielgp.app.AppController;
 import com.ocielgp.database.MembersData;
 import com.ocielgp.database.QueryRows;
+import com.ocielgp.database.models.MembersModel;
 import com.ocielgp.files.ConfigFiles;
-import com.ocielgp.model.MembersModel;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Label;
@@ -89,7 +89,7 @@ public class Pagination {
                 ConfigFiles.saveProperty(ConfigFiles.File.APP, "paginationRows", this.fieldRowsPerPage.getText());
                 this.loadData(1);
             } else {
-                NotificationHandler.danger("Error", "Cantidad de registros no válida.", 2);
+                Notifications.danger("Error", "Cantidad de registros no válida.", 2);
                 Validator.shakeInput(this.fieldRowsPerPage);
             }
         }
@@ -144,25 +144,32 @@ public class Pagination {
                          * 1-3 DAYS = WARN
                          * + 3 DAYS = SUCESS
                          */
-                        // TODO: CENTER DATES
-                        //TODO: FIX WIDTH PER COLUMN
-                        if (member.getDaysLeft() < 0) {
+                        System.out.println("debt" + member.getDebtCount());
+                        if (member.getDebtCount() == 1) {
                             if (getStyleClass().size() == 5) {
-                                getStyleClass().set(4, "danger-style"); // replace color style
+                                getStyleClass().set(4, "creative-style"); // replace color style
                             } else {
-                                getStyleClass().addAll("member-cell", "danger-style");
+                                getStyleClass().addAll("member-cell", "creative-style");
                             }
-                        } else if (member.getDaysLeft() >= 0 && member.getDaysLeft() <= 3) {
-                            if (getStyleClass().size() == 5) {
-                                getStyleClass().set(4, "warn-style"); // replace color style
-                            } else {
-                                getStyleClass().addAll("member-cell", "warn-style");
-                            }
-                        } else if (member.getDaysLeft() > 3) {
-                            if (getStyleClass().size() == 5) {
-                                getStyleClass().set(4, "sucess-style"); // replace color style
-                            } else {
-                                getStyleClass().addAll("member-cell", "sucess-style");
+                        } else {
+                            if (member.getDaysLeft() < 0) {
+                                if (getStyleClass().size() == 5) {
+                                    getStyleClass().set(4, "danger-style"); // replace color style
+                                } else {
+                                    getStyleClass().addAll("member-cell", "danger-style");
+                                }
+                            } else if (member.getDaysLeft() >= 0 && member.getDaysLeft() <= 3) {
+                                if (getStyleClass().size() == 5) {
+                                    getStyleClass().set(4, "warn-style"); // replace color style
+                                } else {
+                                    getStyleClass().addAll("member-cell", "warn-style");
+                                }
+                            } else if (member.getDaysLeft() > 3) {
+                                if (getStyleClass().size() == 5) {
+                                    getStyleClass().set(4, "sucess-style"); // replace color style
+                                } else {
+                                    getStyleClass().addAll("member-cell", "sucess-style");
+                                }
                             }
                         }
                     } else {

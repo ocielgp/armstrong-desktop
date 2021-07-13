@@ -8,10 +8,8 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.FileChooser;
-import javafx.stage.Window;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Files;
 
 
@@ -44,7 +42,7 @@ public class PhotoHandler {
             try {
                 this.bytes = Files.readAllBytes(file.toPath());
             } catch (Exception e) {
-                NotificationHandler.danger("PhotoHandler", "Error al guardar bytes de la foto.", 5);
+                Notifications.danger("PhotoHandler", "Error al guardar bytes de la foto.", 5);
                 e.printStackTrace();
             }
         }

@@ -4,7 +4,7 @@ import com.digitalpersona.uareu.Fmd;
 import com.digitalpersona.uareu.UareUException;
 import com.digitalpersona.uareu.UareUGlobal;
 import com.ocielgp.fingerprint.Fingerprint;
-import com.ocielgp.utilities.NotificationHandler;
+import com.ocielgp.utilities.Notifications;
 
 import java.lang.invoke.MethodHandles;
 import java.sql.Connection;
@@ -27,11 +27,11 @@ public class FingerprintData {
                     Fmd bdFingerprint = UareUGlobal.GetImporter().ImportFmd(rs.getBytes("fingerprint"), Fmd.Format.ANSI_378_2004, Fmd.Format.ANSI_378_2004);
                     boolean fingerprintMatch = Fingerprint.compareFingerprint(fingerprint, bdFingerprint);
                     if (fingerprintMatch) {
-                        NotificationHandler.sucess("Hola", rs.getString("name"), 3);
+                        Notifications.success("Hola", rs.getString("name"), 3);
                         break;
                     }
                 } catch (UareUException uareUException) {
-                    NotificationHandler.catchError(
+                    Notifications.catchError(
                             MethodHandles.lookup().lookupClass().getSimpleName(),
                             Thread.currentThread().getStackTrace()[1],
                             uareUException.getMessage(),
@@ -40,9 +40,9 @@ public class FingerprintData {
                     uareUException.printStackTrace();
                 }
             }
-            NotificationHandler.warn("Lector de Huellas", "Huella no encontrada", 2);
+            Notifications.warn("Lector de Huellas", "Huella no encontrada", 2);
         } catch (SQLException sqlException) {
-            NotificationHandler.catchError(
+            Notifications.catchError(
                     MethodHandles.lookup().lookupClass().getSimpleName(),
                     Thread.currentThread().getStackTrace()[1],
                     "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(),

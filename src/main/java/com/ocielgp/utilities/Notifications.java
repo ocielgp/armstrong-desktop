@@ -4,15 +4,16 @@ import animatefx.animation.FadeInRight;
 import animatefx.animation.FadeOutRight;
 import com.ocielgp.RunApp;
 import com.ocielgp.app.AppController;
-import com.ocielgp.app.NotificationController;
-import com.ocielgp.model.NotificationModel;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
+import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
@@ -20,12 +21,101 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
+import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.LinkedList;
 import java.util.Objects;
+import java.util.ResourceBundle;
 
-public class NotificationHandler {
+class NotificationModel {
+    private String icon;
+    private String title;
+    private String content;
+    private int time;
+    private String style;
+
+    public NotificationModel(String icon, String title, String content, int time, String style) {
+        this.icon = icon;
+        this.title = title;
+        this.content = content;
+        this.time = time;
+        this.style = style;
+    }
+
+    public String getIcon() {
+        return icon;
+    }
+
+    public void setIcon(String icon) {
+        this.icon = icon;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public int getTime() {
+        return time;
+    }
+
+    public void setTime(int time) {
+        this.time = time;
+    }
+
+    public String getStyle() {
+        return style;
+    }
+
+    public void setStyle(String style) {
+        this.style = style;
+    }
+}
+
+class NotificationView implements Initializable {
+    // Attributes
+    private final NotificationModel notification;
+    // Containers
+    @FXML
+    private GridPane container;
+    // Controls
+    @FXML
+    private FontIcon icon;
+    @FXML
+    private Label title;
+    @FXML
+    private Label content;
+
+    public NotificationView(NotificationModel notification) {
+        this.notification = notification;
+    }
+
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+        this.icon.setIconLiteral(this.notification.getIcon());
+        this.title.setText(this.notification.getTitle());
+        this.content.setText(this.notification.getContent());
+
+        // Add styles
+        this.container.getStyleClass().addAll(AppController.getThemeType(), this.notification.getStyle());
+    }
+}
+
+public class Notifications {
+
     // Containers
     private static final Stage stage;
 
@@ -35,13 +125,6 @@ public class NotificationHandler {
     private static final int margin = 20;
     private static Timeline threadHandler;
     private static FadeInRight fadeInRight;
-
-    // Styles
-    public static final String DEFAULT_STYLE = "default-style";
-    public static final String SUCESS_STYLE = "sucess-style";
-    public static final String WARN_STYLE = "warn-style";
-    public static final String DANGER_STYLE = "danger-style";
-    public static final String EPIC_STYLE = "epic-style";
 
     static {
         // Init notifications container
@@ -59,9 +142,9 @@ public class NotificationHandler {
                 style
         );
         FXMLLoader template = new FXMLLoader(
-                Objects.requireNonNull(NotificationHandler.class.getClassLoader().getResource("notification.fxml"))
+                Objects.requireNonNull(Notifications.class.getClassLoader().getResource("notification.fxml"))
         );
-        NotificationController controller = new NotificationController(notification);
+        NotificationView controller = new NotificationView(notification);
         template.setController(controller);
         GridPane gridPane = null;
         try {
@@ -144,52 +227,82 @@ public class NotificationHandler {
     }
 
     public static void notify(String icon, String title, String content, int seconds) {
-        NotificationHandler.createNotification(
+        Notifications.createNotification(
                 icon,
                 title,
                 content,
                 seconds,
-                NotificationHandler.DEFAULT_STYLE
+                AppController.DEFAULT_STYLE
         );
     }
 
-    public static void sucess(String title, String content, int seconds) {
-        NotificationHandler.createNotification(
+    public static void success(String title, String content, int seconds) {
+        Notifications.createNotification(
                 "gmi-check",
                 title,
                 content,
                 seconds,
-                NotificationHandler.SUCESS_STYLE
+                AppController.SUCCESS_STYLE
+        );
+    }
+
+    public static void success(String icon, String title, String content, int seconds) {
+        Notifications.createNotification(
+                icon,
+                title,
+                content,
+                seconds,
+                AppController.SUCCESS_STYLE
         );
     }
 
     public static void warn(String title, String content, int seconds) {
-        NotificationHandler.createNotification(
+        Notifications.createNotification(
                 "gmi-priority-high",
                 title,
                 content,
                 seconds,
-                NotificationHandler.WARN_STYLE
+                AppController.WARN_STYLE
+        );
+    }
+
+    public static void warn(String icon, String title, String content, int seconds) {
+        Notifications.createNotification(
+                icon,
+                title,
+                content,
+                seconds,
+                AppController.WARN_STYLE
         );
     }
 
     public static void danger(String title, String content, int seconds) {
-        NotificationHandler.createNotification(
+        Notifications.createNotification(
                 "gmi-close",
                 title,
                 content,
                 seconds,
-                NotificationHandler.DANGER_STYLE
+                AppController.DANGER_STYLE
+        );
+    }
+
+    public static void danger(String icon, String title, String content, int seconds) {
+        Notifications.createNotification(
+                icon,
+                title,
+                content,
+                seconds,
+                AppController.DANGER_STYLE
         );
     }
 
     public static void catchError(String className, StackTraceElement exceptionMetaData, String body, Exception exception, String... icon) {
-        NotificationHandler.createNotification(
+        Notifications.createNotification(
                 (icon.length > 0) ? icon[0] : "gmi-sync-problem",
                 className,
                 "[" + exceptionMetaData.getMethodName() + " : " + exceptionMetaData.getLineNumber() + " line]\n" + body,
                 20,
-                NotificationHandler.DANGER_STYLE
+                AppController.DANGER_STYLE
         );
         exception.printStackTrace();
     }

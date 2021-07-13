@@ -1,13 +1,71 @@
 @import "global.css";
-@import "colors.css";
 
 * {
     -fx-font-size: 10px;
     -fx-color-unfocus: #d3d3d3;
+    -fx-color-border: #d3d3d3;
 }
 
 * .label, .jfx-text-field, .jfx-password-field, .jfx-button {
     -fx-font: 2em "Roboto";
+}
+
+/* Colors */
+
+.day-theme {
+    -fx-color-background: #ffffff;
+    -fx-color-text: #3c3c3c;
+
+    -fx-background-color: -fx-color-background;
+    -fx-text-fill: -fx-color-text;
+}
+
+.night-theme {
+    -fx-color-background: #3c3c3c;
+    -fx-color-text: #ffffff;
+
+    -fx-background-color: -fx-color-background;
+    -fx-text-fill: -fx-color-text;
+}
+
+.default-style {
+    -fx-background-color: -fx-color-text;
+    -fx-text-fill: -fx-color-background;
+    -fx-border-color: -fx-color-border;
+}
+
+.ikonli-font-icon {
+    -fx-icon-color: -fx-color-text;
+}
+
+.success-style {
+    -fx-color-background: hsb(152, 81%, 53%);
+    -fx-color-text: #fff;
+    -fx-color-border: #198754;
+}
+
+.warn-style {
+    -fx-color-background: hsb(45, 97%, 100%);
+    -fx-color-text: #333;
+    -fx-color-border: #ffc107;
+}
+
+.danger-style {
+    -fx-color-background: hsb(354, 76%, 86%);
+    -fx-color-text: #fff;
+    -fx-color-border: #dc3545;
+}
+
+.creative-style {
+    -fx-color-background: hsb(263, 93%, 95%);
+    -fx-color-text: #fff;
+    -fx-color-border: #6610f2;
+}
+
+.epic-style {
+    -fx-color-background: hsb(190, 95%, 94%);
+    -fx-color-text: #fff;
+    -fx-color-border: #0dcaf0;
 }
 
 .notification-container {

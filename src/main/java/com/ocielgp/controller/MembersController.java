@@ -4,8 +4,9 @@ import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXCheckBox;
 import com.jfoenix.controls.JFXRadioButton;
 import com.jfoenix.controls.JFXTextField;
+import com.ocielgp.app.AppController;
+import com.ocielgp.database.models.MembersModel;
 import com.ocielgp.files.ConfigFiles;
-import com.ocielgp.model.MembersModel;
 import com.ocielgp.utilities.Input;
 import com.ocielgp.utilities.Loader;
 import com.ocielgp.utilities.Pagination;
@@ -74,6 +75,8 @@ public class MembersController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        AppController.showUserInfo(AppController.DANGER_STYLE, null, "12", "erick no se ", "idk", "hi");
+
         this.tableColumnId.setCellValueFactory(new PropertyValueFactory<>("idMember"));
         this.tableColumnName.setCellValueFactory(new PropertyValueFactory<>("name"));
         this.tableColumnLastName.setCellValueFactory(new PropertyValueFactory<>("lastName"));

@@ -2,7 +2,7 @@ package com.ocielgp.fingerprint;
 
 import com.digitalpersona.uareu.*;
 import com.ocielgp.database.FingerprintData;
-import com.ocielgp.utilities.NotificationHandler;
+import com.ocielgp.utilities.Notifications;
 import javafx.scene.layout.VBox;
 
 import java.awt.event.ActionEvent;
@@ -30,7 +30,7 @@ public class Capture
         this.fingerprintPane = fingerprintPane;
         this.m_fmds = new Fmd[2];
         this.fingerprintPane.getChildren().setAll(fingerprintImage);
-        NotificationHandler.notify("gmi-fingerprint", "Lector de huellas", "Coloca la huella sobre el lector.", 2);
+        Notifications.notify("gmi-fingerprint", "Lector de huellas", "Coloca la huella sobre el lector.", 2);
         System.out.println("Captura creada 2");
     }
 
@@ -116,9 +116,9 @@ public class Capture
                                 int targeFalseMatchRate = Engine.PROBABILITY_ONE / 100000; // Target rate is 0.00001
                                 if (falseMatchRate < targeFalseMatchRate) {
                                     Fingerprint.AddFingerprint(m_fmds[0]);
-                                    NotificationHandler.sucess("Lector de Huellas", "Huellas coinciden.", 2);
+                                    Notifications.success("Lector de Huellas", "Huellas coinciden.", 2);
                                 } else {
-                                    NotificationHandler.danger("Lector de huellas", "Las huellas no coinciden.", 2);
+                                    Notifications.danger("Lector de huellas", "Las huellas no coinciden.", 2);
                                 }
                             } catch (UareUException e) {
                                 System.out.println("Engine.CreateFmd()" + e);
@@ -130,7 +130,7 @@ public class Capture
                             // The new loop starts
                         } else {
                             // The loop continues
-                            NotificationHandler.notify("gmi-fingerprint", "Lector de huellas", "Vuelve a colocar la huella sobre el lector.", 2);
+                            Notifications.notify("gmi-fingerprint", "Lector de huellas", "Vuelve a colocar la huella sobre el lector.", 2);
                         }
                     } else {
                         // Discard FMDs

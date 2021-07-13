@@ -22,7 +22,7 @@ public class Loader {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            NotificationHandler.danger("Loader", "[" + viewSource + "]: Hubo un problema al cargar una vista.", 5);
+            Notifications.danger("Loader", "[" + viewSource + "]: Hubo un problema al cargar una vista.", 5);
         }
         return node;
     }

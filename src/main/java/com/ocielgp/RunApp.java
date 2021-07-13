@@ -1,7 +1,7 @@
 package com.ocielgp;
 
 import com.ocielgp.app.AppController;
-import com.ocielgp.model.StaffUsersModel;
+import com.ocielgp.database.models.StaffUsersModel;
 import com.ocielgp.utilities.Loader;
 import javafx.application.Application;
 import javafx.application.Platform;

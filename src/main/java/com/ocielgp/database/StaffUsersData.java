@@ -1,8 +1,8 @@
 package com.ocielgp.database;
 
-import com.ocielgp.model.StaffUsersModel;
+import com.ocielgp.database.models.StaffUsersModel;
 import com.ocielgp.utilities.Hash;
-import com.ocielgp.utilities.NotificationHandler;
+import com.ocielgp.utilities.Notifications;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -25,7 +25,7 @@ public class StaffUsersData {
             rs = ps.executeQuery();
             if (rs.next()) {
                 if (rs.getInt("locked") == 1) {
-                    NotificationHandler.warn("Bloqueado", "Esta cuenta se encuentra suspendida.", 3);
+                    Notifications.warn("Bloqueado", "Esta cuenta se encuentra suspendida.", 3);
                     return null;
                 } else {
                     StaffUsersModel model = new StaffUsersModel();
@@ -48,7 +48,7 @@ public class StaffUsersData {
 //            NotificationHandler.danger("Error", "[RecepcionistData]: Error al iniciar sesión en el servidor", 5);
 //            sqlException.printStackTrace();
         }
-        NotificationHandler.danger("Error", "Usuario / Contraseña incorrectos", 2);
+        Notifications.danger("Error", "Usuario / Contraseña incorrectos", 2);
         return null;
     }
 }

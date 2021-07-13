@@ -23,7 +23,7 @@ public class Validator {
         if (inputsInvalid == 0) {
             return true;
         } else {
-            NotificationHandler.danger("Error", "Los campos en rojo no pueden estar vacios.", 2);
+            Notifications.danger("Error", "Los campos en rojo no pueden estar vacios.", 2);
             return false;
         }
     }
@@ -41,7 +41,7 @@ public class Validator {
         if (inputsInvalid == 0) {
             return true;
         } else {
-            NotificationHandler.danger("Error", "Los campos en rojo deben ser solo texto.", 2);
+            Notifications.danger("Error", "Los campos en rojo deben ser solo texto.", 2);
             return false;
         }
     }
@@ -56,7 +56,7 @@ public class Validator {
         if (inputsInvalid == 0) {
             return true;
         } else {
-            NotificationHandler.danger("Error", "Los campos en rojo deben ser solo numéros.", 2);
+            Notifications.danger("Error", "Los campos en rojo deben ser solo numéros.", 2);
             return false;
         }
     }
@@ -74,7 +74,7 @@ public class Validator {
         if (inputsInvalid == 0) {
             return true;
         } else {
-            NotificationHandler.danger("Error", "Los campos en rojo deben ser solo numéros.", 2);
+            Notifications.danger("Error", "Los campos en rojo deben ser solo numéros.", 2);
             return false;
         }
     }
@@ -85,13 +85,13 @@ public class Validator {
         if (phone.matches(regex)) {
             if (phone.length() != 10) {
                 shakeInput(phoneInput.getNode());
-                NotificationHandler.danger("Error", "El teléfono debe tener 10 numéros.", 2);
+                Notifications.danger("Error", "El teléfono debe tener 10 numéros.", 2);
                 return false;
             }
             return true;
         } else {
             shakeInput(phoneInput.getNode());
-            NotificationHandler.danger("Error", "El teléfono debe tener solo numéros.", 2);
+            Notifications.danger("Error", "El teléfono debe tener solo numéros.", 2);
             return false;
         }
     }
@@ -103,7 +103,7 @@ public class Validator {
             return true;
         } else {
             shakeInput(emailInput.getNode());
-            NotificationHandler.danger("Error", "El correo no es válido.", 2);
+            Notifications.danger("Error", "El correo no es válido.", 2);
             return false;
         }
     }
@@ -116,7 +116,7 @@ public class Validator {
             shakeInput(input.getNode());
         }
         if (notify) {
-            NotificationHandler.danger("Error", "Cantidad no válida.", 2);
+            Notifications.danger("Error", "Cantidad no válida.", 2);
         }
         return false;
     }
@@ -136,7 +136,7 @@ public class Validator {
         if (inputsInvalid == 0) {
             return true;
         } else {
-            NotificationHandler.danger("Error", "Los campos en rojo deben tener solo numéros.", 2);
+            Notifications.danger("Error", "Los campos en rojo deben tener solo numéros.", 2);
             return false;
         }
     }

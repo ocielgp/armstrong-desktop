@@ -1,4 +1,4 @@
-package com.ocielgp.model;
+package com.ocielgp.database.models;
 
 import javafx.beans.property.*;
 
@@ -22,6 +22,7 @@ public class MembersModel {
 
     private final LongProperty daysLeft = new SimpleLongProperty();
     private final StringProperty endDate = new SimpleStringProperty();
+    private final IntegerProperty debtCount = new SimpleIntegerProperty();
 
     private PaymentMembershipsModel paymentMembership;
     private PaymentDebtsModel pendingPayment;
@@ -152,6 +153,18 @@ public class MembersModel {
 
     public void setEndDate(String endDate) {
         this.endDate.set(endDate);
+    }
+
+    public int getDebtCount() {
+        return debtCount.get();
+    }
+
+    public void setDebtCount(int debtCount) {
+        this.debtCount.set(debtCount);
+    }
+
+    public IntegerProperty debtCountProperty() {
+        return debtCount;
     }
 
     public PaymentMembershipsModel getPaymentMembership() {

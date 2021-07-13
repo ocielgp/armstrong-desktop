@@ -1,7 +1,8 @@
 package com.ocielgp.database;
 
+import com.ocielgp.app.AppController;
 import com.ocielgp.files.ConfigFiles;
-import com.ocielgp.utilities.NotificationHandler;
+import com.ocielgp.utilities.Notifications;
 
 import java.lang.invoke.MethodHandles;
 import java.sql.Connection;
@@ -38,16 +39,16 @@ public class DataServer {
     private static void firstConnection() {
         try {
             con = DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "/" + database + "?serverTimezone=UTC", user, password);
-            NotificationHandler.createNotification(
+            Notifications.createNotification(
                     "gmi-cloud-done",
                     "Conexión establecida",
                     "Conexión con el servidor establecida.",
                     2,
-                    NotificationHandler.EPIC_STYLE
+                    AppController.EPIC_STYLE
             );
             System.out.println("[DataServer]: Conectado a " + host);
         } catch (SQLException sqlException) {
-            NotificationHandler.catchError(
+            Notifications.catchError(
                     MethodHandles.lookup().lookupClass().getSimpleName(),
                     Thread.currentThread().getStackTrace()[1],
                     "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(),
@@ -63,17 +64,15 @@ public class DataServer {
                 if (con == null) {
                     firstConnection();
                 } else if (!con.isValid(3)) { // Reconnect if connection is lost
-                    con = DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "/" + database, user, password);
+                    con = DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "/" + database + "?serverTimezone=UTC", user, password);
                     System.out.println("[DataServer]: Reconectado a " + host);
                 }
             } catch (SQLException exception) {
                 exception.printStackTrace();
-                NotificationHandler.createNotification(
-                        "gmi-cloud-off",
+                Notifications.danger("gmi-cloud-off",
                         "Error",
-                        "Hubo un problema al conectarse con el servidor",
-                        5,
-                        NotificationHandler.DANGER_STYLE
+                        "Hubo un problema al conectarse con el servidor.",
+                        5
                 );
             }
             return con;

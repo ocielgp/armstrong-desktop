@@ -1,24 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import com.jfoenix.controls.JFXButton?>
-<?import com.jfoenix.controls.JFXCheckBox?>
-<?import com.jfoenix.controls.JFXRadioButton?>
-<?import com.jfoenix.controls.JFXTextField?>
-<?import java.lang.String?>
+<?import com.jfoenix.controls.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import org.kordamp.ikonli.javafx.*?>
+<?import java.lang.*?>
 <?import java.net.URL?>
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TableView?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.FlowPane?>
-<?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.RowConstraints?>
-<?import javafx.scene.layout.VBox?>
-<?import org.kordamp.ikonli.javafx.FontIcon?>
-
 <GridPane fx:id="membersPane" styleClass="members" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ocielgp.controller.MembersController">
     <columnConstraints>
         <ColumnConstraints hgrow="SOMETIMES" prefWidth="700.0" />
@@ -32,37 +20,37 @@
             <VBox.margin>
                 <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
             </VBox.margin>
-            <JFXButton styleClass="btn-primary" text="Consultar">
+            <JFXButton styleClass="btn-secondary" text="Consultas">
                 <graphic>
-                    <FontIcon iconLiteral="gmi-group" />
+                    <FontIcon iconLiteral="gmi-group"/>
                 </graphic>
             </JFXButton>
             <JFXButton text="Socio nuevo">
-                <styleClass>
-                    <String fx:value="btn-primary" />
-                    <String fx:value="sucess-style" />
-                </styleClass>
                 <graphic>
-                    <FontIcon iconLiteral="gmi-person-add" />
+                    <FontIcon iconLiteral="gmi-person-add"/>
                 </graphic>
+                <styleClass>
+                    <String fx:value="btn-colorful"/>
+                    <String fx:value="success-style"/>
+                </styleClass>
             </JFXButton>
             <JFXButton text="Visita nueva">
-                <styleClass>
-                    <String fx:value="btn-primary" />
-                    <String fx:value="sucess-style" />
-                </styleClass>
                 <graphic>
-                    <FontIcon iconLiteral="gmi-add" />
+                    <FontIcon iconLiteral="gmi-add"/>
                 </graphic>
+                <styleClass>
+                    <String fx:value="btn-colorful"/>
+                    <String fx:value="success-style"/>
+                </styleClass>
             </JFXButton>
             <JFXButton text="Planes">
-                <styleClass>
-                    <String fx:value="btn-primary" />
-                    <String fx:value="warn-style" />
-                </styleClass>
                 <graphic>
-                    <FontIcon iconLiteral="gmi-date-range" />
+                    <FontIcon iconLiteral="gmi-date-range"/>
                 </graphic>
+                <styleClass>
+                    <String fx:value="btn-colorful"/>
+                    <String fx:value="warn-style"/>
+                </styleClass>
             </JFXButton>
         </FlowPane>
         <VBox alignment="CENTER">
@@ -97,59 +85,6 @@
                 <JFXRadioButton fx:id="radioButtonOrderBy1" text="Ordenar por antiguedad" />
             </VBox>
         </HBox>
-        <HBox alignment="CENTER" spacing="10.0">
-            <VBox.margin>
-                <Insets bottom="10.0" />
-            </VBox.margin>
-            <Label text="Vigentes">
-                <graphic>
-                    <FontIcon iconLiteral="gmi-fitness-center" />
-                </graphic>
-                <styleClass>
-                    <String fx:value="btn-primary" />
-                    <String fx:value="sucess-style" />
-                </styleClass>
-                <padding>
-                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                </padding>
-            </Label>
-            <Label text="Por terminar">
-                <graphic>
-                    <FontIcon iconLiteral="gmi-fitness-center" />
-                </graphic>
-                <styleClass>
-                    <String fx:value="btn-primary" />
-                    <String fx:value="warn-style" />
-                </styleClass>
-                <padding>
-                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                </padding>
-            </Label>
-            <Label text="Vencidos">
-                <graphic>
-                    <FontIcon iconLiteral="gmi-fitness-center" />
-                </graphic>
-                <styleClass>
-                    <String fx:value="btn-primary" />
-                    <String fx:value="danger-style" />
-                </styleClass>
-                <padding>
-                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                </padding>
-            </Label>
-            <Label text="Deudores">
-                <graphic>
-                    <FontIcon iconLiteral="gmi-fitness-center" />
-                </graphic>
-                <styleClass>
-                    <String fx:value="btn-primary" />
-                    <String fx:value="epic-style" />
-                </styleClass>
-                <padding>
-                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                </padding>
-            </Label>
-        </HBox>
       <HBox alignment="CENTER_RIGHT" spacing="5.0">
          <children>
             <Label fx:id="labelTotalRows" styleClass="thin" text="0" />
@@ -172,16 +107,45 @@
                 </columnResizePolicy>
             </TableView>
             <VBox alignment="BOTTOM_CENTER">
+                <HBox alignment="CENTER" spacing="10.0">
+                    <VBox.margin>
+                        <Insets bottom="10.0"/>
+                    </VBox.margin>
+                    <Label text="Vigente">
+                        <styleClass>
+                            <String fx:value="table-label"/>
+                            <String fx:value="success-style"/>
+                        </styleClass>
+                    </Label>
+                    <Label text="Por terminar">
+                        <styleClass>
+                            <String fx:value="table-label"/>
+                            <String fx:value="warn-style"/>
+                        </styleClass>
+                    </Label>
+                    <Label text="Vencido">
+                        <styleClass>
+                            <String fx:value="table-label"/>
+                            <String fx:value="danger-style"/>
+                        </styleClass>
+                    </Label>
+                    <Label text="Deudor">
+                        <styleClass>
+                            <String fx:value="table-label"/>
+                            <String fx:value="creative-style"/>
+                        </styleClass>
+                    </Label>
+                </HBox>
                 <VBox alignment="CENTER" maxWidth="200.0" spacing="10.0">
-                    <JFXTextField fx:id="fieldRowsPerPage" alignment="CENTER" promptText="Filas por página" />
+                    <JFXTextField fx:id="fieldRowsPerPage" alignment="CENTER" promptText="Filas por página"/>
                 </VBox>
-            <VBox alignment="CENTER">
-               <children>
-                      <HBox alignment="CENTER">
-                          <Label fx:id="labelPreviousPage" style="-fx-cursor: hand;">
-                              <graphic>
-                                  <FontIcon iconLiteral="gmi-skip-previous" iconSize="40" />
-                              </graphic>
+                <VBox alignment="CENTER">
+                    <children>
+                        <HBox alignment="CENTER">
+                            <Label fx:id="labelPreviousPage" style="-fx-cursor: hand;">
+                                <graphic>
+                                    <FontIcon iconLiteral="gmi-skip-previous" iconSize="40"/>
+                                </graphic>
                           </Label>
                           <HBox alignment="CENTER" spacing="5.0">
                               <Label text="Página">
@@ -195,18 +159,19 @@
                           </HBox>
                           <Label fx:id="labelNextPage" style="-fx-cursor: hand;">
                               <graphic>
-                                  <FontIcon iconLiteral="gmi-skip-next" iconSize="40" />
+                                  <FontIcon iconLiteral="gmi-skip-next" iconSize="40"/>
                               </graphic>
                           </Label>
-                      </HBox>
-               </children>
-            </VBox>
+                        </HBox>
+                    </children>
+                </VBox>
             </VBox>
         </VBox>
     </VBox>
-    <ScrollPane fx:id="memberPane" fitToHeight="true" fitToWidth="true" GridPane.columnIndex="1" />
+    <ScrollPane fx:id="memberPane" fitToHeight="true" fitToWidth="true" GridPane.columnIndex="1"/>
     <stylesheets>
-        <URL value="@../../../styles.css" />
-        <URL value="@../../../controls.css" />
+        <URL value="@../../../controls.css"/>
+        <URL value="@../../../colors.css"/>
+        <URL value="@../../../styles.css"/>
     </stylesheets>
 </GridPane>

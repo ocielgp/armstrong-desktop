@@ -1,7 +1,7 @@
 package com.ocielgp.database;
 
-import com.ocielgp.model.MembershipsModel;
-import com.ocielgp.utilities.NotificationHandler;
+import com.ocielgp.database.models.MembershipsModel;
+import com.ocielgp.utilities.Notifications;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -31,13 +31,13 @@ public class MembershipsData {
                 subscriptions.add(subscription);
             }
             if (subscriptions.isEmpty()) {
-                NotificationHandler.warn("Membresías", "No hay membresías registradas.", 2);
+                Notifications.warn("Membresías", "No hay membresías registradas.", 2);
             } else {
                 return subscriptions;
             }
             return subscriptions;
         } catch (SQLException throwables) {
-            NotificationHandler.danger("Error", "[MembershipsData]: Error al obtener Memberships.", 5);
+            Notifications.danger("Error", "[MembershipsData]: Error al obtener Memberships.", 5);
             throwables.printStackTrace();
             return null;
         }

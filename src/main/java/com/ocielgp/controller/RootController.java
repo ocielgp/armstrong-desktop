@@ -5,9 +5,9 @@ import com.jfoenix.controls.JFXComboBox;
 import com.ocielgp.app.AppController;
 import com.ocielgp.database.DataServer;
 import com.ocielgp.database.GymsData;
+import com.ocielgp.database.models.GymsModel;
 import com.ocielgp.files.ConfigFiles;
 import com.ocielgp.fingerprint.Fingerprint;
-import com.ocielgp.model.GymsModel;
 import com.ocielgp.utilities.Loader;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
@@ -63,14 +63,14 @@ public class RootController implements Initializable {
                     "gmi-snooze",
                     "Hola",
                     "Te quiero",
-                    new JFXButton[]{CustomButton.create("Aceptar", CustomButton.PRIMARY_TYPE, CustomButton.SUCESS_STYLE)}
+                    new JFXButton[]{CustomButton.create("Aceptar", CustomButton.PRIMARY_TYPE, CustomButton.SUCCESS_STYLE)}
             );*/
 //            System.out.println("h: " + resp);
 //            new Administrator().login("uno", "dos");
 //            NotificationHandler.createNotification("gmi-brightness-6", "El pepe", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", 3, NotificationHandler.DEFAULT_STYLE);
 
 //            NotificationHandler.createNotification("gmi-brightness-6", "El pepe", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", 3, NotificationHandler.DEFAULT_STYLE);
-//            NotificationHandler.createNotification("gmi-brightness-6", "El pepe", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", 3, NotificationHandler.SUCESS_STYLE);
+//            NotificationHandler.createNotification("gmi-brightness-6", "El pepe", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", 3, NotificationHandler.SUCCESS_STYLE);
 //            NotificationHandler.createNotification("gmi-brightness-6", "El pepe", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", 3, NotificationHandler.WARNING_STYLE);
 //            NotificationHandler.createNotification("gmi-brightness-6", "El pepe", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", 3, NotificationHandler.DANGER_STYLE);
 //            NotificationHandler.createNotification("gmi-brightness-6", "El pepe", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", 3, NotificationHandler.EPIC_STYLE);

@@ -8,7 +8,7 @@ import com.jfoenix.controls.JFXPasswordField;
 import com.jfoenix.controls.JFXTextField;
 import com.ocielgp.app.AppController;
 import com.ocielgp.database.StaffUsersData;
-import com.ocielgp.model.StaffUsersModel;
+import com.ocielgp.database.models.StaffUsersModel;
 import com.ocielgp.utilities.InputDetails;
 import com.ocielgp.utilities.Loader;
 import com.ocielgp.utilities.Validator;

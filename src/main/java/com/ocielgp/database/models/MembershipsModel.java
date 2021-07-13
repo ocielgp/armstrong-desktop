@@ -1,4 +1,4 @@
-package com.ocielgp.model;
+package com.ocielgp.database.models;
 
 import javafx.beans.property.*;
 

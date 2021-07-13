@@ -51,11 +51,36 @@ public class DashboardController implements Initializable {
     @FXML
     private HBox navMembers;
 
-    private static EventHandler<MouseEvent> fingerprintEvent;
+    // User box
+    @FXML
+    private HBox user_container;
+    @FXML
+    private ImageView user_photo;
+    @FXML
+    private Label user_id;
+    @FXML
+    private Label user_name;
+    @FXML
+    private Label user_gym;
+    @FXML
+    private Label user_membership;
 
+    public void showUserInfo(String style, Image photo, String id, String name, String gym, String membership) {
+        this.user_container.getStyleClass().setAll(AppController.getThemeType(), style);
+        this.user_photo.setImage(photo);
+        this.user_id.setText(id);
+        this.user_name.setText(name);
+        this.user_gym.setText(gym);
+        this.user_membership.setText(membership);
+
+    }
+
+    private static EventHandler<MouseEvent> fingerprintEvent;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        AppController.setDashboardController(this);
+
         this.userImage.setImage(new Image(Objects.requireNonNull(LoginController.class.getClassLoader().getResourceAsStream("default-user.png"))));
         this.logo.setImage(new Image(Objects.requireNonNull(LoginController.class.getClassLoader().getResourceAsStream("img.jpg"))));
 
@@ -100,20 +125,20 @@ public class DashboardController implements Initializable {
         Fingerprint.initializeUI(this.fingerprintIcon, this.fingerprintStatus);
 
         Platform.runLater(() -> {
-            /*Node summaryFXML = Loader.Load(
+            Node summaryFXML = Loader.Load(
                     "summary.fxml",
                     "Dashboard",
                     true
             );
-            this.content.setContent(summaryFXML);*/
+            this.content.setContent(summaryFXML);
             new FadeInUp(AppController.getCurrentGymNode()).play();
 
-            Node members = Loader.Load(
-                    "members.fxml",
-                    "Dashboard",
-                    true
-            );
-            this.content.setContent(members);
+//            Node members = Loader.Load(
+//                    "members.fxml",
+//                    "Dashboard",
+//                    true
+//            );
+//            this.content.setContent(members);
         });
     }
 }

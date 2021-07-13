@@ -5,10 +5,10 @@ import com.jfoenix.controls.*;
 import com.ocielgp.app.AppController;
 import com.ocielgp.database.MembersData;
 import com.ocielgp.database.MembershipsData;
+import com.ocielgp.database.models.MembersModel;
+import com.ocielgp.database.models.MembershipsModel;
+import com.ocielgp.database.models.PaymentDebtsModel;
 import com.ocielgp.fingerprint.Fingerprint;
-import com.ocielgp.model.MembersModel;
-import com.ocielgp.model.MembershipsModel;
-import com.ocielgp.model.PaymentDebtsModel;
 import com.ocielgp.utilities.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -21,7 +21,6 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.Callback;
@@ -225,10 +224,12 @@ public class MemberDetailController implements Initializable {
         });
         this.paymentChanges(this.pym_togglePayment.isSelected());
         this.pym_fieldPaidOut.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (Validator.moneyValidator(false, new InputDetails(this.pym_fieldPaidOut, this.pym_fieldPaidOut.getText()))) {
-                this.pym_fieldOwe.setText(String.valueOf(this.getMembershipPrice() - Double.parseDouble(newValue)));
-            } else {
-                this.pym_fieldOwe.setText(String.valueOf(this.getMembershipPrice()));
+            if (!this.pym_togglePayment.isSelected()) { // !false
+                if (Validator.moneyValidator(false, new InputDetails(this.pym_fieldPaidOut, this.pym_fieldPaidOut.getText()))) {
+                    this.pym_fieldOwe.setText(String.valueOf(this.getMembershipPrice() - Double.parseDouble(newValue)));
+                } else {
+                    this.pym_fieldOwe.setText(String.valueOf(this.getMembershipPrice()));
+                }
             }
         });
 
@@ -315,11 +316,11 @@ public class MemberDetailController implements Initializable {
                         pendingPaymentModel = new PaymentDebtsModel();
                         if (owe == 0) {
                             formValid = false;
-                            NotificationHandler.danger("Error", "Se trata de un pago completo, no hay deuda.", 2);
+                            Notifications.danger("Error", "Se trata de un pago completo, no hay deuda.", 2);
                             Validator.shakeInput(this.pym_fieldPaidOut);
                         } else if (owe < 0) {
                             formValid = false;
-                            NotificationHandler.danger("Error", "La deuda es mayor al total a pagar.", 2);
+                            Notifications.danger("Error", "La deuda es mayor al total a pagar.", 2);
                             Validator.shakeInput(this.pym_fieldPaidOut);
                         } else {
                             pendingPaymentModel.setPaidOut(paidOut);

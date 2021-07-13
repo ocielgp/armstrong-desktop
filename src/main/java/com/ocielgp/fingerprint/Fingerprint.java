@@ -2,7 +2,7 @@ package com.ocielgp.fingerprint;
 
 import com.digitalpersona.uareu.*;
 import com.jfoenix.controls.JFXButton;
-import com.ocielgp.utilities.NotificationHandler;
+import com.ocielgp.utilities.Notifications;
 import javafx.event.EventHandler;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
@@ -49,7 +49,7 @@ public class Fingerprint {
         if (statusCode == 0) {
             captureFingerprint.Stop();
             captureFingerprint = null;
-            NotificationHandler.createNotification("gmi-fingerprint", "Lector de Huellas", "Lector de huellas desconectado", 2, NotificationHandler.WARN_STYLE);
+            Notifications.warn("gmi-fingerprint", "Lector de Huellas", "Lector de huellas desconectado", 2);
         }
         fingerprintStatusCode = statusCode;
         RefreshDashboard();
@@ -76,11 +76,11 @@ public class Fingerprint {
 
     public static void Scanner() {
         if (Scan()) {
-            NotificationHandler.createNotification("gmi-fingerprint", "Lector de Huellas", "Lector de huellas conectado", 2, NotificationHandler.SUCESS_STYLE);
+            Notifications.success("gmi-fingerprint", "Lector de Huellas", "Lector de huellas conectado", 2);
             StartCapture();
         } else {
             fingerprintStatusCode = 0;
-            NotificationHandler.createNotification("gmi-fingerprint", "Lector de Huellas", "Lector de huellas no detectado", 2, NotificationHandler.WARN_STYLE);
+            Notifications.warn("gmi-fingerprint", "Lector de Huellas", "Lector de huellas no detectado", 2);
         }
         RefreshDashboard();
     }
@@ -169,7 +169,7 @@ public class Fingerprint {
 
                     int target_falsematch_rate = Engine.PROBABILITY_ONE / 100000; //target rate is 0.00001
                     if (falsematch_rate < target_falsematch_rate) {
-                        NotificationHandler.warn("Lector de Huellas", "Esa huella ya ha sido agregada.", 2);
+                        Notifications.warn("Lector de Huellas", "Esa huella ya ha sido agregada.", 2);
                         return false;
                     }
                 } catch (UareUException e) {

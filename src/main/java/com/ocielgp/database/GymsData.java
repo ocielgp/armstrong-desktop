@@ -1,7 +1,7 @@
 package com.ocielgp.database;
 
-import com.ocielgp.model.GymsModel;
-import com.ocielgp.utilities.NotificationHandler;
+import com.ocielgp.database.models.GymsModel;
+import com.ocielgp.utilities.Notifications;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -30,12 +30,12 @@ public class GymsData {
                 gyms.add(gym);
             }
             if (gyms.isEmpty()) {
-                NotificationHandler.warn(MethodHandles.lookup().lookupClass().getSimpleName(), "No hay gimnasios registrados.", 5);
+                Notifications.warn(MethodHandles.lookup().lookupClass().getSimpleName(), "No hay gimnasios registrados.", 5);
             } else {
                 return gyms;
             }
         } catch (SQLException sqlException) {
-            NotificationHandler.catchError(
+            Notifications.catchError(
                     MethodHandles.lookup().lookupClass().getSimpleName(),
                     Thread.currentThread().getStackTrace()[1],
                     "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(),
