@@ -14,9 +14,9 @@ import java.util.ListIterator;
 public class FingerprintUI {
     private final VBox fingerprintPane;
     private VBox fingerprintFmd;
-    private Label fingerprintCounter;
+    private final Label fingerprintCounter;
     private JFXButton startCaptureButton;
-    private JFXButton restartCaptureButton;
+    private final JFXButton restartCaptureButton;
     public ArrayList<Fmd> fmds;
 
     private final EventHandler<ActionEvent> captureEvent = actionEvent -> {
@@ -24,9 +24,6 @@ public class FingerprintUI {
             this.fingerprintFmd.requestFocus();
             Fingerprint.StartCapture(this.fingerprintFmd);
             this.startCaptureButton.setText("Detener captura");
-            if (Integer.parseInt(this.fingerprintCounter.getText()) > 0) {
-                this.restartCaptureButton.setDisable(false);
-            }
         } else {
             Fingerprint.StartCapture(); // Background reader
             this.startCaptureButton.setText("Iniciar captura");
@@ -43,7 +40,11 @@ public class FingerprintUI {
 
         this.startCaptureButton.setOnAction(captureEvent);
         this.restartCaptureButton.setOnAction(actionEvent -> {
-            Fingerprint.RestartFingerprintUI();
+            if (this.fingerprintFmd.getChildren().size() > 0) {
+                ((ImageView) this.fingerprintFmd.getChildren().get(0)).setImage(null);
+            }
+            this.clearFingerprints();
+            this.restartCaptureButton.setDisable(true);
             this.fingerprintFmd.requestFocus();
         });
     }
@@ -54,6 +55,7 @@ public class FingerprintUI {
 
     public void clearFingerprints() {
         this.fmds.clear();
+        this.fingerprintCounter.setText("0");
     }
 
     private void enableRestartButton() {
@@ -77,7 +79,6 @@ public class FingerprintUI {
         }
         this.clearFingerprints();
         this.restartCaptureButton.setDisable(true);
-        this.fingerprintCounter.setText("0");
         this.startCaptureButton.setText("Iniciar captura");
         this.startCaptureButton.setOnAction(captureEvent);
     }

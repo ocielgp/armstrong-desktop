@@ -97,6 +97,17 @@ public class Fingerprint {
         }
     }
 
+    public static void VerifyBackgroundReader() { // Verify current status
+        if (fingerprintStatusCode != 1) {
+            if (captureFingerprint != null) {
+                StopCapture();
+            }
+            captureFingerprint = Capture.Run(reader);
+            fingerprintStatusCode = 1;
+            RefreshDashboard();
+        }
+    }
+
     public static void StartCapture() { // Background task
         if (captureFingerprint != null) {
             StopCapture();

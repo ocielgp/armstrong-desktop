@@ -18,13 +18,13 @@ import java.util.ListIterator;
 import java.util.Objects;
 
 public class MembersData {
-    public static int addMember(MembersModel memberModel) {
+    public static int createMember(MembersModel memberModel) {
         Connection con;
         PreparedStatement ps;
         ResultSet rs;
         try {
             con = DataServer.getConnection();
-            ps = con.prepareStatement("INSERT INTO MEMBERS(name, lastName, gender, phone, email, notes, registrationDate) VALUE (?, ?, ?, ?, ?, ?, CURDATE());", Statement.RETURN_GENERATED_KEYS);
+            ps = con.prepareStatement("INSERT INTO MEMBERS(name, lastName, gender, phone, email, notes, registrationDate, idGym) VALUE (?, ?, ?, ?, ?, ?, CURDATE(), ?);", Statement.RETURN_GENERATED_KEYS);
             ps.setString(1, memberModel.getName());
             ps.setString(2, memberModel.getLastName());
             ps.setString(3, memberModel.getGender());
@@ -34,6 +34,7 @@ public class MembersData {
             else ps.setString(5, memberModel.getEmail());
             if (memberModel.getNotes().equals("")) ps.setNull(6, Types.NULL);
             else ps.setString(6, memberModel.getNotes());
+            ps.setInt(7, memberModel.getIdGym());
 
             ps.executeUpdate();
             rs = ps.getGeneratedKeys();
@@ -128,7 +129,7 @@ public class MembersData {
             ps = con.prepareStatement("INSERT INTO PAYMENT_MEMBERSHIPS(price, description, days, startDate, endDate, notes, idMember, idGym, idStaffUser, backup) VALUE (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
             ps.setDouble(1, membership.getPrice()); // price
             ps.setString(2, membership.getDescription()); // description
-            ps.setInt(3, membership.getDays()); // days
+            ps.setLong(3, membership.getDays()); // days
             ps.setString(4, String.valueOf(LocalDate.now())); // startDate
             ps.setString(5, String.valueOf(LocalDate.now().plusDays(membership.getDays()))); // endDate
             if (notes.isEmpty()) ps.setNull(6, Types.NULL);
@@ -178,6 +179,7 @@ public class MembersData {
     }
 
     public static QueryRows getMembers(int limit, int page, String fieldSearchContent) {
+        // CREATE A QUERY JUST TO GET DEBT COUNT
         Connection con;
         PreparedStatement statementLimited, statement;
         ResultSet rs;
@@ -220,7 +222,7 @@ public class MembersData {
             if (filterOrderBy == 0) {
                 query += "ORDER BY M.idMember DESC ";
             } else if (filterOrderBy == 1) {
-                query += "ORDER BY M.registrationDate DESC ";
+                query += "ORDER BY M.registrationDate ";
             }
 
             con = DataServer.getConnection();
@@ -267,9 +269,6 @@ public class MembersData {
 
                 LocalDate endDate = LocalDate.parse(rs.getString("endDate"));
                 member.setEndDate(DateFormatter.getDayMonthYearComplete(endDate));
-                member.setDaysLeft(DateFormatter.daysDifferenceToday(endDate));
-
-                member.setDebtCount(rs.getInt("debtCount"));
 
                 members.add(member);
             }
@@ -284,5 +283,88 @@ public class MembersData {
             );
         }
         return null;
+    }
+
+    public static String getStyle(int idMember) {
+        Connection con;
+        PreparedStatement ps;
+        ResultSet rs;
+
+        con = DataServer.getConnection();
+        try {
+            ps = con.prepareStatement("SELECT PM.endDate - CURDATE() AS 'daysLeft', (SELECT COUNT(PD.idPaymentDebt) FROM PAYMENT_DEBTS PD WHERE PD.flag = 1 AND PD.idMember = ? AND PD.debtStatus = 1 ORDER BY PD.dateTime DESC) AS 'debtCount' FROM MEMBERS M JOIN PAYMENT_MEMBERSHIPS PM on M.idMember = PM.idMember WHERE (M.flag = 1 AND PM.flag = 1) AND M.idMember = ? ORDER BY M.idMember DESC");
+            ps.setInt(1, idMember);
+            ps.setInt(2, idMember);
+            rs = ps.executeQuery();
+            rs.next();
+            long daysLeft = rs.getInt("daysLeft");
+            int debtCount = rs.getInt("debtCount");
+
+            /* DATES
+             *  - 0 DAYS = DANGER
+             * 1-3 DAYS = WARN
+             * + 3 DAYS = SUCCESS
+             */
+            if (debtCount == 1) {
+                return "creative-style";
+            } else {
+                if (daysLeft >= 0 && daysLeft <= 3) {
+                    return "warn-style";
+                } else if (daysLeft > 3) {
+                    return "success-style";
+                } else {
+                    return "danger-style";
+                }
+            }
+        } catch (SQLException sqlException) {
+            Notifications.catchError(
+                    MethodHandles.lookup().lookupClass().getSimpleName(),
+                    Thread.currentThread().getStackTrace()[1],
+                    "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(),
+                    sqlException
+            );
+        }
+        return "default-style";
+    }
+
+    public static void checkIn(int idMember) {
+        Connection con;
+        PreparedStatement ps;
+
+        con = DataServer.getConnection();
+        try {
+            ps = con.prepareStatement("INSERT INTO CHECK_IN(dateTime, idMember, idGym, openedBy) VALUE (CURRENT_TIMESTAMP(), ?, ?, 1)");
+            ps.setInt(1, idMember);
+            ps.setInt(2, AppController.getCurrentGym().getIdGym());
+            ps.executeUpdate();
+        } catch (SQLException sqlException) {
+            Notifications.catchError(
+                    MethodHandles.lookup().lookupClass().getSimpleName(),
+                    Thread.currentThread().getStackTrace()[1],
+                    "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(),
+                    sqlException
+            );
+        }
+    }
+
+    public static void checkIn(int idMember, int openedBy) {
+        Connection con;
+        PreparedStatement ps;
+
+        con = DataServer.getConnection();
+        try {
+            ps = con.prepareStatement("INSERT INTO CHECK_IN(dateTime, idMember, idGym, openedBy) VALUE (CURRENT_TIMESTAMP(), ?, ?, ?)");
+            ps.setInt(1, idMember);
+            ps.setInt(2, AppController.getCurrentGym().getIdGym());
+            ps.setInt(3, openedBy);
+            ps.executeUpdate();
+        } catch (SQLException sqlException) {
+            Notifications.catchError(
+                    MethodHandles.lookup().lookupClass().getSimpleName(),
+                    Thread.currentThread().getStackTrace()[1],
+                    "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(),
+                    sqlException
+            );
+        }
     }
 }

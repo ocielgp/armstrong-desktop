@@ -10,7 +10,7 @@ public class DateFormatter {
     private static final String EEEE_dd_MMM_yyyy = "EEEE, dd/MMM/yyyy";
     private static final String yyyy_mm_dd = "yyyy-mm-dd";
 
-    public static LocalDate plusDaysToCurrentDate(int days) {
+    public static LocalDate plusDaysToCurrentDate(long days) {
         return LocalDate.now().plusDays(days);
     }
 
@@ -23,9 +23,9 @@ public class DateFormatter {
         return ChronoUnit.DAYS.between(LocalDate.now(), date);
     }
 
-    public static int differenceBetweenDays(LocalDate firstDate, LocalDate secondDate) {
-        System.out.println(firstDate.compareTo(secondDate));
-        return Math.abs(firstDate.compareTo(secondDate));
+    public static long differenceBetweenDays(LocalDate firstDate, LocalDate secondDate) {
+        System.out.println();
+        return firstDate.until(secondDate, ChronoUnit.DAYS);
     }
 
     public static String getDayMonthYearComplete(LocalDate date) {

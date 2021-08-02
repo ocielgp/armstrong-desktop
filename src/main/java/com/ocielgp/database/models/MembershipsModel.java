@@ -10,7 +10,7 @@ public class MembershipsModel {
     private final IntegerProperty idMembership = new SimpleIntegerProperty();
     private final SimpleDoubleProperty price = new SimpleDoubleProperty();
     private final StringProperty description = new SimpleStringProperty();
-    private final IntegerProperty days = new SimpleIntegerProperty();
+    private final LongProperty days = new SimpleLongProperty();
 
     public int getIdMembership() {
         return idMembership.get();
@@ -48,16 +48,16 @@ public class MembershipsModel {
         this.description.set(description);
     }
 
-    public int getDays() {
+    public long getDays() {
         return days.get();
     }
 
-    public IntegerProperty daysProperty() {
-        return days;
+    public void setDays(long days) {
+        this.days.set(days);
     }
 
-    public void setDays(int days) {
-        this.days.set(days);
+    public LongProperty daysProperty() {
+        return days;
     }
 
     @Override

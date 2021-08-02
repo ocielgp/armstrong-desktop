@@ -295,11 +295,13 @@ public class MemberDetailController implements Initializable {
                     memberModel.setPhone(Input.spaceRemover(this.pi_fieldPhone.getText()));
                     memberModel.setEmail(Input.spaceRemover(this.pi_fieldEmail.getText()));
                     memberModel.setNotes(Input.capitalizeFirstLetter(this.pi_fieldNotes.getText()));
+                    memberModel.setIdGym(AppController.getCurrentGym().getIdGym());
 
                     // Membership
                     MembershipsModel membershipModel;
                     if (this.ms_togglePersonalized.isSelected()) {
                         membershipModel = new MembershipsModel();
+                        System.out.println(DateFormatter.differenceBetweenDays(LocalDate.now(), this.ms_datePicker.getValue()));
                         membershipModel.setDays(DateFormatter.differenceBetweenDays(LocalDate.now(), this.ms_datePicker.getValue()));
                         membershipModel.setDescription(this.ms_fieldDescription.getText());
                         membershipModel.setPrice(Double.parseDouble(this.ms_fieldPrice.getText()));
@@ -338,7 +340,7 @@ public class MemberDetailController implements Initializable {
                         System.out.println(memberModel.getIdMember());
                         System.out.println(memberModel.getEmail().equals(""));
                         System.out.println("All is good");
-                        int idMember = MembersData.addMember(memberModel);
+                        int idMember = MembersData.createMember(memberModel);
                         if (idMember > 0) {
                             // TODO AFTER MEMBER IS CREATED, DO THIS
                             MembersData.uploadPhoto(idMember, photoHandler.getPhoto());

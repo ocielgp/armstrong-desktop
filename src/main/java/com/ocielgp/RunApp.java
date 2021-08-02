@@ -2,6 +2,7 @@ package com.ocielgp;
 
 import com.ocielgp.app.AppController;
 import com.ocielgp.database.models.StaffUsersModel;
+import com.ocielgp.files.ConfigFiles;
 import com.ocielgp.utilities.Loader;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -24,6 +25,7 @@ public class RunApp extends Application {
 
     @Override
     public void start(Stage primaryStage) throws IOException {
+        primaryStage.getIcons().setAll(ConfigFiles.loadImage("app-icon.png"));
         // Load root parent
         FXMLLoader view = new FXMLLoader(
                 Objects.requireNonNull(RunApp.class.getClassLoader().getResource("app.fxml"))
@@ -37,7 +39,7 @@ public class RunApp extends Application {
         scene.getStylesheets().add(String.valueOf(RunApp.class.getClassLoader().getResource("styles.css")));
 
         // Show app
-        primaryStage.setTitle("Ármstrong");
+        primaryStage.setTitle("Gym App");
         primaryStage.setScene(scene);
 //        primaryStage.setMaximized(true);
         primaryStage.show();

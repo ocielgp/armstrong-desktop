@@ -4,6 +4,7 @@ import animatefx.animation.FadeInRight;
 import animatefx.animation.FadeOutRight;
 import com.ocielgp.RunApp;
 import com.ocielgp.app.AppController;
+import com.ocielgp.files.ConfigFiles;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.event.Event;
@@ -129,6 +130,7 @@ public class Notifications {
     static {
         // Init notifications container
         stage = new Stage();
+        stage.getIcons().setAll(ConfigFiles.loadImage("app-icon.png"));
         stage.initStyle(StageStyle.TRANSPARENT);
         stage.setAlwaysOnTop(true); // Fix notification, always on front
     }

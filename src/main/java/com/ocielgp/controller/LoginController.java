@@ -9,6 +9,7 @@ import com.jfoenix.controls.JFXTextField;
 import com.ocielgp.app.AppController;
 import com.ocielgp.database.StaffUsersData;
 import com.ocielgp.database.models.StaffUsersModel;
+import com.ocielgp.files.ConfigFiles;
 import com.ocielgp.utilities.InputDetails;
 import com.ocielgp.utilities.Loader;
 import com.ocielgp.utilities.Validator;
@@ -17,7 +18,6 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -25,7 +25,6 @@ import javafx.scene.layout.HBox;
 
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Objects;
 import java.util.ResourceBundle;
 
 public class LoginController implements Initializable {
@@ -47,7 +46,7 @@ public class LoginController implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         this.loginPane.setOpacity(0); // Hide loginPane
 
-        this.userImage.setImage(new Image(Objects.requireNonNull(LoginController.class.getClassLoader().getResourceAsStream("default-user.png"))));
+        this.userImage.setImage(ConfigFiles.loadImage("no-user-image.png"));
 
         this.loginButton.setOnAction(actionEvent -> {
             ArrayList<InputDetails> inputs = new ArrayList<>();

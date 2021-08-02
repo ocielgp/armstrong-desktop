@@ -101,13 +101,11 @@
 /* Members */
 .members {
     -fx-background-color: -fx-color-background;
-    -fx-text-fill: -fx-color-text;
 }
 
 .member-cell .table-cell {
     -fx-background-color: -fx-color-background;
     -fx-text-fill: -fx-color-text;
-    -fx-border-color: -fx-color-border;
 }
 
 /*.members*/

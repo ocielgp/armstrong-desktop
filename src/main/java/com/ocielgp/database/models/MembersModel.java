@@ -1,6 +1,9 @@
 package com.ocielgp.database.models;
 
-import javafx.beans.property.*;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 
 public class MembersModel {
     // Max length
@@ -10,6 +13,7 @@ public class MembersModel {
     public static final short emailLength = 254;
     public static final byte notesLength = 80;
 
+    private final IntegerProperty idGym = new SimpleIntegerProperty();
     private final IntegerProperty idMember = new SimpleIntegerProperty();
     private final StringProperty name = new SimpleStringProperty();
     private final StringProperty lastName = new SimpleStringProperty();
@@ -20,12 +24,18 @@ public class MembersModel {
     private final StringProperty registrationDate = new SimpleStringProperty();
     private byte[] photo;
 
-    private final LongProperty daysLeft = new SimpleLongProperty();
     private final StringProperty endDate = new SimpleStringProperty();
-    private final IntegerProperty debtCount = new SimpleIntegerProperty();
 
     private PaymentMembershipsModel paymentMembership;
     private PaymentDebtsModel pendingPayment;
+
+    public byte[] getPhoto() {
+        return photo;
+    }
+
+    public void setPhoto(byte[] photo) {
+        this.photo = photo;
+    }
 
     public int getIdMember() {
         return idMember.get();
@@ -123,24 +133,16 @@ public class MembersModel {
         this.registrationDate.set(registrationDate);
     }
 
-    public byte[] getPhoto() {
-        return photo;
+    public int getIdGym() {
+        return idGym.get();
     }
 
-    public void setPhoto(byte[] photo) {
-        this.photo = photo;
+    public void setIdGym(int idGym) {
+        this.idGym.set(idGym);
     }
 
-    public long getDaysLeft() {
-        return daysLeft.get();
-    }
-
-    public LongProperty daysLeftProperty() {
-        return daysLeft;
-    }
-
-    public void setDaysLeft(long daysLeft) {
-        this.daysLeft.set(daysLeft);
+    public IntegerProperty idGymProperty() {
+        return idGym;
     }
 
     public String getEndDate() {
@@ -153,18 +155,6 @@ public class MembersModel {
 
     public void setEndDate(String endDate) {
         this.endDate.set(endDate);
-    }
-
-    public int getDebtCount() {
-        return debtCount.get();
-    }
-
-    public void setDebtCount(int debtCount) {
-        this.debtCount.set(debtCount);
-    }
-
-    public IntegerProperty debtCountProperty() {
-        return debtCount;
     }
 
     public PaymentMembershipsModel getPaymentMembership() {

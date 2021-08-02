@@ -139,38 +139,11 @@ public class Pagination {
                 public void updateItem(MembersModel member, boolean empty) {
                     super.updateItem(member, empty);
                     if (member != null) {
-                        /* DATES
-                         *  - 0 DAYS = DANGER
-                         * 1-3 DAYS = WARN
-                         * + 3 DAYS = SUCESS
-                         */
-                        System.out.println("debt" + member.getDebtCount());
-                        if (member.getDebtCount() == 1) {
-                            if (getStyleClass().size() == 5) {
-                                getStyleClass().set(4, "creative-style"); // replace color style
-                            } else {
-                                getStyleClass().addAll("member-cell", "creative-style");
-                            }
+                        String style = MembersData.getStyle(member.getIdMember());
+                        if (getStyleClass().size() == 5) {
+                            getStyleClass().set(4, style); // replace color style
                         } else {
-                            if (member.getDaysLeft() < 0) {
-                                if (getStyleClass().size() == 5) {
-                                    getStyleClass().set(4, "danger-style"); // replace color style
-                                } else {
-                                    getStyleClass().addAll("member-cell", "danger-style");
-                                }
-                            } else if (member.getDaysLeft() >= 0 && member.getDaysLeft() <= 3) {
-                                if (getStyleClass().size() == 5) {
-                                    getStyleClass().set(4, "warn-style"); // replace color style
-                                } else {
-                                    getStyleClass().addAll("member-cell", "warn-style");
-                                }
-                            } else if (member.getDaysLeft() > 3) {
-                                if (getStyleClass().size() == 5) {
-                                    getStyleClass().set(4, "sucess-style"); // replace color style
-                                } else {
-                                    getStyleClass().addAll("member-cell", "sucess-style");
-                                }
-                            }
+                            getStyleClass().addAll("member-cell", style);
                         }
                     } else {
                         if (getStyleClass().size() == 5) {

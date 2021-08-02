@@ -4,7 +4,6 @@ import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXCheckBox;
 import com.jfoenix.controls.JFXRadioButton;
 import com.jfoenix.controls.JFXTextField;
-import com.ocielgp.app.AppController;
 import com.ocielgp.database.models.MembersModel;
 import com.ocielgp.files.ConfigFiles;
 import com.ocielgp.utilities.Input;
@@ -18,7 +17,6 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
 
 import java.net.URL;
-import java.util.Objects;
 import java.util.ResourceBundle;
 
 public class MembersController implements Initializable {
@@ -75,8 +73,6 @@ public class MembersController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        AppController.showUserInfo(AppController.DANGER_STYLE, null, "12", "erick no se ", "idk", "hi");
-
         this.tableColumnId.setCellValueFactory(new PropertyValueFactory<>("idMember"));
         this.tableColumnName.setCellValueFactory(new PropertyValueFactory<>("name"));
         this.tableColumnLastName.setCellValueFactory(new PropertyValueFactory<>("lastName"));
@@ -105,40 +101,11 @@ public class MembersController implements Initializable {
         this.radioButtonGender0.setToggleGroup(toggleGender);
         this.radioButtonGender1.setToggleGroup(toggleGender);
         this.radioButtonGender2.setToggleGroup(toggleGender);
-
-        //TODO: ENCAPSULE METHOD ON CONFIG FILES FOR AUTOMATITATION
-        toggleGender.selectedToggleProperty().addListener(((observable, oldValue, newValue) -> {
-            if (oldValue != null && oldValue != newValue) {
-                JFXRadioButton selected = (JFXRadioButton) newValue;
-                ConfigFiles.saveProperty(ConfigFiles.File.APP, "memberGender", String.valueOf(selected.getId().charAt(selected.getId().length() - 1)));
-                pagination.loadData(1);
-            }
-        }));
-        byte genderFilter = Byte.parseByte(Objects.requireNonNull(ConfigFiles.readProperty(ConfigFiles.File.APP, "memberGender")));
-        for (byte i = 0; i < toggleGender.getToggles().size(); i++) {
-            if (((JFXRadioButton) toggleGender.getToggles().get(i)).getId().equals("radioButtonGender" + genderFilter)) {
-                toggleGender.getToggles().get(i).setSelected(true);
-            }
-        }
+        ConfigFiles.createSelectedToggleProperty(toggleGender, "radioButtonGender", "memberGender", pagination);
 
         ToggleGroup toggleOrderBy = new ToggleGroup();
         this.radioButtonOrderBy0.setToggleGroup(toggleOrderBy);
         this.radioButtonOrderBy1.setToggleGroup(toggleOrderBy);
-
-        //TODO: ENCAPSULE METHOD ON CONFIG FILES FOR AUTOMATITATION
-        toggleOrderBy.selectedToggleProperty().addListener(((observable, oldValue, newValue) -> {
-            if (oldValue != null && oldValue != newValue) {
-                JFXRadioButton selected = (JFXRadioButton) newValue;
-                ConfigFiles.saveProperty(ConfigFiles.File.APP, "memberOrderBy", String.valueOf(selected.getId().charAt(selected.getId().length() - 1)));
-                pagination.loadData(1);
-            }
-        }));
-        byte orderByFilter = Byte.parseByte(Objects.requireNonNull(ConfigFiles.readProperty(ConfigFiles.File.APP, "memberOrderBy")));
-        for (byte i = 0; i < toggleOrderBy.getToggles().size(); i++) {
-            if (((JFXRadioButton) toggleOrderBy.getToggles().get(i)).getId().equals("radioButtonOrderBy" + orderByFilter)) {
-                toggleOrderBy.getToggles().get(i).setSelected(true);
-            }
-        }
-
+        ConfigFiles.createSelectedToggleProperty(toggleOrderBy, "radioButtonOrderBy", "memberOrderBy", pagination);
     }
 }

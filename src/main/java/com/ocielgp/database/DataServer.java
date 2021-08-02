@@ -75,8 +75,7 @@ public class DataServer {
                         5
                 );
             }
-            return con;
         }
-        return null;
+        return con;
     }
 }

@@ -1,7 +1,9 @@
 package com.ocielgp.controller;
 
 import animatefx.animation.FadeInUp;
+import com.jfoenix.controls.JFXDialog;
 import com.ocielgp.app.AppController;
+import com.ocielgp.files.ConfigFiles;
 import com.ocielgp.fingerprint.Fingerprint;
 import com.ocielgp.utilities.Input;
 import com.ocielgp.utilities.Loader;
@@ -12,16 +14,18 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import org.kordamp.ikonli.javafx.FontIcon;
 
+import java.io.ByteArrayInputStream;
 import java.net.URL;
 import java.util.HashMap;
-import java.util.Objects;
 import java.util.ResourceBundle;
 
 public class DashboardController implements Initializable {
@@ -65,14 +69,19 @@ public class DashboardController implements Initializable {
     @FXML
     private Label user_membership;
 
-    public void showUserInfo(String style, Image photo, String id, String name, String gym, String membership) {
+    public void showUserInfo(String style, byte[] photo, String idMember, String name, String gym, String membership) {
         this.user_container.getStyleClass().setAll(AppController.getThemeType(), style);
-        this.user_photo.setImage(photo);
-        this.user_id.setText(id);
+        if (photo == null) {
+            this.user_photo.setImage(ConfigFiles.loadImage("no-user-image.png"));
+        } else {
+            Image img = new Image(new ByteArrayInputStream(photo));
+            this.user_photo.setImage(img);
+        }
+
+        this.user_id.setText(idMember);
         this.user_name.setText(name);
         this.user_gym.setText(gym);
         this.user_membership.setText(membership);
-
     }
 
     private static EventHandler<MouseEvent> fingerprintEvent;
@@ -81,8 +90,9 @@ public class DashboardController implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         AppController.setDashboardController(this);
 
-        this.userImage.setImage(new Image(Objects.requireNonNull(LoginController.class.getClassLoader().getResourceAsStream("default-user.png"))));
-        this.logo.setImage(new Image(Objects.requireNonNull(LoginController.class.getClassLoader().getResourceAsStream("img.jpg"))));
+        this.user_photo.setImage(ConfigFiles.loadImage("no-user-image.png"));
+        this.userImage.setImage(ConfigFiles.loadImage("no-user-image.png"));
+        this.logo.setImage(ConfigFiles.loadImage("img.jpg"));
 
         // Update content
         this.nombres.setText(AppController.getStaffUserModel().getName());
@@ -112,6 +122,7 @@ public class DashboardController implements Initializable {
                 );
                 content.setContent(navFXML);
                 Input.getScrollEvent(content);
+                Fingerprint.VerifyBackgroundReader();
             }
         };
         for (HBox route : routes.keySet()) {
@@ -125,20 +136,26 @@ public class DashboardController implements Initializable {
         Fingerprint.initializeUI(this.fingerprintIcon, this.fingerprintStatus);
 
         Platform.runLater(() -> {
-            Node summaryFXML = Loader.Load(
-                    "summary.fxml",
-                    "Dashboard",
-                    true
-            );
-            this.content.setContent(summaryFXML);
-            new FadeInUp(AppController.getCurrentGymNode()).play();
-
-//            Node members = Loader.Load(
-//                    "members.fxml",
+//            Node summaryFXML = Loader.Load(
+//                    "summary.fxml",
 //                    "Dashboard",
 //                    true
 //            );
-//            this.content.setContent(members);
+//            this.content.setContent(summaryFXML);
+            new FadeInUp(AppController.getCurrentGymNode()).play();
+
+            Node members = Loader.Load(
+                    "members.fxml",
+                    "Dashboard",
+                    true
+            );
+            this.content.setContent(members);
+
+            // DIALOG TEST
+            StackPane stackPane = new StackPane();
+            JFXDialog dialog = new JFXDialog();
+            dialog.setContent(new TextField());
+            dialog.show(stackPane);
         });
     }
 }
