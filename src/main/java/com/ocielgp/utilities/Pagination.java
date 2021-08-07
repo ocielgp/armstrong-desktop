@@ -8,6 +8,7 @@ import com.ocielgp.database.QueryRows;
 import com.ocielgp.database.models.MembersModel;
 import com.ocielgp.files.ConfigFiles;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableRow;
@@ -63,7 +64,7 @@ public class Pagination {
         });
         labelPreviusPage.addEventFilter(MouseEvent.MOUSE_CLICKED, mouseEvent -> this.previousPage());
         labelNextPage.addEventFilter(MouseEvent.MOUSE_CLICKED, mouseEvent -> this.nextPage());
-        this.tableView.addEventFilter(MouseEvent.MOUSE_CLICKED, mouseEvent -> this.itemSelected());
+//        this.tableView.addEventFilter(MouseEvent.MOUSE_CLICKED, mouseEvent -> this.itemSelected());
         this.rows = Integer.parseInt(Objects.requireNonNull(ConfigFiles.readProperty(ConfigFiles.File.APP, "paginationRows")));
         this.loadData(1); // Initial data
 
@@ -73,7 +74,10 @@ public class Pagination {
                 this.loadData(1);
             }
         };
+        // DELETE IF BEFORE HAS ADDED
+        AppController.getCurrentGymNode().removeEventHandler(ActionEvent.ACTION, gymChange);
         AppController.getCurrentGymNode().addEventHandler(ActionEvent.ACTION, gymChange);
+
         this.fieldSearch.sceneProperty().addListener((observable, oldScene, newScene) -> {
             if (oldScene != null) {
                 AppController.getCurrentGymNode().removeEventHandler(ActionEvent.ACTION, gymChange);
@@ -82,7 +86,7 @@ public class Pagination {
     }
 
     private void updateRowsPerPage() {
-        if (Validator.numberValidator(new InputDetails(this.fieldRowsPerPage, this.fieldRowsPerPage.getText()))) {
+        if (Validator.numberValidator(new InputDetails(this.fieldRowsPerPage, this.fieldRowsPerPage.getText()), false, true)) {
             int newRowsPerPage = Integer.parseInt(this.fieldRowsPerPage.getText());
             if (newRowsPerPage > 0) {
                 this.rows = Integer.parseInt(this.fieldRowsPerPage.getText());
@@ -95,16 +99,16 @@ public class Pagination {
         }
     }
 
-    public void itemSelected() {
-        switch (source) {
-            case MEMBERS: {
-                if (this.tableView.getSelectionModel().getSelectedItem() != null) {
-                    MembersModel membersModel = (MembersModel) this.tableView.getSelectionModel().getSelectedItem();
-                    System.out.println(membersModel.getIdMember());
-                }
-            }
-        }
-    }
+//    public void itemSelected() {
+//        switch (source) {
+//            case MEMBERS: {
+//                if (this.tableView.getSelectionModel().getSelectedItem() != null) {
+//                    MembersModel membersModel = (MembersModel) this.tableView.getSelectionModel().getSelectedItem();
+//                    System.out.println(membersModel.getIdMember());
+//                }
+//            }
+//        }
+//    }
 
     public void previousPage() {
         this.loadData(Integer.parseInt(this.labelCurrentPage.getText()) - 1);

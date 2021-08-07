@@ -98,7 +98,7 @@ public class Fingerprint {
     }
 
     public static void VerifyBackgroundReader() { // Verify current status
-        if (fingerprintStatusCode != 1) {
+        if (fingerprintStatusCode > 1) {
             if (captureFingerprint != null) {
                 StopCapture();
             }

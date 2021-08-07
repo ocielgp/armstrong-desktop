@@ -71,6 +71,9 @@ public class MembersController implements Initializable {
     @FXML
     private JFXRadioButton radioButtonOrderBy1;
 
+    // Attributes
+    private Pagination pagination;
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         this.tableColumnId.setCellValueFactory(new PropertyValueFactory<>("idMember"));
@@ -78,16 +81,23 @@ public class MembersController implements Initializable {
         this.tableColumnLastName.setCellValueFactory(new PropertyValueFactory<>("lastName"));
         this.tableColumnEndDate.setCellValueFactory(new PropertyValueFactory<>("endDate"));
 
-        Pagination pagination = new Pagination(this.fieldSearch, this.buttonSearch, this.labelTotalRows, this.tableViewMembers, this.fieldRowsPerPage, this.labelPreviousPage, this.labelCurrentPage, this.labelTotalPages, this.labelNextPage, Pagination.Sources.MEMBERS);
-
+        this.pagination = new Pagination(this.fieldSearch, this.buttonSearch, this.labelTotalRows, this.tableViewMembers, this.fieldRowsPerPage, this.labelPreviousPage, this.labelCurrentPage, this.labelTotalPages, this.labelNextPage, Pagination.Sources.MEMBERS);
+        MemberDetailController memberDetailController = new MemberDetailController(this);
         Node memberFXML = Loader.Load(
                 "memberDetail.fxml",
                 "Members",
                 true,
-                new MemberDetailController(pagination)
+                memberDetailController
         );
+
+        this.tableViewMembers.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null) {
+                memberDetailController.initForm(newValue.getIdMember());
+            }
+        });
         this.memberPane.setContent(memberFXML);
         Input.getScrollEvent(this.memberPane);
+        //memberFXML = null;
 
         this.checkBoxAllGyms.setSelected(Boolean.parseBoolean(ConfigFiles.readProperty(ConfigFiles.File.APP, "memberAllGyms")));
         this.checkBoxOnlyActiveMembers.setSelected(Boolean.parseBoolean(ConfigFiles.readProperty(ConfigFiles.File.APP, "memberOnlyActiveMembers")));
@@ -107,5 +117,13 @@ public class MembersController implements Initializable {
         this.radioButtonOrderBy0.setToggleGroup(toggleOrderBy);
         this.radioButtonOrderBy1.setToggleGroup(toggleOrderBy);
         ConfigFiles.createSelectedToggleProperty(toggleOrderBy, "radioButtonOrderBy", "memberOrderBy", pagination);
+    }
+
+    public void refreshTable() {
+        this.pagination.loadData(1);
+    }
+
+    public void unselectTable() {
+        this.tableViewMembers.getSelectionModel().select(null);
     }
 }

@@ -41,7 +41,9 @@ public class RunApp extends Application {
         // Show app
         primaryStage.setTitle("Gym App");
         primaryStage.setScene(scene);
-//        primaryStage.setMaximized(true);
+
+        primaryStage.setMaximized(true);
+
         primaryStage.show();
 
         // Init notification system

@@ -46,7 +46,7 @@ public class Validator {
         }
     }
 
-    public static boolean numberValidator(InputDetails input) {
+    public static boolean numberValidator(InputDetails input, boolean notify, boolean focus) {
         String regex = "[0-9]+";
         int inputsInvalid = 0;
         if (!input.getMetadata().replace(" ", "").matches(regex)) {
@@ -56,7 +56,12 @@ public class Validator {
         if (inputsInvalid == 0) {
             return true;
         } else {
-            Notifications.danger("Error", "Los campos en rojo deben ser solo numéros.", 2);
+            if (notify) {
+                Notifications.danger("Error", "Los campos en rojo deben ser solo numéros.", 2);
+            }
+            if (focus) {
+                input.getNode().requestFocus();
+            }
             return false;
         }
     }

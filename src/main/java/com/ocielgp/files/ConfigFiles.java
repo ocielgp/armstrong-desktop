@@ -36,7 +36,6 @@ public class ConfigFiles {
                     ioException
             );
         }
-        System.out.println("nulo");
         return null;
     }
 
@@ -88,13 +87,18 @@ public class ConfigFiles {
         try {
             Properties properties = loadPropertiesFile(file);
             properties.setProperty(property, value);
-            properties.store(new FileOutputStream(
-                            Objects.requireNonNull(AppController.class.getClassLoader().getResource(fileName)).getPath()
-                    ),
-                    null
+            FileOutputStream fileOutputStream = new FileOutputStream(
+                    Objects.requireNonNull(AppController.class.getClassLoader().getResource(fileName)).getPath()
             );
-        } catch (Exception e) {
-            e.printStackTrace();
+            properties.store(fileOutputStream, null);
+            fileOutputStream.close();
+        } catch (Exception exception) {
+            Notifications.catchError(
+                    MethodHandles.lookup().lookupClass().getSimpleName(),
+                    Thread.currentThread().getStackTrace()[1],
+                    exception.getMessage(),
+                    exception
+            );
         }
     }
 

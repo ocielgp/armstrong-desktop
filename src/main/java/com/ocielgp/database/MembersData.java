@@ -327,6 +327,39 @@ public class MembersData {
         return "default-style";
     }
 
+    public static MembersModel getMember(int idMember) {
+        Connection con;
+        PreparedStatement ps;
+        ResultSet rs;
+
+        con = DataServer.getConnection();
+        MembersModel membersModel = new MembersModel();
+        try {
+            ps = con.prepareStatement("SELECT M.name, M.lastName, M.gender, M.phone, M.email, M.notes, M.registrationDate, (SELECT MP.photo FROM MEMBER_PHOTOS MP WHERE MP.idMember = M.idMember LIMIT 1) AS 'photo' FROM MEMBERS M WHERE (M.flag = 1) AND M.idMember = ? ORDER BY M.registrationDate DESC");
+            ps.setInt(1, idMember);
+            rs = ps.executeQuery();
+
+            if (rs.next()) {
+                membersModel = new MembersModel();
+                membersModel.setName(rs.getString("name"));
+                membersModel.setLastName(rs.getString("lastName"));
+                membersModel.setGender(rs.getString("gender"));
+                membersModel.setPhone(rs.getString("phone"));
+                membersModel.setEmail(rs.getString("email"));
+                membersModel.setNotes(rs.getString("notes"));
+                membersModel.setRegistrationDate(rs.getString("registrationDate"));
+            }
+        } catch (SQLException sqlException) {
+            Notifications.catchError(
+                    MethodHandles.lookup().lookupClass().getSimpleName(),
+                    Thread.currentThread().getStackTrace()[1],
+                    "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(),
+                    sqlException
+            );
+        }
+        return membersModel;
+    }
+
     public static void checkIn(int idMember) {
         Connection con;
         PreparedStatement ps;

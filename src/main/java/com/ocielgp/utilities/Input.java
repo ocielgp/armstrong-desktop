@@ -65,21 +65,23 @@ public class Input {
 
     public static void clearInputs(Node... inputs) {
         for (Node input : inputs) {
-            if (input.getClass() == JFXTextField.class) { // JFXTextField
-                JFXTextField field = (JFXTextField) input;
-                field.setText("");
-            } else if (input.getClass() == JFXPasswordField.class) { // JFXPasswordField
-                JFXPasswordField field = (JFXPasswordField) input;
-                field.setText("");
-            } else if (input.getClass() == JFXComboBox.class) { // JFXComboBox
-                JFXComboBox comboBox = (JFXComboBox) input;
-                comboBox.getSelectionModel().select(-1);
-            } else if (input.getClass() == JFXDatePicker.class) {
-                JFXDatePicker datePicker = (JFXDatePicker) input;
-                datePicker.getEditor().setText("");
-            } else if (input.getClass() == Label.class) {
-                Label label = (Label) input;
-                label.setText("");
+            if (input != null) {
+                if (input.getClass() == JFXTextField.class) { // JFXTextField
+                    JFXTextField field = (JFXTextField) input;
+                    field.clear();
+                } else if (input.getClass() == JFXPasswordField.class) { // JFXPasswordField
+                    JFXPasswordField field = (JFXPasswordField) input;
+                    field.clear();
+                } else if (input.getClass() == JFXComboBox.class) { // JFXComboBox
+                    JFXComboBox comboBox = (JFXComboBox) input;
+                    comboBox.getSelectionModel().select(-1);
+                } else if (input.getClass() == JFXDatePicker.class) {
+                    JFXDatePicker datePicker = (JFXDatePicker) input;
+                    datePicker.getEditor().clear();
+                } else if (input.getClass() == Label.class) {
+                    Label label = (Label) input;
+                    label.setText("");
+                }
             }
         }
     }

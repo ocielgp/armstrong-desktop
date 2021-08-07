@@ -114,11 +114,11 @@
 
 .member-title {
     -fx-border-color: -fx-color-border;
-    -fx-background-color: -fx-color-text;
+    -fx-background-color: -fx-color-background;
 }
 
 .member-title .label {
-    -fx-text-fill: -fx-color-background;
+    -fx-text-fill: -fx-color-text;
 }
 
 .member {
