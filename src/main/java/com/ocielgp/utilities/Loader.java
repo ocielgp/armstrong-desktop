@@ -1,6 +1,6 @@
 package com.ocielgp.utilities;
 
-import com.ocielgp.controller.RootController;
+import com.ocielgp.controller.AppController;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 
@@ -11,7 +11,7 @@ public class Loader {
         Node node = null;
         try {
             FXMLLoader view = new FXMLLoader(
-                    Objects.requireNonNull(RootController.class.getClassLoader().getResource(viewFileName))
+                    Objects.requireNonNull(AppController.class.getClassLoader().getResource(viewFileName))
             );
             if (controller.length > 0) {
                 view.setController(controller[0]);

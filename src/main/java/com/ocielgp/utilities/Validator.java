@@ -11,6 +11,16 @@ import javafx.scene.paint.Color;
 import java.util.ListIterator;
 
 public class Validator {
+    public static boolean emptyValidator(InputDetails input) {
+        if (input.getMetadata().replace(" ", "").length() == 0 || input.getMetadata().equals("-1")) {
+            shakeInput(input.getNode());
+            Notifications.danger("Error", "Los campos en rojo no pueden estar vacios.");
+            return false;
+        } else {
+            return true;
+        }
+    }
+
     public static boolean emptyValidator(ListIterator<InputDetails> inputs) {
         int inputsInvalid = 0;
         while (inputs.hasNext()) {
@@ -23,7 +33,7 @@ public class Validator {
         if (inputsInvalid == 0) {
             return true;
         } else {
-            Notifications.danger("Error", "Los campos en rojo no pueden estar vacios.", 2);
+            Notifications.danger("Error", "Los campos en rojo no pueden estar vacios.");
             return false;
         }
     }
@@ -41,7 +51,7 @@ public class Validator {
         if (inputsInvalid == 0) {
             return true;
         } else {
-            Notifications.danger("Error", "Los campos en rojo deben ser solo texto.", 2);
+            Notifications.danger("Error", "Los campos en rojo deben ser solo texto.");
             return false;
         }
     }
@@ -57,7 +67,7 @@ public class Validator {
             return true;
         } else {
             if (notify) {
-                Notifications.danger("Error", "Los campos en rojo deben ser solo numéros.", 2);
+                Notifications.danger("Error", "Los campos en rojo deben ser solo numéros.");
             }
             if (focus) {
                 input.getNode().requestFocus();
@@ -79,7 +89,7 @@ public class Validator {
         if (inputsInvalid == 0) {
             return true;
         } else {
-            Notifications.danger("Error", "Los campos en rojo deben ser solo numéros.", 2);
+            Notifications.danger("Error", "Los campos en rojo deben ser solo numéros.");
             return false;
         }
     }
@@ -90,13 +100,13 @@ public class Validator {
         if (phone.matches(regex)) {
             if (phone.length() != 10) {
                 shakeInput(phoneInput.getNode());
-                Notifications.danger("Error", "El teléfono debe tener 10 numéros.", 2);
+                Notifications.danger("Error", "El teléfono debe tener 10 numéros.");
                 return false;
             }
             return true;
         } else {
             shakeInput(phoneInput.getNode());
-            Notifications.danger("Error", "El teléfono debe tener solo numéros.", 2);
+            Notifications.danger("Error", "El teléfono debe tener solo numéros.");
             return false;
         }
     }
@@ -108,20 +118,22 @@ public class Validator {
             return true;
         } else {
             shakeInput(emailInput.getNode());
-            Notifications.danger("Error", "El correo no es válido.", 2);
+            Notifications.danger("Error", "El correo no es válido.");
             return false;
         }
     }
 
-    public static boolean moneyValidator(boolean notify, InputDetails input) {
+    public static boolean moneyValidator(InputDetails input, boolean notify) {
         try {
             Double.parseDouble(input.getMetadata());
             return true;
         } catch (NumberFormatException ignored) {
-            shakeInput(input.getNode());
+            if (!input.getMetadata().isEmpty()) {
+                shakeInput(input.getNode());
+            }
         }
         if (notify) {
-            Notifications.danger("Error", "Cantidad no válida.", 2);
+            Notifications.danger("Error", "Cantidad no válida.");
         }
         return false;
     }
@@ -141,7 +153,7 @@ public class Validator {
         if (inputsInvalid == 0) {
             return true;
         } else {
-            Notifications.danger("Error", "Los campos en rojo deben tener solo numéros.", 2);
+            Notifications.danger("Error", "Los campos en rojo deben tener solo numéros.");
             return false;
         }
     }
@@ -167,5 +179,9 @@ public class Validator {
             }
             new Shake(input).play();
         }
+    }
+
+    public static boolean compare(String newText, String originalText) {
+        return newText.equalsIgnoreCase(originalText);
     }
 }

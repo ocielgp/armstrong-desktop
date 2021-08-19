@@ -1,7 +1,8 @@
 package com.ocielgp.utilities;
 
 import com.jfoenix.controls.JFXButton;
-import com.ocielgp.app.AppController;
+import com.ocielgp.app.GlobalController;
+import com.ocielgp.files.ConfigFiles;
 import com.ocielgp.fingerprint.Fingerprint;
 import javafx.event.ActionEvent;
 import javafx.scene.image.Image;
@@ -10,6 +11,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.stage.FileChooser;
 
 import java.io.File;
+import java.lang.invoke.MethodHandles;
 import java.nio.file.Files;
 
 
@@ -25,6 +27,9 @@ public class PhotoHandler {
         imageViewPhoto.addEventFilter(MouseEvent.MOUSE_CLICKED, mouseEvent -> browseImage());
         buttonUploadPhoto.addEventFilter(ActionEvent.ACTION, actionEvent -> browseImage());
         buttonDeletePhoto.addEventFilter(ActionEvent.ACTION, actionEvent -> deleteImage());
+
+        this.imageViewPhoto.setStyle("-fx-cursor: hand");
+        this.imageViewPhoto.setImage(ConfigFiles.getDefaultImage());
     }
 
     private void browseImage() {
@@ -35,15 +40,24 @@ public class PhotoHandler {
         FileChooser fileChooser = new FileChooser();
         FileChooser.ExtensionFilter extensionFilter = new FileChooser.ExtensionFilter("Imágenes", "*.png", "*.jpg", "*.jpeg");
         fileChooser.getExtensionFilters().add(extensionFilter);
-        File file = fileChooser.showOpenDialog(AppController.getPrimaryStage());
+
+        // TODO: OPEN LAST LOCATION
+        File file = fileChooser.showOpenDialog(GlobalController.getPrimaryStage());
         if (file != null) {
             this.imageViewPhoto.setImage(new Image(file.toURI().toString()));
             this.buttonDeletePhoto.setDisable(false);
             try {
                 this.bytes = Files.readAllBytes(file.toPath());
-            } catch (Exception e) {
-                Notifications.danger("PhotoHandler", "Error al guardar bytes de la foto.", 5);
-                e.printStackTrace();
+
+                fileChooser = null;
+                file = null;
+            } catch (Exception exception) {
+                Notifications.catchError(
+                        MethodHandles.lookup().lookupClass().getSimpleName(),
+                        Thread.currentThread().getStackTrace()[1],
+                        exception.getMessage(),
+                        exception
+                );
             }
         }
 
@@ -53,14 +67,31 @@ public class PhotoHandler {
     }
 
     private void deleteImage() {
-        this.imageViewPhoto.setImage(null);
+        this.imageViewPhoto.setImage(ConfigFiles.getDefaultImage());
         this.buttonDeletePhoto.setDisable(true);
         this.bytes = null;
         this.imageViewPhoto.requestFocus();
     }
 
+    public void setPhoto(byte[] bytes) {
+        if (bytes != null) {
+            this.bytes = bytes;
+            this.imageViewPhoto.setImage(ConfigFiles.loadImage(bytes));
+            this.buttonDeletePhoto.setDisable(false);
+        } else {
+            this.imageViewPhoto.setImage(ConfigFiles.getDefaultImage());
+            this.buttonDeletePhoto.setDisable(true);
+        }
+    }
+
     public byte[] getPhoto() {
         return this.bytes;
+    }
+
+    public void resetHandler() {
+        this.imageViewPhoto.setImage(null);
+        this.bytes = null;
+        this.buttonDeletePhoto.setDisable(true);
     }
 
 }

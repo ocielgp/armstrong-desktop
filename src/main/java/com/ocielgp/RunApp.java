@@ -1,21 +1,20 @@
 package com.ocielgp;
 
-import com.ocielgp.app.AppController;
-import com.ocielgp.database.models.StaffUsersModel;
+import com.ocielgp.app.GlobalController;
+import com.ocielgp.controller.AppController;
+import com.ocielgp.database.members.MODEL_MEMBERS;
+import com.ocielgp.database.staff.MODEL_STAFF_MEMBERS;
 import com.ocielgp.files.ConfigFiles;
 import com.ocielgp.utilities.Loader;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
 import java.io.IOException;
-import java.util.Objects;
 
 public class RunApp extends Application {
 
@@ -25,30 +24,29 @@ public class RunApp extends Application {
 
     @Override
     public void start(Stage primaryStage) throws IOException {
-        primaryStage.getIcons().setAll(ConfigFiles.loadImage("app-icon.png"));
+        primaryStage.getIcons().setAll(ConfigFiles.getIconApp());
         // Load root parent
-        FXMLLoader view = new FXMLLoader(
-                Objects.requireNonNull(RunApp.class.getClassLoader().getResource("app.fxml"))
+        AppController appController = new AppController();
+        GlobalController.setAppController(appController);
+        BorderPane appView = (BorderPane) Loader.Load(
+                "app.fxml",
+                "RunApp",
+                false,
+                appController
         );
-        Parent root = view.load();
 
         // Place content on scene
-        Scene scene = new Scene(root, 1366, 768); // HD
-
-        // Add stylesheets
+        Scene scene = new Scene(appView, 1366, 768); // HD
         scene.getStylesheets().add(String.valueOf(RunApp.class.getClassLoader().getResource("styles.css")));
 
         // Show app
         primaryStage.setTitle("Gym App");
         primaryStage.setScene(scene);
-
         primaryStage.setMaximized(true);
-
         primaryStage.show();
 
         // Init notification system
-        AppController.setPrimaryStage(primaryStage);
-//        NotificationHandler.primaryStage = primaryStage;
+        GlobalController.setPrimaryStage(primaryStage);
 
         // Kill all threads when an event closing occur
         primaryStage.addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, evt -> {
@@ -56,16 +54,21 @@ public class RunApp extends Application {
             System.exit(0);
         });
 
-        StaffUsersModel staffUserModel = new StaffUsersModel();
-        staffUserModel.setName("Ociel");
-        staffUserModel.setIdStaffUser(2);
-        AppController.setStaffUserModel(staffUserModel);
+        MODEL_STAFF_MEMBERS modelStaffMembers = new MODEL_STAFF_MEMBERS();
+        modelStaffMembers.setPassword("a94cbdca65dd4582c45c2b8dd97aec782baa8fbad32b73b547bf5b0e52ef58f3");
+        modelStaffMembers.setIdRole(2);
+        MODEL_MEMBERS modelMembers = new MODEL_MEMBERS();
+        modelMembers.setIdMember(2);
+        modelMembers.setName("Ociel");
+        modelMembers.setLastName("Garcia");
+        modelMembers.setModelStaffMembers(modelStaffMembers);
+
+        GlobalController.setStaffUserModel(modelMembers);
         Node dashboardFXML = Loader.Load(
                 "dashboard.fxml",
                 "Login",
                 true
         );
-        BorderPane pane = (BorderPane) root;
-        pane.setCenter(dashboardFXML);
+        appView.setCenter(dashboardFXML);
     }
 }

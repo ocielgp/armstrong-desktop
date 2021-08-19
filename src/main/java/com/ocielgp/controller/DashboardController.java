@@ -2,12 +2,12 @@ package com.ocielgp.controller;
 
 import animatefx.animation.FadeInUp;
 import com.jfoenix.controls.JFXDialog;
-import com.ocielgp.app.AppController;
+import com.ocielgp.app.GlobalController;
 import com.ocielgp.files.ConfigFiles;
 import com.ocielgp.fingerprint.Fingerprint;
-import com.ocielgp.utilities.Input;
-import com.ocielgp.utilities.Loader;
+import com.ocielgp.utilities.*;
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -15,7 +15,6 @@ import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
@@ -23,7 +22,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import org.kordamp.ikonli.javafx.FontIcon;
 
-import java.io.ByteArrayInputStream;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.ResourceBundle;
@@ -54,6 +52,8 @@ public class DashboardController implements Initializable {
     private HBox navSummary;
     @FXML
     private HBox navMembers;
+    @FXML
+    private HBox navSecureMode;
 
     // User box
     @FXML
@@ -69,13 +69,12 @@ public class DashboardController implements Initializable {
     @FXML
     private Label user_membership;
 
-    public void showUserInfo(String style, byte[] photo, String idMember, String name, String gym, String membership) {
-        this.user_container.getStyleClass().setAll(AppController.getThemeType(), style);
+    public void showUserInfo(Styles style, byte[] photo, String idMember, String name, String gym, String membership) {
+        this.user_container.getStyleClass().setAll(GlobalController.getThemeType(), Input.styleToColor(style));
         if (photo == null) {
             this.user_photo.setImage(ConfigFiles.loadImage("no-user-image.png"));
         } else {
-            Image img = new Image(new ByteArrayInputStream(photo));
-            this.user_photo.setImage(img);
+            this.user_photo.setImage(ConfigFiles.loadImage(photo));
         }
 
         this.user_id.setText(idMember);
@@ -84,18 +83,16 @@ public class DashboardController implements Initializable {
         this.user_membership.setText(membership);
     }
 
-    private static EventHandler<MouseEvent> fingerprintEvent;
-
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        AppController.setDashboardController(this);
+        GlobalController.setDashboardController(this);
 
         this.user_photo.setImage(ConfigFiles.loadImage("no-user-image.png"));
         this.userImage.setImage(ConfigFiles.loadImage("no-user-image.png"));
         this.logo.setImage(ConfigFiles.loadImage("img.jpg"));
 
         // Update content
-        this.nombres.setText(AppController.getStaffUserModel().getName());
+        this.nombres.setText(GlobalController.getStaffUserModel().getName());
 
         /* Routing */
         HashMap<HBox, String> routes = new HashMap<>();
@@ -118,7 +115,7 @@ public class DashboardController implements Initializable {
                 Node navFXML = Loader.Load(
                         routes.get(navOption),
                         "Dashboard",
-                        true
+                        false
                 );
                 content.setContent(navFXML);
                 Input.getScrollEvent(content);
@@ -135,6 +132,8 @@ public class DashboardController implements Initializable {
         // Fingerprint
         Fingerprint.initializeUI(this.fingerprintIcon, this.fingerprintStatus);
 
+        this.navSecureMode.setOnMouseClicked(this.eventHandlerSecureMode());
+
         Platform.runLater(() -> {
 //            Node summaryFXML = Loader.Load(
 //                    "summary.fxml",
@@ -142,7 +141,7 @@ public class DashboardController implements Initializable {
 //                    true
 //            );
 //            this.content.setContent(summaryFXML);
-            new FadeInUp(AppController.getCurrentGymNode()).play();
+            new FadeInUp(GlobalController.getCurrentGymNode()).play();
 
             Node members = Loader.Load(
                     "members.fxml",
@@ -150,12 +149,39 @@ public class DashboardController implements Initializable {
                     true
             );
             this.content.setContent(members);
-
-            // DIALOG TEST
-            StackPane stackPane = new StackPane();
-            JFXDialog dialog = new JFXDialog();
-            dialog.setContent(new TextField());
-            dialog.show(stackPane);
         });
     }
+
+    // event handlers
+    private EventHandler<MouseEvent> eventHandlerSecureMode() {
+        return mouseEvent -> {
+            if (GlobalController.isSecureMode()) {
+                // TODO: DON'T LOST FOCUS
+                Dialog dialog = new Dialog(
+                        Styles.WARN,
+                        "Modo seguro",
+                        "Ingresa tu contraseña para desactivar el modo seguro",
+                        DialogTypes.PASSWORD,
+                        Dialog.OK, Dialog.NO
+                );
+                if (dialog.show()) {
+                    GlobalController.setSecureMode(false);
+                }
+            } else {
+                Dialog dialog = new Dialog(
+                        Styles.WARN,
+                        "Modo seguro",
+                        "El modo seguro bloquea la interfaz pero el sistema sigue funcionando, útil para ausentarse con seguridad",
+                        DialogTypes.MESSAGE,
+                        Dialog.OK, Dialog.NO
+                );
+                if (dialog.show()) {
+                    GlobalController.setSecureMode(true);
+                }
+            }
+
+            this.content.setDisable(GlobalController.isSecureMode());
+        };
+    }
+
 }

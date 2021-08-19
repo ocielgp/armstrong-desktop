@@ -2,6 +2,7 @@ package com.ocielgp.fingerprint;
 
 import com.digitalpersona.uareu.Fmd;
 import com.jfoenix.controls.JFXButton;
+import com.ocielgp.database.members.DATA_MEMBERS_FINGERPRINTS;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Label;
@@ -104,6 +105,17 @@ public class FingerprintUI {
             return null;
         } else {
             return this.fmds.listIterator();
+        }
+    }
+
+    public void loadFingerprints(int idMember) {
+        if (this.fingerprintPane.isVisible()) {
+            int fingerprints = DATA_MEMBERS_FINGERPRINTS.countFingerprints(idMember);
+            if (fingerprints > 0) {
+                this.fingerprintCounter.setText(String.valueOf(fingerprints));
+                this.fmds = DATA_MEMBERS_FINGERPRINTS.SelectFingerprints(idMember);
+                this.restartCaptureButton.setDisable(false);
+            }
         }
     }
 

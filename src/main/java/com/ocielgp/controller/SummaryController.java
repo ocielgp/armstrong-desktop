@@ -1,5 +1,7 @@
 package com.ocielgp.controller;
 
+import animatefx.animation.FadeIn;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.layout.FlowPane;
@@ -27,5 +29,7 @@ public class SummaryController implements Initializable {
 //                Cards.createCard("gmi-person-add", "Hola", "Lola")
         );
 //        charts.getChildren().add(pieChart);
+
+        Platform.runLater(() -> new FadeIn(this.rootPane).play());
     }
 }

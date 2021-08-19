@@ -30,7 +30,6 @@
 .dashboard .aside .selected .label {
     -fx-text-fill: -fx-color-background;
     -fx-font: 2.5em "Roboto Bold";
-    -fx-underline: true;
 }
 
 .dashboard .aside .selected .ikonli-font-icon {
@@ -70,6 +69,8 @@
     -fx-font: 2em "Roboto Thin";
 }
 
+/* End Dashboard */
+
 /* Summary */
 .summary {
     -fx-background-color: -fx-color-dashboard;
@@ -99,32 +100,12 @@
 /* End Summary */
 
 /* Members */
-.members {
-    -fx-background-color: -fx-color-background;
-}
-
 .member-cell .table-cell {
     -fx-background-color: -fx-color-background;
     -fx-text-fill: -fx-color-text;
 }
 
-/*.members*/
-
 /* Member */
-
-.member-title {
-    -fx-border-color: -fx-color-border;
-    -fx-background-color: -fx-color-background;
-}
-
-.member-title .label {
-    -fx-text-fill: -fx-color-text;
-}
-
-.member {
-    -fx-border-color: -fx-color-border;
-    -fx-background-color: -fx-color-background;
-}
 
 .member-section {
     -fx-border-color: -fx-color-border;
@@ -133,8 +114,6 @@
 /* End Member */
 
 /* End Members */
-
-/* End Dashboard */
 
 /* Footer */
 .footer {

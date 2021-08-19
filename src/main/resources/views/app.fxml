@@ -7,7 +7,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<BorderPane fx:id="rootPane" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ocielgp.controller.RootController">
+<BorderPane fx:id="borderPane" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <bottom>
       <HBox styleClass="footer" BorderPane.alignment="CENTER">
          <HBox alignment="CENTER_LEFT">
@@ -19,7 +19,7 @@
             <Label text="Un proyecto de Ociel" />
          </HBox>
          <HBox alignment="CENTER_LEFT">
-            <Button fx:id="theme" mnemonicParsing="false" styleClass="icon-theme-container">
+            <Button fx:id="buttonTheme" mnemonicParsing="false" styleClass="icon-theme-container">
                <graphic>
                   <FontIcon fx:id="iconTheme" iconLiteral="gmi-brightness-6" styleClass="icon-theme" />
                </graphic>

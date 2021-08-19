@@ -1,11 +1,11 @@
-package com.ocielgp.database.models;
+package com.ocielgp.database.members;
 
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import com.ocielgp.database.payments.MODEL_DEBTS;
+import com.ocielgp.database.payments.MODEL_PAYMENTS_MEMBERSHIPS;
+import com.ocielgp.database.staff.MODEL_STAFF_MEMBERS;
+import javafx.beans.property.*;
 
-public class MembersModel {
+public class MODEL_MEMBERS {
     // Max length
     public static final byte nameLength = 30;
     public static final byte lastNameLength = 30;
@@ -13,7 +13,6 @@ public class MembersModel {
     public static final short emailLength = 254;
     public static final byte notesLength = 80;
 
-    private final IntegerProperty idGym = new SimpleIntegerProperty();
     private final IntegerProperty idMember = new SimpleIntegerProperty();
     private final StringProperty name = new SimpleStringProperty();
     private final StringProperty lastName = new SimpleStringProperty();
@@ -22,20 +21,23 @@ public class MembersModel {
     private final StringProperty email = new SimpleStringProperty();
     private final StringProperty notes = new SimpleStringProperty();
     private final StringProperty registrationDate = new SimpleStringProperty();
-    private byte[] photo;
+    private final BooleanProperty access = new SimpleBooleanProperty();
+    private final IntegerProperty idGym = new SimpleIntegerProperty();
 
     private final StringProperty endDate = new SimpleStringProperty();
 
-    private PaymentMembershipsModel paymentMembership;
-    private PaymentDebtsModel pendingPayment;
+    // members
+    private MODEL_MEMBERS_PHOTOS modelMembersPhotos;
+    private MODEL_MEMBERS_FINGERPRINTS modelMembersFingerprints;
 
-    public byte[] getPhoto() {
-        return photo;
-    }
+    // staff
+    private MODEL_STAFF_MEMBERS modelStaffMembers;
 
-    public void setPhoto(byte[] photo) {
-        this.photo = photo;
-    }
+    // payments
+    private MODEL_PAYMENTS_MEMBERSHIPS modelPaymentsMemberships;
+
+    // debts
+    private MODEL_DEBTS modelDebtsMemberships;
 
     public int getIdMember() {
         return idMember.get();
@@ -133,16 +135,28 @@ public class MembersModel {
         this.registrationDate.set(registrationDate);
     }
 
+    public boolean isAccess() {
+        return access.get();
+    }
+
+    public BooleanProperty accessProperty() {
+        return access;
+    }
+
+    public void setAccess(boolean access) {
+        this.access.set(access);
+    }
+
     public int getIdGym() {
         return idGym.get();
     }
 
-    public void setIdGym(int idGym) {
-        this.idGym.set(idGym);
-    }
-
     public IntegerProperty idGymProperty() {
         return idGym;
+    }
+
+    public void setIdGym(int idGym) {
+        this.idGym.set(idGym);
     }
 
     public String getEndDate() {
@@ -157,19 +171,43 @@ public class MembersModel {
         this.endDate.set(endDate);
     }
 
-    public PaymentMembershipsModel getPaymentMembership() {
-        return paymentMembership;
+    public MODEL_MEMBERS_PHOTOS getModelMembersPhotos() {
+        return modelMembersPhotos;
     }
 
-    public void setPaymentMembership(PaymentMembershipsModel paymentMembership) {
-        this.paymentMembership = paymentMembership;
+    public void setModelMembersPhotos(MODEL_MEMBERS_PHOTOS modelMembersPhotos) {
+        this.modelMembersPhotos = modelMembersPhotos;
     }
 
-    public PaymentDebtsModel getPendingPayment() {
-        return pendingPayment;
+    public MODEL_MEMBERS_FINGERPRINTS getModelMembersFingerprints() {
+        return modelMembersFingerprints;
     }
 
-    public void setPendingPayment(PaymentDebtsModel pendingPayment) {
-        this.pendingPayment = pendingPayment;
+    public void setModelMembersFingerprints(MODEL_MEMBERS_FINGERPRINTS modelMembersFingerprints) {
+        this.modelMembersFingerprints = modelMembersFingerprints;
+    }
+
+    public MODEL_STAFF_MEMBERS getModelStaffMembers() {
+        return modelStaffMembers;
+    }
+
+    public void setModelStaffMembers(MODEL_STAFF_MEMBERS modelStaffMembers) {
+        this.modelStaffMembers = modelStaffMembers;
+    }
+
+    public MODEL_PAYMENTS_MEMBERSHIPS getModelPaymentsMemberships() {
+        return modelPaymentsMemberships;
+    }
+
+    public void setModelPaymentsMemberships(MODEL_PAYMENTS_MEMBERSHIPS modelPaymentsMemberships) {
+        this.modelPaymentsMemberships = modelPaymentsMemberships;
+    }
+
+    public MODEL_DEBTS getModelDebtsMemberships() {
+        return modelDebtsMemberships;
+    }
+
+    public void setModelDebtsMemberships(MODEL_DEBTS modelDebtsMemberships) {
+        this.modelDebtsMemberships = modelDebtsMemberships;
     }
 }

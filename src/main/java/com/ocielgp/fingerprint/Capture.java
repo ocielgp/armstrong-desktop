@@ -1,7 +1,7 @@
 package com.ocielgp.fingerprint;
 
 import com.digitalpersona.uareu.*;
-import com.ocielgp.database.FingerprintData;
+import com.ocielgp.database.members.DATA_MEMBERS_FINGERPRINTS;
 import com.ocielgp.utilities.Notifications;
 import javafx.scene.layout.VBox;
 
@@ -30,7 +30,7 @@ public class Capture
         this.fingerprintPane = fingerprintPane;
         this.m_fmds = new Fmd[2];
         this.fingerprintPane.getChildren().setAll(fingerprintImage);
-        Notifications.notify("gmi-fingerprint", "Lector de huellas", "Coloca la huella sobre el lector.", 2);
+        Notifications.buildNotification("gmi-fingerprint", "Lector de huellas", "Coloca la huella sobre el lector.", 2);
         System.out.println("Captura creada 2");
     }
 
@@ -62,7 +62,7 @@ public class Capture
                     } else if (Fingerprint.getStatusCode() == 1) {
                         try {
                             System.out.println("convertido");
-                            FingerprintData.searchFingerprint(UareUGlobal.GetEngine().CreateFmd(evt.capture_result.image, Fmd.Format.ANSI_378_2004));
+                            DATA_MEMBERS_FINGERPRINTS.SelectSearchFingerprints(UareUGlobal.GetEngine().CreateFmd(evt.capture_result.image, Fmd.Format.ANSI_378_2004));
                         } catch (UareUException uareUException) {
                             uareUException.printStackTrace();
                         }
@@ -130,7 +130,7 @@ public class Capture
                             // The new loop starts
                         } else {
                             // The loop continues
-                            Notifications.notify("gmi-fingerprint", "Lector de huellas", "Vuelve a colocar la huella sobre el lector.", 2);
+                            Notifications.buildNotification("gmi-fingerprint", "Lector de huellas", "Vuelve a colocar la huella sobre el lector.", 2);
                         }
                     } else {
                         // Discard FMDs

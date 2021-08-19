@@ -1,14 +1,17 @@
 package com.ocielgp.controller;
 
+import animatefx.animation.FadeIn;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXCheckBox;
 import com.jfoenix.controls.JFXRadioButton;
 import com.jfoenix.controls.JFXTextField;
-import com.ocielgp.database.models.MembersModel;
+import com.ocielgp.database.members.MODEL_MEMBERS;
+import com.ocielgp.database.payments.MODEL_PAYMENTS_MEMBERSHIPS;
 import com.ocielgp.files.ConfigFiles;
 import com.ocielgp.utilities.Input;
 import com.ocielgp.utilities.Loader;
 import com.ocielgp.utilities.Pagination;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
@@ -22,7 +25,7 @@ import java.util.ResourceBundle;
 public class MembersController implements Initializable {
     // Containers
     @FXML
-    private GridPane membersPane;
+    public GridPane boxMembersPane;
     @FXML
     private ScrollPane memberPane;
 
@@ -34,15 +37,15 @@ public class MembersController implements Initializable {
     @FXML
     private Label labelTotalRows;
     @FXML
-    private TableView<MembersModel> tableViewMembers;
+    private TableView<MODEL_MEMBERS> tableViewMembers;
     @FXML
-    private TableColumn<MembersModel, Integer> tableColumnId;
+    private TableColumn<MODEL_MEMBERS, Integer> tableColumnId;
     @FXML
-    private TableColumn<MembersModel, String> tableColumnName;
+    private TableColumn<MODEL_MEMBERS, String> tableColumnName;
     @FXML
-    private TableColumn<MembersModel, String> tableColumnLastName;
+    private TableColumn<MODEL_MEMBERS, String> tableColumnLastName;
     @FXML
-    private TableColumn<MembersModel, String> tableColumnEndDate;
+    private TableColumn<MODEL_MEMBERS, String> tableColumnEndDate;
     @FXML
     private JFXTextField fieldRowsPerPage;
     @FXML
@@ -92,12 +95,12 @@ public class MembersController implements Initializable {
 
         this.tableViewMembers.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
-                memberDetailController.initForm(newValue.getIdMember());
+                memberDetailController.loadMember(newValue.getIdMember());
             }
         });
         this.memberPane.setContent(memberFXML);
         Input.getScrollEvent(this.memberPane);
-        //memberFXML = null;
+        memberFXML = null;
 
         this.checkBoxAllGyms.setSelected(Boolean.parseBoolean(ConfigFiles.readProperty(ConfigFiles.File.APP, "memberAllGyms")));
         this.checkBoxOnlyActiveMembers.setSelected(Boolean.parseBoolean(ConfigFiles.readProperty(ConfigFiles.File.APP, "memberOnlyActiveMembers")));
@@ -117,6 +120,8 @@ public class MembersController implements Initializable {
         this.radioButtonOrderBy0.setToggleGroup(toggleOrderBy);
         this.radioButtonOrderBy1.setToggleGroup(toggleOrderBy);
         ConfigFiles.createSelectedToggleProperty(toggleOrderBy, "radioButtonOrderBy", "memberOrderBy", pagination);
+
+        Platform.runLater(() -> new FadeIn(this.boxMembersPane).play());
     }
 
     public void refreshTable() {

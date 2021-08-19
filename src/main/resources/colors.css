@@ -78,7 +78,7 @@
 
 .night-theme .epic-style {
     -fx-color-background: hsb(190, 95%, 84%);
-    -fx-color-text: #333;
+    -fx-color-text: #fff;
     -fx-color-border: hsb(190, 95%, 84%);
 }
 

@@ -7,7 +7,6 @@ import java.sql.SQLException;
 
 public class Utilities {
     public static int countRows(PreparedStatement ps) {
-        Connection con = DataServer.getConnection();
         try {
             ResultSet rs = ps.executeQuery();
             if (rs.last()) {

@@ -2,17 +2,17 @@ package com.ocielgp.utilities;
 
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
-import com.ocielgp.app.AppController;
-import com.ocielgp.database.MembersData;
+import com.ocielgp.app.GlobalController;
+import com.ocielgp.database.members.DATA_MEMBERS;
 import com.ocielgp.database.QueryRows;
-import com.ocielgp.database.models.MembersModel;
+import com.ocielgp.database.members.MODEL_MEMBERS;
 import com.ocielgp.files.ConfigFiles;
 import javafx.event.ActionEvent;
-import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseEvent;
 
@@ -75,12 +75,12 @@ public class Pagination {
             }
         };
         // DELETE IF BEFORE HAS ADDED
-        AppController.getCurrentGymNode().removeEventHandler(ActionEvent.ACTION, gymChange);
-        AppController.getCurrentGymNode().addEventHandler(ActionEvent.ACTION, gymChange);
+        GlobalController.getCurrentGymNode().removeEventHandler(ActionEvent.ACTION, gymChange);
+        GlobalController.getCurrentGymNode().addEventHandler(ActionEvent.ACTION, gymChange);
 
         this.fieldSearch.sceneProperty().addListener((observable, oldScene, newScene) -> {
             if (oldScene != null) {
-                AppController.getCurrentGymNode().removeEventHandler(ActionEvent.ACTION, gymChange);
+                GlobalController.getCurrentGymNode().removeEventHandler(ActionEvent.ACTION, gymChange);
             }
         });
     }
@@ -132,18 +132,18 @@ public class Pagination {
     }
 
     private void loadMembers(int page) {
-        QueryRows queryRows = MembersData.getMembers(this.rows, page, this.fieldSearch.getText());
+        QueryRows queryRows = DATA_MEMBERS.ReadMembers(this.rows, page, this.fieldSearch.getText());
         if (queryRows != null && queryRows.getData().size() > 0) {
             this.labelTotalPages.setText(String.valueOf(queryRows.getPages()));
             this.labelTotalRows.setText(String.valueOf(queryRows.getRows()));
             this.tableView.setItems(queryRows.getData());
             this.labelCurrentPage.setText(String.valueOf(page));
-            this.tableView.setRowFactory(row -> new TableRow<MembersModel>() {
+            this.tableView.setRowFactory(row -> new TableRow<MODEL_MEMBERS>() {
                 @Override
-                public void updateItem(MembersModel member, boolean empty) {
-                    super.updateItem(member, empty);
-                    if (member != null) {
-                        String style = MembersData.getStyle(member.getIdMember());
+                public void updateItem(MODEL_MEMBERS modelMembers, boolean empty) {
+                    super.updateItem(modelMembers, empty);
+                    if (modelMembers != null) {
+                        String style = Input.styleToColor(DATA_MEMBERS.ReadStyle(modelMembers.getIdMember()));
                         if (getStyleClass().size() == 5) {
                             getStyleClass().set(4, style); // replace color style
                         } else {

@@ -77,10 +77,6 @@
     -jfx-rippler-fill: -fx-color-text;
 }
 
-.upload-image {
-    -fx-cursor: hand;
-}
-
 .jfx-check-box {
     -fx-text-fill: -fx-color-text;
     -jfx-checked-color: -fx-color-text;

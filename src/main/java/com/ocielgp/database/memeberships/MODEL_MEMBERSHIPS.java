@@ -1,8 +1,8 @@
-package com.ocielgp.database.models;
+package com.ocielgp.database.memeberships;
 
 import javafx.beans.property.*;
 
-public class MembershipsModel {
+public class MODEL_MEMBERSHIPS {
     // Max length
     public static final byte priceLength = 10;
     public static final byte descriptionLength = 60;

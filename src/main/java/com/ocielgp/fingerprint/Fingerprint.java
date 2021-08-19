@@ -40,6 +40,10 @@ public class Fingerprint {
         RefreshDashboard();
     }
 
+    public static void loadFingerprints(int idMember) {
+        fingerprintUI.loadFingerprints(idMember);
+    }
+
     public static void setFingerprintBox(VBox container, VBox fmdContainer, Label labelCounter, JFXButton startCaptureButton, JFXButton restartCaptureButton) {
         fingerprintUI = new FingerprintUI(container, fmdContainer, labelCounter, startCaptureButton, restartCaptureButton);
         RefreshDashboard();

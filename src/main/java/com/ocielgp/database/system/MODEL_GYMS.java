@@ -1,9 +1,9 @@
-package com.ocielgp.database.models;
+package com.ocielgp.database.system;
 
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 
-public class GymsModel {
+public class MODEL_GYMS {
     private final SimpleIntegerProperty idGym = new SimpleIntegerProperty();
     private final SimpleStringProperty name = new SimpleStringProperty();
     private final SimpleStringProperty address = new SimpleStringProperty();

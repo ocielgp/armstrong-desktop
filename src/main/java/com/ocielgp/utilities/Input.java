@@ -14,6 +14,14 @@ import java.util.Locale;
 public class Input {
     private static final double SPEED_SCROLL = 0.003;
 
+    public static void createVisibleProperty(Node node) {
+        node.visibleProperty().addListener((observable, oldValue, newValue) -> {
+            node.setVisible(newValue);
+            node.setManaged(newValue);
+        });
+        node.setVisible(false);
+    }
+
     public static void createMaxLengthEvent(TextInputControl textInput, int maxLength) {
         textInput.addEventFilter(KeyEvent.KEY_TYPED, keyEvent -> {
             if (((TextInputControl) keyEvent.getSource()).getText().length() > maxLength - 1) {
@@ -86,4 +94,49 @@ public class Input {
         }
     }
 
+    public static String styleToColor(Styles style) {
+        switch (style) {
+            case SUCCESS -> {
+                return "success-style";
+            }
+            case WARN -> {
+                return "warn-style";
+            }
+            case DANGER -> {
+                return "danger-style";
+            }
+            case EPIC -> {
+                return "epic-style";
+            }
+            case CREATIVE -> {
+                return "creative-style";
+            }
+            default -> {
+                return "default-style";
+            }
+        }
+    }
+
+    public static Styles colorToStyle(String style) {
+        switch (style) {
+            case "success-style" -> {
+                return Styles.SUCCESS;
+            }
+            case "warn-style" -> {
+                return Styles.WARN;
+            }
+            case "danger-style" -> {
+                return Styles.DANGER;
+            }
+            case "epic-style" -> {
+                return Styles.EPIC;
+            }
+            case "creative-style" -> {
+                return Styles.CREATIVE;
+            }
+            default -> {
+                return Styles.DEFAULT;
+            }
+        }
+    }
 }

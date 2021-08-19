@@ -1,17 +1,15 @@
 package com.ocielgp.controller;
 
-import animatefx.animation.FadeIn;
-import animatefx.animation.FadeInUp;
-import animatefx.animation.FadeOutDown;
+import animatefx.animation.*;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXPasswordField;
 import com.jfoenix.controls.JFXTextField;
-import com.ocielgp.app.AppController;
-import com.ocielgp.database.StaffUsersData;
-import com.ocielgp.database.models.StaffUsersModel;
+import com.ocielgp.app.GlobalController;
+import com.ocielgp.database.staff.DATA_STAFF_MEMBERS;
 import com.ocielgp.files.ConfigFiles;
 import com.ocielgp.utilities.InputDetails;
 import com.ocielgp.utilities.Loader;
+import com.ocielgp.utilities.Notifications;
 import com.ocielgp.utilities.Validator;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
@@ -28,66 +26,77 @@ import java.util.ArrayList;
 import java.util.ResourceBundle;
 
 public class LoginController implements Initializable {
-    // Containers
     @FXML
-    private HBox loginPane;
+    private HBox boxLoginPane;
+    @FXML
+    private ImageView imageUser;
+    @FXML
+    private JFXTextField fieldUsername;
+    @FXML
+    private JFXPasswordField fieldPassword;
+    @FXML
+    private JFXButton buttonLogin;
 
-    // Controls
-    @FXML
-    private ImageView userImage;
-    @FXML
-    private JFXTextField userField;
-    @FXML
-    private JFXPasswordField passwordField;
-    @FXML
-    private JFXButton loginButton;
+    // Attributes
+    private byte attemps = 0;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        this.loginPane.setOpacity(0); // Hide loginPane
+        this.imageUser.setImage(ConfigFiles.getDefaultImage());
 
-        this.userImage.setImage(ConfigFiles.loadImage("no-user-image.png"));
-
-        this.loginButton.setOnAction(actionEvent -> {
+        this.buttonLogin.setOnAction(actionEvent -> {
             ArrayList<InputDetails> inputs = new ArrayList<>();
-            inputs.add(new InputDetails(this.userField, this.userField.getText()));
-            inputs.add(new InputDetails(this.passwordField, this.passwordField.getText()));
+            inputs.add(new InputDetails(this.fieldUsername, this.fieldUsername.getText()));
+            inputs.add(new InputDetails(this.fieldPassword, this.fieldPassword.getText()));
             if (Validator.emptyValidator(inputs.listIterator())) {
-                this.loginPane.setDisable(true);
-
-                StaffUsersModel staffUserModel = StaffUsersData.login(this.userField.getText(), this.passwordField.getText());
-                if (staffUserModel != null) { // If administrador isn't null, do this
-                    AppController.setStaffUserModel(staffUserModel);
+                this.boxLoginPane.setDisable(true);
+                Boolean answer = DATA_STAFF_MEMBERS.Login(this.fieldUsername.getText(), this.fieldPassword.getText());
+                if (answer == null) {
+                    new Flash(this.boxLoginPane).play();
+                    Notifications.warn("Bloqueado", "Esta cuenta se encuentra bloqueada.");
+                } else if (answer) {
                     Node dashboardFXML = Loader.Load(
                             "dashboard.fxml",
                             "Login",
                             false
                     );
-                    FadeOutDown hideLoginPane = new FadeOutDown(this.loginPane);
-                    hideLoginPane.setOnFinished(evt -> {
-                        AppController.setCenter(dashboardFXML);
-                        new FadeIn(dashboardFXML).play();
-                    });
-                    hideLoginPane.play();
-                } else { // If administrador is null, do this
-                    this.loginPane.setDisable(false);
+                    FadeOutDown fadeOutDown = new FadeOutDown(this.boxLoginPane);
+                    fadeOutDown.setOnFinished((action) -> GlobalController.appController.borderPane.setCenter(dashboardFXML));
+                    fadeOutDown.play();
+                    new FadeOutDown(this.boxLoginPane).play();
+                } else {
+                    this.attemps++;
+                    if (attemps == 3) {
+                        new Flash(this.boxLoginPane).play();
+                        Notifications.danger("Intentos excedidos", "Si no recuerdas la contraseña, contacte con el encargado.");
+                    } else {
+                        Notifications.danger("Error", "Usuario / Contraseña incorrectos.", 2);
+                        new Shake(this.boxLoginPane).play();
+                        this.boxLoginPane.setDisable(false);
+                    }
                 }
             }
+
+            // clear memory
+            inputs = null;
         });
 
-        EventHandler<KeyEvent> enterKey = keyEvent -> {
+        this.fieldUsername.setOnKeyPressed(this.eventHandlerLogin());
+        this.fieldPassword.setOnKeyPressed(this.eventHandlerLogin());
+        Platform.runLater(() -> {
+            new FadeInUp(this.boxLoginPane).play();
+            this.fieldUsername.requestFocus();
+            this.fieldUsername.setText("Ociel");
+            this.fieldPassword.setText("dos");
+        });
+    }
+
+    // Event handlers
+    private EventHandler<KeyEvent> eventHandlerLogin() {
+        return keyEvent -> {
             if (keyEvent.getCode() == KeyCode.ENTER) {
-                this.loginButton.fire();
+                this.buttonLogin.fire();
             }
         };
-        this.userField.addEventFilter(KeyEvent.KEY_PRESSED, enterKey);
-        this.passwordField.addEventFilter(KeyEvent.KEY_PRESSED, enterKey);
-        Platform.runLater(() -> {
-            // Animation initial
-            new FadeInUp(this.loginPane).play();
-            this.userField.requestFocus();
-            this.userField.setText("ociel");
-            this.passwordField.setText("dos");
-        });
     }
 }

@@ -1,8 +1,8 @@
 package com.ocielgp.database;
 
-import com.ocielgp.app.AppController;
 import com.ocielgp.files.ConfigFiles;
 import com.ocielgp.utilities.Notifications;
+import com.ocielgp.utilities.Styles;
 
 import java.lang.invoke.MethodHandles;
 import java.sql.Connection;
@@ -23,6 +23,7 @@ public class DataServer {
     static {
         try {
             byte source = Byte.parseByte(Objects.requireNonNull(ConfigFiles.readProperty(ConfigFiles.File.DATASOURCE, "source")));
+            // TODO: ENCRYPT PROPERTIES
             host = ConfigFiles.readProperty(ConfigFiles.File.DATASOURCE, "host" + source);
             port = ConfigFiles.readProperty(ConfigFiles.File.DATASOURCE, "port" + source);
             user = ConfigFiles.readProperty(ConfigFiles.File.DATASOURCE, "user" + source);
@@ -43,8 +44,8 @@ public class DataServer {
                     "gmi-cloud-done",
                     "Conexión establecida",
                     "Conexión con el servidor establecida.",
-                    2,
-                    AppController.EPIC_STYLE
+                    3,
+                    Styles.EPIC
             );
             System.out.println("[DataServer]: Conectado a " + host);
         } catch (SQLException sqlException) {
@@ -67,13 +68,8 @@ public class DataServer {
                     con = DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "/" + database + "?serverTimezone=UTC", user, password);
                     System.out.println("[DataServer]: Reconectado a " + host);
                 }
-            } catch (SQLException exception) {
-                exception.printStackTrace();
-                Notifications.danger("gmi-cloud-off",
-                        "Error",
-                        "Hubo un problema al conectarse con el servidor.",
-                        5
-                );
+            } catch (SQLException sqlException) {
+                Notifications.catchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException, "gmi-cloud-off");
             }
         }
         return con;
