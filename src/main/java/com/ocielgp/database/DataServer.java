@@ -9,6 +9,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 
 public class DataServer {
     private static String host;
@@ -37,9 +38,10 @@ public class DataServer {
         }
     }
 
-    private static void firstConnection() {
+    synchronized private static Connection firstConnection() {
+        Connection connection = null;
         try {
-            con = DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "/" + database + "?serverTimezone=UTC", user, password);
+            connection = DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "/" + database + "?serverTimezone=UTC", user, password);
             Notifications.createNotification(
                     "gmi-cloud-done",
                     "Conexión establecida",
@@ -57,13 +59,16 @@ public class DataServer {
                     "gmi-cloud-off"
             );
         }
+        return connection;
     }
 
-    public static Connection getConnection() {
+    synchronized public static Connection getConnection() {
         if (configValid) {
             try {
                 if (con == null) {
-                    firstConnection();
+                    CompletableFuture.supplyAsync(
+                            DataServer::firstConnection
+                    ).thenApply(connection -> con = connection);
                 } else if (!con.isValid(3)) { // Reconnect if connection is lost
                     con = DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "/" + database + "?serverTimezone=UTC", user, password);
                     System.out.println("[DataServer]: Reconectado a " + host);

@@ -1,7 +1,6 @@
 package com.ocielgp.database.staff;
 
 import com.ocielgp.app.GlobalController;
-import com.ocielgp.database.DataServer;
 import com.ocielgp.database.members.MODEL_MEMBERS;
 import com.ocielgp.utilities.Hash;
 import com.ocielgp.utilities.Notifications;
@@ -14,7 +13,7 @@ import java.sql.SQLException;
 
 public class DATA_STAFF_MEMBERS {
     public static Boolean Login(String username, String password) {
-        Connection con = DataServer.getConnection();
+        Connection con = null;
         PreparedStatement ps;
         ResultSet rs;
         try {

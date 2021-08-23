@@ -1,7 +1,6 @@
 package com.ocielgp.database.memeberships;
 
 import com.ocielgp.app.GlobalController;
-import com.ocielgp.database.DataServer;
 import com.ocielgp.utilities.Notifications;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -16,7 +15,7 @@ import java.time.LocalDate;
 public class DATA_MEMBERSHIPS {
 
     public static ObservableList<MODEL_MEMBERSHIPS> ReadMemberships() {
-        Connection con = DataServer.getConnection();
+        Connection con = null;
         PreparedStatement ps;
         ResultSet rs;
         ObservableList<MODEL_MEMBERSHIPS> modelMembershipsList = FXCollections.observableArrayList();
@@ -42,7 +41,7 @@ public class DATA_MEMBERSHIPS {
 
     /* Update section */
     public static boolean UpdateMembership(int idMember, MODEL_MEMBERSHIPS modelMemberships) {
-        Connection con = DataServer.getConnection();
+        Connection con = null;
         PreparedStatement ps;
         try {
             // Clear previous debt if exists

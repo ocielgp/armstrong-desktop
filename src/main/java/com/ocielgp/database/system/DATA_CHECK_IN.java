@@ -1,7 +1,6 @@
 package com.ocielgp.database.system;
 
 import com.ocielgp.app.GlobalController;
-import com.ocielgp.database.DataServer;
 import com.ocielgp.utilities.Notifications;
 
 import java.lang.invoke.MethodHandles;
@@ -11,7 +10,7 @@ import java.sql.SQLException;
 
 public class DATA_CHECK_IN {
     public static boolean CreateCheckIn(int idMember, int openedBy) {
-        Connection con = DataServer.getConnection();
+        Connection con = null;
         PreparedStatement ps;
         try {
             ps = con.prepareStatement("INSERT INTO CHECK_IN(dateTime, idMember, idGym, openedBy) VALUE (NOW(), ?, ?, ?)");

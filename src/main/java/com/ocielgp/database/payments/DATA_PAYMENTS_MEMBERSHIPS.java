@@ -1,7 +1,6 @@
 package com.ocielgp.database.payments;
 
 import com.ocielgp.app.GlobalController;
-import com.ocielgp.database.DataServer;
 import com.ocielgp.database.memeberships.MODEL_MEMBERSHIPS;
 import com.ocielgp.utilities.Notifications;
 
@@ -11,7 +10,7 @@ import java.time.LocalDate;
 
 public class DATA_PAYMENTS_MEMBERSHIPS {
     public static int CreatePaymentMembership(int idMember, MODEL_MEMBERSHIPS modelMemberships) {
-        Connection con = DataServer.getConnection();
+        Connection con = null;
         PreparedStatement ps;
         ResultSet rs;
         try {
@@ -35,7 +34,7 @@ public class DATA_PAYMENTS_MEMBERSHIPS {
     }
 
     public static MODEL_PAYMENTS_MEMBERSHIPS getLastPayment(int idMember) {
-        Connection con = DataServer.getConnection();
+        Connection con = null;
         PreparedStatement ps;
         ResultSet rs;
         MODEL_PAYMENTS_MEMBERSHIPS modelPaymentsMemberships = new MODEL_PAYMENTS_MEMBERSHIPS();

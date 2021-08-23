@@ -6,10 +6,10 @@ import com.jfoenix.controls.JFXCheckBox;
 import com.jfoenix.controls.JFXRadioButton;
 import com.jfoenix.controls.JFXTextField;
 import com.ocielgp.database.members.MODEL_MEMBERS;
-import com.ocielgp.database.payments.MODEL_PAYMENTS_MEMBERSHIPS;
 import com.ocielgp.files.ConfigFiles;
 import com.ocielgp.utilities.Input;
 import com.ocielgp.utilities.Loader;
+import com.ocielgp.utilities.Loading;
 import com.ocielgp.utilities.Pagination;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -95,6 +95,7 @@ public class MembersController implements Initializable {
 
         this.tableViewMembers.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
+                Loading.show();
                 memberDetailController.loadMember(newValue.getIdMember());
             }
         });
@@ -121,7 +122,10 @@ public class MembersController implements Initializable {
         this.radioButtonOrderBy1.setToggleGroup(toggleOrderBy);
         ConfigFiles.createSelectedToggleProperty(toggleOrderBy, "radioButtonOrderBy", "memberOrderBy", pagination);
 
-        Platform.runLater(() -> new FadeIn(this.boxMembersPane).play());
+        Platform.runLater(() -> {
+            new FadeIn(this.boxMembersPane).play();
+            Loading.close();
+        });
     }
 
     public void refreshTable() {

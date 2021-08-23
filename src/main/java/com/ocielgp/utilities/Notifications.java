@@ -2,16 +2,14 @@ package com.ocielgp.utilities;
 
 import animatefx.animation.FadeInRight;
 import animatefx.animation.FadeOutRight;
-import com.ocielgp.RunApp;
 import com.ocielgp.app.GlobalController;
-import com.ocielgp.files.ConfigFiles;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
@@ -19,24 +17,19 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
+import javafx.stage.Modality;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
 import org.kordamp.ikonli.javafx.FontIcon;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.LinkedList;
-import java.util.Objects;
 import java.util.ResourceBundle;
 
 class NotificationView implements Initializable {
-    // Containers
-    @FXML
-    private GridPane container;
-
-    // Controls
+    private final int seconds;
     @FXML
     private FontIcon fontIcon;
     @FXML
@@ -48,7 +41,8 @@ class NotificationView implements Initializable {
     private final String icon;
     private final String title;
     private final String content;
-    private int seconds;
+    @FXML
+    private GridPane gridPane;
     private final Styles style;
 
     public NotificationView(String icon, String title, String content, int seconds, Styles style) {
@@ -64,9 +58,7 @@ class NotificationView implements Initializable {
         this.fontIcon.setIconLiteral(this.icon);
         this.labelTitle.setText(this.title);
         this.labelContent.setText(this.content);
-
-        // Add styles
-        this.container.getStyleClass().addAll(GlobalController.getThemeType(), Input.styleToColor(this.style));
+        this.gridPane.getStyleClass().addAll(GlobalController.getThemeType(), Input.styleToColor(this.style));
     }
 
     public String getTitle() {
@@ -77,52 +69,26 @@ class NotificationView implements Initializable {
         return seconds;
     }
 
-    public void setSeconds(int seconds) {
-        this.seconds = seconds;
-    }
 }
 
 public class Notifications {
-
-    // Containers
-    private static final Stage stage;
-
-    // Attributes
-    private static final LinkedList<GridPane> notificationContainers = new LinkedList<>();
-    private static final LinkedList<NotificationView> notifications = new LinkedList<>();
+    private static final Stage stage = new Stage(StageStyle.TRANSPARENT);
+    private static final LinkedList<GridPane> notificationViews = new LinkedList<>();
+    private static final LinkedList<NotificationView> notificationControllers = new LinkedList<>();
     private static final int margin = 20;
     private static Timeline threadHandler;
     private static FadeInRight fadeInRight;
 
     static {
-        // Init notifications container
-        stage = new Stage();
-        stage.getIcons().setAll(ConfigFiles.loadImage("app-icon.png"));
-        stage.initStyle(StageStyle.TRANSPARENT);
-        stage.setAlwaysOnTop(true); // Fix notification, always on front
+        stage.initModality(Modality.NONE);
+        stage.initOwner(GlobalController.getPrimaryStage());
+        stage.setAlwaysOnTop(true);
     }
 
     public static void createNotification(String icon, String title, String content, int seconds, Styles style) {
-        FXMLLoader template = new FXMLLoader(
-                Objects.requireNonNull(Notifications.class.getClassLoader().getResource("notification.fxml"))
-        );
-        NotificationView notification = new NotificationView(
-                icon,
-                title,
-                content,
-                seconds,
-                style
-        );
-        template.setController(notification);
-        GridPane gridPane = null;
-        try {
-            gridPane = template.load();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        GridPane finalGridPane = gridPane;
-        gridPane.addEventHandler(EventType.ROOT, new EventHandler<>() {
+        NotificationView notificationController = new NotificationView(icon, title, content, seconds, style);
+        GridPane notificationView = (GridPane) Loader.Load("notification.fxml", "Notifications", false, notificationController);
+        notificationView.addEventHandler(EventType.ROOT, new EventHandler<>() {
             @Override
             public void handle(Event event) {
                 if (event.getEventType() == MouseEvent.MOUSE_CLICKED && ((MouseEvent) event).getButton() == MouseButton.PRIMARY) {
@@ -132,7 +98,7 @@ public class Notifications {
                     }
                     threadHandler.stop();
                     hiddenNotification(false);
-                    finalGridPane.removeEventHandler(EventType.ROOT, this);
+                    notificationView.removeEventHandler(EventType.ROOT, this);
                 } else if (event.getEventType() == MouseEvent.MOUSE_CLICKED && ((MouseEvent) event).getButton() == MouseButton.SECONDARY) {
                     if (fadeInRight != null) {
                         fadeInRight.stop();
@@ -140,40 +106,33 @@ public class Notifications {
                     }
                     threadHandler.stop();
                     hiddenNotification(true);
-                    finalGridPane.removeEventHandler(EventType.ROOT, this);
+                    notificationView.removeEventHandler(EventType.ROOT, this);
                 }
             }
         });
-        notificationContainers.add(gridPane);
-        notifications.add(notification);
-        if (notificationContainers.size() == 1) {
-            threadHandler = new Timeline(scheduleNotification(notifications.getFirst().getSeconds()));
+        notificationViews.add(notificationView);
+        notificationControllers.add(notificationController);
+        if (notificationViews.size() == 1) {
+            threadHandler = new Timeline(scheduleNotification(Notifications.notificationControllers.getFirst().getSeconds()));
             threadHandler.play(); // Run thread
         }
     }
 
     public static KeyFrame scheduleNotification(int seconds) {
-        // Show notification
-        GridPane notificationUI = notificationContainers.getFirst();
-        NotificationView notificationView = notifications.getFirst();
-        showNotification(notificationUI, notificationView);
-
+        GridPane notificationView = notificationViews.getFirst();
+        showNotification(notificationView);
         return new KeyFrame(Duration.seconds(seconds), evt -> hiddenNotification(false));
     }
 
-    private static void showNotification(GridPane notificationUI, NotificationView notificationController) {
-        Scene scene = new Scene(notificationUI);
-        scene.getStylesheets().add(String.valueOf(RunApp.class.getClassLoader().getResource("notifications.css")));
-
-        stage.setTitle(notificationController.getTitle());
-        stage.setScene(scene);
+    private static void showNotification(GridPane notificationView) {
+        Scene scene = new Scene(notificationView);
+        scene.getStylesheets().add(String.valueOf(Notifications.class.getClassLoader().getResource("notifications.css")));
         scene.setFill(Color.TRANSPARENT);
-        notificationUI.setOpacity(0);
-        stage.show(); // Calculate UI pixels
-
-        if (GlobalController.getPrimaryStage() != null) {
-            GlobalController.getPrimaryStage().requestFocus();
-        }
+        stage.setScene(scene);
+        Platform.runLater(() -> {
+            stage.show(); // Calculate UI pixels
+        });
+        GlobalController.getPrimaryStage().requestFocus();
 
         // Set new position to Stage
         stage.setX(
@@ -182,25 +141,25 @@ public class Notifications {
         stage.setY(
                 Screen.getPrimary().getVisualBounds().getHeight() - stage.getHeight() - margin
         );
-        fadeInRight = new FadeInRight(notificationUI);
+        fadeInRight = new FadeInRight(notificationView);
         fadeInRight.play();
     }
 
     public static void hiddenNotification(boolean clearAll) {
-        notificationContainers.getFirst().setDisable(true);
-        FadeOutRight fadeOutRight = new FadeOutRight(notificationContainers.getFirst());
+        notificationViews.getFirst().setDisable(true);
+        FadeOutRight fadeOutRight = new FadeOutRight(notificationViews.getFirst());
         fadeOutRight.setOnFinished(actionEvent -> {
-            notificationContainers.pop();
-            notifications.pop();
+            notificationViews.pop();
+            notificationControllers.pop();
             stage.hide();
 
             if (clearAll) {
-                notificationContainers.clear();
-                notifications.clear();
+                notificationViews.clear();
+                notificationControllers.clear();
             }
 
-            if (!notificationContainers.isEmpty()) {
-                threadHandler = new Timeline(scheduleNotification(notifications.getFirst().getSeconds()));
+            if (!notificationViews.isEmpty()) {
+                threadHandler = new Timeline(scheduleNotification(notificationControllers.getFirst().getSeconds()));
                 threadHandler.play(); // Run thread
             }
         });

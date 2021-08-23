@@ -14,20 +14,21 @@ import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
-import java.io.IOException;
-
 public class RunApp extends Application {
 
     public static void main(String[] args) {
+        Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
         launch(args);
     }
 
     @Override
-    public void start(Stage primaryStage) throws IOException {
+    public void start(Stage primaryStage) {
         primaryStage.getIcons().setAll(ConfigFiles.getIconApp());
-        // Load root parent
         AppController appController = new AppController();
+
+        GlobalController.setPrimaryStage(primaryStage);
         GlobalController.setAppController(appController);
+
         BorderPane appView = (BorderPane) Loader.Load(
                 "app.fxml",
                 "RunApp",
@@ -35,20 +36,17 @@ public class RunApp extends Application {
                 appController
         );
 
-        // Place content on scene
+        // scene
         Scene scene = new Scene(appView, 1366, 768); // HD
         scene.getStylesheets().add(String.valueOf(RunApp.class.getClassLoader().getResource("styles.css")));
 
-        // Show app
+        // show app
         primaryStage.setTitle("Gym App");
         primaryStage.setScene(scene);
         primaryStage.setMaximized(true);
         primaryStage.show();
 
-        // Init notification system
-        GlobalController.setPrimaryStage(primaryStage);
-
-        // Kill all threads when an event closing occur
+        // kill all threads when a closing event occur
         primaryStage.addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, evt -> {
             Platform.exit();
             System.exit(0);
@@ -64,11 +62,11 @@ public class RunApp extends Application {
         modelMembers.setModelStaffMembers(modelStaffMembers);
 
         GlobalController.setStaffUserModel(modelMembers);
-        Node dashboardFXML = Loader.Load(
-                "dashboard.fxml",
+        Node loginFXML = Loader.Load(
+                "login.fxml",
                 "Login",
                 true
         );
-        appView.setCenter(dashboardFXML);
+        appView.setCenter(loginFXML);
     }
 }

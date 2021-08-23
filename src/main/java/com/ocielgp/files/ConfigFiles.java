@@ -5,6 +5,8 @@ import com.ocielgp.app.GlobalController;
 import com.ocielgp.utilities.Notifications;
 import com.ocielgp.utilities.Pagination;
 import javafx.beans.value.ChangeListener;
+import javafx.concurrent.Service;
+import javafx.concurrent.Task;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.image.Image;
 
@@ -80,23 +82,35 @@ public class ConfigFiles {
     }
 
     public static void saveProperty(File file, String property, String value) {
-        String fileName = getFileName(file);
-        try {
-            Properties properties = loadPropertiesFile(file);
-            properties.setProperty(property, value);
-            FileOutputStream fileOutputStream = new FileOutputStream(
-                    Objects.requireNonNull(GlobalController.class.getClassLoader().getResource(fileName)).getPath()
-            );
-            properties.store(fileOutputStream, null);
-            fileOutputStream.close();
-        } catch (Exception exception) {
-            Notifications.catchError(
-                    MethodHandles.lookup().lookupClass().getSimpleName(),
-                    Thread.currentThread().getStackTrace()[1],
-                    exception.getMessage(),
-                    exception
-            );
-        }
+        Service service = new Service() {
+            @Override
+            protected Task createTask() {
+                return new Task() {
+                    @Override
+                    protected Object call() {
+                        String fileName = getFileName(file);
+                        try {
+                            Properties properties = loadPropertiesFile(file);
+                            properties.setProperty(property, value);
+                            FileOutputStream fileOutputStream = new FileOutputStream(
+                                    Objects.requireNonNull(GlobalController.class.getClassLoader().getResource(fileName)).getPath()
+                            );
+                            properties.store(fileOutputStream, null);
+                            fileOutputStream.close();
+                        } catch (Exception exception) {
+                            Notifications.catchError(
+                                    MethodHandles.lookup().lookupClass().getSimpleName(),
+                                    Thread.currentThread().getStackTrace()[1],
+                                    exception.getMessage(),
+                                    exception
+                            );
+                        }
+                        return null;
+                    }
+                };
+            }
+        };
+        service.start();
     }
 
     public static void createSelectedToggleProperty(ToggleGroup toggle, String radioButtonPrefix, String property, Pagination pagination) {

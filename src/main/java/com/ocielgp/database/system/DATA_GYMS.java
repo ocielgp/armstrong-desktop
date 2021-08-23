@@ -10,10 +10,12 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 public class DATA_GYMS {
     public static MODEL_GYMS ReadGym(int idGym) {
-        Connection con = DataServer.getConnection();
+        Connection con = null;
         PreparedStatement ps;
         ResultSet rs;
         MODEL_GYMS modelGyms = new MODEL_GYMS();
@@ -38,32 +40,42 @@ public class DATA_GYMS {
     }
 
     public static ObservableList<MODEL_GYMS> ReadGyms() {
-        Connection con;
-        PreparedStatement ps;
-        ResultSet rs;
-        ObservableList<MODEL_GYMS> modelGymsList = FXCollections.observableArrayList();
+        System.out.println("entro");
+        CompletableFuture<ObservableList<MODEL_GYMS>> completableFuture = new CompletableFuture();
         try {
-            con = DataServer.getConnection();
-            ps = con.prepareStatement("SELECT idGym, name, address FROM GYMS WHERE flag = 1");
-            rs = ps.executeQuery();
-            while (rs.next()) {
-                MODEL_GYMS modelGyms = new MODEL_GYMS();
-                modelGyms.setIdGym(rs.getInt("idGym"));
-                modelGyms.setName(rs.getString("name"));
-                modelGyms.setAddress(rs.getString("address"));
-                modelGymsList.add(modelGyms);
-            }
-            if (modelGymsList.isEmpty()) {
-                Notifications.warn(MethodHandles.lookup().lookupClass().getSimpleName(), "No hay gimnasios registrados.", 5);
-            }
-        } catch (SQLException sqlException) {
-            Notifications.catchError(
-                    MethodHandles.lookup().lookupClass().getSimpleName(),
-                    Thread.currentThread().getStackTrace()[1],
-                    "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(),
-                    sqlException
-            );
+            return CompletableFuture.supplyAsync(() -> {
+                Connection con = DataServer.getConnection();
+                PreparedStatement ps;
+                ResultSet rs;
+                ObservableList<MODEL_GYMS> modelGymsList = FXCollections.observableArrayList();
+                try {
+                    ps = con.prepareStatement("SELECT idGym, name, address FROM GYMS WHERE flag = 1");
+                    rs = ps.executeQuery();
+                    while (rs.next()) {
+                        MODEL_GYMS modelGyms = new MODEL_GYMS();
+                        modelGyms.setIdGym(rs.getInt("idGym"));
+                        modelGyms.setName(rs.getString("name"));
+                        modelGyms.setAddress(rs.getString("address"));
+                        modelGymsList.add(modelGyms);
+                    }
+                    if (modelGymsList.isEmpty()) {
+                        Notifications.warn(MethodHandles.lookup().lookupClass().getSimpleName(), "No hay gimnasios registrados.", 5);
+                    }
+                } catch (SQLException sqlException) {
+                    Notifications.catchError(
+                            MethodHandles.lookup().lookupClass().getSimpleName(),
+                            Thread.currentThread().getStackTrace()[1],
+                            "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(),
+                            sqlException
+                    );
+                }
+                return modelGymsList;
+            }).get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
         }
-        return modelGymsList;
+        return null;
     }
 }

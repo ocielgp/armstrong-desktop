@@ -1,6 +1,5 @@
 package com.ocielgp.database.members;
 
-import com.ocielgp.database.DataServer;
 import com.ocielgp.utilities.Notifications;
 
 import java.lang.invoke.MethodHandles;
@@ -11,7 +10,7 @@ import java.sql.SQLException;
 
 public class DATA_MEMBERS_PHOTOS {
     public static boolean CreatePhoto(int idMember, byte[] photoBytes) {
-        Connection con = DataServer.getConnection();
+        Connection con = null;
         PreparedStatement ps;
         try {
             ps = con.prepareStatement("INSERT INTO MEMBERS_PHOTOS(photo, idMember) VALUE (?, ?)");
@@ -26,7 +25,7 @@ public class DATA_MEMBERS_PHOTOS {
     }
 
     public static MODEL_MEMBERS_PHOTOS ReadPhoto(int idMember) {
-        Connection con = DataServer.getConnection();
+        Connection con = null;
         PreparedStatement ps;
         ResultSet rs;
         try {
@@ -45,7 +44,7 @@ public class DATA_MEMBERS_PHOTOS {
     }
 
     public static boolean UpdatePhoto(int idMember, byte[] photoBytes) {
-        Connection con = DataServer.getConnection();
+        Connection con = null;
         PreparedStatement ps;
         try {
             ps = con.prepareStatement("UPDATE MEMBERS_PHOTOS SET photo = ? WHERE idMember = ?");

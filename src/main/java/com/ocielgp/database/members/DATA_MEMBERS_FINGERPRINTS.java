@@ -4,7 +4,6 @@ import com.digitalpersona.uareu.Fmd;
 import com.digitalpersona.uareu.UareUException;
 import com.digitalpersona.uareu.UareUGlobal;
 import com.ocielgp.app.GlobalController;
-import com.ocielgp.database.DataServer;
 import com.ocielgp.database.system.DATA_CHECK_IN;
 import com.ocielgp.files.ConfigFiles;
 import com.ocielgp.fingerprint.Fingerprint;
@@ -33,7 +32,7 @@ public class DATA_MEMBERS_FINGERPRINTS {
         if (fingerprints == null) {
             return true; // Skip fingerprints
         }
-        Connection con = DataServer.getConnection();
+        Connection con = null;
         PreparedStatement ps;
         try {
             // Remove all previous fingerprints if exists
@@ -56,7 +55,7 @@ public class DATA_MEMBERS_FINGERPRINTS {
     }
 
     public static int SelectSearchFingerprints(Fmd fingerprint) {
-        Connection con = DataServer.getConnection();
+        Connection con = null;
         PreparedStatement ps;
         ResultSet rs;
         try {
@@ -119,7 +118,7 @@ public class DATA_MEMBERS_FINGERPRINTS {
     }
 
     public static ArrayList<Fmd> SelectFingerprints(int idMember) {
-        Connection con = DataServer.getConnection();
+        Connection con = null;
         PreparedStatement ps;
         ResultSet rs;
         ArrayList<Fmd> fingerprints = new ArrayList<>();
@@ -153,8 +152,7 @@ public class DATA_MEMBERS_FINGERPRINTS {
     }
 
     public static int countFingerprints(int idMember) {
-        Connection con = DataServer.getConnection();
-        ;
+        Connection con = null;
         PreparedStatement ps;
         ResultSet rs;
 

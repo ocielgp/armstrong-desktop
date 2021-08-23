@@ -1,7 +1,6 @@
 package com.ocielgp.database.payments;
 
 import com.ocielgp.app.GlobalController;
-import com.ocielgp.database.DataServer;
 import com.ocielgp.utilities.Notifications;
 
 import java.lang.invoke.MethodHandles;
@@ -13,7 +12,7 @@ import java.util.ArrayList;
 
 public class DATA_DEBTS {
     public static boolean CreateDebt(MODEL_DEBTS modelDebts, int idMember, int debtType) {
-        Connection con = DataServer.getConnection();
+        Connection con = null;
         PreparedStatement ps;
         try {
             ps = con.prepareStatement("INSERT INTO DEBTS(dateTime, owe, paidOut, amount, description, idStaff, idMember, idDebtType) VALUE (NOW(), ?, ?, ?, ?, ?, ?, ?)");
@@ -33,7 +32,7 @@ public class DATA_DEBTS {
     }
 
     public static boolean ReadHaveDebts(int idMember) {
-        Connection con = DataServer.getConnection();
+        Connection con = null;
         PreparedStatement ps;
         ResultSet rs;
         try {
@@ -50,7 +49,7 @@ public class DATA_DEBTS {
     }
 
     public static ArrayList<MODEL_DEBTS> ReadDebts(int idMember) {
-        Connection con = DataServer.getConnection();
+        Connection con = null;
         PreparedStatement ps;
         ResultSet rs;
         ArrayList<MODEL_DEBTS> debtsList = new ArrayList<>();
@@ -77,7 +76,7 @@ public class DATA_DEBTS {
     }
 
     public static double ReadTotalOwe(int idMember) {
-        Connection con = DataServer.getConnection();
+        Connection con = null;
         PreparedStatement ps;
         ResultSet rs;
         try {

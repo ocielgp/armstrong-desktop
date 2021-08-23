@@ -1,28 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.String?>
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.RowConstraints?>
-<?import javafx.scene.layout.VBox?>
-<?import org.kordamp.ikonli.javafx.FontIcon?>
-
-<GridPane fx:id="rootPane" prefHeight="768.0" prefWidth="1366.0" stylesheets="@../../styles.css" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ocielgp.controller.DashboardController">
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import org.kordamp.ikonli.javafx.*?>
+<?import java.lang.*?>
+<GridPane xmlns:fx="http://javafx.com/fxml/1" fx:id="rootPane" prefHeight="768.0" prefWidth="1366.0"
+          styleClass="dashboard" xmlns="http://javafx.com/javafx/15.0.1"
+          fx:controller="com.ocielgp.controller.DashboardController">
    <columnConstraints>
-      <ColumnConstraints hgrow="SOMETIMES" maxWidth="200.0" />
-      <ColumnConstraints hgrow="SOMETIMES" />
+      <ColumnConstraints hgrow="SOMETIMES" maxWidth="200.0"/>
+      <ColumnConstraints hgrow="SOMETIMES"/>
    </columnConstraints>
    <rowConstraints>
-      <RowConstraints fillHeight="false" maxHeight="100.0" minHeight="100.0" prefHeight="100.0" />
-      <RowConstraints vgrow="SOMETIMES" />
+      <RowConstraints fillHeight="false" maxHeight="100.0" minHeight="100.0" prefHeight="100.0"/>
+      <RowConstraints vgrow="SOMETIMES"/>
    </rowConstraints>
-   <HBox alignment="CENTER" style="-fx-border-color: -fx-color-border; -fx-border-width: 0px 1px 1px 0px;" styleClass="aside">
+   <HBox alignment="CENTER" style="-fx-border-color: -fx-color-border; -fx-border-width: 0px 1px 1px 0px;"
+         styleClass="aside">
       <ImageView fx:id="logo" fitHeight="75.0" fitWidth="75.0" pickOnBounds="true" preserveRatio="true">
          <HBox.margin>
             <Insets />
@@ -70,14 +66,18 @@
                </graphic>
             </Label>
          </HBox>
-         <HBox fx:id="navSecureMode" styleClass="option">
+         <HBox fx:id="navSecureMode" style="-fx-background-color: -fx-color-background;">
             <children>
                <Label text="Modo seguro">
                   <graphic>
-                     <FontIcon iconLiteral="gmi-security" />
+                     <FontIcon iconLiteral="gmi-security"/>
                   </graphic>
                </Label>
             </children>
+            <styleClass>
+               <String fx:value="option"/>
+               <String fx:value="success-style"/>
+            </styleClass>
          </HBox>
       </VBox>
       <VBox alignment="BOTTOM_CENTER" styleClass="fingerprint" VBox.vgrow="ALWAYS">
@@ -190,8 +190,4 @@
       </GridPane.margin>
    </HBox>
    <ScrollPane fx:id="content" fitToHeight="true" fitToWidth="true" styleClass="content" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-   <styleClass>
-      <String fx:value="dashboard" />
-      <String fx:value="day-theme" />
-   </styleClass>
 </GridPane>

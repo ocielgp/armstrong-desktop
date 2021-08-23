@@ -3,16 +3,15 @@ package com.ocielgp.utilities;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
 import com.ocielgp.app.GlobalController;
-import com.ocielgp.database.members.DATA_MEMBERS;
 import com.ocielgp.database.QueryRows;
-import com.ocielgp.database.members.MODEL_MEMBERS;
+import com.ocielgp.database.members.DATA_MEMBERS;
 import com.ocielgp.files.ConfigFiles;
+import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Label;
-import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseEvent;
 
@@ -132,34 +131,27 @@ public class Pagination {
     }
 
     private void loadMembers(int page) {
-        QueryRows queryRows = DATA_MEMBERS.ReadMembers(this.rows, page, this.fieldSearch.getText());
-        if (queryRows != null && queryRows.getData().size() > 0) {
-            this.labelTotalPages.setText(String.valueOf(queryRows.getPages()));
-            this.labelTotalRows.setText(String.valueOf(queryRows.getRows()));
-            this.tableView.setItems(queryRows.getData());
-            this.labelCurrentPage.setText(String.valueOf(page));
-            this.tableView.setRowFactory(row -> new TableRow<MODEL_MEMBERS>() {
-                @Override
-                public void updateItem(MODEL_MEMBERS modelMembers, boolean empty) {
-                    super.updateItem(modelMembers, empty);
-                    if (modelMembers != null) {
-                        String style = Input.styleToColor(DATA_MEMBERS.ReadStyle(modelMembers.getIdMember()));
-                        if (getStyleClass().size() == 5) {
-                            getStyleClass().set(4, style); // replace color style
-                        } else {
-                            getStyleClass().addAll("member-cell", style);
-                        }
-                    } else {
-                        if (getStyleClass().size() == 5) {
-                            getStyleClass().remove(4); // remove member-cell
-                            getStyleClass().remove(3); // remove color style
-                        }
-                    }
+        Task<QueryRows> queryRowsTask = DATA_MEMBERS.ReadMembers(
+                this.rows,
+                page,
+                this.fieldSearch.getText(),
+                this.tableView
+
+        );
+        queryRowsTask.setOnSucceeded(workerStateEvent -> {
+            QueryRows queryRows = queryRowsTask.getValue();
+            Platform.runLater(() -> {
+                if (queryRows != null && queryRows.getData().size() > 0) {
+                    this.labelTotalPages.setText(String.valueOf(queryRows.getPages()));
+                    this.labelTotalRows.setText(String.valueOf(queryRows.getRows()));
+//                    this.tableView.setItems(queryRows.getData());
+                    this.labelCurrentPage.setText(String.valueOf(page));
+                } else if (page == 1) {
+                    this.restartCounters();
                 }
             });
-        } else if (page == 1) {
-            this.restartCounters();
-        }
+        });
+        new Thread(queryRowsTask).start();
     }
 
     public void restartCounters() {
