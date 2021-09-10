@@ -1,12 +1,11 @@
 package com.ocielgp.app;
 
 import com.jfoenix.controls.JFXComboBox;
-import com.ocielgp.controller.DashboardController;
 import com.ocielgp.controller.AppController;
+import com.ocielgp.controller.DashboardController;
 import com.ocielgp.database.members.MODEL_MEMBERS;
 import com.ocielgp.database.system.MODEL_GYMS;
 import com.ocielgp.utilities.Styles;
-import javafx.scene.Node;
 import javafx.stage.Stage;
 
 import java.util.Locale;
@@ -15,7 +14,7 @@ public class GlobalController {
     public static AppController appController;
     private static MODEL_MEMBERS staffUserModel;
     private static Stage primaryStage;
-    private static DashboardController dashboardController;
+    public static DashboardController dashboardController;
     private static boolean secureMode = false;
 
     public static Stage getPrimaryStage() {

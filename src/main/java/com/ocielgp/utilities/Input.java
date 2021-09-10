@@ -4,12 +4,11 @@ import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXDatePicker;
 import com.jfoenix.controls.JFXPasswordField;
 import com.jfoenix.controls.JFXTextField;
-import javafx.event.EventHandler;
 import javafx.scene.Node;
-import javafx.scene.control.*;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextInputControl;
 import javafx.scene.input.KeyEvent;
-
-import java.util.Locale;
 
 public class Input {
     private static final double SPEED_SCROLL = 0.003;
@@ -20,6 +19,14 @@ public class Input {
             node.setManaged(newValue);
         });
         node.setVisible(false);
+    }
+
+    public static void createVisibleProperty(Node node, boolean property) {
+        node.visibleProperty().addListener((observable, oldValue, newValue) -> {
+            node.setVisible(newValue);
+            node.setManaged(newValue);
+        });
+        node.setVisible(property);
     }
 
     public static void createMaxLengthEvent(TextInputControl textInput, int maxLength) {

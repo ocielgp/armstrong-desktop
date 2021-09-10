@@ -1,326 +1,333 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import com.jfoenix.controls.JFXButton?>
-<?import com.jfoenix.controls.JFXComboBox?>
-<?import com.jfoenix.controls.JFXTextField?>
-<?import com.jfoenix.controls.JFXToggleButton?>
-<?import java.lang.String?>
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Label?>
+<?import com.jfoenix.controls.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
-<?import org.kordamp.ikonli.javafx.FontIcon?>
-
-<VBox fx:id="boxMemberDetails" maxWidth="412.0" style="-fx-border-color: -fx-color-border; -fx-background-color: -fx-color-background;" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1">
-    <HBox fx:id="titlePane" alignment="CENTER" style="-fx-background-color: -fx-color-background; -fx-border-color: -fx-color-border; -fx-border-width: 0 0 1px 0;" styleClass="default-style">
-        <VBox.margin>
-            <Insets />
-        </VBox.margin>
-        <Label fx:id="t_labelTitle" style="-fx-text-fill: -fx-color-text;" text="SOCIO NUEVO">
-            <padding>
-                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-            </padding>
-        </Label>
-    </HBox>
-   <VBox spacing="10.0">
-      <VBox.margin>
-         <Insets />
-      </VBox.margin>
-      <padding>
-         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-      </padding>
-      <VBox fx:id="quickViewPane" spacing="10.0" styleClass="member-section" VBox.vgrow="ALWAYS">
-         <padding>
-            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-         </padding>
-         <children>
-            <HBox alignment="CENTER">
-               <children>
-                  <Label styleClass="bold" text="Vista rápida">
-                     <graphic>
-                        <FontIcon iconLiteral="gmi-swap-horizontal-circle" />
-                     </graphic>
-                  </Label>
-               </children>
+<?import javafx.scene.layout.*?>
+<?import org.kordamp.ikonli.javafx.*?>
+<?import java.lang.*?>
+<ScrollPane xmlns:fx="http://javafx.com/fxml/1" fx:id="scrollPane" fitToHeight="true" fitToWidth="true" maxWidth="412.0"
+            xmlns="http://javafx.com/javafx/15.0.1">
+    <content>
+        <VBox fx:id="boxMemberDetails" maxWidth="412.0"
+              style="-fx-border-color: -fx-color-border; -fx-background-color: -fx-color-background;">
+            <HBox fx:id="titlePane" alignment="CENTER"
+                  style="-fx-background-color: -fx-color-background; -fx-border-color: -fx-color-border; -fx-border-width: 0 0 1px 0;"
+                  styleClass="default-style">
+                <VBox.margin>
+                    <Insets/>
+                </VBox.margin>
+                <Label fx:id="t_labelTitle" style="-fx-text-fill: -fx-color-text;" text="SOCIO NUEVO">
+                    <padding>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                    </padding>
+                </Label>
             </HBox>
-            <HBox spacing="5.0">
-               <children>
-                  <Label styleClass="bold" text="Registro" />
-                  <Label fx:id="qv_labelRegistrationDate" text="date" />
-               </children>
-            </HBox>
-            <HBox spacing="5.0">
-               <children>
-                  <Label styleClass="bold" text="Último pago" />
-                  <Label fx:id="qv_labelLastPayment" text="date" />
-               </children>
-            </HBox>
-            <HBox spacing="5.0">
-               <children>
-                  <Label styleClass="bold" text="Gimnasio" />
-                  <Label fx:id="qv_labelGym" text="gymName" />
-               </children>
-            </HBox>
-            <VBox alignment="CENTER">
-               <children>
-                  <Label styleClass="bold" text="Atendido por" />
-                  <Label fx:id="qv_staffName" text="staffName" textAlignment="CENTER" wrapText="true" />
-               </children>
+            <VBox spacing="10.0">
+                <VBox.margin>
+                    <Insets/>
+                </VBox.margin>
+                <padding>
+                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                </padding>
+                <VBox fx:id="quickViewPane" spacing="10.0" styleClass="member-section" VBox.vgrow="ALWAYS">
+                    <padding>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                    </padding>
+                    <children>
+                        <HBox alignment="CENTER">
+                            <children>
+                                <Label styleClass="bold" text="Vista rápida">
+                                    <graphic>
+                                        <FontIcon iconLiteral="gmi-swap-horizontal-circle"/>
+                                    </graphic>
+                                </Label>
+                            </children>
+                        </HBox>
+                        <HBox spacing="5.0">
+                            <children>
+                                <Label styleClass="bold" text="Registro"/>
+                                <Label fx:id="qv_labelRegistrationDate" text="date"/>
+                            </children>
+                        </HBox>
+                        <HBox spacing="5.0">
+                            <children>
+                                <Label styleClass="bold" text="Último pago"/>
+                                <Label fx:id="qv_labelLastPayment" text="N / A"/>
+                            </children>
+                        </HBox>
+                        <HBox spacing="5.0">
+                            <children>
+                                <Label styleClass="bold" text="Gimnasio"/>
+                                <Label fx:id="qv_labelGym" text="gymName"/>
+                            </children>
+                        </HBox>
+                        <VBox alignment="CENTER">
+                            <children>
+                                <Label styleClass="bold" text="Atendido por"/>
+                                <Label fx:id="qv_staffName" text="N / A" textAlignment="CENTER" wrapText="true"/>
+                            </children>
+                        </VBox>
+                    </children>
+                </VBox>
+                <VBox fx:id="shortcutPane" spacing="10.0" styleClass="member-section">
+                    <padding>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                    </padding>
+                    <children>
+                        <HBox alignment="CENTER">
+                            <children>
+                                <Label styleClass="bold" text="Acciones rápidas">
+                                    <graphic>
+                                        <FontIcon iconLiteral="gmi-swap-horizontal-circle"/>
+                                    </graphic>
+                                </Label>
+                            </children>
+                        </HBox>
+                        <JFXButton fx:id="sh_buttonOpenDoor" text="Abrir puerta">
+                            <styleClass>
+                                <String fx:value="btn-colorful"/>
+                                <String fx:value="success-style"/>
+                            </styleClass>
+                        </JFXButton>
+                        <JFXButton fx:id="sh_buttonAccess" text="Bloquear acceso">
+                            <styleClass>
+                                <String fx:value="btn-colorful"/>
+                                <String fx:value="danger-style"/>
+                            </styleClass>
+                        </JFXButton>
+                        <JFXButton fx:id="sh_buttonPayDebt" text="Abonar mensualidad">
+                            <styleClass>
+                                <String fx:value="btn-colorful"/>
+                                <String fx:value="creative-style"/>
+                            </styleClass>
+                        </JFXButton>
+                    </children>
+                </VBox>
+                <VBox alignment="CENTER" spacing="10.0" styleClass="member-section">
+                    <HBox alignment="CENTER">
+                        <VBox>
+                            <ImageView fx:id="ph_imgMemberPhoto" fitHeight="150.0" fitWidth="150.0" pickOnBounds="true"
+                                       preserveRatio="true">
+                                <image>
+                                    <Image url="@../../../img.jpg"/>
+                                </image>
+                            </ImageView>
+                        </VBox>
+                    </HBox>
+                    <HBox alignment="CENTER" spacing="10.0">
+                        <VBox.margin>
+                            <Insets/>
+                        </VBox.margin>
+                        <JFXButton fx:id="ph_buttonUploadPhoto" styleClass="btn-primary" text="Subir foto">
+                            <graphic>
+                                <FontIcon iconLiteral="gmi-file-upload"/>
+                            </graphic>
+                        </JFXButton>
+                        <JFXButton fx:id="ph_buttonDeletePhoto" disable="true" text="Borrar foto">
+                            <graphic>
+                                <FontIcon iconLiteral="gmi-delete-forever"/>
+                            </graphic>
+                            <styleClass>
+                                <String fx:value="btn-colorful"/>
+                                <String fx:value="danger-style"/>
+                            </styleClass>
+                        </JFXButton>
+                    </HBox>
+                    <padding>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                    </padding>
+                </VBox>
+                <VBox spacing="10.0" styleClass="member-section">
+                    <padding>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                    </padding>
+                    <HBox alignment="CENTER">
+                        <Label styleClass="bold" text="Información personal">
+                            <graphic>
+                                <FontIcon iconLiteral="gmi-person"/>
+                            </graphic>
+                        </Label>
+                    </HBox>
+                    <VBox>
+                        <Label styleClass="bold" text="Nombres *">
+                            <graphic>
+                                <FontIcon iconLiteral="gmi-create"/>
+                            </graphic>
+                        </Label>
+                        <JFXTextField fx:id="pi_fieldName"/>
+                    </VBox>
+                    <VBox>
+                        <Label styleClass="bold" text="Apellidos *">
+                            <graphic>
+                                <FontIcon iconLiteral="gmi-create"/>
+                            </graphic>
+                        </Label>
+                        <JFXTextField fx:id="pi_fieldLastName"/>
+                    </VBox>
+                    <VBox>
+                        <Label styleClass="bold" text="Género *">
+                            <graphic>
+                                <FontIcon iconLiteral="gmi-wc"/>
+                            </graphic>
+                        </Label>
+                        <JFXComboBox fx:id="pi_comboBoxGender" promptText="Selecciona uno"/>
+                    </VBox>
+                    <VBox>
+                        <Label styleClass="bold" text="Teléfono">
+                            <graphic>
+                                <FontIcon iconLiteral="gmi-phone-iphone"/>
+                            </graphic>
+                        </Label>
+                        <JFXTextField fx:id="pi_fieldPhone"/>
+                    </VBox>
+                    <VBox>
+                        <Label styleClass="bold" text="Correo">
+                            <graphic>
+                                <FontIcon iconLiteral="gmi-email"/>
+                            </graphic>
+                        </Label>
+                        <JFXTextField fx:id="pi_fieldEmail"/>
+                    </VBox>
+                    <VBox>
+                        <Label styleClass="bold" text="Notas">
+                            <graphic>
+                                <FontIcon iconLiteral="gmi-info"/>
+                            </graphic>
+                        </Label>
+                        <JFXTextField fx:id="pi_fieldNotes" promptText="Enfermedades / Lesiones"/>
+                    </VBox>
+                </VBox>
+                <VBox fx:id="fingerprintPane" spacing="5.0" styleClass="member-section">
+                    <padding>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                    </padding>
+                    <HBox alignment="CENTER">
+                        <HBox HBox.hgrow="ALWAYS">
+                            <Label styleClass="bold" text="Lector de Huellas">
+                                <graphic>
+                                    <FontIcon iconLiteral="gmi-fingerprint"/>
+                                </graphic>
+                            </Label>
+                        </HBox>
+                        <Label styleClass="thin" text="opcional"/>
+                    </HBox>
+                    <HBox>
+                        <VBox fx:id="fp_boxFingerprint" alignment="CENTER" fillWidth="false" maxHeight="152.0"
+                              maxWidth="152.0" minHeight="152.0" minWidth="152.0"
+                              style="-fx-border-color: -fx-color-border;" HBox.hgrow="NEVER"/>
+                        <VBox alignment="CENTER" HBox.hgrow="ALWAYS">
+                            <HBox alignment="CENTER" spacing="5.0" VBox.vgrow="ALWAYS">
+                                <Label text="Huellas:"/>
+                                <Label fx:id="fp_labelFingerprintCounter" text="0"/>
+                            </HBox>
+                        </VBox>
+                    </HBox>
+                    <VBox/>
+                    <HBox alignment="CENTER" spacing="5.0">
+                        <JFXButton fx:id="fp_buttonCapture" styleClass="btn-primary" text="Iniciar captura">
+                            <HBox.margin>
+                                <Insets/>
+                            </HBox.margin>
+                        </JFXButton>
+                        <JFXButton fx:id="fp_buttonRestartCapture" disable="true" text="Reiniciar huellas">
+                            <styleClass>
+                                <String fx:value="btn-colorful"/>
+                                <String fx:value="default-style"/>
+                            </styleClass>
+                        </JFXButton>
+                    </HBox>
+                </VBox>
+                <VBox spacing="5.0" styleClass="member-section">
+                    <padding>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                    </padding>
+                    <HBox alignment="CENTER">
+                        <Label styleClass="bold" text="Membresía">
+                            <graphic>
+                                <FontIcon iconLiteral="gmi-event"/>
+                            </graphic>
+                        </Label>
+                    </HBox>
+                    <VBox fx:id="ms_boxComboBox" spacing="10.0">
+                        <children>
+                            <JFXComboBox fx:id="ms_comboBoxMemberships" promptText="Selecciona uno"/>
+                            <HBox fx:id="ms_boxEndDate" alignment="CENTER" spacing="5.0">
+                                <children>
+                                    <Label styleClass="bold" text="Termina"/>
+                                    <Label fx:id="ms_labelEndDate" text="date"/>
+                                </children>
+                            </HBox>
+                        </children>
+                    </VBox>
+                    <HBox fx:id="ms_boxRenewMembership" alignment="CENTER">
+                        <children>
+                            <JFXButton fx:id="ms_buttonRenewMembership" text="Renovar">
+                                <styleClass>
+                                    <String fx:value="btn-colorful"/>
+                                    <String fx:value="epic-style"/>
+                                </styleClass>
+                            </JFXButton>
+                        </children>
+                    </HBox>
+                </VBox>
+                <VBox fx:id="pym_boxPayment" spacing="5.0" styleClass="member-section">
+                    <VBox.margin>
+                        <Insets/>
+                    </VBox.margin>
+                    <padding>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                    </padding>
+                    <HBox alignment="CENTER">
+                        <Label styleClass="bold" text="Pago">
+                            <graphic>
+                                <FontIcon iconLiteral="gmi-payment"/>
+                            </graphic>
+                        </Label>
+                    </HBox>
+                    <JFXToggleButton fx:id="pym_togglePayment" selected="true" text="Pago completo"/>
+                    <VBox fx:id="pym_boxOwe">
+                        <HBox alignment="CENTER_LEFT">
+                            <Label text="Abono *">
+                                <HBox.margin>
+                                    <Insets right="10.0"/>
+                                </HBox.margin>
+                                <graphic>
+                                    <FontIcon iconLiteral="gmi-add-circle"/>
+                                </graphic>
+                            </Label>
+                            <JFXTextField fx:id="pym_fieldPaidOut" HBox.hgrow="ALWAYS"/>
+                        </HBox>
+                        <HBox alignment="CENTER_LEFT" disable="true">
+                            <Label minWidth="96.0" text="Debe">
+                                <HBox.margin>
+                                    <Insets right="10.0"/>
+                                </HBox.margin>
+                                <graphic>
+                                    <FontIcon iconLiteral="gmi-remove-circle"/>
+                                </graphic>
+                            </Label>
+                            <JFXTextField fx:id="pym_fieldOwe" HBox.hgrow="ALWAYS"/>
+                        </HBox>
+                    </VBox>
+                </VBox>
+                <HBox alignment="CENTER" spacing="10.0">
+                    <JFXButton fx:id="buttonAction" text="Registrar">
+                        <styleClass>
+                            <String fx:value="btn-colorful"/>
+                            <String fx:value="success-style"/>
+                        </styleClass>
+                    </JFXButton>
+                    <JFXButton fx:id="buttonCancel" text="Cancelar">
+                        <styleClass>
+                            <String fx:value="btn-colorful"/>
+                            <String fx:value="danger-style"/>
+                        </styleClass>
+                    </JFXButton>
+                </HBox>
             </VBox>
-         </children>
-      </VBox>
-       <VBox fx:id="shortcutPane" spacing="10.0" styleClass="member-section">
-           <padding>
-               <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-           </padding>
-           <children>
-               <HBox alignment="CENTER">
-                   <children>
-                       <Label styleClass="bold" text="Acciones rápidas">
-                           <graphic>
-                               <FontIcon iconLiteral="gmi-swap-horizontal-circle" />
-                           </graphic>
-                       </Label>
-                   </children>
-               </HBox>
-               <JFXButton fx:id="sh_buttonOpenDoor" text="Abrir puerta">
-                   <styleClass>
-                       <String fx:value="btn-colorful" />
-                       <String fx:value="success-style" />
-                   </styleClass>
-               </JFXButton>
-               <JFXButton fx:id="sh_buttonAccess" text="Bloquear acceso">
-                   <styleClass>
-                       <String fx:value="btn-colorful" />
-                       <String fx:value="danger-style" />
-                   </styleClass>
-               </JFXButton>
-               <JFXButton fx:id="sh_buttonPayDebt" text="Abonar mensualidad">
-                   <styleClass>
-                       <String fx:value="btn-colorful" />
-                       <String fx:value="creative-style" />
-                   </styleClass>
-               </JFXButton>
-           </children>
-       </VBox>
-      <VBox alignment="CENTER" spacing="10.0" styleClass="member-section">
-         <HBox alignment="CENTER">
-            <VBox>
-               <ImageView fx:id="ph_imgMemberPhoto" fitHeight="150.0" fitWidth="150.0" pickOnBounds="true" preserveRatio="true">
-                  <image>
-                     <Image url="@../../../img.jpg" />
-                  </image>
-               </ImageView>
-            </VBox>
-         </HBox>
-         <HBox alignment="CENTER" spacing="10.0">
-            <VBox.margin>
-               <Insets />
-            </VBox.margin>
-            <JFXButton fx:id="ph_buttonUploadPhoto" styleClass="btn-primary" text="Subir foto">
-               <graphic>
-                  <FontIcon iconLiteral="gmi-file-upload" />
-               </graphic>
-            </JFXButton>
-            <JFXButton fx:id="ph_buttonDeletePhoto" disable="true" text="Borrar foto">
-                <graphic>
-                    <FontIcon iconLiteral="gmi-delete-forever" />
-                </graphic>
-                <styleClass>
-                    <String fx:value="btn-colorful" />
-                    <String fx:value="danger-style" />
-                </styleClass>
-            </JFXButton>
-         </HBox>
-         <padding>
-            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-         </padding>
-      </VBox>
-       <VBox spacing="10.0" styleClass="member-section">
-           <padding>
-               <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-           </padding>
-           <HBox alignment="CENTER">
-               <Label styleClass="bold" text="Información personal">
-                   <graphic>
-                       <FontIcon iconLiteral="gmi-person" />
-                   </graphic>
-               </Label>
-         </HBox>
-         <VBox>
-            <Label styleClass="bold" text="Nombres *">
-               <graphic>
-                  <FontIcon iconLiteral="gmi-create" />
-               </graphic>
-            </Label>
-            <JFXTextField fx:id="pi_fieldName" />
-         </VBox>
-         <VBox>
-            <Label styleClass="bold" text="Apellidos *">
-               <graphic>
-                  <FontIcon iconLiteral="gmi-create" />
-               </graphic>
-            </Label>
-            <JFXTextField fx:id="pi_fieldLastName" />
-         </VBox>
-         <VBox>
-            <Label styleClass="bold" text="Género *">
-               <graphic>
-                  <FontIcon iconLiteral="gmi-wc" />
-               </graphic>
-            </Label>
-            <JFXComboBox fx:id="pi_comboBoxGender" promptText="Selecciona uno" />
-         </VBox>
-         <VBox>
-            <Label styleClass="bold" text="Teléfono">
-               <graphic>
-                  <FontIcon iconLiteral="gmi-phone-iphone" />
-               </graphic>
-            </Label>
-            <JFXTextField fx:id="pi_fieldPhone" />
-         </VBox>
-         <VBox>
-            <Label styleClass="bold" text="Correo">
-               <graphic>
-                  <FontIcon iconLiteral="gmi-email" />
-               </graphic>
-            </Label>
-            <JFXTextField fx:id="pi_fieldEmail" />
-         </VBox>
-         <VBox>
-            <Label styleClass="bold" text="Notas">
-               <graphic>
-                  <FontIcon iconLiteral="gmi-info" />
-               </graphic>
-            </Label>
-            <JFXTextField fx:id="pi_fieldNotes" promptText="Enfermedades / Lesiones" />
-         </VBox>
-      </VBox>
-      <VBox fx:id="fingerprintPane" spacing="5.0" styleClass="member-section">
-         <padding>
-            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-         </padding>
-         <HBox alignment="CENTER">
-            <HBox HBox.hgrow="ALWAYS">
-               <Label styleClass="bold" text="Lector de Huellas">
-                  <graphic>
-                     <FontIcon iconLiteral="gmi-fingerprint" />
-                  </graphic>
-               </Label>
-            </HBox>
-            <Label styleClass="thin" text="opcional" />
-         </HBox>
-         <HBox>
-            <VBox fx:id="fp_boxFingerprint" alignment="CENTER" fillWidth="false" maxHeight="152.0" maxWidth="152.0" minHeight="152.0" minWidth="152.0" style="-fx-border-color: -fx-color-border;" HBox.hgrow="NEVER" />
-            <VBox alignment="CENTER" HBox.hgrow="ALWAYS">
-               <HBox alignment="CENTER" spacing="5.0" VBox.vgrow="ALWAYS">
-                  <Label text="Huellas:" />
-                  <Label fx:id="fp_labelFingerprintCounter" text="0" />
-               </HBox>
-            </VBox>
-         </HBox>
-         <VBox />
-         <HBox alignment="CENTER" spacing="5.0">
-            <JFXButton fx:id="fp_buttonCapture" styleClass="btn-primary" text="Iniciar captura">
-               <HBox.margin>
-                  <Insets />
-               </HBox.margin>
-            </JFXButton>
-            <JFXButton fx:id="fp_buttonRestartCapture" disable="true" text="Reiniciar huellas">
-               <styleClass>
-                  <String fx:value="btn-colorful" />
-                  <String fx:value="default-style" />
-               </styleClass></JFXButton>
-         </HBox>
-      </VBox>
-      <VBox spacing="5.0" styleClass="member-section">
-         <padding>
-            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-         </padding>
-         <HBox alignment="CENTER">
-            <Label styleClass="bold" text="Membresía">
-               <graphic>
-                  <FontIcon iconLiteral="gmi-event" />
-               </graphic>
-            </Label>
-         </HBox>
-         <VBox fx:id="ms_boxComboBox" spacing="10.0">
-            <children>
-               <JFXComboBox fx:id="ms_comboBoxMemberships" promptText="Selecciona uno" />
-               <HBox fx:id="ms_boxEndDate" alignment="CENTER" spacing="5.0">
-                  <children>
-                     <Label styleClass="bold" text="Termina" />
-                     <Label fx:id="ms_labelEndDate" text="date" />
-                  </children>
-               </HBox>
-            </children>
-         </VBox>
-         <HBox fx:id="ms_boxRenewMembership" alignment="CENTER">
-            <children>
-               <JFXButton fx:id="ms_buttonRenewMembership" text="Renovar">
-                  <styleClass>
-                     <String fx:value="btn-colorful" />
-                     <String fx:value="epic-style" />
-                  </styleClass>
-               </JFXButton>
-            </children>
-         </HBox>
-      </VBox>
-      <VBox fx:id="pym_boxPayment" spacing="5.0" styleClass="member-section">
-         <VBox.margin>
-            <Insets />
-         </VBox.margin>
-         <padding>
-            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-         </padding>
-         <HBox alignment="CENTER">
-            <Label styleClass="bold" text="Pago">
-               <graphic>
-                  <FontIcon iconLiteral="gmi-payment" />
-               </graphic>
-            </Label>
-         </HBox>
-         <JFXToggleButton fx:id="pym_togglePayment" selected="true" text="Pago completo" />
-         <VBox fx:id="pym_boxOwe">
-            <HBox alignment="CENTER_LEFT">
-               <Label text="Abono *">
-                  <HBox.margin>
-                     <Insets right="10.0" />
-                  </HBox.margin>
-                  <graphic>
-                     <FontIcon iconLiteral="gmi-add-circle" />
-                  </graphic>
-               </Label>
-               <JFXTextField fx:id="pym_fieldPaidOut" HBox.hgrow="ALWAYS" />
-            </HBox>
-            <HBox alignment="CENTER_LEFT" disable="true">
-               <Label minWidth="96.0" text="Debe">
-                  <HBox.margin>
-                     <Insets right="10.0" />
-                  </HBox.margin>
-                  <graphic>
-                     <FontIcon iconLiteral="gmi-remove-circle" />
-                  </graphic>
-               </Label>
-               <JFXTextField fx:id="pym_fieldOwe" HBox.hgrow="ALWAYS" />
-            </HBox>
-         </VBox>
-      </VBox>
-      <HBox alignment="CENTER" spacing="10.0">
-          <JFXButton fx:id="buttonAction" text="Registrar">
-              <styleClass>
-                  <String fx:value="btn-colorful" />
-                  <String fx:value="success-style" />
-              </styleClass>
-          </JFXButton>
-         <JFXButton fx:id="buttonCancel" text="Cancelar">
-            <styleClass>
-               <String fx:value="btn-colorful" />
-               <String fx:value="danger-style" />
-            </styleClass>
-         </JFXButton>
-      </HBox>
-   </VBox>
-</VBox>
+        </VBox>
+    </content>
+</ScrollPane>

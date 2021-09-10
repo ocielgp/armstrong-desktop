@@ -4,6 +4,7 @@ import com.jfoenix.controls.JFXButton;
 import com.ocielgp.app.GlobalController;
 import com.ocielgp.files.ConfigFiles;
 import com.ocielgp.fingerprint.Fingerprint;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -16,11 +17,13 @@ import java.nio.file.Files;
 
 
 public class PhotoHandler {
+    private final BooleanUpdater booleanUpdater;
     private final ImageView imageViewPhoto;
     private byte[] bytes;
     private final JFXButton buttonDeletePhoto;
 
-    public PhotoHandler(ImageView imageViewPhoto, JFXButton buttonUploadPhoto, JFXButton buttonDeletePhoto) {
+    public PhotoHandler(BooleanUpdater booleanUpdater, ImageView imageViewPhoto, JFXButton buttonUploadPhoto, JFXButton buttonDeletePhoto) {
+        this.booleanUpdater = booleanUpdater;
         this.imageViewPhoto = imageViewPhoto;
         this.buttonDeletePhoto = buttonDeletePhoto;
 
@@ -29,8 +32,9 @@ public class PhotoHandler {
         buttonDeletePhoto.addEventFilter(ActionEvent.ACTION, actionEvent -> deleteImage());
 
         this.imageViewPhoto.setStyle("-fx-cursor: hand");
-        this.imageViewPhoto.setImage(ConfigFiles.getDefaultImage());
+        ConfigFiles.getDefaultImage().thenAccept(image -> Platform.runLater(() -> this.imageViewPhoto.setImage(image)));
     }
+
 
     private void browseImage() {
         if (Fingerprint.getStatusCode() != 0) {
@@ -48,6 +52,9 @@ public class PhotoHandler {
             this.buttonDeletePhoto.setDisable(false);
             try {
                 this.bytes = Files.readAllBytes(file.toPath());
+                if (this.booleanUpdater.isListener()) {
+                    this.booleanUpdater.change("photo", false);
+                }
 
                 fileChooser = null;
                 file = null;
@@ -67,7 +74,7 @@ public class PhotoHandler {
     }
 
     private void deleteImage() {
-        this.imageViewPhoto.setImage(ConfigFiles.getDefaultImage());
+        ConfigFiles.getDefaultImage().thenAccept(image -> Platform.runLater(() -> this.imageViewPhoto.setImage(image)));
         this.buttonDeletePhoto.setDisable(true);
         this.bytes = null;
         this.imageViewPhoto.requestFocus();
@@ -76,10 +83,10 @@ public class PhotoHandler {
     public void setPhoto(byte[] bytes) {
         if (bytes != null) {
             this.bytes = bytes;
-            this.imageViewPhoto.setImage(ConfigFiles.loadImage(bytes));
+            ConfigFiles.loadImage(bytes).thenAccept(image -> Platform.runLater(() -> this.imageViewPhoto.setImage(image)));
             this.buttonDeletePhoto.setDisable(false);
         } else {
-            this.imageViewPhoto.setImage(ConfigFiles.getDefaultImage());
+            ConfigFiles.getDefaultImage().thenAccept(image -> Platform.runLater(() -> this.imageViewPhoto.setImage(image)));
             this.buttonDeletePhoto.setDisable(true);
         }
     }
@@ -89,9 +96,8 @@ public class PhotoHandler {
     }
 
     public void resetHandler() {
-        this.imageViewPhoto.setImage(null);
+        ConfigFiles.getDefaultImage().thenAccept(image -> Platform.runLater(() -> this.imageViewPhoto.setImage(image)));
         this.bytes = null;
         this.buttonDeletePhoto.setDisable(true);
     }
-
 }

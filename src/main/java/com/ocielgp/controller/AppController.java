@@ -7,6 +7,7 @@ import com.ocielgp.database.system.DATA_GYMS;
 import com.ocielgp.database.system.MODEL_GYMS;
 import com.ocielgp.files.ConfigFiles;
 import com.ocielgp.fingerprint.Fingerprint;
+import com.ocielgp.utilities.Notifications;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -16,8 +17,8 @@ import javafx.scene.layout.BorderPane;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.net.URL;
-import java.util.Objects;
 import java.util.ResourceBundle;
+import java.util.concurrent.CompletableFuture;
 
 public class AppController implements Initializable {
     // Containers
@@ -61,29 +62,32 @@ public class AppController implements Initializable {
         );
         this.borderPane.setCenter(loginFXML);*/
 
-        // Connect to data source
-        if (DataServer.getConnection() != null) {
-            ObservableList<MODEL_GYMS> gyms = DATA_GYMS.ReadGyms();
-            if (gyms == null) {
-                this.comboBoxGyms.setDisable(true);
-            } else {
-                this.comboBoxGyms.setItems(gyms);
-                int previousIdGym = Integer.parseInt(Objects.requireNonNull(ConfigFiles.readProperty(ConfigFiles.File.APP, "idGym")));
-                for (MODEL_GYMS gym : gyms) {
-                    if (previousIdGym == gym.getIdGym()) {
-                        this.comboBoxGyms.getSelectionModel().select(gym);
-                        break;
-                    }
-                }
-                this.comboBoxGyms.valueProperty().addListener((observable, oldValue, newValue) -> ConfigFiles.saveProperty(ConfigFiles.File.APP, "idGym", String.valueOf(this.comboBoxGyms.getSelectionModel().getSelectedItem().getIdGym())));
-                this.comboBoxGyms.focusedProperty().addListener((observableValue, oldValue, newValue) -> this.comboBoxGyms.getStyleClass().remove("red-border-input-line"));
-            }
-        }
-
-        // Check if fingerprint scanner is connected
+        // TODO: RESEARCH ABOUT THIS
+        Notifications.initializeNotificationSystem();
         Platform.runLater(() -> {
-            Fingerprint.Scanner();
             new FadeIn(this.borderPane).play();
+
+            // Connect to data source
+            CompletableFuture.runAsync(() -> {
+                if (DataServer.getConnection() != null) {
+                    ObservableList<MODEL_GYMS> gyms = DATA_GYMS.ReadGyms();
+                    Platform.runLater(() -> {
+                        comboBoxGyms.setItems(gyms);
+                        int previousIdGym = Integer.parseInt(ConfigFiles.readProperty(ConfigFiles.File.APP, "idGym"));
+                        for (MODEL_GYMS gym : gyms) {
+                            if (previousIdGym == gym.getIdGym()) {
+                                comboBoxGyms.getSelectionModel().select(gym);
+                                break;
+                            }
+                        }
+                    });
+                    comboBoxGyms.valueProperty().addListener((observable, oldValue, newValue) -> ConfigFiles.saveProperty(ConfigFiles.File.APP, "idGym", String.valueOf(comboBoxGyms.getSelectionModel().getSelectedItem().getIdGym())));
+                    comboBoxGyms.focusedProperty().addListener((observableValue, oldValue, newValue) -> comboBoxGyms.getStyleClass().remove("red-border-input-line"));
+                }
+            });
+
+            // Check if fingerprint scanner is connected
+            CompletableFuture.runAsync(Fingerprint::Scanner);
         });
     }
 

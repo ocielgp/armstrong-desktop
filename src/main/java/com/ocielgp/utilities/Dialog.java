@@ -1,6 +1,7 @@
 package com.ocielgp.utilities;
 
-import animatefx.animation.*;
+import animatefx.animation.FadeInUp;
+import animatefx.animation.Shake;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
 import com.ocielgp.app.GlobalController;
@@ -11,14 +12,11 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.input.InputMethodTextRun;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -67,7 +65,7 @@ public class Dialog {
         Scene scene = new Scene(this.dialogView);
         scene.setFill(Color.TRANSPARENT);
         scene.getStylesheets().add("styles.css");
-        this.stage.getIcons().setAll(ConfigFiles.getIconApp());
+        ConfigFiles.getIconApp().thenAccept(image -> Platform.runLater(() -> this.stage.getIcons().setAll(image)));
         this.stage.setTitle("MENSAJE");
         this.stage.initModality(Modality.APPLICATION_MODAL);
         this.stage.setScene(scene);

@@ -24,6 +24,7 @@ import javafx.scene.layout.HBox;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
+import java.util.concurrent.CompletableFuture;
 
 public class LoginController implements Initializable {
     @FXML
@@ -42,7 +43,7 @@ public class LoginController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        this.imageUser.setImage(ConfigFiles.getDefaultImage());
+        ConfigFiles.getDefaultImage().thenAccept(image -> Platform.runLater(() -> this.imageUser.setImage(image)));
 
         this.buttonLogin.setOnAction(actionEvent -> {
             ArrayList<InputDetails> inputs = new ArrayList<>();
@@ -50,31 +51,39 @@ public class LoginController implements Initializable {
             inputs.add(new InputDetails(this.fieldPassword, this.fieldPassword.getText()));
             if (Validator.emptyValidator(inputs.listIterator())) {
                 this.boxLoginPane.setDisable(true);
-                Boolean answer = DATA_STAFF_MEMBERS.Login(this.fieldUsername.getText(), this.fieldPassword.getText());
-                if (answer == null) {
-                    new Flash(this.boxLoginPane).play();
-                    Notifications.warn("Bloqueado", "Esta cuenta se encuentra bloqueada.");
-                } else if (answer) {
-                    Node dashboardFXML = Loader.Load(
-                            "dashboard.fxml",
-                            "Login",
-                            false
-                    );
-                    FadeOutDown fadeOutDown = new FadeOutDown(this.boxLoginPane);
-                    fadeOutDown.setOnFinished((action) -> GlobalController.appController.borderPane.setCenter(dashboardFXML));
-                    fadeOutDown.play();
-                    new FadeOutDown(this.boxLoginPane).play();
-                } else {
-                    this.attemps++;
-                    if (attemps == 3) {
-                        new Flash(this.boxLoginPane).play();
-                        Notifications.danger("Intentos excedidos", "Si no recuerdas la contraseña, contacte con el encargado.");
+                CompletableFuture.runAsync(() -> {
+                    Boolean answer = DATA_STAFF_MEMBERS.Login(this.fieldUsername.getText(), this.fieldPassword.getText());
+                    if (answer == null) {
+                        Platform.runLater(() -> new Flash(this.boxLoginPane).play());
+                        Notifications.warn("Bloqueado", "Esta cuenta se encuentra bloqueada.");
+                    } else if (answer) {
+                        Node dashboardFXML = Loader.Load(
+                                "dashboard.fxml",
+                                "Login",
+                                false
+                        );
+                        Platform.runLater(() -> {
+                            FadeOutDown fadeOutDown = new FadeOutDown(this.boxLoginPane);
+                            fadeOutDown.setOnFinished((action) -> {
+                                GlobalController.appController.borderPane.setCenter(dashboardFXML);
+                                new FadeIn(GlobalController.appController.borderPane.getCenter()).play();
+                            });
+                            fadeOutDown.play();
+                        });
                     } else {
-                        Notifications.danger("Error", "Usuario / Contraseña incorrectos.", 2);
-                        new Shake(this.boxLoginPane).play();
-                        this.boxLoginPane.setDisable(false);
+                        this.attemps++;
+                        if (attemps == 3) {
+                            Notifications.danger("Intentos excedidos", "Si no recuerdas la contraseña, contacte con el encargado.");
+                            Platform.runLater(() -> new Flash(this.boxLoginPane).play());
+                        } else {
+                            Notifications.danger("Error", "Usuario / Contraseña incorrectos.", 2);
+                            Platform.runLater(() -> {
+                                new Shake(this.boxLoginPane).play();
+                                this.boxLoginPane.setDisable(false);
+                            });
+                        }
                     }
-                }
+                });
             }
 
             // clear memory

@@ -23,7 +23,7 @@ public class RunApp extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        primaryStage.getIcons().setAll(ConfigFiles.getIconApp());
+        ConfigFiles.getIconApp().thenAccept(image -> Platform.runLater(() -> primaryStage.getIcons().setAll(image)));
         AppController appController = new AppController();
 
         GlobalController.setPrimaryStage(primaryStage);
@@ -43,7 +43,7 @@ public class RunApp extends Application {
         // show app
         primaryStage.setTitle("Gym App");
         primaryStage.setScene(scene);
-        primaryStage.setMaximized(true);
+//        primaryStage.setMaximized(true);
         primaryStage.show();
 
         // kill all threads when a closing event occur
@@ -52,6 +52,7 @@ public class RunApp extends Application {
             System.exit(0);
         });
 
+        // TODO: FIX BUG WINDOWS IS BLANK
         MODEL_STAFF_MEMBERS modelStaffMembers = new MODEL_STAFF_MEMBERS();
         modelStaffMembers.setPassword("a94cbdca65dd4582c45c2b8dd97aec782baa8fbad32b73b547bf5b0e52ef58f3");
         modelStaffMembers.setIdRole(2);
@@ -63,7 +64,7 @@ public class RunApp extends Application {
 
         GlobalController.setStaffUserModel(modelMembers);
         Node loginFXML = Loader.Load(
-                "login.fxml",
+                "dashboard.fxml",
                 "Login",
                 true
         );

@@ -21,27 +21,26 @@ import org.kordamp.ikonli.javafx.FontIcon;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.ResourceBundle;
+import java.util.concurrent.CompletableFuture;
 
 public class DashboardController implements Initializable {
-    // Containers
     @FXML
-    private GridPane rootPane;
+    private GridPane boxDashboard;
     @FXML
-    private ScrollPane content;
+    private ScrollPane scrollPaneContent;
 
-    // Controls
     @FXML
-    private ImageView logo;
+    private ImageView imageViewLogo;
     @FXML
-    private Label section;
+    private Label labelSection;
     @FXML
-    private ImageView userImage;
+    private ImageView imageViewUser;
     @FXML
-    private Label nombres;
+    private Label labelStaffName;
     @FXML
-    private FontIcon fingerprintIcon;
+    private FontIcon fontIconFingerprint;
     @FXML
-    private Label fingerprintStatus;
+    private Label labelFingerprintStatus;
 
     // Routes
     @FXML
@@ -51,105 +50,126 @@ public class DashboardController implements Initializable {
     @FXML
     private HBox navSecureMode;
 
-    // User box
+    // -> check in (ci)
     @FXML
-    private HBox user_container;
+    private HBox ci_box;
     @FXML
-    private ImageView user_photo;
+    private ImageView ci_imgPhoto;
     @FXML
-    private Label user_id;
+    private Label ci_labelId;
     @FXML
-    private Label user_name;
+    private Label ci_labelName;
     @FXML
-    private Label user_gym;
+    private Label ci_labelGym;
     @FXML
-    private Label user_membership;
+    private Label ci_labelMembership;
 
-    public void showUserInfo(Styles style, byte[] photo, String idMember, String name, String gym, String membership) {
-        this.user_container.getStyleClass().setAll(GlobalController.getThemeType(), Input.styleToColor(style));
-        if (photo == null) {
-            this.user_photo.setImage(ConfigFiles.loadImage("no-user-image.png"));
-        } else {
-            this.user_photo.setImage(ConfigFiles.loadImage(photo));
+    // attributes
+    private boolean boolRoutesEnabled = true;
+    private HashMap<HBox, String> routes;
+
+    public void enableRoutes() {
+        if (!boolRoutesEnabled) {
+            for (HBox nav : routes.keySet()) {
+                nav.setDisable(false);
+            }
+            this.boolRoutesEnabled = true;
         }
+    }
 
-        this.user_id.setText(idMember);
-        this.user_name.setText(name);
-        this.user_gym.setText(gym);
-        this.user_membership.setText(membership);
+    private void disableRoutes() {
+        Loading.show();
+        for (HBox nav : routes.keySet()) {
+            nav.setDisable(true);
+        }
+        this.boolRoutesEnabled = false;
     }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         GlobalController.setDashboardController(this);
+        ConfigFiles.loadImage("no-user-image.png").thenAccept(image -> Platform.runLater(() -> this.ci_imgPhoto.setImage(image)));
+        ConfigFiles.loadImage("no-user-image.png").thenAccept(image -> Platform.runLater(() -> this.imageViewUser.setImage(image)));
+        ConfigFiles.loadImage("img.jpg").thenAccept(image -> Platform.runLater(() -> this.imageViewLogo.setImage(image)));
 
-        this.user_photo.setImage(ConfigFiles.loadImage("no-user-image.png"));
-        this.userImage.setImage(ConfigFiles.loadImage("no-user-image.png"));
-        this.logo.setImage(ConfigFiles.loadImage("img.jpg"));
-
-        // Update content
-        this.nombres.setText(GlobalController.getStaffUserModel().getName());
+        // Update scrollPaneContent
+        this.labelStaffName.setText(GlobalController.getStaffUserModel().getName());
 
         /* Routing */
-        HashMap<HBox, String> routes = new HashMap<>();
+        this.routes = new HashMap<>();
         routes.put(navSummary, "summary.fxml");
         routes.put(navMembers, "members.fxml");
-        EventHandler<MouseEvent> routeClick = new EventHandler<>() {
-            @Override
-            public void handle(MouseEvent mouseEvent) {
-                Loading.show();
-                for (HBox route : routes.keySet()) {
-                    if (route.getStyleClass().contains("selected")) {
-                        route.getStyleClass().remove("selected");
-                        route.addEventFilter(MouseEvent.MOUSE_CLICKED, this);
-                        break;
-                    }
-                }
 
-                HBox navOption = (HBox) mouseEvent.getSource();
-                navOption.getStyleClass().add("selected");
-                navOption.removeEventFilter(MouseEvent.MOUSE_CLICKED, this);
-                Node navFXML = Loader.Load(
-                        routes.get(navOption),
-                        "Dashboard",
-                        false
-                );
-                content.setContent(navFXML);
-                Input.getScrollEvent(content);
-                Fingerprint.VerifyBackgroundReader();
-            }
-        };
-        for (HBox route : routes.keySet()) {
-            if (!route.getStyleClass().contains("selected")) {
-                route.addEventFilter(MouseEvent.MOUSE_CLICKED, routeClick);
+        for (HBox navBox : routes.keySet()) {
+            if (!navBox.getStyleClass().contains("selected")) {
+                navBox.addEventFilter(MouseEvent.MOUSE_CLICKED, eventEventHandlerNav());
             }
         }
         /* End Routing */
 
         // Fingerprint
-        Fingerprint.initializeUI(this.fingerprintIcon, this.fingerprintStatus);
+        Fingerprint.initializeUI(this.fontIconFingerprint, this.labelFingerprintStatus);
 
         this.navSecureMode.setOnMouseClicked(this.eventHandlerSecureMode());
 
         Platform.runLater(() -> {
-//            Node summaryFXML = Loader.Load(
-//                    "summary.fxml",
-//                    "Dashboard",
-//                    true
-//            );
-//            this.content.setContent(summaryFXML);
-            new FadeInUp(GlobalController.getCurrentGymNode()).play();
-
-            Node members = Loader.Load(
+            Node summaryFXML = Loader.Load(
                     "members.fxml",
                     "Dashboard",
                     true
             );
-            this.content.setContent(members);
+            this.scrollPaneContent.setContent(summaryFXML);
+            new FadeInUp(GlobalController.getCurrentGymNode()).play();
         });
     }
 
+    public void showUserInfo(Styles style, byte[] photo, String idMember, String name, String gym, String membership) {
+        this.ci_box.getStyleClass().setAll(GlobalController.getThemeType(), Input.styleToColor(style));
+        if (photo == null) {
+            ConfigFiles.loadImage("no-user-image.png").thenAccept(image -> Platform.runLater(() -> this.ci_imgPhoto.setImage(image)));
+        } else {
+            ConfigFiles.loadImage(photo).thenAccept(image -> Platform.runLater(() -> this.ci_imgPhoto.setImage(image)));
+        }
+
+        this.ci_labelId.setText(idMember);
+        this.ci_labelName.setText(name);
+        this.ci_labelGym.setText(gym);
+        this.ci_labelMembership.setText(membership);
+    }
+
     // event handlers
+    private EventHandler<MouseEvent> eventEventHandlerNav() {
+        return new EventHandler<>() {
+            @Override
+            public void handle(MouseEvent mouseEvent) {
+                disableRoutes();
+                CompletableFuture.runAsync(() -> {
+                    for (HBox navBox : routes.keySet()) {
+                        if (navBox.getStyleClass().contains("selected")) {
+                            navBox.getStyleClass().remove("selected");
+                            navBox.addEventFilter(MouseEvent.MOUSE_CLICKED, this);
+                            break;
+                        }
+                    }
+
+                    HBox navBox = (HBox) mouseEvent.getSource();
+                    navBox.getStyleClass().add("selected");
+                    navBox.removeEventFilter(MouseEvent.MOUSE_CLICKED, this);
+                    Node navFXML = Loader.Load(
+                            routes.get(navBox),
+                            "Dashboard",
+                            false
+                    );
+                    Platform.runLater(() -> {
+                        scrollPaneContent.setContent(navFXML);
+                        Input.getScrollEvent(scrollPaneContent);
+                        Fingerprint.BackgroundReader();
+                    });
+                });
+            }
+        };
+    }
+
     private EventHandler<MouseEvent> eventHandlerSecureMode() {
         return mouseEvent -> {
             if (GlobalController.isSecureMode()) {
@@ -177,7 +197,7 @@ public class DashboardController implements Initializable {
                 }
             }
 
-            this.content.setDisable(GlobalController.isSecureMode());
+            this.scrollPaneContent.setDisable(GlobalController.isSecureMode());
         };
     }
 

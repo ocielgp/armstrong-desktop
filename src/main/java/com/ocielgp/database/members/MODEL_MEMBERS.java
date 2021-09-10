@@ -3,6 +3,8 @@ package com.ocielgp.database.members;
 import com.ocielgp.database.payments.MODEL_DEBTS;
 import com.ocielgp.database.payments.MODEL_PAYMENTS_MEMBERSHIPS;
 import com.ocielgp.database.staff.MODEL_STAFF_MEMBERS;
+import com.ocielgp.database.system.MODEL_GYMS;
+import com.ocielgp.utilities.Styles;
 import javafx.beans.property.*;
 
 public class MODEL_MEMBERS {
@@ -25,10 +27,14 @@ public class MODEL_MEMBERS {
     private final IntegerProperty idGym = new SimpleIntegerProperty();
 
     private final StringProperty endDate = new SimpleStringProperty();
+    private Styles style;
 
     // members
     private MODEL_MEMBERS_PHOTOS modelMembersPhotos;
     private MODEL_MEMBERS_FINGERPRINTS modelMembersFingerprints;
+
+    // gym
+    private MODEL_GYMS modelGyms;
 
     // staff
     private MODEL_STAFF_MEMBERS modelStaffMembers;
@@ -171,6 +177,14 @@ public class MODEL_MEMBERS {
         this.endDate.set(endDate);
     }
 
+    public Styles getStyle() {
+        return style;
+    }
+
+    public void setStyle(Styles style) {
+        this.style = style;
+    }
+
     public MODEL_MEMBERS_PHOTOS getModelMembersPhotos() {
         return modelMembersPhotos;
     }
@@ -185,6 +199,14 @@ public class MODEL_MEMBERS {
 
     public void setModelMembersFingerprints(MODEL_MEMBERS_FINGERPRINTS modelMembersFingerprints) {
         this.modelMembersFingerprints = modelMembersFingerprints;
+    }
+
+    public MODEL_GYMS getModelGyms() {
+        return modelGyms;
+    }
+
+    public void setModelGyms(MODEL_GYMS modelGyms) {
+        this.modelGyms = modelGyms;
     }
 
     public MODEL_STAFF_MEMBERS getModelStaffMembers() {

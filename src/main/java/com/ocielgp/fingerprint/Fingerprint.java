@@ -3,14 +3,19 @@ package com.ocielgp.fingerprint;
 import com.digitalpersona.uareu.*;
 import com.jfoenix.controls.JFXButton;
 import com.ocielgp.utilities.Notifications;
+import javafx.application.Platform;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.event.EventHandler;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import org.kordamp.ikonli.javafx.FontIcon;
 
+import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.ListIterator;
+import java.util.concurrent.CompletableFuture;
 
 public class Fingerprint {
     private static Reader reader;
@@ -30,14 +35,70 @@ public class Fingerprint {
 
     private static Capture captureFingerprint;
     private static FontIcon fingerprintIcon; // Dashboard
-    private static Label fingerprintLabel; // Dashboard
+    private static final StringProperty fingerprintStatusProperty = new SimpleStringProperty(Fingerprint.getStatusDescription()); // Dashboard
     private static FingerprintUI fingerprintUI; // Fingerprint Box Controller
     private static final EventHandler<MouseEvent> fingerprintEvent = mouseEvent -> Fingerprint.Scanner();
 
+    private static CompletableFuture<Boolean> Scan() {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                ReaderCollection readerCollection = UareUGlobal.GetReaderCollection();
+                readerCollection.GetReaders();
+                reader = readerCollection.get(0); // catch exception
+                return true;
+            } catch (UareUException ignored) {
+                return false;
+            }
+        });
+    }
+
+    public static void Scanner() {
+        Fingerprint.Scan().thenAccept(scannerConnected -> {
+            if (scannerConnected) {
+                Notifications.success("gmi-fingerprint", "Lector de Huellas", "Lector de huellas conectado", 2);
+                StartCapture();
+            } else {
+                Fingerprint.setStatusCode(0);
+                Notifications.warn("gmi-fingerprint", "Lector de Huellas", "Lector de huellas no detectado", 2);
+            }
+            RefreshDashboard();
+        });
+    }
+
     public static void initializeUI(FontIcon fontIconFingerprint, Label labelStatus) {
-        fingerprintIcon = fontIconFingerprint;
-        fingerprintLabel = labelStatus;
-        RefreshDashboard();
+        CompletableFuture.runAsync(() -> {
+            fingerprintIcon = fontIconFingerprint;
+            labelStatus.textProperty().bind(fingerprintStatusProperty);
+            RefreshDashboard();
+        });
+    }
+
+    public static void RefreshDashboard() {
+        CompletableFuture.runAsync(() -> {
+            if (fingerprintIcon != null) {
+                Platform.runLater(() -> {
+                    String styleClass;
+                    if (fingerprintStatusCode == 0) { // disconnected
+                        fingerprintIcon.addEventFilter(MouseEvent.MOUSE_CLICKED, fingerprintEvent);
+                        styleClass = "off";
+                    } else { // connected
+                        fingerprintIcon.removeEventFilter(MouseEvent.MOUSE_CLICKED, fingerprintEvent);
+                        styleClass = "on";
+                    }
+                    fingerprintIcon.getStyleClass().set(2, styleClass);
+                    fingerprintStatusProperty.set(Fingerprint.getStatusDescription());
+                });
+            }
+
+            if (fingerprintUI != null) {
+                if (fingerprintStatusCode == 0) { // disconnected
+                    fingerprintUI.restartUI();
+                    fingerprintUI.hide();
+                } else {
+                    fingerprintUI.show();
+                }
+            }
+        });
     }
 
     public static void loadFingerprints(int idMember) {
@@ -45,15 +106,16 @@ public class Fingerprint {
     }
 
     public static void setFingerprintBox(VBox container, VBox fmdContainer, Label labelCounter, JFXButton startCaptureButton, JFXButton restartCaptureButton) {
-        fingerprintUI = new FingerprintUI(container, fmdContainer, labelCounter, startCaptureButton, restartCaptureButton);
-        RefreshDashboard();
+        CompletableFuture.runAsync(() -> {
+            fingerprintUI = new FingerprintUI(container, fmdContainer, labelCounter, startCaptureButton, restartCaptureButton);
+            RefreshDashboard();
+        });
     }
 
     public static void setStatusCode(int statusCode) {
-        if (statusCode == 0) {
+        if (statusCode == 0 && captureFingerprint != null) {
             captureFingerprint.Stop();
             captureFingerprint = null;
-            Notifications.warn("gmi-fingerprint", "Lector de Huellas", "Lector de huellas desconectado", 2);
         }
         fingerprintStatusCode = statusCode;
         RefreshDashboard();
@@ -67,154 +129,129 @@ public class Fingerprint {
         return fingerprintStatusDescription[fingerprintStatusCode];
     }
 
-    private static boolean Scan() {
-        try {
-            ReaderCollection readerCollection = UareUGlobal.GetReaderCollection();
-            readerCollection.GetReaders();
-            reader = readerCollection.get(0); // Fast test to get first lector
-            return true;
-        } catch (Exception ignored) {
-            return false;
-        }
-    }
-
-    public static void Scanner() {
-        if (Scan()) {
-            Notifications.success("gmi-fingerprint", "Lector de Huellas", "Lector de huellas conectado", 2);
-            StartCapture();
-        } else {
-            fingerprintStatusCode = 0;
-            Notifications.warn("gmi-fingerprint", "Lector de Huellas", "Lector de huellas no detectado", 2);
-        }
-        RefreshDashboard();
-    }
-
     public static void StopCapture() {
-        if (captureFingerprint != null) {
-            captureFingerprint.Stop();
-            captureFingerprint = null;
+        CompletableFuture.runAsync(() -> {
+            if (captureFingerprint != null) {
+                captureFingerprint.Stop();
+                captureFingerprint = null;
 
-            if (fingerprintUI != null) {
-                fingerprintUI.resetUI();
+                if (fingerprintUI != null) {
+                    fingerprintUI.resetUI();
+                }
+                RefreshDashboard();
             }
-            RefreshDashboard();
-        }
+        });
     }
 
-    public static void VerifyBackgroundReader() { // Verify current status
-        if (fingerprintStatusCode > 1) {
+    public static void BackgroundReader() {
+        CompletableFuture.runAsync(() -> {
+            if (fingerprintStatusCode > 1) { // verify background status
+                if (captureFingerprint != null) {
+                    StopCapture();
+                }
+                captureFingerprint = Capture.Run(reader);
+                Fingerprint.setStatusCode(1);
+            }
+        });
+    }
+
+    public static void StartCapture() { // start background task
+        CompletableFuture.runAsync(() -> {
             if (captureFingerprint != null) {
                 StopCapture();
             }
             captureFingerprint = Capture.Run(reader);
-            fingerprintStatusCode = 1;
-            RefreshDashboard();
-        }
+            Fingerprint.setStatusCode(1);
+        });
     }
 
-    public static void StartCapture() { // Background task
-        if (captureFingerprint != null) {
-            StopCapture();
-        }
-        captureFingerprint = Capture.Run(reader);
-        fingerprintStatusCode = 1;
-        RefreshDashboard();
-    }
-
-    public static void StartCapture(VBox pane) { // UI task
-        if (captureFingerprint != null) {
-            StopCapture();
-        }
-        if (fingerprintStatusCode > 0 && fingerprintStatusCode != 2) {
-            captureFingerprint = Capture.Run(reader, pane);
-            fingerprintStatusCode = 2;
-            RefreshDashboard();
-        }
+    public static void StartCapture(VBox pane) { // start UI task
+        CompletableFuture.runAsync(() -> {
+            if (captureFingerprint != null) {
+                StopCapture();
+            }
+            if (fingerprintStatusCode > 0 && fingerprintStatusCode != 2) {
+                captureFingerprint = Capture.Run(reader, pane);
+                Fingerprint.setStatusCode(2);
+            }
+        });
     }
 
     public static void ResetFingerprintUI() {
-        if (fingerprintUI != null) {
-            fingerprintUI.resetUI();
-        }
-    }
-
-    public static void RestartFingerprintUI() {
-        if (fingerprintUI != null) {
-            fingerprintUI.restartUI();
-        }
-    }
-
-    public static void RefreshDashboard() {
-        if (fingerprintIcon != null && fingerprintLabel != null) {
-            String styleClass;
-            if (fingerprintStatusCode == 0) {
-                fingerprintIcon.addEventFilter(MouseEvent.MOUSE_CLICKED, fingerprintEvent);
-                styleClass = "off";
-            } else {
-                fingerprintIcon.removeEventFilter(MouseEvent.MOUSE_CLICKED, fingerprintEvent);
-                styleClass = "on";
+        CompletableFuture.runAsync(() -> {
+            if (fingerprintUI != null) {
+                fingerprintUI.resetUI();
             }
-            fingerprintIcon.getStyleClass().set(2, styleClass);
-            fingerprintLabel.setText(Fingerprint.getStatusDescription());
-        }
-
-        if (fingerprintUI != null) {
-            if (fingerprintStatusCode == 0) {
-                fingerprintUI.restartUI();
-                fingerprintUI.hide();
-            } else {
-                fingerprintUI.show();
-            }
-        }
+        });
     }
 
     public static void AddFingerprint(Fmd fmd) {
-        if (fingerprintUI != null) {
-            fingerprintUI.add(fmd);
-        }
+        CompletableFuture.runAsync(() -> {
+            if (fingerprintUI != null) {
+                fingerprintUI.add(fmd);
+            }
+        });
     }
 
-    public static boolean compareFingerprint(Fmd fmdMember) {
-        if (fingerprintUI != null) {
-            ArrayList<Fmd> fmds = fingerprintUI.getFmds();
-            Engine engine = UareUGlobal.GetEngine();
-            for (Fmd fmd : fmds) {
-                try {
-                    int falsematch_rate = engine.Compare(fmdMember, 0, fmd, 0);
+    public static CompletableFuture<Boolean> compareFingerprint(Fmd fmdMember) {
+        return CompletableFuture.supplyAsync(() -> {
+            if (fingerprintUI != null) {
+                ArrayList<Fmd> fmds = fingerprintUI.getFmds();
+                Engine engine = UareUGlobal.GetEngine();
+                for (Fmd fmd : fmds) {
+                    try {
+                        int falseMatchRate = engine.Compare(fmdMember, 0, fmd, 0);
 
-                    int target_falsematch_rate = Engine.PROBABILITY_ONE / 100000; //target rate is 0.00001
-                    if (falsematch_rate < target_falsematch_rate) {
-                        Notifications.warn("Lector de Huellas", "Esa huella ya ha sido agregada.", 2);
-                        return false;
+                        int targetFalseMatchRate = Engine.PROBABILITY_ONE / 100000; // target rate is 0.00001
+                        if (falseMatchRate < targetFalseMatchRate) {
+                            Notifications.warn("Lector de Huellas", "Esa huella ya ha sido agregada.", 2);
+                            return false;
+                        }
+                    } catch (UareUException uareUException) {
+                        Notifications.catchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], uareUException.getMessage(), uareUException);
                     }
-                } catch (UareUException e) {
-                    System.out.println("Engine.CreateFmd()" + e);
                 }
             }
-        }
-        return true;
+            return true;
+        });
     }
 
-    public static boolean compareFingerprint(Fmd fingerprint1, Fmd fingerprint2) {
-        Engine engine = UareUGlobal.GetEngine();
-        try {
-            int falsematch_rate = engine.Compare(fingerprint1, 0, fingerprint2, 0);
+    public static CompletableFuture<Boolean> compareFingerprint(Fmd fingerprint1, byte[] fingerprintFromDatabase) {
+        return CompletableFuture.supplyAsync(() -> {
+            Engine engine = UareUGlobal.GetEngine();
+            try {
+                Fmd fingerprint2 = UareUGlobal.GetImporter().ImportFmd(fingerprintFromDatabase, Fmd.Format.ANSI_378_2004, Fmd.Format.ANSI_378_2004);
+                int falseMatchRate = engine.Compare(fingerprint1, 0, fingerprint2, 0);
 
-            int target_falsematch_rate = Engine.PROBABILITY_ONE / 100000; //target rate is 0.00001
-            if (falsematch_rate < target_falsematch_rate) {
-                return true;
+                int targetFalseMatchRate = Engine.PROBABILITY_ONE / 100000; // target rate is 0.00001
+                if (falseMatchRate < targetFalseMatchRate) {
+                    return true;
+                }
+            } catch (UareUException uareUException) {
+                Notifications.catchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], uareUException.getMessage(), uareUException);
             }
-        } catch (UareUException e) {
-            System.out.println("Engine.CreateFmd()" + e);
-        }
-        return false;
+            return false;
+        });
+    }
+
+    public static CompletableFuture<Boolean> compareFingerprint(Fmd fingerprint1, Fmd fingerprint2) {
+        return CompletableFuture.supplyAsync(() -> {
+            Engine engine = UareUGlobal.GetEngine();
+            try {
+                int falseMatchRate = engine.Compare(fingerprint1, 0, fingerprint2, 0);
+
+                int targetFalseMatchRate = Engine.PROBABILITY_ONE / 100000; // target rate is 0.00001
+                if (falseMatchRate < targetFalseMatchRate) {
+                    return true;
+                }
+            } catch (UareUException uareUException) {
+                Notifications.catchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], uareUException.getMessage(), uareUException);
+            }
+            return false;
+        });
     }
 
     public static ListIterator<Fmd> getFingerprints() {
-        if (fingerprintUI != null) {
-            return fingerprintUI.getFingerprints();
-        } else {
-            return null;
-        }
+        return (fingerprintUI == null) ? null : fingerprintUI.getFingerprints();
     }
 }

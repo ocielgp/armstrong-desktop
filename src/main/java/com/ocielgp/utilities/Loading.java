@@ -2,12 +2,14 @@ package com.ocielgp.utilities;
 
 import com.jfoenix.controls.JFXSpinner;
 import com.ocielgp.app.GlobalController;
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Modality;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
@@ -29,19 +31,15 @@ public class Loading {
         stage.setScene(scene);
         stage.initModality(Modality.NONE);
         stage.initOwner(GlobalController.getPrimaryStage());
-        stage.showingProperty().addListener((observableValue, oldValue, newValue) -> {
-            if (newValue) {
-                System.out.println(stage.getX());
-                System.out.println(stage.getWidth());
-                stage.setX(stage.getX() + stage.getWidth() / 2);
-                stage.setY(stage.getY() + stage.getHeight() / 2);
-            }
-        });
     }
 
     public static void show() {
         if (!stage.isShowing()) {
-            stage.show();
+            Platform.runLater(() -> {
+                stage.show();
+                stage.setX(Screen.getPrimary().getVisualBounds().getWidth() / 2 - stage.getWidth() / 2);
+                stage.setY(Screen.getPrimary().getVisualBounds().getHeight() / 2 - stage.getHeight() / 2);
+            });
         }
     }
 

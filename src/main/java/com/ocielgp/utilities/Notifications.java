@@ -81,8 +81,11 @@ public class Notifications {
 
     static {
         stage.initModality(Modality.NONE);
-        stage.initOwner(GlobalController.getPrimaryStage());
         stage.setAlwaysOnTop(true);
+    }
+
+    public static void initializeNotificationSystem() {
+        stage.initOwner(GlobalController.getPrimaryStage());
     }
 
     public static void createNotification(String icon, String title, String content, int seconds, Styles style) {
@@ -113,8 +116,11 @@ public class Notifications {
         notificationViews.add(notificationView);
         notificationControllers.add(notificationController);
         if (notificationViews.size() == 1) {
-            threadHandler = new Timeline(scheduleNotification(Notifications.notificationControllers.getFirst().getSeconds()));
-            threadHandler.play(); // Run thread
+            // Run thread
+            Platform.runLater(() -> {
+                threadHandler = new Timeline(scheduleNotification(Notifications.notificationControllers.getFirst().getSeconds()));
+                threadHandler.play();
+            });
         }
     }
 
@@ -130,19 +136,20 @@ public class Notifications {
         scene.setFill(Color.TRANSPARENT);
         stage.setScene(scene);
         Platform.runLater(() -> {
-            stage.show(); // Calculate UI pixels
-        });
-        GlobalController.getPrimaryStage().requestFocus();
+            stage.show();
+            GlobalController.getPrimaryStage().requestFocus();
 
-        // Set new position to Stage
-        stage.setX(
-                Screen.getPrimary().getVisualBounds().getWidth() - stage.getWidth() - margin
-        );
-        stage.setY(
-                Screen.getPrimary().getVisualBounds().getHeight() - stage.getHeight() - margin
-        );
-        fadeInRight = new FadeInRight(notificationView);
-        fadeInRight.play();
+            // Set new position to Stage
+            stage.setX(
+                    Screen.getPrimary().getVisualBounds().getWidth() - stage.getWidth() - margin
+            );
+            stage.setY(
+                    Screen.getPrimary().getVisualBounds().getHeight() - stage.getHeight() - margin
+            );
+            fadeInRight = new FadeInRight(notificationView);
+            fadeInRight.play();
+        });
+
     }
 
     public static void hiddenNotification(boolean clearAll) {
@@ -181,7 +188,7 @@ public class Notifications {
     }
 
     public static void success(String title, String content, int seconds) {
-        Notifications.createNotification("gmi-check", title, content, seconds, Styles.SUCCESS);
+        Notifications.createNotification("gmi-check", title, content + ".", seconds, Styles.SUCCESS);
     }
 
     public static void success(String title, String content) {

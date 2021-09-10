@@ -7,7 +7,6 @@ import com.jfoenix.controls.JFXRadioButton;
 import com.jfoenix.controls.JFXTextField;
 import com.ocielgp.database.members.MODEL_MEMBERS;
 import com.ocielgp.files.ConfigFiles;
-import com.ocielgp.utilities.Input;
 import com.ocielgp.utilities.Loader;
 import com.ocielgp.utilities.Loading;
 import com.ocielgp.utilities.Pagination;
@@ -15,21 +14,24 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
-import javafx.scene.control.*;
+import javafx.scene.control.Label;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
 
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.concurrent.CompletableFuture;
 
 public class MembersController implements Initializable {
-    // Containers
     @FXML
     public GridPane boxMembersPane;
     @FXML
-    private ScrollPane memberPane;
+    private VBox memberPane;
 
-    // Controls
     @FXML
     private JFXTextField fieldSearch;
     @FXML
@@ -84,7 +86,6 @@ public class MembersController implements Initializable {
         this.tableColumnLastName.setCellValueFactory(new PropertyValueFactory<>("lastName"));
         this.tableColumnEndDate.setCellValueFactory(new PropertyValueFactory<>("endDate"));
 
-        this.pagination = new Pagination(this.fieldSearch, this.buttonSearch, this.labelTotalRows, this.tableViewMembers, this.fieldRowsPerPage, this.labelPreviousPage, this.labelCurrentPage, this.labelTotalPages, this.labelNextPage, Pagination.Sources.MEMBERS);
         MemberDetailController memberDetailController = new MemberDetailController(this);
         Node memberFXML = Loader.Load(
                 "memberDetail.fxml",
@@ -93,16 +94,18 @@ public class MembersController implements Initializable {
                 memberDetailController
         );
 
+        // TODO: ADD EXECUTOR SERVICE
         this.tableViewMembers.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
+                this.tableViewMembers.setDisable(true);
                 Loading.show();
-                memberDetailController.loadMember(newValue.getIdMember());
+                CompletableFuture.runAsync(() -> memberDetailController.loadMember(newValue.getIdMember()));
             }
         });
-        this.memberPane.setContent(memberFXML);
-        Input.getScrollEvent(this.memberPane);
-        memberFXML = null;
+        this.memberPane.getChildren().setAll(memberFXML);
 
+        // filters
+        this.pagination = new Pagination(this.fieldSearch, this.buttonSearch, this.labelTotalRows, this.tableViewMembers, this.fieldRowsPerPage, this.labelPreviousPage, this.labelCurrentPage, this.labelTotalPages, this.labelNextPage, Pagination.Sources.MEMBERS);
         this.checkBoxAllGyms.setSelected(Boolean.parseBoolean(ConfigFiles.readProperty(ConfigFiles.File.APP, "memberAllGyms")));
         this.checkBoxOnlyActiveMembers.setSelected(Boolean.parseBoolean(ConfigFiles.readProperty(ConfigFiles.File.APP, "memberOnlyActiveMembers")));
         this.checkBoxOnlyDebtors.setSelected(Boolean.parseBoolean(ConfigFiles.readProperty(ConfigFiles.File.APP, "memberOnlyDebtors")));
@@ -124,12 +127,20 @@ public class MembersController implements Initializable {
 
         Platform.runLater(() -> {
             new FadeIn(this.boxMembersPane).play();
-            Loading.close();
+            this.pagination.restartTable();
         });
     }
 
+    public void enableTable() {
+        this.tableViewMembers.setDisable(false);
+    }
+
+    public void disableTable() {
+        this.tableViewMembers.setDisable(true);
+    }
+
     public void refreshTable() {
-        this.pagination.loadData(1);
+        this.pagination.restartTable();
     }
 
     public void unselectTable() {

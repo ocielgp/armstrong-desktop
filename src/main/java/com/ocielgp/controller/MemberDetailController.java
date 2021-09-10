@@ -1,29 +1,33 @@
 package com.ocielgp.controller;
 
 import animatefx.animation.FadeIn;
+import animatefx.animation.FadeInUp;
+import animatefx.animation.FadeOutDown;
 import animatefx.animation.Shake;
-import com.jfoenix.controls.*;
+import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXComboBox;
+import com.jfoenix.controls.JFXTextField;
+import com.jfoenix.controls.JFXToggleButton;
 import com.ocielgp.app.GlobalController;
-import com.ocielgp.database.payments.DATA_DEBTS;
 import com.ocielgp.database.members.DATA_MEMBERS;
 import com.ocielgp.database.members.DATA_MEMBERS_FINGERPRINTS;
 import com.ocielgp.database.members.DATA_MEMBERS_PHOTOS;
 import com.ocielgp.database.members.MODEL_MEMBERS;
 import com.ocielgp.database.memeberships.DATA_MEMBERSHIPS;
 import com.ocielgp.database.memeberships.MODEL_MEMBERSHIPS;
-import com.ocielgp.database.payments.MODEL_DEBTS;
+import com.ocielgp.database.payments.DATA_DEBTS;
 import com.ocielgp.database.payments.DATA_PAYMENTS_MEMBERSHIPS;
+import com.ocielgp.database.payments.MODEL_DEBTS;
 import com.ocielgp.database.system.DATA_GYMS;
 import com.ocielgp.fingerprint.Fingerprint;
 import com.ocielgp.utilities.*;
 import javafx.application.Platform;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
@@ -33,13 +37,13 @@ import java.net.URL;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
+import java.util.concurrent.CompletableFuture;
 
 public class MemberDetailController implements Initializable {
-    // Containers
     @FXML
     private VBox boxMemberDetails;
+    private final MembersController membersController;
 
-    // Controls
     // -> Title section [t]
     @FXML
     private HBox titlePane;
@@ -83,7 +87,7 @@ public class MemberDetailController implements Initializable {
     @FXML
     private JFXTextField pi_fieldLastName;
     @FXML
-    JFXComboBox<String> pi_comboBoxGender;
+    private ScrollPane scrollPane;
     @FXML
     private JFXTextField pi_fieldPhone;
     @FXML
@@ -137,116 +141,144 @@ public class MemberDetailController implements Initializable {
 
     // Attributes
     private PhotoHandler photoHandler;
-    private MembersController rootController;
-    private MODEL_MEMBERS modelMembers;
-    BooleanUpdater booleanUpdater;
+    @FXML
+    private JFXComboBox<String> pi_comboBoxGender;
+    private MODEL_MEMBERS modelMembers = null;
+    private BooleanUpdater booleanUpdater;
 
-
-    public MemberDetailController(MembersController rootController) {
-        this.rootController = rootController;
-    }
-
-    public MemberDetailController(MembersController rootController, int idMember) { // TODO: LOAD MEMBER DATA TO FORM
-        this.rootController = rootController;
+    public MemberDetailController(MembersController membersController) {
+        this.membersController = membersController;
     }
 
     public void loadMember(int idMember) {
-        MODEL_MEMBERS modelMembers = DATA_MEMBERS.ReadMember(idMember);
-        modelMembers.setIdMember(idMember);
-        modelMembers.setModelPaymentsMemberships(DATA_PAYMENTS_MEMBERSHIPS.getLastPayment(idMember));
-        this.initForm(modelMembers);
+        FadeOutDown fadeOutDown = new FadeOutDown(this.scrollPane);
+        fadeOutDown.setOnFinished(actionEvent -> {
+//            this.scrollPane.setVvalue(0.0);
+            if (this.modelMembers != null) {
+                this.clearForm(false);
+            }
+            DATA_MEMBERS.ReadMember(idMember).thenAccept(model_members -> {
+                this.modelMembers = model_members;
+                this.modelMembers.setIdMember(idMember);
+            }).thenRunAsync(() -> DATA_PAYMENTS_MEMBERSHIPS.getLastPayment(idMember).thenAccept(model_payments_memberships -> {
+                this.modelMembers.setModelPaymentsMemberships(model_payments_memberships);
+                if (model_payments_memberships == null) {
+                    DATA_GYMS.ReadGym(this.modelMembers.getIdGym())
+                            .thenAccept(model_gyms -> {
+                                this.modelMembers.setModelGyms(model_gyms);
+                                this.initForm();
+                            });
+                } else {
+                    DATA_MEMBERS.ReadMember(model_payments_memberships.getIdStaff()).thenAccept(model_members -> {
+                        DATA_GYMS.ReadGym(model_payments_memberships.getIdGym()).thenAccept(model_gyms -> {
+                            this.modelMembers.setModelGyms(model_gyms);
+                            Platform.runLater(() -> this.qv_staffName.setText(model_members.getName() + " " + model_members.getLastName()));
+                            this.initForm();
+                        });
+                    });
+                }
+            }));
+        });
+        Platform.runLater(fadeOutDown::play);
     }
 
-    private void initForm(MODEL_MEMBERS modelMembers) {
+    private void initForm() {
         if (this.modelMembers != null) {
-            this.clearForm(false);
+            Platform.runLater(() -> {
+                // Init form
+                this.titlePane.getStyleClass().set(0, Input.styleToColor(DATA_MEMBERS.ReadStyle(this.modelMembers.getIdMember())));
+                this.t_labelTitle.setText("[ " + this.modelMembers.getIdMember() + " ] " + this.modelMembers.getName().toUpperCase());
+
+                // quick view
+                this.qv_labelRegistrationDate.setText(
+                        DateFormatter.getDateWithDayName(
+                                LocalDate.parse(this.modelMembers.getRegistrationDate())
+                        )
+                );
+                if (this.modelMembers.getModelPaymentsMemberships() != null) {
+                    this.qv_labelLastPayment.setText(
+                            DateFormatter.getDateWithDayName(
+                                    LocalDate.parse(this.modelMembers.getModelPaymentsMemberships().getStartDate())
+                            )
+                    );
+                } else {
+                    this.qv_labelLastPayment.setText("N / A");
+                }
+                this.qv_labelGym.setText(this.modelMembers.getModelGyms().getName());
+                this.quickViewPane.setVisible(true);
+
+
+                // Shortcut
+                this.initButtonAccess();
+                this.sh_buttonAccess.setOnAction(this.eventHandlerAccess());
+
+                this.sh_buttonPayDebt.setVisible(Styles.CREATIVE == Input.colorToStyle(this.titlePane.getStyleClass().get(0)));
+                this.shortcutPane.setVisible(true);
+
+                // Photo
+                this.photoHandler.setPhoto(this.modelMembers.getModelMembersPhotos().getPhoto());
+
+                // Personal information
+                this.pi_fieldName.setText(this.modelMembers.getName());
+                this.pi_fieldLastName.setText(this.modelMembers.getLastName());
+                this.pi_comboBoxGender.getSelectionModel().select(this.modelMembers.getGender());
+                this.pi_fieldPhone.setText(this.modelMembers.getPhone());
+                this.pi_fieldEmail.setText(this.modelMembers.getEmail());
+                this.pi_fieldNotes.setText(this.modelMembers.getNotes());
+
+                // Fingerprint
+                // TODO: ADD SUPPORT
+                Fingerprint.loadFingerprints(this.modelMembers.getIdMember());
+
+                // Membership
+                if (this.modelMembers.getModelPaymentsMemberships() != null) {
+                    this.initRenewMembership();
+
+                    this.ms_comboBoxMemberships.setDisable(true);
+                    this.ms_boxRenewMembership.setVisible(true);
+
+                    this.selectPreviousMembership();
+                    this.ms_labelEndDate.setText(
+                            DateFormatter.getDateWithDayName(LocalDate.parse(this.modelMembers.getModelPaymentsMemberships().getEndDate()
+                            ))
+                    );
+                    this.ms_boxEndDate.setVisible(true);
+                }
+
+                if (this.ms_comboBoxMemberships.getSelectionModel().getSelectedIndex() == -1) {
+                    Notifications.warn("Sin membresía", "Última membresía no encontrada.");
+                }
+
+                this.pym_boxPayment.setVisible(false);
+                this.pym_boxPayment.setDisable(false);
+
+                Loading.close();
+                this.membersController.enableTable();
+                new FadeInUp(this.scrollPane).play();
+                this.boxMemberDetails.requestFocus();
+
+                // End buttons
+                this.buttonAction.setText("Guardar cambios");
+                this.buttonAction.setDisable(true);
+                this.buttonCancel.setText("Cancelar");
+
+                this.booleanUpdater.setListener(true);
+            });
         }
-        this.modelMembers = modelMembers;
-
-        // Init form
-        this.titlePane.getStyleClass().set(0, Input.styleToColor(DATA_MEMBERS.ReadStyle(this.modelMembers.getIdMember())));
-        this.t_labelTitle.setText("[ " + this.modelMembers.getIdMember() + " ] " + this.modelMembers.getName().toUpperCase());
-
-        // Quick view
-        this.qv_labelRegistrationDate.setText(
-                DateFormatter.getDateWithDayName(
-                        LocalDate.parse(this.modelMembers.getRegistrationDate())
-                )
-        );
-        if (this.modelMembers.getModelPaymentsMemberships() != null) {
-            this.qv_labelGym.setText(DATA_GYMS.ReadGym(this.modelMembers.getModelPaymentsMemberships().getIdGym()).getName());
-            this.qv_labelLastPayment.setText(
-                    DateFormatter.getDateWithDayName(
-                            LocalDate.parse(this.modelMembers.getModelPaymentsMemberships().getStartDate())
-                    )
-            );
-            MODEL_MEMBERS staffMember = DATA_MEMBERS.ReadMember(this.modelMembers.getModelPaymentsMemberships().getIdStaff());
-            this.qv_staffName.setText("[ " + staffMember.getIdMember() + " ] " + staffMember.getName() + " " + staffMember.getLastName());
-        } else {
-            this.qv_labelLastPayment.setText("N / A");
-            this.qv_labelGym.setText(DATA_GYMS.ReadGym(this.modelMembers.getIdGym()).getName());
-        }
-        this.quickViewPane.setVisible(true);
-
-
-        // Shortcut
-        this.initButtonAccess();
-        this.sh_buttonAccess.setOnAction(this.eventHandlerAccess());
-
-        // TODO ADD DIALOG TO THIS
-        if (Styles.CREATIVE == Input.colorToStyle(this.titlePane.getStyleClass().get(0))) {
-            this.sh_buttonPayDebt.setVisible(true);
-        } else {
-            this.sh_buttonPayDebt.setVisible(false);
-        }
-        this.shortcutPane.setVisible(true);
-
-        // Photo
-        this.photoHandler.setPhoto(this.modelMembers.getModelMembersPhotos().getPhoto());
-
-        // Personal information
-        this.pi_fieldName.setText(this.modelMembers.getName());
-        this.pi_fieldLastName.setText(this.modelMembers.getLastName());
-        this.pi_comboBoxGender.getSelectionModel().select(this.modelMembers.getGender());
-        this.pi_fieldPhone.setText(this.modelMembers.getPhone());
-        this.pi_fieldEmail.setText(this.modelMembers.getEmail());
-        this.pi_fieldNotes.setText(this.modelMembers.getNotes());
-
-        // Fingerprint
-        // TODO: ADD SUPPORT
-        Fingerprint.loadFingerprints(this.modelMembers.getIdMember());
-
-        // Membership
-        if (this.modelMembers.getModelPaymentsMemberships() != null) {
-            this.initRenewMembership();
-
-            this.ms_comboBoxMemberships.setDisable(true);
-            this.ms_boxRenewMembership.setVisible(true);
-
-            this.selectPreviousMembership();
-
-            this.ms_labelEndDate.setText(DateFormatter.getDateWithDayName(LocalDate.parse(this.modelMembers.getModelPaymentsMemberships().getEndDate())));
-            this.ms_boxEndDate.setVisible(true);
-        }
-
-        if (this.ms_comboBoxMemberships.getSelectionModel().getSelectedIndex() == -1) {
-            Notifications.warn("Sin membresía", "Última membresía no encontrada.");
-        }
-
-        this.pym_boxPayment.setVisible(false);
-        this.pym_boxPayment.setDisable(false);
-
-        new FadeIn(this.boxMemberDetails).play();
-        this.booleanUpdater.setListener(true);
-
-        // End buttons
-        this.buttonAction.setText("Guardar cambios");
-        this.buttonAction.setDisable(true);
-        this.buttonCancel.setText("Cancelar");
     }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        Input.getScrollEvent(this.scrollPane);
+        this.scrollPane.opacityProperty().addListener(((observableValue, oldValue, newValue) -> {
+            if (this.modelMembers != null) {
+                if (newValue.doubleValue() > 0) {
+                    this.scrollPane.setVvalue(1d);
+                }
+            } else {
+                this.scrollPane.setVvalue(0d);
+            }
+        }));
         this.booleanUpdater = new BooleanUpdater(this.buttonAction);
         booleanUpdater.add("photo");
         booleanUpdater.add("name");
@@ -284,15 +316,18 @@ public class MemberDetailController implements Initializable {
         this.sh_buttonPayDebt.setOnAction(this.eventHandlerPayDebt()); // TODO
 
         // Photo section
-        this.photoHandler = new PhotoHandler(this.ph_imgMemberPhoto, this.ph_buttonUploadPhoto, this.ph_buttonDeletePhoto);
+        this.photoHandler = new PhotoHandler(this.booleanUpdater, this.ph_imgMemberPhoto, this.ph_buttonUploadPhoto, this.ph_buttonDeletePhoto);
 
         // Personal information
-        this.pi_comboBoxGender.setItems(FXCollections.observableArrayList("Hombre", "Mujer")); // Genders
+
+        DATA_MEMBERS.ReadGenders().thenAccept(genders -> {
+            this.pi_comboBoxGender.setItems(genders);
+        });
         this.pi_comboBoxGender.setOnKeyPressed(keyEvent -> {
             if (keyEvent.getCode() == KeyCode.H) {
-                this.pi_comboBoxGender.getSelectionModel().select("Hombre");
+                this.pi_comboBoxGender.getSelectionModel().select(0);
             } else if (keyEvent.getCode() == KeyCode.M) {
-                this.pi_comboBoxGender.getSelectionModel().select("Mujer");
+                this.pi_comboBoxGender.getSelectionModel().select(1);
             }
         });
 
@@ -350,10 +385,9 @@ public class MemberDetailController implements Initializable {
 //            }
 //        });
 
-        ObservableList<MODEL_MEMBERSHIPS> memberships = DATA_MEMBERSHIPS.ReadMemberships(); // Load data plans to combobox
-        if (memberships != null) {
-            this.ms_comboBoxMemberships.setItems(memberships);
-        }
+        DATA_MEMBERSHIPS.ReadMemberships().thenAccept(model_memberships -> {
+            this.ms_comboBoxMemberships.setItems(model_memberships);
+        });
 
         // Payment section
         Input.createVisibleProperty(this.pym_boxPayment);
@@ -387,13 +421,13 @@ public class MemberDetailController implements Initializable {
         });
 
         // End buttons section
-        this.buttonAction.setOnAction(this.eventHandlerRegister());
+        this.buttonAction.setOnAction(actionEvent -> CompletableFuture.runAsync(this::eventHandlerRegister));
         this.buttonCancel.setOnAction((actionEvent) -> {
             this.clearForm(true);
-            this.rootController.unselectTable();
+            this.membersController.unselectTable();
         });
 
-        Platform.runLater(() -> new FadeIn(this.rootController.boxMembersPane));
+        Platform.runLater(() -> new FadeIn(this.membersController.boxMembersPane));
     }
 
     private void paymentChanges(boolean visible) {
@@ -413,43 +447,41 @@ public class MemberDetailController implements Initializable {
     }
 
     private void clearForm(boolean animation) {
-        this.modelMembers = null;
-        this.booleanUpdater.setListener(false);
-        this.titlePane.getStyleClass().set(0, "default-style");
-        this.t_labelTitle.setText("NUEVO SOCIO");
+        Platform.runLater(() -> {
+            this.modelMembers = null;
+            this.booleanUpdater.setListener(false);
+            this.titlePane.getStyleClass().set(0, "default-style");
+            this.t_labelTitle.setText("NUEVO SOCIO");
 
-        this.quickViewPane.setVisible(false);
-        this.shortcutPane.setVisible(false);
+            this.quickViewPane.setVisible(false);
+            this.shortcutPane.setVisible(false);
 
-        this.photoHandler.resetHandler();
+            this.photoHandler.resetHandler();
 
-        Fingerprint.ResetFingerprintUI();
+            Fingerprint.ResetFingerprintUI();
 
-        Input.clearInputs(
-                this.pi_fieldName,
-                this.pi_fieldLastName,
-                this.pi_comboBoxGender,
-                (this.pi_fieldPhone.getText().isEmpty()) ? null : this.pi_fieldPhone,
-                (this.pi_fieldEmail.getText().isEmpty()) ? null : this.pi_fieldEmail,
-                (this.pi_fieldNotes.getText().isEmpty()) ? null : this.pi_fieldNotes,
-                this.ms_comboBoxMemberships
-        );
+            Input.clearInputs(
+                    this.pi_fieldName,
+                    this.pi_fieldLastName,
+                    this.pi_comboBoxGender,
+                    (this.pi_fieldPhone.getText().isEmpty()) ? null : this.pi_fieldPhone,
+                    (this.pi_fieldEmail.getText().isEmpty()) ? null : this.pi_fieldEmail,
+                    (this.pi_fieldNotes.getText().isEmpty()) ? null : this.pi_fieldNotes,
+                    this.ms_comboBoxMemberships
+            );
 
-        this.ms_comboBoxMemberships.setDisable(false);
-        this.ms_boxEndDate.setVisible(false);
-        this.restartRenewMembership(true);
+            this.ms_comboBoxMemberships.setDisable(false);
+            this.ms_boxEndDate.setVisible(false);
+            this.restartRenewMembership(true);
 
-        this.buttonAction.setText("Registrar");
-        this.buttonAction.setDisable(false);
-        this.buttonCancel.setText("Limpiar");
+            this.buttonAction.setText("Registrar");
+            this.buttonAction.setDisable(false);
+            this.buttonCancel.setText("Limpiar");
 
-        if (animation) {
-            new FadeIn(this.boxMemberDetails).play();
-        }
-
-
-//        this.pym_boxPayment.setVisible(true);
-//        this.pym_togglePayment.setSelected(true);
+            if (animation) {
+                new FadeInUp(this.scrollPane).play();
+            }
+        });
     }
 
     // Init shortcut pane
@@ -466,163 +498,164 @@ public class MemberDetailController implements Initializable {
     }
 
     // Event Handlers
-    private EventHandler<ActionEvent> eventHandlerRegister() {
-        return actionEvent -> {
-            ArrayList<InputDetails> nodesRequired = new ArrayList<>();
-            // Personal information section
+    private void eventHandlerRegister() {
+        ArrayList<InputDetails> nodesRequired = new ArrayList<>();
+        // Personal information section
+        nodesRequired.add(new InputDetails(this.pi_fieldName, this.pi_fieldName.getText()));
+        nodesRequired.add(new InputDetails(this.pi_fieldLastName, this.pi_fieldLastName.getText()));
+        nodesRequired.add(new InputDetails(this.pi_comboBoxGender, String.valueOf(this.pi_comboBoxGender.getSelectionModel().getSelectedIndex())));
+        nodesRequired.add(new InputDetails(GlobalController.getCurrentGymNode(), String.valueOf(GlobalController.getCurrentGymNode().getSelectionModel().getSelectedIndex())));
+
+        // Plan section
+        nodesRequired.add(new InputDetails(this.ms_comboBoxMemberships, String.valueOf(this.ms_comboBoxMemberships.getSelectionModel().getSelectedIndex())));
+
+        // Payment section
+        if (!pym_togglePayment.isSelected()) {
+            nodesRequired.add(new InputDetails(this.pym_fieldPaidOut, this.pym_fieldPaidOut.getText()));
+        }
+
+        Boolean formValid = Validator.emptyValidator(nodesRequired.listIterator());
+        if (formValid) { // Text validator
+            nodesRequired.clear();
             nodesRequired.add(new InputDetails(this.pi_fieldName, this.pi_fieldName.getText()));
             nodesRequired.add(new InputDetails(this.pi_fieldLastName, this.pi_fieldLastName.getText()));
-            nodesRequired.add(new InputDetails(this.pi_comboBoxGender, String.valueOf(this.pi_comboBoxGender.getSelectionModel().getSelectedIndex())));
-            nodesRequired.add(new InputDetails(GlobalController.getCurrentGymNode(), String.valueOf(GlobalController.getCurrentGymNode().getSelectionModel().getSelectedIndex())));
+            formValid = Validator.textValidator(nodesRequired.listIterator());
 
-            // Plan section
-            nodesRequired.add(new InputDetails(this.ms_comboBoxMemberships, String.valueOf(this.ms_comboBoxMemberships.getSelectionModel().getSelectedIndex())));
-
-            // Payment section
-            if (!pym_togglePayment.isSelected()) {
-                nodesRequired.add(new InputDetails(this.pym_fieldPaidOut, this.pym_fieldPaidOut.getText()));
+            if (formValid) { // Number validator
+                if (this.pi_fieldPhone.getText().length() != 0) { // Phone validator
+                    formValid = Validator.phoneValidator(new InputDetails(this.pi_fieldPhone, this.pi_fieldPhone.getText()));
+                }
             }
 
-            Boolean formValid = Validator.emptyValidator(nodesRequired.listIterator());
-            if (formValid) { // Text validator
+            if (formValid) {
+                if (this.pi_fieldEmail.getText().length() != 0) { // Email validator
+                    formValid = Validator.emailValidator(new InputDetails(this.pi_fieldEmail, this.pi_fieldEmail.getText()));
+                }
+            }
+
+            if (formValid) { // Money validator
                 nodesRequired.clear();
-                nodesRequired.add(new InputDetails(this.pi_fieldName, this.pi_fieldName.getText()));
-                nodesRequired.add(new InputDetails(this.pi_fieldLastName, this.pi_fieldLastName.getText()));
-                formValid = Validator.textValidator(nodesRequired.listIterator());
+                if (!this.pym_togglePayment.isSelected()) {
+                    nodesRequired.add(new InputDetails(this.pym_fieldPaidOut, this.pym_fieldPaidOut.getText()));
+                }
+                formValid = Validator.moneyValidator(nodesRequired.listIterator());
+            }
 
-                if (formValid) { // Number validator
-                    if (this.pi_fieldPhone.getText().length() != 0) { // Phone validator
-                        formValid = Validator.phoneValidator(new InputDetails(this.pi_fieldPhone, this.pi_fieldPhone.getText()));
+            if (formValid) { // Form 100% valid
+
+                MODEL_MEMBERS memberModel = new MODEL_MEMBERS();
+                memberModel.setName(Input.capitalizeFirstLetterPerWord(this.pi_fieldName.getText()));
+                memberModel.setLastName(Input.capitalizeFirstLetterPerWord(this.pi_fieldLastName.getText()));
+                memberModel.setGender(this.pi_comboBoxGender.getSelectionModel().getSelectedItem());
+
+                memberModel.setPhone(Input.spaceRemover(this.pi_fieldPhone.getText()));
+                memberModel.setEmail(Input.spaceRemover(this.pi_fieldEmail.getText()));
+                memberModel.setNotes(Input.capitalizeFirstLetter(this.pi_fieldNotes.getText()));
+                memberModel.setIdGym(GlobalController.getCurrentGym().getIdGym());
+
+                // Membership
+                MODEL_MEMBERSHIPS modelMemberships;
+                modelMemberships = this.ms_comboBoxMemberships.getSelectionModel().getSelectedItem();
+
+                // Payment
+                MODEL_DEBTS modelDebts = null;
+                if (!this.pym_togglePayment.isSelected()) { // !false
+                    double paidOut = Double.parseDouble(this.pym_fieldPaidOut.getText());
+                    double owe = Double.parseDouble(this.pym_fieldOwe.getText());
+
+                    if (owe == 0) {
+                        formValid = false;
+                        Notifications.danger("Error", "Se trata de un pago completo, no hay deuda.");
+                        Validator.shakeInput(this.pym_fieldPaidOut);
+                    } else if (owe < 0) {
+                        formValid = false;
+                        Notifications.danger("Error", "La deuda es mayor al total a pagar.");
+                        Validator.shakeInput(this.pym_fieldPaidOut);
+                    } else {
+                        modelDebts = new MODEL_DEBTS();
+                        modelDebts.setPaidOut(paidOut);
+                        modelDebts.setOwe(owe);
+                        modelDebts.setAmount(1);
+                        modelDebts.setDescription(modelMemberships.getDescription() + " (" + modelMemberships.getDays() + ") días");
                     }
                 }
 
-                if (formValid) {
-                    if (this.pi_fieldEmail.getText().length() != 0) { // Email validator
-                        formValid = Validator.emailValidator(new InputDetails(this.pi_fieldEmail, this.pi_fieldEmail.getText()));
-                    }
-                }
-
-                if (formValid) { // Money validator
-                    nodesRequired.clear();
-                    if (!this.pym_togglePayment.isSelected()) {
-                        nodesRequired.add(new InputDetails(this.pym_fieldPaidOut, this.pym_fieldPaidOut.getText()));
-                    }
-                    formValid = Validator.moneyValidator(nodesRequired.listIterator());
-                }
-
-                if (formValid) { // Form 100% valid
-
-                    MODEL_MEMBERS memberModel = new MODEL_MEMBERS();
-                    memberModel.setName(Input.capitalizeFirstLetterPerWord(this.pi_fieldName.getText()));
-                    memberModel.setLastName(Input.capitalizeFirstLetterPerWord(this.pi_fieldLastName.getText()));
-                    memberModel.setGender(this.pi_comboBoxGender.getSelectionModel().getSelectedItem());
-
-                    memberModel.setPhone(Input.spaceRemover(this.pi_fieldPhone.getText()));
-                    memberModel.setEmail(Input.spaceRemover(this.pi_fieldEmail.getText()));
-                    memberModel.setNotes(Input.capitalizeFirstLetter(this.pi_fieldNotes.getText()));
-                    memberModel.setIdGym(GlobalController.getCurrentGym().getIdGym());
-
-                    // Membership
-                    MODEL_MEMBERSHIPS modelMemberships;
-                    modelMemberships = this.ms_comboBoxMemberships.getSelectionModel().getSelectedItem();
-
-                    // Payment
-                    MODEL_DEBTS modelDebts = null;
-                    if (!this.pym_togglePayment.isSelected()) { // !false
-                        double paidOut = Double.parseDouble(this.pym_fieldPaidOut.getText());
-                        double owe = Double.parseDouble(this.pym_fieldOwe.getText());
-
-                        if (owe == 0) {
-                            formValid = false;
-                            Notifications.danger("Error", "Se trata de un pago completo, no hay deuda.");
-                            Validator.shakeInput(this.pym_fieldPaidOut);
-                        } else if (owe < 0) {
-                            formValid = false;
-                            Notifications.danger("Error", "La deuda es mayor al total a pagar.");
-                            Validator.shakeInput(this.pym_fieldPaidOut);
-                        } else {
-                            modelDebts = new MODEL_DEBTS();
-                            modelDebts.setPaidOut(paidOut);
-                            modelDebts.setOwe(owe);
-                            modelDebts.setAmount(1);
-                            modelDebts.setDescription(modelMemberships.getDescription() + " (" + modelMemberships.getDays() + ") días");
+                if (formValid) { // Save into data server
+                    MODEL_DEBTS finalModelDebts = modelDebts;
+                    if (this.booleanUpdater.isListener()) {
+                        if (this.booleanUpdater.isChanged("photo")) {
+                            DATA_MEMBERS_PHOTOS.UpdatePhoto(this.modelMembers.getIdMember(), this.photoHandler.getPhoto());
                         }
-                    }
+                        if (this.booleanUpdater.isChanged("name")) {
+                            DATA_MEMBERS.UpdateName(this.modelMembers.getIdMember(), memberModel.getName());
+                        }
 
-                    if (formValid) { // Save into data server
-                        if (this.booleanUpdater.isListener()) {
-                            boolean flag = true;
-                            if (!this.booleanUpdater.getBool("photo")) {
-                                flag = DATA_MEMBERS_PHOTOS.UpdatePhoto(this.modelMembers.getIdMember(), this.photoHandler.getPhoto());
-                            }
-                            if (flag && !this.booleanUpdater.getBool("name")) {
-                                flag = DATA_MEMBERS.UpdateName(this.modelMembers.getIdMember(), memberModel.getName());
-                            }
-                            if (flag && this.booleanUpdater.getBool("lastName")) {
-                                flag = DATA_MEMBERS.UpdateLastName(this.modelMembers.getIdMember(), memberModel.getLastName());
-                            }
-                            if (flag && !this.booleanUpdater.getBool("gender")) {
-                                flag = DATA_MEMBERS.UpdateGender(this.modelMembers.getIdMember(), memberModel.getGender());
-                            }
-                            if (flag && !this.booleanUpdater.getBool("phone")) {
-                                flag = DATA_MEMBERS.UpdatePhone(this.modelMembers.getIdMember(), memberModel.getPhone());
-                            }
-                            if (flag && !this.booleanUpdater.getBool("email")) {
-                                flag = DATA_MEMBERS.UpdateEmail(this.modelMembers.getIdMember(), memberModel.getEmail());
-                            }
-                            if (flag && !this.booleanUpdater.getBool("notes")) {
-                                flag = DATA_MEMBERS.UpdateNotes(this.modelMembers.getIdMember(), memberModel.getNotes());
-                            }
-                            if (flag && !this.booleanUpdater.getBool("fingerprint")) {
+                        if (this.booleanUpdater.isChanged("lastName")) {
+                            DATA_MEMBERS.UpdateLastName(this.modelMembers.getIdMember(), memberModel.getLastName());
+                        }
+                        if (this.booleanUpdater.isChanged("gender")) {
+                            DATA_MEMBERS.UpdateGender(this.modelMembers.getIdMember(), memberModel.getGender());
+                        }
+                        if (this.booleanUpdater.isChanged("phone")) {
+                            DATA_MEMBERS.UpdatePhone(this.modelMembers.getIdMember(), memberModel.getPhone());
+                        }
+                        if (this.booleanUpdater.isChanged("email")) {
+                            DATA_MEMBERS.UpdateEmail(this.modelMembers.getIdMember(), memberModel.getEmail());
+                        }
+                        if (this.booleanUpdater.isChanged("notes")) {
+                            DATA_MEMBERS.UpdateNotes(this.modelMembers.getIdMember(), memberModel.getNotes());
+                        }
+                        if (this.booleanUpdater.isChanged("fingerprint")) {
 //                                flag =
-                            }
-                            if (flag && !this.booleanUpdater.getBool("renewMembership")) {
-                                int idLastMembership = DATA_PAYMENTS_MEMBERSHIPS.CreatePaymentMembership(this.modelMembers.getIdMember(), modelMemberships);
-                                if (modelDebts != null && idLastMembership > 0) {
-                                    DATA_DEBTS.CreateDebt(modelDebts, this.modelMembers.getIdMember(), 1);
+                        }
+                        if (this.booleanUpdater.isChanged("renewMembership")) {
+                            DATA_PAYMENTS_MEMBERSHIPS.CreatePaymentMembership(this.modelMembers.getIdMember(), modelMemberships).thenAccept(idPaymentMembership -> {
+                                if (finalModelDebts != null && idPaymentMembership > 0) {
+                                    DATA_DEBTS.CreateDebt(finalModelDebts, this.modelMembers.getIdMember(), 1);
                                 }
-                            } else if (flag && !this.booleanUpdater.getBool("changeMembership") && this.modelMembers.getModelPaymentsMemberships() != null) {
-                                DATA_MEMBERSHIPS.UpdateMembership(this.modelMembers.getIdMember(), modelMemberships);
-                                if (modelDebts != null) {
-                                    DATA_DEBTS.CreateDebt(modelDebts, this.modelMembers.getIdMember(), 1);
-                                }
+                            });
+                        } else if (this.booleanUpdater.isChanged("changeMembership") && this.modelMembers.getModelPaymentsMemberships() != null) {
+                            DATA_MEMBERSHIPS.UpdateMembership(this.modelMembers.getIdMember(), modelMemberships);
+                            if (modelDebts != null) {
+                                DATA_DEBTS.CreateDebt(modelDebts, this.modelMembers.getIdMember(), 1);
                             }
-                            if (flag) {
-                                Notifications.success("Guardar cambios", "La información de " + memberModel.getName() + " ha sido actualizada.");
-                            } else {
-                                Notifications.danger("Guardar cambios", "Parte de la información no se pudo guardar.");
-                            }
-                        } else {
-                            System.out.println("All is good");
-                            int idMember = DATA_MEMBERS.CreateMember(memberModel);
+                        }
+                        Notifications.success("Información actualizada", "[ " + this.modelMembers.getIdMember() + " ] " + memberModel.getName() + " información actualizada.");
+                    } else {
+                        MODEL_MEMBERSHIPS finalModelMemberships = modelMemberships;
+                        MODEL_MEMBERS finalMemberModel = memberModel;
+                        DATA_MEMBERS.CreateMember(memberModel).thenAccept(idMember -> {
                             if (idMember > 0) {
-                                // TODO AFTER MEMBER IS CREATED, DO THIS
                                 DATA_MEMBERS_PHOTOS.CreatePhoto(idMember, photoHandler.getPhoto());
                                 DATA_MEMBERS_FINGERPRINTS.InsertFingerprints(idMember, Fingerprint.getFingerprints());
+                                DATA_PAYMENTS_MEMBERSHIPS.CreatePaymentMembership(idMember, finalModelMemberships).thenAccept(idLastMembership -> {
+                                    if (finalModelDebts != null && idLastMembership > 0) {
+                                        DATA_DEBTS.CreateDebt(finalModelDebts, idMember, 1);
+                                    }
+                                });
 
-                                int idLastMembership = DATA_PAYMENTS_MEMBERSHIPS.CreatePaymentMembership(idMember, modelMemberships);
-                                // TODO: CREATE PENDING PAYMENTS
-                                if (modelDebts != null && idLastMembership > 0) {
-                                    DATA_DEBTS.CreateDebt(modelDebts, idMember, 1);
-                                }
-
-                                Notifications.success("Nuevo miembro", memberModel.getName() + " ha sido registrado.");
+                                Notifications.success("Nuevo socio", "[ " + idMember + " ] " + finalMemberModel.getName() + " ha sido registrado.");
                             }
-                        }
-
-                        this.rootController.refreshTable();
-                        this.clearForm(true);
-
-                        // Clear memory data
-                        nodesRequired = null;
-                        formValid = null;
-                        memberModel = null;
-                        modelMemberships = null;
-                        modelDebts = null;
+                        });
                     }
+
+                    FadeOutDown fadeOutDown = new FadeOutDown(this.scrollPane);
+                    fadeOutDown.setOnFinished(actionEvent -> {
+                        this.clearForm(true);
+                        this.membersController.refreshTable();
+                    });
+                    this.membersController.disableTable();
+                    fadeOutDown.play();
+
+                    // Clear memory data
+                    nodesRequired = null;
+                    formValid = null;
+                    memberModel = null;
+                    modelMemberships = null;
+                    modelDebts = null;
                 }
             }
-        };
+        }
     }
 
     private EventHandler<ActionEvent> eventHandlerAccess() {
@@ -636,14 +669,16 @@ public class MemberDetailController implements Initializable {
                         Dialog.YES, Dialog.CANCEL
                 );
                 if (dialog.show()) {
-                    if (DATA_MEMBERS.UpdateAccess(this.modelMembers.getIdMember(), this.modelMembers.isAccess())) {
-                        this.modelMembers.setAccess(!this.modelMembers.isAccess());
-                        this.sh_buttonOpenDoor.setDisable(true);
-                        this.sh_buttonAccess.getStyleClass().set(3, Input.styleToColor(Styles.SUCCESS));
-                        this.sh_buttonAccess.setText("Desbloquear acceso");
-                        Notifications.danger("Acceso bloqueado", this.modelMembers.getName() + " ha perdido el acceso a los gimnasios.");
-                        // TODO: ABONAR MENSUALIDADES
-                    }
+                    DATA_MEMBERS.UpdateAccess(this.modelMembers.getIdMember(), this.modelMembers.isAccess()).thenAccept(bool_access -> {
+                        if (bool_access) {
+                            this.modelMembers.setAccess(!this.modelMembers.isAccess());
+                            this.sh_buttonOpenDoor.setDisable(true);
+                            this.sh_buttonAccess.getStyleClass().set(3, Input.styleToColor(Styles.SUCCESS));
+                            this.sh_buttonAccess.setText("Desbloquear acceso");
+                            Notifications.danger("Acceso bloqueado", this.modelMembers.getName() + " ha perdido el acceso a los gimnasios.");
+                            // TODO: ABONAR MENSUALIDADES
+                        }
+                    });
                 }
             } else {
                 Dialog dialog = new Dialog(
@@ -654,13 +689,13 @@ public class MemberDetailController implements Initializable {
                         Dialog.YES, Dialog.CANCEL
                 );
                 if (dialog.show()) {
-                    if (DATA_MEMBERS.UpdateAccess(this.modelMembers.getIdMember(), this.modelMembers.isAccess())) {
+                    DATA_MEMBERS.UpdateAccess(this.modelMembers.getIdMember(), this.modelMembers.isAccess()).thenAccept(bool_access -> {
                         this.modelMembers.setAccess(!this.modelMembers.isAccess());
                         this.sh_buttonOpenDoor.setDisable(false);
                         this.sh_buttonAccess.getStyleClass().set(3, Input.styleToColor(Styles.DANGER));
                         this.sh_buttonAccess.setText("Bloquear acceso");
                         Notifications.success("Acceso desbloqueado", this.modelMembers.getName() + " puede entrar a los gimnasios nuevamente.");
-                    }
+                    });
                 }
             }
         };
@@ -668,16 +703,17 @@ public class MemberDetailController implements Initializable {
 
     private EventHandler<ActionEvent> eventHandlerPayDebt() {
         return actionEvent -> {
-            ArrayList<MODEL_DEBTS> debtsList = DATA_DEBTS.ReadDebts(this.modelMembers.getIdMember());
-            Dialog dialog = new Dialog(
-                    Styles.CREATIVE,
-                    "Abonar mensualidad",
-                    debtsList,
-                    Dialog.OK, Dialog.CANCEL
-            );
-            if (dialog.show()) {
+            DATA_DEBTS.ReadDebts(this.modelMembers.getIdMember()).thenAccept(model_debts -> {
+                Dialog dialog = new Dialog(
+                        Styles.CREATIVE,
+                        "Abonar mensualidad",
+                        model_debts,
+                        Dialog.OK, Dialog.CANCEL
+                );
+                if (dialog.show()) {
 
-            }
+                }
+            });
         };
     }
 
@@ -806,14 +842,6 @@ public class MemberDetailController implements Initializable {
 
     // Update listener
     private void createUpdaterListeners() {
-        this.ph_imgMemberPhoto.imageProperty().addListener((observable, oldValue, newValue) -> {
-            if (this.booleanUpdater.isListener()) {
-                this.booleanUpdater.change(
-                        "photo",
-                        false
-                );
-            }
-        });
         this.pi_fieldName.setOnKeyTyped(keyEvent -> {
             if (this.booleanUpdater.isListener()) {
                 this.booleanUpdater.change(

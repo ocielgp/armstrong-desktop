@@ -3,6 +3,8 @@ package com.ocielgp.fingerprint;
 import com.digitalpersona.uareu.Fmd;
 import com.jfoenix.controls.JFXButton;
 import com.ocielgp.database.members.DATA_MEMBERS_FINGERPRINTS;
+import com.ocielgp.utilities.Input;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Label;
@@ -11,6 +13,7 @@ import javafx.scene.layout.VBox;
 
 import java.util.ArrayList;
 import java.util.ListIterator;
+import java.util.concurrent.CompletableFuture;
 
 public class FingerprintUI {
     private final VBox fingerprintPane;
@@ -38,6 +41,7 @@ public class FingerprintUI {
         this.startCaptureButton = startCaptureButton;
         this.restartCaptureButton = restartCaptureButton;
         this.fmds = new ArrayList<>();
+        Input.createVisibleProperty(this.fingerprintPane, true);
 
         this.startCaptureButton.setOnAction(captureEvent);
         this.restartCaptureButton.setOnAction(actionEvent -> {
@@ -55,68 +59,81 @@ public class FingerprintUI {
     }
 
     public void clearFingerprints() {
-        this.fmds.clear();
-        this.fingerprintCounter.setText("0");
+        Platform.runLater(() -> {
+            this.fmds.clear();
+            this.fingerprintCounter.setText("0");
+        });
     }
 
     private void enableRestartButton() {
-        this.restartCaptureButton.setDisable(false);
+        Platform.runLater(() -> {
+            this.restartCaptureButton.setDisable(false);
+        });
     }
 
     public void resetUI() {
-        if (this.fingerprintFmd.getChildren().size() > 0) {
-            ((ImageView) this.fingerprintFmd.getChildren().get(0)).setImage(null);
-        }
-        if (this.fmds.size() == 0) {
-            this.restartCaptureButton.setDisable(true);
-        }
-        this.startCaptureButton.setText("Iniciar captura");
-        this.startCaptureButton.setOnAction(captureEvent);
+        Platform.runLater(() -> {
+            if (this.fingerprintFmd.getChildren().size() > 0) {
+                ((ImageView) this.fingerprintFmd.getChildren().get(0)).setImage(null);
+            }
+            if (this.fmds.size() == 0) {
+                this.restartCaptureButton.setDisable(true);
+            }
+            this.startCaptureButton.setText("Iniciar captura");
+            this.startCaptureButton.setOnAction(captureEvent);
+        });
     }
 
     public void restartUI() {
-        if (this.fingerprintFmd.getChildren().size() > 0) {
-            ((ImageView) this.fingerprintFmd.getChildren().get(0)).setImage(null);
-        }
-        this.clearFingerprints();
-        this.restartCaptureButton.setDisable(true);
-        this.startCaptureButton.setText("Iniciar captura");
-        this.startCaptureButton.setOnAction(captureEvent);
+        Platform.runLater(() -> {
+            if (this.fingerprintFmd.getChildren().size() > 0) {
+                ((ImageView) this.fingerprintFmd.getChildren().get(0)).setImage(null);
+            }
+            this.clearFingerprints();
+            this.restartCaptureButton.setDisable(true);
+            this.startCaptureButton.setText("Iniciar captura");
+            this.startCaptureButton.setOnAction(captureEvent);
+        });
     }
 
     public void show() {
-        this.fingerprintPane.setVisible(true);
-        this.fingerprintPane.setManaged(true);
+        Platform.runLater(() -> {
+            this.fingerprintPane.setVisible(true);
+        });
     }
 
     public void hide() {
-        this.fingerprintPane.setVisible(false);
-        this.fingerprintPane.setManaged(false);
+        Platform.runLater(() -> {
+            this.fingerprintPane.setVisible(false);
+        });
     }
 
     public void add(Fmd fmd) {
-        this.fmds.add(fmd);
-        this.fingerprintCounter.setText(String.valueOf(fmds.size()));
-        this.enableRestartButton();
+        CompletableFuture.runAsync(() -> {
+            this.fmds.add(fmd);
+            Platform.runLater(() -> {
+                this.fingerprintCounter.setText(String.valueOf(fmds.size()));
+                this.enableRestartButton();
+            });
+        });
     }
 
     public ListIterator<Fmd> getFingerprints() {
-        if (this.fmds.size() == 0) {
-            return null;
-        } else {
-            return this.fmds.listIterator();
-        }
+        return (this.fmds.size() == 0) ? null : this.fmds.listIterator();
     }
 
     public void loadFingerprints(int idMember) {
-        if (this.fingerprintPane.isVisible()) {
-            int fingerprints = DATA_MEMBERS_FINGERPRINTS.countFingerprints(idMember);
-            if (fingerprints > 0) {
-                this.fingerprintCounter.setText(String.valueOf(fingerprints));
-                this.fmds = DATA_MEMBERS_FINGERPRINTS.SelectFingerprints(idMember);
-                this.restartCaptureButton.setDisable(false);
+        CompletableFuture.runAsync(() -> {
+            if (this.fingerprintPane.isVisible()) {
+                DATA_MEMBERS_FINGERPRINTS.ReadFingerprints(idMember).thenAccept(fingerprints -> {
+                    Platform.runLater(() -> {
+                        this.fingerprintCounter.setText(fingerprints.getKey().toString());
+                        this.fmds = fingerprints.getValue();
+                        this.restartCaptureButton.setDisable(!(fingerprints.getKey() > 0));
+                    });
+                });
             }
-        }
+        });
     }
 
 }

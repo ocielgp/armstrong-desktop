@@ -3,10 +3,12 @@ package com.ocielgp.fingerprint;
 import com.digitalpersona.uareu.*;
 import com.ocielgp.database.members.DATA_MEMBERS_FINGERPRINTS;
 import com.ocielgp.utilities.Notifications;
+import javafx.application.Platform;
 import javafx.scene.layout.VBox;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.lang.invoke.MethodHandles;
 
 public class Capture
         implements ActionListener {
@@ -29,7 +31,7 @@ public class Capture
         this.fingerprintImage = new ImagePanel();
         this.fingerprintPane = fingerprintPane;
         this.m_fmds = new Fmd[2];
-        this.fingerprintPane.getChildren().setAll(fingerprintImage);
+        Platform.runLater(() -> this.fingerprintPane.getChildren().setAll(fingerprintImage));
         Notifications.buildNotification("gmi-fingerprint", "Lector de huellas", "Coloca la huella sobre el lector.", 2);
         System.out.println("Captura creada 2");
     }
@@ -47,6 +49,18 @@ public class Capture
         if (null != captureThread) captureThread.join(1000);
     }
 
+    public static Capture Run(Reader reader) { // run capture in background
+        Capture capture = new Capture(reader);
+        capture.startCapture();
+        return capture;
+    }
+
+    public static Capture Run(Reader reader, VBox pane) { // run capture at the interface
+        Capture capture = new Capture(reader, pane);
+        capture.startCapture(pane);
+        return capture;
+    }
+
     public void actionPerformed(ActionEvent e) {
         if (e.getActionCommand().equals(CaptureThread.ACT_CAPTURE)) {
             // Event from capture thread
@@ -59,20 +73,24 @@ public class Capture
                         // Display image
                         fingerprintImage.showImage(evt.capture_result.image);
                         ProcessCaptureResult(evt);
-                    } else if (Fingerprint.getStatusCode() == 1) {
+                    } else {
                         try {
                             System.out.println("convertido");
-                            DATA_MEMBERS_FINGERPRINTS.SelectSearchFingerprints(UareUGlobal.GetEngine().CreateFmd(evt.capture_result.image, Fmd.Format.ANSI_378_2004));
+                            DATA_MEMBERS_FINGERPRINTS.SelectSearchFingerprints(
+                                    UareUGlobal.GetEngine().CreateFmd(
+                                            evt.capture_result.image, Fmd.Format.ANSI_378_2004
+                                    )
+                            );
                         } catch (UareUException uareUException) {
-                            uareUException.printStackTrace();
+                            Notifications.catchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], uareUException.getMessage(), uareUException);
                         }
                     }
                     System.out.println("[Data]: " + evt.capture_result.image.getData());
                 } else if (Reader.CaptureQuality.CANCELED == evt.capture_result.quality) {
-                    // Capture or streaming was canceled, just quit
+                    // capture or streaming was canceled, just quit
                     bCanceled = true;
                 } else {
-                    // Bad quality
+                    // bad quality
                     System.out.println(evt.capture_result.quality);
                 }
             } else if (evt.exception != null) {
@@ -80,14 +98,14 @@ public class Capture
                 System.out.println("murio 1");
                 System.out.println("Capture: " + evt.exception);
                 bCanceled = true;
-                Fingerprint.setStatusCode(0); // Fingerprint Off
+                Fingerprint.setStatusCode(0); // fingerprint Off
             } else if (evt.reader_status != null) {
                 System.out.println(evt.reader_status);
                 bCanceled = true;
             }
 
             if (!bCanceled) {
-                // Restart capture thread
+                // restart capture thread
                 WaitForCaptureThread();
                 StartCaptureThread();
             }
@@ -99,62 +117,61 @@ public class Capture
 
         if (evt.capture_result != null) {
             if (evt.capture_result.image != null && Reader.CaptureQuality.GOOD == evt.capture_result.quality) {
-                // Extract features
-                Engine engine = UareUGlobal.GetEngine();
+                Engine engine = UareUGlobal.GetEngine(); // extract features
 
                 try {
                     Fmd fmd = engine.CreateFmd(evt.capture_result.image, Fmd.Format.ANSI_378_2004);
-                    if (Fingerprint.compareFingerprint(fmd)) {
-                        if (null == m_fmds[0]) m_fmds[0] = fmd;
-                        else if (null == m_fmds[1]) m_fmds[1] = fmd;
+                    Fingerprint.compareFingerprint(fmd).thenAccept(isNewFingerprint -> {
+                        if (isNewFingerprint) {
+                            if (m_fmds[0] == null) m_fmds[0] = fmd;
+                            else if (m_fmds[1] == null) m_fmds[1] = fmd;
 
-                        if (null != m_fmds[0] && null != m_fmds[1]) {
-                            // Perform comparison
-                            try {
-                                int falseMatchRate = engine.Compare(m_fmds[0], 0, m_fmds[1], 0);
+                            if (m_fmds[0] != null && m_fmds[1] != null) { // perform comparison
+                                try {
+                                    int falseMatchRate = engine.Compare(m_fmds[0], 0, m_fmds[1], 0);
 
-                                int targeFalseMatchRate = Engine.PROBABILITY_ONE / 100000; // Target rate is 0.00001
-                                if (falseMatchRate < targeFalseMatchRate) {
-                                    Fingerprint.AddFingerprint(m_fmds[0]);
-                                    Notifications.success("Lector de Huellas", "Huellas coinciden.", 2);
-                                } else {
-                                    Notifications.danger("Lector de huellas", "Las huellas no coinciden.", 2);
+                                    int targetFalseMatchRate = Engine.PROBABILITY_ONE / 100000; // target rate is 0.00001
+                                    if (falseMatchRate < targetFalseMatchRate) {
+                                        Fingerprint.AddFingerprint(m_fmds[0]);
+                                        Notifications.success("Lector de Huellas ( 2 / 2 )", "Huella guardada", 2);
+                                    } else {
+                                        Notifications.danger("Lector de huellas", "Las huellas son diferentes, vuelve a intentar");
+                                    }
+                                } catch (UareUException uareUException) {
+                                    Notifications.catchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], uareUException.getMessage(), uareUException);
                                 }
-                            } catch (UareUException e) {
-                                System.out.println("Engine.CreateFmd()" + e);
-                            }
 
-                            // Discard FMDs
+                                // discard FMDs
+                                m_fmds[0] = null;
+                                m_fmds[1] = null;
+                                // the new loop starts
+                            } else {
+                                // The loop continues
+                                Notifications.buildNotification("gmi-fingerprint", "Lector de huellas ( 1 / 2 )", "Colocar de nuevo la huella", 2);
+                            }
+                        } else {
+                            // discard FMDs
                             m_fmds[0] = null;
                             m_fmds[1] = null;
-                            // The new loop starts
-                        } else {
-                            // The loop continues
-                            Notifications.buildNotification("gmi-fingerprint", "Lector de huellas", "Vuelve a colocar la huella sobre el lector.", 2);
                         }
-                    } else {
-                        // Discard FMDs
-                        m_fmds[0] = null;
-                        m_fmds[1] = null;
-                    }
-                } catch (UareUException e) {
-                    System.out.println("Engine.CreateFmd()" + e);
+                    });
+                } catch (UareUException uareUException) {
+                    Notifications.catchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], uareUException.getMessage(), uareUException);
                 }
             } else if (Reader.CaptureQuality.CANCELED == evt.capture_result.quality) {
-                // Capture or streaming was canceled, just quit
+                // capture or streaming was canceled, just quit
                 bCanceled = true;
             } else {
-                //bad quality
+                // bad quality
                 System.out.println("Bad Quality " + evt.capture_result.quality);
             }
-        } else if (null != evt.exception) {
-            // Exception during capture
-            System.out.println("murio 2");
-            System.out.println("Capture " + evt.exception);
-            Fingerprint.setStatusCode(0); // Fingerprint Off
+        } else if (evt.exception != null) {
+            // exception during capture
+            Notifications.catchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], evt.exception.getMessage(), evt.exception);
+            Fingerprint.setStatusCode(0); // fingerprint Off
             bCanceled = true;
         } else if (null != evt.reader_status) {
-            //reader failure
+            // reader failure
             System.out.println("Bad Status " + evt.reader_status);
             bCanceled = true;
         }
@@ -163,54 +180,35 @@ public class Capture
     }
 
     private void startCapture() {
-        // Open reader
         try {
             reader.Open(Reader.Priority.COOPERATIVE);
-        } catch (UareUException e) {
-            System.out.println("Reader.Open()");
-            System.out.println(e);
+        } catch (UareUException uareUException) {
+            Notifications.catchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], uareUException.getMessage(), uareUException);
         }
         StartCaptureThread();
     }
 
     private void startCapture(VBox pane) {
-        // Open reader
         try {
             reader.Open(Reader.Priority.COOPERATIVE);
-        } catch (UareUException e) {
-            System.out.println("Reader.Open()");
-            System.out.println(e);
+        } catch (UareUException uareUException) {
+            Notifications.catchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], uareUException.getMessage(), uareUException);
         }
-
         StartCaptureThread();
 
     }
 
-    public static Capture Run(Reader reader) { // Run capture in background
-        Capture capture = new Capture(reader);
-        capture.startCapture();
-        return capture;
-    }
-
-    public static Capture Run(Reader reader, VBox pane) { // Run capture on interface
-        Capture capture = new Capture(reader, pane);
-        capture.startCapture(pane);
-        return capture;
-    }
-
     public void Stop() {
-        // Cancel capture
+        // cancel capture
         StopCaptureThread();
 
-        // Wait for capture thread to finish
+        // wait for capture thread to finish
         WaitForCaptureThread();
 
-        // Close reader
+        // close reader
         try {
             reader.Close();
-        } catch (UareUException e) {
-            System.out.println("Reader.Close()");
-            System.out.println(e);
+        } catch (UareUException ignored) {
         }
     }
 

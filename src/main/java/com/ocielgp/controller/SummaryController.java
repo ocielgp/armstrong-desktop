@@ -1,6 +1,7 @@
 package com.ocielgp.controller;
 
 import animatefx.animation.FadeIn;
+import com.ocielgp.app.GlobalController;
 import com.ocielgp.utilities.Loading;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -33,6 +34,7 @@ public class SummaryController implements Initializable {
 
         Platform.runLater(() -> {
             new FadeIn(this.rootPane).play();
+            GlobalController.dashboardController.enableRoutes();
             Loading.close();
         });
     }

@@ -8,40 +8,36 @@ import java.lang.invoke.MethodHandles;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.Objects;
-import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class DataServer {
-    private static String host;
-    private static String port;
-    private static String user;
-    private static String password;
-    private static String database;
-    private static Connection con;
+    private static final String host;
+    private static final String port;
+    private static final String user;
+    private static final String password;
+    private static final String database;
+    private static final AtomicReference<Connection> con = new AtomicReference<>();
 
     private static boolean configValid = false;
 
     static {
-        try {
-            byte source = Byte.parseByte(Objects.requireNonNull(ConfigFiles.readProperty(ConfigFiles.File.DATASOURCE, "source")));
-            // TODO: ENCRYPT PROPERTIES
-            host = ConfigFiles.readProperty(ConfigFiles.File.DATASOURCE, "host" + source);
-            port = ConfigFiles.readProperty(ConfigFiles.File.DATASOURCE, "port" + source);
-            user = ConfigFiles.readProperty(ConfigFiles.File.DATASOURCE, "user" + source);
-            password = ConfigFiles.readProperty(ConfigFiles.File.DATASOURCE, "password" + source);
-            database = ConfigFiles.readProperty(ConfigFiles.File.DATASOURCE, "database");
+        byte source = Byte.parseByte(ConfigFiles.readProperty(ConfigFiles.File.DATASOURCE, "source"));
 
-            if (host != null && port != null && user != null && password != null && database != null) {
-                configValid = true;
-            }
-        } catch (Exception ignored) {
+        // TODO: ENCRYPT PROPERTIES
+        host = ConfigFiles.readProperty(ConfigFiles.File.DATASOURCE, "host" + source);
+        port = ConfigFiles.readProperty(ConfigFiles.File.DATASOURCE, "port" + source);
+        user = ConfigFiles.readProperty(ConfigFiles.File.DATASOURCE, "user" + source);
+        password = ConfigFiles.readProperty(ConfigFiles.File.DATASOURCE, "password" + source);
+        database = ConfigFiles.readProperty(ConfigFiles.File.DATASOURCE, "database");
+        if (host != null && port != null && user != null && password != null && database != null) {
+            configValid = true;
         }
+        System.out.println(configValid);
     }
 
-    synchronized private static Connection firstConnection() {
-        Connection connection = null;
+    private static void firstConnection() {
         try {
-            connection = DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "/" + database + "?serverTimezone=UTC", user, password);
+            con.set(DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "/" + database + "?serverTimezone=UTC", user, password));
             Notifications.createNotification(
                     "gmi-cloud-done",
                     "Conexión establecida",
@@ -59,24 +55,22 @@ public class DataServer {
                     "gmi-cloud-off"
             );
         }
-        return connection;
     }
 
     synchronized public static Connection getConnection() {
+        System.out.println("getConnection");
         if (configValid) {
             try {
-                if (con == null) {
-                    CompletableFuture.supplyAsync(
-                            DataServer::firstConnection
-                    ).thenApply(connection -> con = connection);
-                } else if (!con.isValid(3)) { // Reconnect if connection is lost
-                    con = DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "/" + database + "?serverTimezone=UTC", user, password);
+                if (con.get() == null) {
+                    DataServer.firstConnection();
+                } else if (!con.get().isValid(3)) { // Reconnect if connection is lost
+                    con.set(DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "/" + database + "?serverTimezone=UTC", user, password));
                     System.out.println("[DataServer]: Reconectado a " + host);
                 }
             } catch (SQLException sqlException) {
                 Notifications.catchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException, "gmi-cloud-off");
             }
         }
-        return con;
+        return con.get();
     }
 }
