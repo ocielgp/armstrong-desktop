@@ -228,7 +228,6 @@ public class DATA_MEMBERS {
                         modelMembers.setLastName(rs.getString("lastName"));
                         modelMembers.setEndDate("-");
                         modelMembers.setStyle(Styles.DANGER);
-
                     }
                     members.add(modelMembers);
                 }

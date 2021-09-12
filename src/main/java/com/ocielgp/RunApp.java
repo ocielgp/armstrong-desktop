@@ -43,6 +43,7 @@ public class RunApp extends Application {
         // show app
         primaryStage.setTitle("Gym App");
         primaryStage.setScene(scene);
+//        primaryStage.setAlwaysOnTop(true);
 //        primaryStage.setMaximized(true);
         primaryStage.show();
 

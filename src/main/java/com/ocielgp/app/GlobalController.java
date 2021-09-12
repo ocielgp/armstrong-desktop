@@ -62,7 +62,7 @@ public class GlobalController {
         GlobalController.dashboardController = dashboardController;
     }
 
-    public static void showUserInfo(Styles style, byte[] photo, String idMember, String name, String gym, String membership) {
+    public static void showUserInfo(Styles style, byte[] photo, int idMember, String name, String gym, String membership) {
         dashboardController.showUserInfo(style, photo, idMember, name, gym, membership);
     }
 

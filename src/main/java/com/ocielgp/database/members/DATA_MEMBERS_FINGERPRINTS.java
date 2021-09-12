@@ -4,6 +4,7 @@ import com.digitalpersona.uareu.Fmd;
 import com.digitalpersona.uareu.UareUException;
 import com.digitalpersona.uareu.UareUGlobal;
 import com.ocielgp.database.DataServer;
+import com.ocielgp.database.system.DATA_CHECK_IN;
 import com.ocielgp.files.ConfigFiles;
 import com.ocielgp.fingerprint.Fingerprint;
 import com.ocielgp.utilities.Notifications;
@@ -57,14 +58,21 @@ public class DATA_MEMBERS_FINGERPRINTS {
                 /*ps = con.prepareStatement("SELECT MF.fingerprint AS 'fingerprint', MP.photo AS 'photo', M.idMember AS 'idMember', M.name AS 'name', M.lastName AS 'lastName', G.name AS 'gymName', PM.description AS 'description', PM.endDate AS 'endDate' FROM MEMBERS_FINGERPRINTS MF JOIN MEMBERS M on MF.idMember = M.idMember LEFT JOIN MEMBERS_PHOTOS MP on M.idMember = MP.idMember JOIN GYMS G on M.idGym = G.idGym JOIN PAYMENTS_MEMBERSHIPS PM on M.idMember = PM.idMember WHERE DATE_ADD(PM.endDate, INTERVAL ? DAY) >= CURDATE() AND ( M.flag = 1 AND PM.flag = 1 ) ORDER BY PM.startDate DESC");
                 ps.setInt(1, fingerprintsDaysLimit);
                 rs = ps.executeQuery();*/
-                ps = con.prepareStatement("SELECT MF.fingerprint, MF.idMember FROM MEMBERS_FINGERPRINTS MF JOIN PAYMENTS_MEMBERSHIPS PM on MF.idMember = PM.idMember WHERE DATE_ADD(PM.endDate, INTERVAL ? DAY) >= CURDATE() ORDER BY PM.startDate");
+                ps = con.prepareStatement("SELECT MF.fingerprint, MF.idMember, SM.idStaffMember FROM MEMBERS_FINGERPRINTS MF JOIN PAYMENTS_MEMBERSHIPS PM on MF.idMember = PM.idMember LEFT JOIN STAFF_MEMBERS SM on MF.idMember = SM.idMember WHERE DATE_ADD(PM.endDate, INTERVAL ? DAY) >= CURDATE() ORDER BY PM.startDate");
                 ps.setInt(1, fingerprintsDaysLimit);
                 rs = ps.executeQuery();
 
                 while (rs.next()) {
                     Fingerprint.compareFingerprint(fingerprint, rs.getBytes("fingerprint")).thenAccept(fingerprintMatch -> {
                         if (fingerprintMatch) {
-                            DATA_MEMBERS.ReadMember()
+                            try {
+                                DATA_CHECK_IN.CreateCheckIn(rs.getBoolean("idStaffMember"), rs.getInt("idMember"), 0);
+                            } catch (SQLException sqlException) {
+                                Notifications.catchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
+
+                            }
+
+//                            DATA_MEMBERS.ReadMember()
                         }
                     });
 //                    Fingerprint.compareFingerprint(fingerprint, rs.getBytes("fingerprint")).thenAccept(fingerprintMatch -> {
