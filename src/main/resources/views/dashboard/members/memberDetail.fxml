@@ -200,7 +200,7 @@
                         <JFXTextField fx:id="pi_fieldNotes" promptText="Enfermedades / Lesiones"/>
                     </VBox>
                 </VBox>
-                <VBox fx:id="fingerprintPane" spacing="5.0" styleClass="member-section">
+                <VBox fx:id="boxFingerprintPane" spacing="5.0" styleClass="member-section">
                     <padding>
                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
                     </padding>
@@ -320,7 +320,7 @@
                             <String fx:value="success-style"/>
                         </styleClass>
                     </JFXButton>
-                    <JFXButton fx:id="buttonCancel" text="Cancelar">
+                    <JFXButton fx:id="buttonClear" text="Limpiar">
                         <styleClass>
                             <String fx:value="btn-colorful"/>
                             <String fx:value="danger-style"/>

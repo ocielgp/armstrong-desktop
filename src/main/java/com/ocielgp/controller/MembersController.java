@@ -94,7 +94,6 @@ public class MembersController implements Initializable {
                 memberDetailController
         );
 
-        // TODO: ADD EXECUTOR SERVICE
         this.tableViewMembers.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
                 this.tableViewMembers.setDisable(true);

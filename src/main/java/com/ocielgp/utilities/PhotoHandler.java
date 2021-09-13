@@ -38,8 +38,7 @@ public class PhotoHandler {
 
     private void browseImage() {
         if (Fingerprint.getStatusCode() != 0) {
-            Fingerprint.StopCapture();
-            Fingerprint.ResetFingerprintUI();
+            Fingerprint.FB_StopReader();
         }
         FileChooser fileChooser = new FileChooser();
         FileChooser.ExtensionFilter extensionFilter = new FileChooser.ExtensionFilter("Imágenes", "*.png", "*.jpg", "*.jpeg");

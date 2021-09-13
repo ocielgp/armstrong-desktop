@@ -12,6 +12,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
@@ -124,17 +125,22 @@ public class DashboardController implements Initializable {
     }
 
     public void showUserInfo(Styles style, byte[] photo, Integer idMember, String name, String gym, String membership) {
-        this.ci_box.getStyleClass().setAll(GlobalController.getThemeType(), Input.styleToColor(style));
+        CompletableFuture<Image> loadImage;
         if (photo == null) {
-            ConfigFiles.loadImage("no-user-image.png").thenAccept(image -> Platform.runLater(() -> this.ci_imgPhoto.setImage(image)));
+            loadImage = ConfigFiles.getDefaultImage();
         } else {
-            ConfigFiles.loadImage(photo).thenAccept(image -> Platform.runLater(() -> this.ci_imgPhoto.setImage(image)));
+            loadImage = ConfigFiles.loadImage(photo);
         }
-
-        this.ci_labelId.setText(idMember.toString());
-        this.ci_labelName.setText(name);
-        this.ci_labelGym.setText(gym);
-        this.ci_labelMembership.setText(membership);
+        loadImage.thenAccept(image -> {
+            Platform.runLater(() -> {
+                this.ci_box.getStyleClass().setAll(GlobalController.getThemeType(), Input.styleToColor(style));
+                this.ci_imgPhoto.setImage(image);
+                this.ci_labelId.setText(idMember.toString());
+                this.ci_labelName.setText(name);
+                this.ci_labelGym.setText(gym);
+                this.ci_labelMembership.setText(membership);
+            });
+        });
     }
 
     // event handlers

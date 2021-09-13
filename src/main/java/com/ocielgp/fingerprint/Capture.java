@@ -2,6 +2,7 @@ package com.ocielgp.fingerprint;
 
 import com.digitalpersona.uareu.*;
 import com.ocielgp.database.members.DATA_MEMBERS_FINGERPRINTS;
+import com.ocielgp.utilities.Loading;
 import com.ocielgp.utilities.Notifications;
 import javafx.application.Platform;
 import javafx.scene.layout.VBox;
@@ -17,7 +18,7 @@ public class Capture
     private CaptureThread captureThread;
     private ImagePanel fingerprintImage;
     private final Reader reader;
-    private Fmd[] m_fmds;
+    private Fmd[] fingerprintsArray;
 
     private Capture(Reader reader) {
         this.reader = reader;
@@ -30,9 +31,8 @@ public class Capture
         this.captureThread = new CaptureThread(this.reader, false, Fid.Format.ANSI_381_2004, Reader.ImageProcessing.IMG_PROC_DEFAULT);
         this.fingerprintImage = new ImagePanel();
         this.fingerprintPane = fingerprintPane;
-        this.m_fmds = new Fmd[2];
+        this.fingerprintsArray = new Fmd[2];
         Platform.runLater(() -> this.fingerprintPane.getChildren().setAll(fingerprintImage));
-        Notifications.buildNotification("gmi-fingerprint", "Lector de huellas", "Coloca la huella sobre el lector.", 2);
         System.out.println("Captura creada 2");
     }
 
@@ -57,7 +57,7 @@ public class Capture
 
     public static Capture Run(Reader reader, VBox pane) { // run capture at the interface
         Capture capture = new Capture(reader, pane);
-        capture.startCapture(pane);
+        capture.startCapture();
         return capture;
     }
 
@@ -75,6 +75,7 @@ public class Capture
                         ProcessCaptureResult(evt);
                     } else {
                         try {
+                            Loading.show();
                             System.out.println("convertido");
                             DATA_MEMBERS_FINGERPRINTS.SelectSearchFingerprints(
                                     UareUGlobal.GetEngine().CreateFmd(
@@ -121,38 +122,39 @@ public class Capture
 
                 try {
                     Fmd fmd = engine.CreateFmd(evt.capture_result.image, Fmd.Format.ANSI_378_2004);
-                    Fingerprint.compareFingerprint(fmd).thenAccept(isNewFingerprint -> {
+                    Fingerprint.FB_CompareLocalFingerprints(fmd).thenAccept(isNewFingerprint -> {
                         if (isNewFingerprint) {
-                            if (m_fmds[0] == null) m_fmds[0] = fmd;
-                            else if (m_fmds[1] == null) m_fmds[1] = fmd;
+                            if (fingerprintsArray[0] == null) fingerprintsArray[0] = fmd;
+                            else if (fingerprintsArray[1] == null) fingerprintsArray[1] = fmd;
 
-                            if (m_fmds[0] != null && m_fmds[1] != null) { // perform comparison
+                            if (fingerprintsArray[0] != null && fingerprintsArray[1] != null) { // perform comparison
                                 try {
-                                    int falseMatchRate = engine.Compare(m_fmds[0], 0, m_fmds[1], 0);
+                                    int falseMatchRate = engine.Compare(fingerprintsArray[0], 0, fingerprintsArray[1], 0);
 
                                     int targetFalseMatchRate = Engine.PROBABILITY_ONE / 100000; // target rate is 0.00001
                                     if (falseMatchRate < targetFalseMatchRate) {
-                                        Fingerprint.AddFingerprint(m_fmds[0]);
-                                        Notifications.success("Lector de Huellas ( 2 / 2 )", "Huella guardada", 2);
+                                        Fingerprint.FB_AddFingerprint(fingerprintsArray[0]);
+                                        Notifications.success("Lector de Huellas ( 2 / 2 )", "Huella guardada", 1.5);
                                     } else {
-                                        Notifications.danger("Lector de huellas", "Las huellas son diferentes, vuelve a intentar");
+                                        Fingerprint.FB_Shake();
+                                        Notifications.danger("Lector de huellas", "Las huellas son diferentes, vuelve a intentar", 2);
                                     }
                                 } catch (UareUException uareUException) {
                                     Notifications.catchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], uareUException.getMessage(), uareUException);
                                 }
 
                                 // discard FMDs
-                                m_fmds[0] = null;
-                                m_fmds[1] = null;
+                                fingerprintsArray[0] = null;
+                                fingerprintsArray[1] = null;
                                 // the new loop starts
                             } else {
                                 // The loop continues
-                                Notifications.buildNotification("gmi-fingerprint", "Lector de huellas ( 1 / 2 )", "Colocar de nuevo la huella", 2);
+                                Notifications.buildNotification("gmi-fingerprint", "Lector de huellas ( 1 / 2 )", "Colocar de nuevo la huella", 1.5);
                             }
                         } else {
                             // discard FMDs
-                            m_fmds[0] = null;
-                            m_fmds[1] = null;
+                            fingerprintsArray[0] = null;
+                            fingerprintsArray[1] = null;
                         }
                     });
                 } catch (UareUException uareUException) {
@@ -186,16 +188,6 @@ public class Capture
             Notifications.catchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], uareUException.getMessage(), uareUException);
         }
         StartCaptureThread();
-    }
-
-    private void startCapture(VBox pane) {
-        try {
-            reader.Open(Reader.Priority.COOPERATIVE);
-        } catch (UareUException uareUException) {
-            Notifications.catchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], uareUException.getMessage(), uareUException);
-        }
-        StartCaptureThread();
-
     }
 
     public void Stop() {

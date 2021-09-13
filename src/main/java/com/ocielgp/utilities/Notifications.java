@@ -29,7 +29,6 @@ import java.util.LinkedList;
 import java.util.ResourceBundle;
 
 class NotificationView implements Initializable {
-    private final int seconds;
     @FXML
     private FontIcon fontIcon;
     @FXML
@@ -41,11 +40,12 @@ class NotificationView implements Initializable {
     private final String icon;
     private final String title;
     private final String content;
+    private final double seconds;
     @FXML
     private GridPane gridPane;
     private final Styles style;
 
-    public NotificationView(String icon, String title, String content, int seconds, Styles style) {
+    public NotificationView(String icon, String title, String content, double seconds, Styles style) {
         this.icon = icon;
         this.title = title;
         this.content = content;
@@ -65,7 +65,7 @@ class NotificationView implements Initializable {
         return title;
     }
 
-    public int getSeconds() {
+    public double getSeconds() {
         return seconds;
     }
 
@@ -88,7 +88,9 @@ public class Notifications {
         stage.initOwner(GlobalController.getPrimaryStage());
     }
 
-    public static void createNotification(String icon, String title, String content, int seconds, Styles style) {
+    private static final double SECONDS = 3;
+
+    public static void createNotification(String icon, String title, String content, double seconds, Styles style) {
         NotificationView notificationController = new NotificationView(icon, title, content, seconds, style);
         GridPane notificationView = (GridPane) Loader.Load("notification.fxml", "Notifications", false, notificationController);
         notificationView.addEventHandler(EventType.ROOT, new EventHandler<>() {
@@ -122,12 +124,6 @@ public class Notifications {
                 threadHandler.play();
             });
         }
-    }
-
-    public static KeyFrame scheduleNotification(int seconds) {
-        GridPane notificationView = notificationViews.getFirst();
-        showNotification(notificationView);
-        return new KeyFrame(Duration.seconds(seconds), evt -> hiddenNotification(false));
     }
 
     private static void showNotification(GridPane notificationView) {
@@ -173,9 +169,13 @@ public class Notifications {
         fadeOutRight.play();
     }
 
-    private static final int SECONDS = 3;
+    public static KeyFrame scheduleNotification(double seconds) {
+        GridPane notificationView = notificationViews.getFirst();
+        showNotification(notificationView);
+        return new KeyFrame(Duration.seconds(seconds), evt -> hiddenNotification(false));
+    }
 
-    public static void buildNotification(String icon, String title, String content, int seconds) {
+    public static void buildNotification(String icon, String title, String content, double seconds) {
         Notifications.createNotification(icon, title, content, seconds, Styles.DEFAULT);
     }
 
@@ -183,11 +183,11 @@ public class Notifications {
         Notifications.createNotification(icon, title, content, SECONDS, Styles.DEFAULT);
     }
 
-    public static void success(String icon, String title, String content, int seconds) {
+    public static void success(String icon, String title, String content, double seconds) {
         Notifications.createNotification(icon, title, content, seconds, Styles.SUCCESS);
     }
 
-    public static void success(String title, String content, int seconds) {
+    public static void success(String title, String content, double seconds) {
         Notifications.createNotification("gmi-check", title, content + ".", seconds, Styles.SUCCESS);
     }
 
@@ -195,11 +195,11 @@ public class Notifications {
         Notifications.createNotification("gmi-check", title, content, SECONDS, Styles.SUCCESS);
     }
 
-    public static void warn(String icon, String title, String content, int seconds) {
+    public static void warn(String icon, String title, String content, double seconds) {
         Notifications.createNotification(icon, title, content, seconds, Styles.WARN);
     }
 
-    public static void warn(String title, String content, int seconds) {
+    public static void warn(String title, String content, double seconds) {
         Notifications.createNotification("gmi-priority-high", title, content, seconds, Styles.WARN);
     }
 
@@ -207,11 +207,11 @@ public class Notifications {
         Notifications.createNotification("gmi-priority-high", title, content, SECONDS, Styles.WARN);
     }
 
-    public static void danger(String icon, String title, String content, int seconds) {
+    public static void danger(String icon, String title, String content, double seconds) {
         Notifications.createNotification(icon, title, content, seconds, Styles.DANGER);
     }
 
-    public static void danger(String title, String content, int seconds) {
+    public static void danger(String title, String content, double seconds) {
         Notifications.createNotification("gmi-close", title, content, seconds, Styles.DANGER);
     }
 

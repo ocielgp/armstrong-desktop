@@ -1,10 +1,12 @@
 package com.ocielgp.fingerprint;
 
+import com.digitalpersona.uareu.Fid;
+import com.digitalpersona.uareu.Reader;
+import com.digitalpersona.uareu.UareUException;
+import javafx.application.Platform;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
-import com.digitalpersona.uareu.*;
-import javafx.application.Platform;
 
 public class CaptureThread extends Thread {
     public static final String ACT_CAPTURE = "capture_thread_captured";
@@ -78,7 +80,7 @@ public class CaptureThread extends Thread {
                     break;
                 } else {
                     // Reader failure
-                    NotifyListener(ACT_CAPTURE, null, rs, null);
+                    NotifyListener(null, rs, null);
                     break;
                 }
             }
@@ -86,17 +88,17 @@ public class CaptureThread extends Thread {
             if (bCancel) {
                 Reader.CaptureResult cr = new Reader.CaptureResult();
                 cr.quality = Reader.CaptureQuality.CANCELED;
-                NotifyListener(ACT_CAPTURE, cr, null, null);
+                NotifyListener(cr, null, null);
             }
 
 
             if (bReady) {
                 // Capture
                 Reader.CaptureResult cr = reader.Capture(format, proc, 500, -1);
-                NotifyListener(ACT_CAPTURE, cr, null, null);
+                NotifyListener(cr, null, null);
             }
         } catch (UareUException e) {
-            NotifyListener(ACT_CAPTURE, null, null, e);
+            NotifyListener(null, null, e);
         }
     }
 
@@ -120,7 +122,7 @@ public class CaptureThread extends Thread {
                     break;
                 } else {
                     // Reader failure
-                    NotifyListener(ACT_CAPTURE, null, rs, null);
+                    NotifyListener(null, rs, null);
                     break;
                 }
             }
@@ -132,30 +134,30 @@ public class CaptureThread extends Thread {
                 // Get images
                 while (!bCancel) {
                     Reader.CaptureResult cr = reader.GetStreamImage(format, proc, 500);
-                    NotifyListener(ACT_CAPTURE, cr, null, null);
+                    NotifyListener(cr, null, null);
                 }
 
                 // Stop streaming
                 reader.StopStreaming();
             }
         } catch (UareUException e) {
-            NotifyListener(ACT_CAPTURE, null, null, e);
+            NotifyListener(null, null, e);
         }
 
         if (bCancel) {
             Reader.CaptureResult cr = new Reader.CaptureResult();
             cr.quality = Reader.CaptureQuality.CANCELED;
-            NotifyListener(ACT_CAPTURE, cr, null, null);
+            NotifyListener(cr, null, null);
         }
     }
 
-    private void NotifyListener(String action, Reader.CaptureResult cr, Reader.Status st, UareUException ex) {
-        final CaptureEvent evt = new CaptureEvent(this, action, cr, st, ex);
+    private void NotifyListener(Reader.CaptureResult cr, Reader.Status st, UareUException ex) {
+        final CaptureEvent evt = new CaptureEvent(this, CaptureThread.ACT_CAPTURE, cr, st, ex);
 
         // Store last capture event
         last_capture = evt;
 
-        if (null == listener || null == action || action.equals("")) return;
+        if (null == listener) return;
 
         // Invoke listener on EDT thread
         Platform.runLater(() -> listener.actionPerformed(evt));

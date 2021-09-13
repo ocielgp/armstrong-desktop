@@ -97,7 +97,7 @@ public class MemberDetailController implements Initializable {
 
     // -> Fingerprint section [fp]
     @FXML
-    private VBox fingerprintPane;
+    private VBox boxFingerprintPane;
     @FXML
     private VBox fp_boxFingerprint;
     @FXML
@@ -137,7 +137,7 @@ public class MemberDetailController implements Initializable {
     @FXML
     private JFXButton buttonAction;
     @FXML
-    private JFXButton buttonCancel;
+    private JFXButton buttonClear;
 
     // Attributes
     private PhotoHandler photoHandler;
@@ -158,26 +158,27 @@ public class MemberDetailController implements Initializable {
                 this.clearForm(false);
             }
             DATA_MEMBERS.ReadMember(idMember).thenAccept(model_members -> {
-                this.modelMembers = model_members;
-                this.modelMembers.setIdMember(idMember);
-            }).thenRunAsync(() -> DATA_PAYMENTS_MEMBERSHIPS.getLastPayment(idMember).thenAccept(model_payments_memberships -> {
-                this.modelMembers.setModelPaymentsMemberships(model_payments_memberships);
-                if (model_payments_memberships == null) {
-                    DATA_GYMS.ReadGym(this.modelMembers.getIdGym())
-                            .thenAccept(model_gyms -> {
-                                this.modelMembers.setModelGyms(model_gyms);
-                                this.initForm();
+                        this.modelMembers = model_members;
+                        this.modelMembers.setIdMember(idMember);
+                    }).thenRunAsync(() -> Fingerprint.loadFingerprints(idMember))
+                    .thenRunAsync(() -> DATA_PAYMENTS_MEMBERSHIPS.getLastPayment(idMember).thenAccept(model_payments_memberships -> {
+                        this.modelMembers.setModelPaymentsMemberships(model_payments_memberships);
+                        if (model_payments_memberships == null) {
+                            DATA_GYMS.ReadGym(this.modelMembers.getIdGym())
+                                    .thenAccept(model_gyms -> {
+                                        this.modelMembers.setModelGyms(model_gyms);
+                                        this.initForm();
+                                    });
+                        } else {
+                            DATA_MEMBERS.ReadMember(model_payments_memberships.getIdStaff()).thenAccept(model_members -> {
+                                DATA_GYMS.ReadGym(model_payments_memberships.getIdGym()).thenAccept(model_gyms -> {
+                                    this.modelMembers.setModelGyms(model_gyms);
+                                    Platform.runLater(() -> this.qv_staffName.setText(model_members.getName() + " " + model_members.getLastName()));
+                                    this.initForm();
+                                });
                             });
-                } else {
-                    DATA_MEMBERS.ReadMember(model_payments_memberships.getIdStaff()).thenAccept(model_members -> {
-                        DATA_GYMS.ReadGym(model_payments_memberships.getIdGym()).thenAccept(model_gyms -> {
-                            this.modelMembers.setModelGyms(model_gyms);
-                            Platform.runLater(() -> this.qv_staffName.setText(model_members.getName() + " " + model_members.getLastName()));
-                            this.initForm();
-                        });
-                    });
-                }
-            }));
+                        }
+                    }));
         });
         Platform.runLater(fadeOutDown::play);
     }
@@ -226,10 +227,6 @@ public class MemberDetailController implements Initializable {
                 this.pi_fieldEmail.setText(this.modelMembers.getEmail());
                 this.pi_fieldNotes.setText(this.modelMembers.getNotes());
 
-                // Fingerprint
-                // TODO: ADD SUPPORT
-                Fingerprint.loadFingerprints(this.modelMembers.getIdMember());
-
                 // Membership
                 if (this.modelMembers.getModelPaymentsMemberships() != null) {
                     this.initRenewMembership();
@@ -260,7 +257,7 @@ public class MemberDetailController implements Initializable {
                 // End buttons
                 this.buttonAction.setText("Guardar cambios");
                 this.buttonAction.setDisable(true);
-                this.buttonCancel.setText("Cancelar");
+                this.buttonClear.setText("Cancelar");
 
                 this.booleanUpdater.setListener(true);
             });
@@ -332,7 +329,7 @@ public class MemberDetailController implements Initializable {
         });
 
         // Fingerprint section
-        Fingerprint.setFingerprintBox(this.fingerprintPane, this.fp_boxFingerprint, this.fp_labelFingerprintCounter, this.fp_buttonCapture, this.fp_buttonRestartCapture);
+        Fingerprint.setFingerprintBox(this.boxFingerprintPane, this.fp_boxFingerprint, this.fp_labelFingerprintCounter, this.fp_buttonCapture, this.fp_buttonRestartCapture);
 
         // Membership section
         Input.createVisibleProperty(this.ms_boxEndDate);
@@ -422,10 +419,7 @@ public class MemberDetailController implements Initializable {
 
         // End buttons section
         this.buttonAction.setOnAction(actionEvent -> CompletableFuture.runAsync(this::eventHandlerRegister));
-        this.buttonCancel.setOnAction((actionEvent) -> {
-            this.clearForm(true);
-            this.membersController.unselectTable();
-        });
+        this.buttonClear.setOnAction((actionEvent) -> this.clearForm(true));
 
         Platform.runLater(() -> new FadeIn(this.membersController.boxMembersPane));
     }
@@ -458,7 +452,7 @@ public class MemberDetailController implements Initializable {
 
             this.photoHandler.resetHandler();
 
-            Fingerprint.ResetFingerprintUI();
+            Fingerprint.FB_RestartCapture();
 
             Input.clearInputs(
                     this.pi_fieldName,
@@ -474,13 +468,16 @@ public class MemberDetailController implements Initializable {
             this.ms_boxEndDate.setVisible(false);
             this.restartRenewMembership(true);
 
-            this.buttonAction.setText("Registrar");
-            this.buttonAction.setDisable(false);
-            this.buttonCancel.setText("Limpiar");
 
             if (animation) {
                 new FadeInUp(this.scrollPane).play();
+            } else {
+                this.membersController.unselectTable();
             }
+
+            this.buttonAction.setDisable(false);
+            this.buttonAction.setText("Registrar");
+            this.buttonClear.setText("Limpiar");
         });
     }
 
@@ -606,7 +603,7 @@ public class MemberDetailController implements Initializable {
                             DATA_MEMBERS.UpdateNotes(this.modelMembers.getIdMember(), memberModel.getNotes());
                         }
                         if (this.booleanUpdater.isChanged("fingerprint")) {
-//                                flag =
+                            DATA_MEMBERS_FINGERPRINTS.CreateFingerprints(this.modelMembers.getIdMember(), Fingerprint.getFingerprints());
                         }
                         if (this.booleanUpdater.isChanged("renewMembership")) {
                             DATA_PAYMENTS_MEMBERSHIPS.CreatePaymentMembership(this.modelMembers.getIdMember(), modelMemberships).thenAccept(idPaymentMembership -> {
@@ -627,7 +624,7 @@ public class MemberDetailController implements Initializable {
                         DATA_MEMBERS.CreateMember(memberModel).thenAccept(idMember -> {
                             if (idMember > 0) {
                                 DATA_MEMBERS_PHOTOS.CreatePhoto(idMember, photoHandler.getPhoto());
-                                DATA_MEMBERS_FINGERPRINTS.InsertFingerprints(idMember, Fingerprint.getFingerprints());
+                                DATA_MEMBERS_FINGERPRINTS.CreateFingerprints(idMember, Fingerprint.getFingerprints());
                                 DATA_PAYMENTS_MEMBERSHIPS.CreatePaymentMembership(idMember, finalModelMemberships).thenAccept(idLastMembership -> {
                                     if (finalModelDebts != null && idLastMembership > 0) {
                                         DATA_DEBTS.CreateDebt(finalModelDebts, idMember, 1);
@@ -887,6 +884,14 @@ public class MemberDetailController implements Initializable {
                 this.booleanUpdater.change(
                         "notes",
                         Validator.compare(this.pi_fieldNotes.getText(), this.modelMembers.getNotes())
+                );
+            }
+        });
+        this.fp_labelFingerprintCounter.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (this.booleanUpdater.isListener() && !oldValue.equals(newValue)) {
+                this.booleanUpdater.change(
+                        "fingerprint",
+                        false
                 );
             }
         });

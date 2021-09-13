@@ -21,12 +21,12 @@ public class Input {
         node.setVisible(false);
     }
 
-    public static void createVisibleProperty(Node node, boolean property) {
+    public static void createVisibleProperty(Node node, boolean initialValue) {
         node.visibleProperty().addListener((observable, oldValue, newValue) -> {
             node.setVisible(newValue);
             node.setManaged(newValue);
         });
-        node.setVisible(property);
+        node.setVisible(initialValue);
     }
 
     public static void createMaxLengthEvent(TextInputControl textInput, int maxLength) {

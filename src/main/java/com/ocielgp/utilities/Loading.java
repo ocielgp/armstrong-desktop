@@ -44,6 +44,6 @@ public class Loading {
     }
 
     public static void close() {
-        stage.close();
+        Platform.runLater(stage::close);
     }
 }
