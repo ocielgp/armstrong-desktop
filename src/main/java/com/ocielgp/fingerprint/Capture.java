@@ -62,6 +62,7 @@ public class Capture
     }
 
     public void actionPerformed(ActionEvent e) {
+        System.out.println("captura");
         if (e.getActionCommand().equals(CaptureThread.ACT_CAPTURE)) {
             // Event from capture thread
             CaptureThread.CaptureEvent evt = (CaptureThread.CaptureEvent) e;

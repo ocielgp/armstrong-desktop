@@ -1,5 +1,6 @@
 package com.ocielgp.controller;
 
+import animatefx.animation.FadeIn;
 import animatefx.animation.FadeInUp;
 import com.ocielgp.app.GlobalController;
 import com.ocielgp.files.ConfigFiles;
@@ -139,6 +140,7 @@ public class DashboardController implements Initializable {
                 this.ci_labelName.setText(name);
                 this.ci_labelGym.setText(gym);
                 this.ci_labelMembership.setText(membership);
+                new FadeIn(this.ci_box).play();
             });
         });
     }
