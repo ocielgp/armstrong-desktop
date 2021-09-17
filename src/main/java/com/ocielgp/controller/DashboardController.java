@@ -90,9 +90,9 @@ public class DashboardController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         GlobalController.setDashboardController(this);
-        ConfigFiles.loadImage("no-user-image.png").thenAccept(image -> Platform.runLater(() -> this.ci_imgPhoto.setImage(image)));
-        ConfigFiles.loadImage("no-user-image.png").thenAccept(image -> Platform.runLater(() -> this.imageViewUser.setImage(image)));
-        ConfigFiles.loadImage("img.jpg").thenAccept(image -> Platform.runLater(() -> this.imageViewLogo.setImage(image)));
+        this.ci_imgPhoto.setImage(ConfigFiles.loadImage("no-user-image.png"));
+        this.imageViewUser.setImage(ConfigFiles.loadImage("no-user-image.png"));
+        this.imageViewLogo.setImage(ConfigFiles.loadImage("img.jpg"));
 
         // Update scrollPaneContent
         this.labelStaffName.setText(GlobalController.getStaffUserModel().getName());
@@ -126,22 +126,21 @@ public class DashboardController implements Initializable {
     }
 
     public void showUserInfo(Styles style, byte[] photo, Integer idMember, String name, String gym, String membership) {
-        CompletableFuture<Image> loadImage;
+        Image loadImage;
         if (photo == null) {
             loadImage = ConfigFiles.getDefaultImage();
         } else {
             loadImage = ConfigFiles.loadImage(photo);
         }
-        loadImage.thenAccept(image -> {
-            Platform.runLater(() -> {
-                this.ci_box.getStyleClass().setAll(GlobalController.getThemeType(), Input.styleToColor(style));
-                this.ci_imgPhoto.setImage(image);
-                this.ci_labelId.setText(idMember.toString());
-                this.ci_labelName.setText(name);
-                this.ci_labelGym.setText(gym);
-                this.ci_labelMembership.setText(membership);
-                new FadeIn(this.ci_box).play();
-            });
+
+        Platform.runLater(() -> {
+            this.ci_box.getStyleClass().setAll(GlobalController.getThemeType(), Input.styleToColor(style));
+            this.ci_imgPhoto.setImage(loadImage);
+            this.ci_labelId.setText(idMember.toString());
+            this.ci_labelName.setText(name);
+            this.ci_labelGym.setText(gym);
+            this.ci_labelMembership.setText(membership);
+            new FadeIn(this.ci_box).play();
         });
     }
 

@@ -10,11 +10,15 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
+import java.util.HashMap;
+
 public class RunApp extends Application {
+    private final HashMap<String, Image> appIcon = new HashMap<>();
 
     public static void main(String[] args) {
         Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
@@ -23,7 +27,9 @@ public class RunApp extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        ConfigFiles.getIconApp().thenAccept(image -> Platform.runLater(() -> primaryStage.getIcons().setAll(image)));
+        appIcon.put("focus", ConfigFiles.getIconApp());
+        appIcon.put("unfocused", ConfigFiles.loadImage("app-icon-unfocused.png"));
+        primaryStage.getIcons().setAll(ConfigFiles.getIconApp());
         AppController appController = new AppController();
 
         GlobalController.setPrimaryStage(primaryStage);
@@ -41,11 +47,19 @@ public class RunApp extends Application {
         scene.getStylesheets().add(String.valueOf(RunApp.class.getClassLoader().getResource("styles.css")));
 
         // show app
+        primaryStage.focusedProperty().addListener((observable, oldValue, newValue) -> {
+            Platform.runLater(() -> {
+                primaryStage.getIcons().setAll(
+                        (newValue) ? this.appIcon.get("focus") : this.appIcon.get("unfocused")
+                );
+            });
+        });
         primaryStage.setTitle("Gym App");
         primaryStage.setScene(scene);
 //        primaryStage.setAlwaysOnTop(true);
 //        primaryStage.setMaximized(true);
         primaryStage.show();
+
 
         // kill all threads when a closing event occur
         primaryStage.addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, evt -> {

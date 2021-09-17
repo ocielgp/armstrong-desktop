@@ -39,11 +39,11 @@ public class LoginController implements Initializable {
     private JFXButton buttonLogin;
 
     // Attributes
-    private byte attemps = 0;
+    private byte attempts = 0;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        ConfigFiles.getDefaultImage().thenAccept(image -> Platform.runLater(() -> this.imageUser.setImage(image)));
+        this.imageUser.setImage(ConfigFiles.getDefaultImage());
 
         this.buttonLogin.setOnAction(actionEvent -> {
             ArrayList<InputDetails> inputs = new ArrayList<>();
@@ -71,8 +71,8 @@ public class LoginController implements Initializable {
                             fadeOutDown.play();
                         });
                     } else {
-                        this.attemps++;
-                        if (attemps == 3) {
+                        this.attempts++;
+                        if (attempts == 3) {
                             Notifications.danger("Intentos excedidos", "Si no recuerdas la contraseña, contacte con el encargado.");
                             Platform.runLater(() -> new Flash(this.boxLoginPane).play());
                         } else {

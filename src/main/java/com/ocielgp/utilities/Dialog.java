@@ -65,9 +65,9 @@ public class Dialog {
         Scene scene = new Scene(this.dialogView);
         scene.setFill(Color.TRANSPARENT);
         scene.getStylesheets().add("styles.css");
-        ConfigFiles.getIconApp().thenAccept(image -> Platform.runLater(() -> this.stage.getIcons().setAll(image)));
-        this.stage.setTitle("MENSAJE");
+        this.stage.getIcons().setAll(ConfigFiles.getIconApp());
         this.stage.initModality(Modality.APPLICATION_MODAL);
+        this.stage.setAlwaysOnTop(true);
         this.stage.setScene(scene);
         this.stage.show();
         this.stage.setX(

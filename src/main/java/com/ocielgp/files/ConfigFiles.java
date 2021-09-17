@@ -130,51 +130,70 @@ public class ConfigFiles {
         };
     }
 
-    public static CompletableFuture<Image> getDefaultImage() {
+    public static Image getDefaultImage() {
         return loadImage("no-user-image.png");
     }
 
-    public static CompletableFuture<Image> getIconApp() {
+    public static Image getIconApp() {
         return loadImage("app-icon.png");
     }
 
 
-    public static CompletableFuture<Image> loadImage(String fileName) {
-        return CompletableFuture.supplyAsync(() -> {
-            InputStream file = ConfigFiles.class.getClassLoader().getResourceAsStream(fileName);
-            Image image = null;
-            try {
-                image = new Image(file);
-                file.close();
-            } catch (Exception exception) {
-                System.out.println("error");
-                Notifications.catchError(
-                        MethodHandles.lookup().lookupClass().getSimpleName(),
-                        Thread.currentThread().getStackTrace()[1],
-                        exception.getMessage(),
-                        exception
-                );
-            }
-            return image;
-        });
+    public static Image loadImage(String fileName) {
+        try {
+            return CompletableFuture.supplyAsync(() -> {
+                InputStream file = ConfigFiles.class.getClassLoader().getResourceAsStream(fileName);
+                Image image = null;
+                try {
+                    image = new Image(file);
+                    file.close();
+                } catch (Exception exception) {
+                    Notifications.catchError(
+                            MethodHandles.lookup().lookupClass().getSimpleName(),
+                            Thread.currentThread().getStackTrace()[1],
+                            exception.getMessage(),
+                            exception
+                    );
+                }
+                return image;
+            }).get();
+        } catch (InterruptedException | ExecutionException exception) {
+            Notifications.catchError(
+                    MethodHandles.lookup().lookupClass().getSimpleName(),
+                    Thread.currentThread().getStackTrace()[1],
+                    exception.getMessage(),
+                    exception
+            );
+        }
+        return null;
     }
 
-    public static CompletableFuture<Image> loadImage(byte[] bytes) {
-        return CompletableFuture.supplyAsync(() -> {
-            ByteArrayInputStream imgBytes = new ByteArrayInputStream(bytes);
-            Image image = new Image(imgBytes);
-            try {
-                imgBytes.close();
-            } catch (IOException ioException) {
-                Notifications.catchError(
-                        MethodHandles.lookup().lookupClass().getSimpleName(),
-                        Thread.currentThread().getStackTrace()[1],
-                        ioException.getMessage(),
-                        ioException
-                );
-            }
-            return image;
-        });
+    public static Image loadImage(byte[] bytes) {
+        try {
+            return CompletableFuture.supplyAsync(() -> {
+                ByteArrayInputStream imgBytes = new ByteArrayInputStream(bytes);
+                Image image = new Image(imgBytes);
+                try {
+                    imgBytes.close();
+                } catch (IOException ioException) {
+                    Notifications.catchError(
+                            MethodHandles.lookup().lookupClass().getSimpleName(),
+                            Thread.currentThread().getStackTrace()[1],
+                            ioException.getMessage(),
+                            ioException
+                    );
+                }
+                return image;
+            }).get();
+        } catch (InterruptedException | ExecutionException exception) {
+            Notifications.catchError(
+                    MethodHandles.lookup().lookupClass().getSimpleName(),
+                    Thread.currentThread().getStackTrace()[1],
+                    exception.getMessage(),
+                    exception
+            );
+        }
+        return null;
     }
 
     public enum File {

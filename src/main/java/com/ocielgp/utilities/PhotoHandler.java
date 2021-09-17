@@ -4,7 +4,6 @@ import com.jfoenix.controls.JFXButton;
 import com.ocielgp.app.GlobalController;
 import com.ocielgp.files.ConfigFiles;
 import com.ocielgp.fingerprint.Fingerprint;
-import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -32,7 +31,7 @@ public class PhotoHandler {
         buttonDeletePhoto.addEventFilter(ActionEvent.ACTION, actionEvent -> deleteImage());
 
         this.imageViewPhoto.setStyle("-fx-cursor: hand");
-        ConfigFiles.getDefaultImage().thenAccept(image -> Platform.runLater(() -> this.imageViewPhoto.setImage(image)));
+        this.imageViewPhoto.setImage(ConfigFiles.getDefaultImage());
     }
 
 
@@ -73,7 +72,7 @@ public class PhotoHandler {
     }
 
     private void deleteImage() {
-        ConfigFiles.getDefaultImage().thenAccept(image -> Platform.runLater(() -> this.imageViewPhoto.setImage(image)));
+        this.imageViewPhoto.setImage(ConfigFiles.getDefaultImage());
         this.buttonDeletePhoto.setDisable(true);
         this.bytes = null;
         this.imageViewPhoto.requestFocus();
@@ -82,10 +81,10 @@ public class PhotoHandler {
     public void setPhoto(byte[] bytes) {
         if (bytes != null) {
             this.bytes = bytes;
-            ConfigFiles.loadImage(bytes).thenAccept(image -> Platform.runLater(() -> this.imageViewPhoto.setImage(image)));
+            this.imageViewPhoto.setImage(ConfigFiles.loadImage(bytes));
             this.buttonDeletePhoto.setDisable(false);
         } else {
-            ConfigFiles.getDefaultImage().thenAccept(image -> Platform.runLater(() -> this.imageViewPhoto.setImage(image)));
+            this.imageViewPhoto.setImage(ConfigFiles.getDefaultImage());
             this.buttonDeletePhoto.setDisable(true);
         }
     }
@@ -95,7 +94,7 @@ public class PhotoHandler {
     }
 
     public void resetHandler() {
-        ConfigFiles.getDefaultImage().thenAccept(image -> Platform.runLater(() -> this.imageViewPhoto.setImage(image)));
+        this.imageViewPhoto.setImage(ConfigFiles.getDefaultImage());
         this.bytes = null;
         this.buttonDeletePhoto.setDisable(true);
     }
