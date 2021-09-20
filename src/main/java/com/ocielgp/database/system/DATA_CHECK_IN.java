@@ -3,6 +3,7 @@ package com.ocielgp.database.system;
 import com.ocielgp.app.GlobalController;
 import com.ocielgp.database.DataServer;
 import com.ocielgp.database.members.DATA_MEMBERS;
+import com.ocielgp.database.members.DATA_MEMBERS_FINGERPRINTS;
 import com.ocielgp.utilities.DateFormatter;
 import com.ocielgp.utilities.Loading;
 import com.ocielgp.utilities.Notifications;
@@ -88,6 +89,8 @@ public class DATA_CHECK_IN {
             } catch (SQLException sqlException) {
                 Notifications.catchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
             }
+            System.out.println("false");
+            DATA_MEMBERS_FINGERPRINTS.SCANNING = false;
         });
     }
 }

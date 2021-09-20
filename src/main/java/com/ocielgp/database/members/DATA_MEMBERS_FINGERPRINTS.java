@@ -22,6 +22,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class DATA_MEMBERS_FINGERPRINTS {
     private static final int fingerprintsDaysLimit;
+    public static boolean SCANNING = false;
 
     static {
         fingerprintsDaysLimit = Integer.parseInt(ConfigFiles.readProperty(ConfigFiles.File.APP, "fingerprintsDaysLimit"));
@@ -50,27 +51,32 @@ public class DATA_MEMBERS_FINGERPRINTS {
     }
 
     public static void SelectSearchFingerprints(Fmd fingerprint) {
-        CompletableFuture.runAsync(() -> {
-            Connection con = DataServer.getConnection();
-            PreparedStatement ps;
-            ResultSet rs;
-            try {
-                ps = con.prepareStatement("SELECT MF.fingerprint, MF.idMember, SM.idStaffMember FROM MEMBERS_FINGERPRINTS MF JOIN PAYMENTS_MEMBERSHIPS PM on MF.idMember = PM.idMember LEFT JOIN STAFF_MEMBERS SM on MF.idMember = SM.idMember WHERE DATE_ADD(PM.endDate, INTERVAL ? DAY) >= CURDATE() ORDER BY PM.startDate");
-                ps.setInt(1, fingerprintsDaysLimit);
-                rs = ps.executeQuery();
+        if (!SCANNING) {
+            SCANNING = true;
+            CompletableFuture.runAsync(() -> {
+                Connection con = DataServer.getConnection();
+                PreparedStatement ps;
+                ResultSet rs;
+                try {
+                    ps = con.prepareStatement("SELECT MF.fingerprint, MF.idMember, SM.idStaffMember FROM MEMBERS_FINGERPRINTS MF JOIN PAYMENTS_MEMBERSHIPS PM on MF.idMember = PM.idMember LEFT JOIN STAFF_MEMBERS SM on MF.idMember = SM.idMember WHERE DATE_ADD(PM.endDate, INTERVAL ? DAY) >= CURDATE() ORDER BY PM.startDate");
+                    ps.setInt(1, fingerprintsDaysLimit);
+                    rs = ps.executeQuery();
 
-                while (rs.next()) {
-                    if (Fingerprint.CompareFingerprints(fingerprint, rs.getBytes("fingerprint"))) {
-                        DATA_CHECK_IN.CreateCheckIn(rs.getBoolean("idStaffMember"), rs.getInt("idMember"), 1);
-                        return;
+                    while (rs.next()) {
+                        if (Fingerprint.CompareFingerprints(fingerprint, rs.getBytes("fingerprint"))) {
+                            DATA_CHECK_IN.CreateCheckIn(rs.getBoolean("idStaffMember"), rs.getInt("idMember"), 1);
+                            return;
+                        }
                     }
+                    Notifications.danger("gmi-fingerprint", "Lector de Huellas", "Huella no encontrada", 1.5);
+                    Loading.close();
+                } catch (SQLException sqlException) {
+                    Notifications.catchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
                 }
-                Notifications.danger("gmi-fingerprint", "Lector de Huellas", "Huella no encontrada", 1.5);
-                Loading.close();
-            } catch (SQLException sqlException) {
-                Notifications.catchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
-            }
-        });
+            });
+        } else {
+            System.out.println("no entro");
+        }
     }
 
     public static CompletableFuture<Pair<Integer, ArrayList<Fmd>>> ReadFingerprints(int idMember) {
