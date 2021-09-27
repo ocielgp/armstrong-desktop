@@ -2,10 +2,10 @@ package com.ocielgp.utilities;
 
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
-import com.ocielgp.app.GlobalController;
-import com.ocielgp.configuration.AppPreferences;
-import com.ocielgp.database.members.DATA_MEMBERS;
-import com.ocielgp.database.members.MODEL_MEMBERS;
+import com.ocielgp.app.Application;
+import com.ocielgp.app.UserPreferences;
+import com.ocielgp.dao.JDBC_Member;
+import com.ocielgp.models.Model_Member;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -45,7 +45,6 @@ public class Pagination {
 
         this.fieldSearch.setOnKeyPressed((keyEvent -> {
             if (keyEvent.getCode() == KeyCode.ENTER) {
-                System.out.println("buscado");
                 this.restartTable();
             }
         }));
@@ -58,20 +57,20 @@ public class Pagination {
         });
         labelPreviusPage.setOnMouseClicked(this.previousPage());
         labelNextPage.setOnMouseClicked(this.nextPage());
-        this.rows = AppPreferences.getPreferenceInt("PAGINATION_MAX_ROWS");
+        this.rows = UserPreferences.getPreferenceInt("PAGINATION_MAX_ROWS");
 
         // Listener on ComboBox GymModel
         EventHandler<ActionEvent> gymChange = actionEvent -> {
-            if (AppPreferences.getPreferenceBool("FILTER_MEMBER_ALL_GYMS")) {
+            if (UserPreferences.getPreferenceBool("FILTER_MEMBER_ALL_GYMS")) {
                 this.restartTable();
             }
         };
-        GlobalController.getCurrentGymNode().removeEventHandler(ActionEvent.ACTION, gymChange);
-        GlobalController.getCurrentGymNode().addEventHandler(ActionEvent.ACTION, gymChange);
+        Application.getCurrentGymNode().removeEventHandler(ActionEvent.ACTION, gymChange);
+        Application.getCurrentGymNode().addEventHandler(ActionEvent.ACTION, gymChange);
 
         this.fieldSearch.sceneProperty().addListener((observable, oldScene, newScene) -> {
             if (oldScene != null) {
-                GlobalController.getCurrentGymNode().removeEventHandler(ActionEvent.ACTION, gymChange);
+                Application.getCurrentGymNode().removeEventHandler(ActionEvent.ACTION, gymChange);
             }
         });
     }
@@ -81,7 +80,7 @@ public class Pagination {
             int newRowsPerPage = Integer.parseInt(this.fieldRowsPerPage.getText());
             if (newRowsPerPage > 0) {
                 this.rows = Integer.parseInt(this.fieldRowsPerPage.getText());
-                AppPreferences.setPreference("PAGINATION_MAX_ROWS", Integer.parseInt(this.fieldRowsPerPage.getText()));
+                UserPreferences.setPreference("PAGINATION_MAX_ROWS", Integer.parseInt(this.fieldRowsPerPage.getText()));
                 this.restartTable();
             } else {
                 Notifications.danger("Error", "Cantidad de registros no válida.", 2);
@@ -134,41 +133,39 @@ public class Pagination {
     }
 
     private void loadMembers() {
-        DATA_MEMBERS.ReadMembers(this.rows, this.page, this.fieldSearch.getText()).thenAccept(queryRows -> {
-            Platform.runLater(() -> {
-                if (queryRows.getData().size() > 0) {
-                    this.labelTotalPages.setText(queryRows.getPages().toString());
-                    this.labelTotalRows.setText(queryRows.getRows().toString());
-                    this.tableView.setRowFactory(row -> new TableRow<MODEL_MEMBERS>() {
-                        @Override
-                        public void updateItem(MODEL_MEMBERS modelMembers, boolean empty) {
-                            super.updateItem(modelMembers, empty);
-                            if (modelMembers != null) {
-                                String style = Input.styleToColor(modelMembers.getStyle());
-                                if (getStyleClass().size() == 5) {
-                                    getStyleClass().set(4, style); // replace color style
-                                } else {
-                                    getStyleClass().addAll("member-cell", style);
-                                }
+        JDBC_Member.ReadMembers(this.rows, this.page, this.fieldSearch.getText()).thenAccept(queryRows -> Platform.runLater(() -> {
+            if (queryRows.getData().size() > 0) {
+                this.labelTotalPages.setText(queryRows.getPages().toString());
+                this.labelTotalRows.setText(queryRows.getRows().toString());
+                this.tableView.setRowFactory(row -> new TableRow<Model_Member>() {
+                    @Override
+                    public void updateItem(Model_Member modelMember, boolean empty) {
+                        super.updateItem(modelMember, empty);
+                        if (modelMember != null) {
+                            String style = Input.styleToColor(modelMember.getStyle());
+                            if (getStyleClass().size() == 5) {
+                                getStyleClass().set(4, style); // replace color style
                             } else {
-                                if (getStyleClass().size() == 5) {
-                                    getStyleClass().remove(4); // remove member-cell
-                                    getStyleClass().remove(3); // remove color style
-                                }
+                                getStyleClass().addAll("member-cell", style);
+                            }
+                        } else {
+                            if (getStyleClass().size() == 5) {
+                                getStyleClass().remove(4); // remove member-cell
+                                getStyleClass().remove(3); // remove color style
                             }
                         }
-                    });
-                    this.tableView.setItems(queryRows.getData());
-                    this.labelCurrentPage.setText(this.page.toString());
-                } else {
-                    this.restartCounters();
-                }
+                    }
+                });
+                this.tableView.setItems(queryRows.getData());
+                this.labelCurrentPage.setText(this.page.toString());
+            } else {
+                this.restartCounters();
+            }
 
-                GlobalController.dashboardController.enableRoutes();
-                Loading.close();
-                this.tableView.setDisable(false);
-            });
-        });
+            Application.controllerDashboard.enableRoutes();
+            Loading.close();
+            this.tableView.setDisable(false);
+        }));
     }
 
     public void restartCounters() {

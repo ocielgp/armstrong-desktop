@@ -1,7 +1,7 @@
 package com.ocielgp.fingerprint;
 
 import com.digitalpersona.uareu.*;
-import com.ocielgp.database.members.DATA_MEMBERS_FINGERPRINTS;
+import com.ocielgp.dao.JDBC_Member_Fingerprint;
 import com.ocielgp.utilities.Loading;
 import com.ocielgp.utilities.Notifications;
 import javafx.application.Platform;
@@ -78,7 +78,7 @@ public class Capture
                         try {
                             Loading.show();
                             System.out.println("convertido");
-                            DATA_MEMBERS_FINGERPRINTS.ReadFindFingerprint(
+                            JDBC_Member_Fingerprint.ReadFindFingerprint(
                                     UareUGlobal.GetEngine().CreateFmd(
                                             evt.capture_result.image, Fmd.Format.ANSI_378_2004
                                     )

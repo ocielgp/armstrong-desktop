@@ -1,12 +1,11 @@
 package com.ocielgp;
 
-import com.ocielgp.app.GlobalController;
-import com.ocielgp.controller.AppController;
-import com.ocielgp.database.members.MODEL_MEMBERS;
-import com.ocielgp.database.staff.MODEL_STAFF_MEMBERS;
-import com.ocielgp.files.ConfigFiles;
+import com.ocielgp.app.Application;
+import com.ocielgp.controller.Controller_App;
+import com.ocielgp.models.Model_Member;
+import com.ocielgp.models.Model_Staff_Member;
+import com.ocielgp.utilities.FileLoader;
 import com.ocielgp.utilities.Loader;
-import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -17,7 +16,7 @@ import javafx.stage.WindowEvent;
 
 import java.util.HashMap;
 
-public class RunApp extends Application {
+public class RunApp extends javafx.application.Application {
     private final HashMap<String, Image> appIcon = new HashMap<>();
 
     public static void main(String[] args) {
@@ -27,19 +26,19 @@ public class RunApp extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        appIcon.put("focus", ConfigFiles.getIconApp());
-        appIcon.put("unfocused", ConfigFiles.loadImage("app-icon-unfocused.png"));
-        primaryStage.getIcons().setAll(ConfigFiles.getIconApp());
-        AppController appController = new AppController();
+        appIcon.put("focus", FileLoader.getIconApp());
+        appIcon.put("unfocused", FileLoader.loadImage("app-icon-unfocused.png"));
+        primaryStage.getIcons().setAll(FileLoader.getIconApp());
+        Controller_App controllerApp = new Controller_App();
 
-        GlobalController.setPrimaryStage(primaryStage);
-        GlobalController.setAppController(appController);
+        Application.setPrimaryStage(primaryStage);
+        Application.setAppController(controllerApp);
 
         BorderPane appView = (BorderPane) Loader.Load(
                 "app.fxml",
                 "RunApp",
                 false,
-                appController
+                controllerApp
         );
 
         // scene
@@ -54,7 +53,7 @@ public class RunApp extends Application {
                 );
             });
         });
-        primaryStage.setTitle("Gym App");
+        primaryStage.setTitle("Model_Gym Application");
         primaryStage.setScene(scene);
 //        primaryStage.setAlwaysOnTop(true);
 //        primaryStage.setMaximized(true);
@@ -68,16 +67,16 @@ public class RunApp extends Application {
         });
 
         // TODO: FIX BUG WINDOWS IS BLANK
-        MODEL_STAFF_MEMBERS modelStaffMembers = new MODEL_STAFF_MEMBERS();
-        modelStaffMembers.setPassword("a94cbdca65dd4582c45c2b8dd97aec782baa8fbad32b73b547bf5b0e52ef58f3");
-        modelStaffMembers.setIdRole(2);
-        MODEL_MEMBERS modelMembers = new MODEL_MEMBERS();
+        Model_Staff_Member modelStaffMember = new Model_Staff_Member();
+        modelStaffMember.setPassword("a94cbdca65dd4582c45c2b8dd97aec782baa8fbad32b73b547bf5b0e52ef58f3");
+        modelStaffMember.setIdRole(2);
+        Model_Member modelMembers = new Model_Member();
         modelMembers.setIdMember(2);
         modelMembers.setName("Ociel");
         modelMembers.setLastName("Garcia");
-        modelMembers.setModelStaffMembers(modelStaffMembers);
+        modelMembers.setModelStaffMember(modelStaffMember);
 
-        GlobalController.setStaffUserModel(modelMembers);
+        Application.setStaffUserModel(modelMembers);
         Node loginFXML = Loader.Load(
                 "dashboard.fxml",
                 "Login",

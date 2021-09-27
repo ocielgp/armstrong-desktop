@@ -1,8 +1,7 @@
 package com.ocielgp.utilities;
 
 import com.jfoenix.controls.JFXButton;
-import com.ocielgp.app.GlobalController;
-import com.ocielgp.files.ConfigFiles;
+import com.ocielgp.app.Application;
 import com.ocielgp.fingerprint.Fingerprint;
 import javafx.event.ActionEvent;
 import javafx.scene.image.Image;
@@ -31,7 +30,7 @@ public class PhotoHandler {
         buttonDeletePhoto.addEventFilter(ActionEvent.ACTION, actionEvent -> deleteImage());
 
         this.imageViewPhoto.setStyle("-fx-cursor: hand");
-        this.imageViewPhoto.setImage(ConfigFiles.getDefaultImage());
+        this.imageViewPhoto.setImage(FileLoader.getDefaultImage());
     }
 
 
@@ -44,7 +43,7 @@ public class PhotoHandler {
         fileChooser.getExtensionFilters().add(extensionFilter);
 
         // TODO: OPEN LAST LOCATION
-        File file = fileChooser.showOpenDialog(GlobalController.getPrimaryStage());
+        File file = fileChooser.showOpenDialog(Application.getPrimaryStage());
         if (file != null) {
             this.imageViewPhoto.setImage(new Image(file.toURI().toString()));
             this.buttonDeletePhoto.setDisable(false);
@@ -72,7 +71,7 @@ public class PhotoHandler {
     }
 
     private void deleteImage() {
-        this.imageViewPhoto.setImage(ConfigFiles.getDefaultImage());
+        this.imageViewPhoto.setImage(FileLoader.getDefaultImage());
         this.buttonDeletePhoto.setDisable(true);
         this.bytes = null;
         this.imageViewPhoto.requestFocus();
@@ -81,10 +80,10 @@ public class PhotoHandler {
     public void setPhoto(byte[] bytes) {
         if (bytes != null) {
             this.bytes = bytes;
-            this.imageViewPhoto.setImage(ConfigFiles.loadImage(bytes));
+            this.imageViewPhoto.setImage(FileLoader.loadImage(bytes));
             this.buttonDeletePhoto.setDisable(false);
         } else {
-            this.imageViewPhoto.setImage(ConfigFiles.getDefaultImage());
+            this.imageViewPhoto.setImage(FileLoader.getDefaultImage());
             this.buttonDeletePhoto.setDisable(true);
         }
     }
@@ -94,7 +93,7 @@ public class PhotoHandler {
     }
 
     public void resetHandler() {
-        this.imageViewPhoto.setImage(ConfigFiles.getDefaultImage());
+        this.imageViewPhoto.setImage(FileLoader.getDefaultImage());
         this.bytes = null;
         this.buttonDeletePhoto.setDisable(true);
     }

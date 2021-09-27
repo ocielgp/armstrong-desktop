@@ -1,6 +1,6 @@
 package com.ocielgp.database;
 
-import com.ocielgp.configuration.AppPreferences;
+import com.ocielgp.app.UserPreferences;
 import com.ocielgp.utilities.Notifications;
 import com.ocielgp.utilities.Styles;
 import com.zaxxer.hikari.HikariConfig;
@@ -11,7 +11,8 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 public class DataServer {
-    private static final HikariDataSource hikariDataSource;
+    private static final HikariConfig hikariConfig;
+    private static HikariDataSource hikariDataSource;
     private static final String host;
     private static final String port;
     private static final String user;
@@ -19,21 +20,28 @@ public class DataServer {
     private static final String database;
 
     static {
-        int source = AppPreferences.getPreferenceInt("DB_SOURCE");
-        database = AppPreferences.getPreferenceString("DB_NAME");
-        host = AppPreferences.getPreferenceString("DB_HOST_" + source);
-        port = AppPreferences.getPreferenceString("DB_PORT_" + source);
-        user = AppPreferences.getPreferenceString("DB_USER_" + source);
-        password = AppPreferences.getPreferenceString("DB_PASSWORD_" + source);
+        int source = UserPreferences.getPreferenceInt("DB_SOURCE");
+        database = UserPreferences.getPreferenceString("DB_NAME");
+        host = UserPreferences.getPreferenceString("DB_HOST_" + source);
+        port = UserPreferences.getPreferenceString("DB_PORT_" + source);
+        user = UserPreferences.getPreferenceString("DB_USER_" + source);
+        password = UserPreferences.getPreferenceString("DB_PASSWORD_" + source);
 
-        HikariConfig hikariConfig = new HikariConfig();
+        hikariConfig = new HikariConfig();
         hikariConfig.setJdbcUrl("jdbc:mysql://" + host + ":" + port + "/" + database);
         hikariConfig.setUsername(user);
         hikariConfig.setPassword(password);
         hikariConfig.addDataSourceProperty("cachePrepStmts", "true");
         hikariConfig.addDataSourceProperty("prepStmtCacheSize", "250");
         hikariConfig.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
-        hikariConfig.setLeakDetectionThreshold(8000);
+        /*hikariConfig.setMinimumIdle(0);
+        hikariConfig.setConnectionTimeout(30000);
+        hikariConfig.setIdleTimeout(35000);
+        hikariConfig.setMaxLifetime(45000);*/
+        hikariConfig.setKeepaliveTime(30000);
+//        hikariConfig.setMaxLifetime(25000);
+        hikariConfig.setConnectionTimeout(25000);
+        hikariConfig.setLeakDetectionThreshold(3000);
         System.out.println("[DataServer]: Tratando de conectar a " + host + "...");
         hikariDataSource = new HikariDataSource(hikariConfig);
         System.out.println("[DataServer]: Conectado a " + host);
@@ -51,7 +59,10 @@ public class DataServer {
         try {
             return hikariDataSource.getConnection();
         } catch (SQLException sqlException) {
-            Notifications.catchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
+            hikariDataSource = new HikariDataSource(hikariConfig);
+            if (!hikariDataSource.isRunning()) {
+                Notifications.catchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
+            }
         }
         return null;
     }

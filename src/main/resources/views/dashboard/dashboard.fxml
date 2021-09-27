@@ -8,7 +8,7 @@
 <?import java.lang.*?>
 <GridPane xmlns:fx="http://javafx.com/fxml/1" fx:id="boxDashboard" prefHeight="768.0" prefWidth="1366.0"
           styleClass="dashboard" xmlns="http://javafx.com/javafx/15.0.1"
-          fx:controller="com.ocielgp.controller.DashboardController">
+          fx:controller="com.ocielgp.controller.Controller_Dashboard">
     <columnConstraints>
         <ColumnConstraints hgrow="SOMETIMES" maxWidth="200.0"/>
         <ColumnConstraints hgrow="SOMETIMES"/>

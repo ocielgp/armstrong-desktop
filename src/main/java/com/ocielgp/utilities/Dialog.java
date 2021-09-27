@@ -4,9 +4,8 @@ import animatefx.animation.FadeInUp;
 import animatefx.animation.Shake;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
-import com.ocielgp.app.GlobalController;
-import com.ocielgp.database.payments.MODEL_DEBTS;
-import com.ocielgp.files.ConfigFiles;
+import com.ocielgp.app.Application;
+import com.ocielgp.models.Model_Debt;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -25,8 +24,9 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
+import java.math.BigDecimal;
 import java.net.URL;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 
 public class Dialog {
@@ -50,8 +50,8 @@ public class Dialog {
         this.dialogController = new DialogView(this, style, title, content, type, buttonsText);
     }
 
-    public Dialog(Styles style, String title, ArrayList<MODEL_DEBTS> debtsList, String... buttonsText) {
-        this.dialogController = new DialogView(this, style, title, DialogTypes.DEBT, debtsList, buttonsText);
+    public Dialog(Styles style, String title, List<Model_Debt> debtList, String... buttonsText) {
+        this.dialogController = new DialogView(this, style, title, DialogTypes.DEBT, debtList, buttonsText);
     }
 
     public boolean show() {
@@ -65,7 +65,7 @@ public class Dialog {
         Scene scene = new Scene(this.dialogView);
         scene.setFill(Color.TRANSPARENT);
         scene.getStylesheets().add("styles.css");
-        this.stage.getIcons().setAll(ConfigFiles.getIconApp());
+        this.stage.getIcons().setAll(FileLoader.getIconApp());
         this.stage.initModality(Modality.APPLICATION_MODAL);
         this.stage.setAlwaysOnTop(true);
         this.stage.setScene(scene);
@@ -116,7 +116,7 @@ public class Dialog {
         public final DialogTypes dialogType;
         private final String[] buttonsText;
 
-        private ArrayList<MODEL_DEBTS> debtsList;
+        private List<Model_Debt> debtList;
 
         public DialogView(Dialog controller, Styles style, String title, String content, DialogTypes dialogType, String... buttonText) {
             this.controller = controller;
@@ -127,12 +127,12 @@ public class Dialog {
             this.buttonsText = buttonText;
         }
 
-        public DialogView(Dialog controller, Styles style, String title, DialogTypes dialogType, ArrayList<MODEL_DEBTS> debtsList, String... buttonText) {
+        public DialogView(Dialog controller, Styles style, String title, DialogTypes dialogType, List<Model_Debt> debtList, String... buttonText) {
             this.controller = controller;
             this.style = style;
             this.title = title;
             this.dialogType = dialogType;
-            this.debtsList = debtsList;
+            this.debtList = debtList;
             this.buttonsText = buttonText;
         }
 
@@ -141,7 +141,7 @@ public class Dialog {
             this.boxDialog.requestFocus();
             this.boxDialog.setMinWidth(500);
             this.boxDialog.setMaxWidth(500);
-            this.boxDialog.getStyleClass().addAll(GlobalController.getThemeType());
+            this.boxDialog.getStyleClass().addAll(Application.getThemeType());
             String style = Input.styleToColor(this.style);
             this.boxContent.getStyleClass().add(style);
             this.labelTitle.setText(this.title.toUpperCase());
@@ -178,7 +178,7 @@ public class Dialog {
                         this.controller.closeModal();
                     }
                     case PASSWORD: {
-                        if (Hash.generateHash(this.input.getText()).equals(GlobalController.getStaffUserModel().getModelStaffMembers().getPassword())) {
+                        if (Hash.generateHash(this.input.getText()).equals(Application.getStaffUserModel().getModelStaffMember().getPassword())) {
                             this.controller.answerStatus = true;
                             this.controller.closeModal();
                         } else {
@@ -218,15 +218,15 @@ public class Dialog {
                     this.scrollPane.setPrefHeight(500);
                     this.labelContent.setText("[fecha y hora](cantidad)[deuda restante] descripción");
                     this.labelContent.getStyleClass().add("bold");
-                    for (MODEL_DEBTS debt : debtsList) {
+                    for (Model_Debt modelDebt : debtList) {
                         Label label = new Label(
-                                "[" + debt.getDateTime() + "](" + debt.getAmount() + ")[$" + debt.getOwe() + "] " + debt.getDescription()
+                                "[" + modelDebt.getDateTime() + "](" + modelDebt.getAmount() + ")[$" + modelDebt.getOwe() + "] " + modelDebt.getDescription()
                         );
                         label.setWrapText(true);
                         label.setStyle("-fx-text-fill: -fx-color-text");
                         this.boxContentBuilder.getChildren().add(label);
                     }
-                    this.labelDebt.setText(String.valueOf(this.debtsList.get(0).getTotalOwe()));
+                    this.labelDebt.setText(String.valueOf(this.debtList.get(0).getTotalOwe()));
                     this.input.setPromptText("Ingresa la cantidad a abonar");
                     this.input.textProperty().addListener((observable, oldValue, newValue) -> {
                         boolean flag = Validator.moneyValidator(
@@ -238,18 +238,18 @@ public class Dialog {
                         );
 
                         if (flag) {
-                            double number = Double.parseDouble(this.input.getText());
-                            double owe = this.debtsList.get(0).getTotalOwe() - number;
-                            if (number > 0 && owe >= 0) {
+                            BigDecimal number = new BigDecimal(this.input.getText());
+                            BigDecimal owe = this.debtList.get(0).getTotalOwe().subtract(number);
+                            if (number.compareTo(BigDecimal.ZERO) > 0 && owe.compareTo(BigDecimal.ZERO) >= 0) {
                                 this.labelDebt.setText(String.valueOf(owe));
                                 this.buttonOk.setDisable(false);
                             } else {
-                                this.labelDebt.setText(String.valueOf(this.debtsList.get(0).getTotalOwe()));
+                                this.labelDebt.setText(String.valueOf(this.debtList.get(0).getTotalOwe()));
                                 this.buttonOk.setDisable(true);
                                 new Shake(this.input).play();
                             }
                         } else {
-                            this.labelDebt.setText(String.valueOf(this.debtsList.get(0).getTotalOwe()));
+                            this.labelDebt.setText(String.valueOf(this.debtList.get(0).getTotalOwe()));
                             this.buttonOk.setDisable(true);
                         }
                     });

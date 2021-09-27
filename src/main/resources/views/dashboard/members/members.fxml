@@ -6,13 +6,14 @@
 <?import javafx.scene.layout.*?>
 <?import org.kordamp.ikonli.javafx.*?>
 <?import java.lang.*?>
-<GridPane fx:id="boxMembersPane" style="-fx-background-color: -fx-color-background;" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ocielgp.controller.MembersController">
+<GridPane xmlns:fx="http://javafx.com/fxml/1" fx:id="boxMembersPane" style="-fx-background-color: -fx-color-background;"
+          xmlns="http://javafx.com/javafx/15.0.1" fx:controller="com.ocielgp.controller.Controller_Members">
     <columnConstraints>
-        <ColumnConstraints hgrow="SOMETIMES" prefWidth="700.0" />
-        <ColumnConstraints maxWidth="412.0" minWidth="412.0" />
+        <ColumnConstraints hgrow="SOMETIMES" prefWidth="700.0"/>
+        <ColumnConstraints maxWidth="412.0" minWidth="412.0"/>
     </columnConstraints>
     <rowConstraints>
-        <RowConstraints vgrow="SOMETIMES" />
+        <RowConstraints vgrow="SOMETIMES"/>
     </rowConstraints>
     <VBox alignment="TOP_CENTER">
         <FlowPane alignment="CENTER" columnHalignment="CENTER" hgap="10.0" vgap="10.0">

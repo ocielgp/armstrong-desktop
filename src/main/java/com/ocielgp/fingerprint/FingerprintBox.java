@@ -2,7 +2,7 @@ package com.ocielgp.fingerprint;
 
 import com.digitalpersona.uareu.Fmd;
 import com.jfoenix.controls.JFXButton;
-import com.ocielgp.database.members.DATA_MEMBERS_FINGERPRINTS;
+import com.ocielgp.dao.JDBC_Member_Fingerprint;
 import com.ocielgp.utilities.Input;
 import javafx.application.Platform;
 import javafx.scene.control.Label;
@@ -62,7 +62,7 @@ public class FingerprintBox {
     public void loadFingerprints(int idMember) {
         if (this.boxFingerprintPane.isVisible()) {
             CompletableFuture.runAsync(() -> {
-                DATA_MEMBERS_FINGERPRINTS.ReadFingerprints(idMember).thenAccept(fingerprints -> {
+                JDBC_Member_Fingerprint.ReadFingerprints(idMember).thenAccept(fingerprints -> {
                     Platform.runLater(() -> {
                         this.labelFingerprintCounter.setText(fingerprints.getKey().toString());
                         this.arrayFingerprints = fingerprints.getValue();

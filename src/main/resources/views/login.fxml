@@ -5,20 +5,19 @@
 <?import com.jfoenix.controls.JFXTextField?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.*?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
-
-<HBox fx:id="boxLoginPane" alignment="CENTER" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ocielgp.controller.LoginController">
+<HBox xmlns:fx="http://javafx.com/fxml/1" fx:id="boxLoginPane" alignment="CENTER"
+      xmlns="http://javafx.com/javafx/15.0.1" fx:controller="com.ocielgp.controller.Controller_Login">
    <VBox alignment="CENTER" prefWidth="400.0">
       <VBox style="-fx-border-color: -fx-color-unfocus; -fx-background-radius: 10px; -fx-border-radius: 10px;">
          <HBox alignment="CENTER">
-            <ImageView fx:id="imageUser" fitHeight="150.0" fitWidth="150.0" pickOnBounds="true" preserveRatio="true" />
+            <ImageView fx:id="imageUser" fitHeight="150.0" fitWidth="150.0" pickOnBounds="true" preserveRatio="true"/>
          </HBox>
          <VBox>
             <JFXTextField fx:id="fieldUsername" alignment="CENTER" promptText="Usuario">
                <VBox.margin>
-                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
                </VBox.margin>
             </JFXTextField>
             <JFXPasswordField fx:id="fieldPassword" alignment="CENTER" promptText="Contraseña">

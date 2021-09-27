@@ -2,7 +2,7 @@ package com.ocielgp.utilities;
 
 import animatefx.animation.FadeInRight;
 import animatefx.animation.FadeOutRight;
-import com.ocielgp.app.GlobalController;
+import com.ocielgp.app.Application;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
@@ -58,7 +58,7 @@ class NotificationView implements Initializable {
         this.fontIcon.setIconLiteral(this.icon);
         this.labelTitle.setText(this.title);
         this.labelContent.setText(this.content);
-        this.gridPane.getStyleClass().addAll(GlobalController.getThemeType(), Input.styleToColor(this.style));
+        this.gridPane.getStyleClass().addAll(Application.getThemeType(), Input.styleToColor(this.style));
     }
 
     public String getTitle() {
@@ -85,7 +85,7 @@ public class Notifications {
     }
 
     public static void initializeNotificationSystem() {
-        stage.initOwner(GlobalController.getPrimaryStage());
+        stage.initOwner(Application.getPrimaryStage());
     }
 
     private static final double SECONDS = 3;
@@ -133,7 +133,7 @@ public class Notifications {
         stage.setScene(scene);
         Platform.runLater(() -> {
             stage.show();
-            GlobalController.getPrimaryStage().requestFocus();
+            Application.getPrimaryStage().requestFocus();
 
             // Set new position to Stage
             stage.setX(

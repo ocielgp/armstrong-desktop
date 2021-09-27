@@ -1,7 +1,7 @@
 package com.ocielgp.utilities;
 
 import com.jfoenix.controls.JFXSpinner;
-import com.ocielgp.app.GlobalController;
+import com.ocielgp.app.Application;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -30,7 +30,7 @@ public class Loading {
         scene.setFill(Color.TRANSPARENT);
         stage.setScene(scene);
         stage.initModality(Modality.NONE);
-        stage.initOwner(GlobalController.getPrimaryStage());
+        stage.initOwner(Application.getPrimaryStage());
     }
 
     public static void show() {
