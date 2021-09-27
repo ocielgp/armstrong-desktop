@@ -16,10 +16,11 @@ public class DATA_GYMS {
     public static CompletableFuture<MODEL_GYMS> ReadGym(int idGym) {
         return CompletableFuture.supplyAsync(() -> {
             Connection con = DataServer.getConnection();
-            PreparedStatement ps;
-            ResultSet rs;
             MODEL_GYMS modelGyms = null;
             try {
+                PreparedStatement ps;
+                ResultSet rs;
+                assert con != null;
                 ps = con.prepareStatement("SELECT idGym, name, address FROM GYMS WHERE idGym = ?");
                 ps.setInt(1, idGym);
                 rs = ps.executeQuery();
@@ -36,6 +37,8 @@ public class DATA_GYMS {
                         "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(),
                         sqlException
                 );
+            } finally {
+                DataServer.closeConnection(con);
             }
             return modelGyms;
         });
@@ -43,10 +46,11 @@ public class DATA_GYMS {
 
     public static ObservableList<MODEL_GYMS> ReadGyms() {
         Connection con = DataServer.getConnection();
-        PreparedStatement ps;
-        ResultSet rs;
         ObservableList<MODEL_GYMS> modelGymsList = FXCollections.observableArrayList();
         try {
+            PreparedStatement ps;
+            ResultSet rs;
+            assert con != null;
             ps = con.prepareStatement("SELECT idGym, name, address FROM GYMS WHERE flag = 1");
             rs = ps.executeQuery();
             while (rs.next()) {
@@ -60,12 +64,9 @@ public class DATA_GYMS {
                 Notifications.warn(MethodHandles.lookup().lookupClass().getSimpleName(), "No hay gimnasios registrados.", 5);
             }
         } catch (SQLException sqlException) {
-            Notifications.catchError(
-                    MethodHandles.lookup().lookupClass().getSimpleName(),
-                    Thread.currentThread().getStackTrace()[1],
-                    "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(),
-                    sqlException
-            );
+            Notifications.catchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
+        } finally {
+            DataServer.closeConnection(con);
         }
         return modelGymsList;
     }

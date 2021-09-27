@@ -10,10 +10,11 @@ module app {
     requires com.jfoenix;
 
     requires java.sql;
-    requires mysql.connector.java;
+    requires com.zaxxer.hikari;
 
     requires java.desktop;
     requires javafx.swing;
+    requires java.prefs;
 
     exports com.digitalpersona.uareu;
     exports animatefx.animation;
@@ -32,4 +33,5 @@ module app {
     opens com.ocielgp.database.payments;
     opens com.ocielgp.database.staff;
     opens com.ocielgp.database.system;
+    opens com.ocielgp.configuration;
 }

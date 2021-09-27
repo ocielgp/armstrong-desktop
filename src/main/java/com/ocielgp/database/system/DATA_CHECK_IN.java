@@ -21,10 +21,11 @@ public class DATA_CHECK_IN {
     public static void CreateCheckIn(boolean isStaff, int idMember, int openedBy) {
         CompletableFuture.runAsync(() -> {
             Connection con = DataServer.getConnection();
-            PreparedStatement ps;
-            ResultSet rs;
             try {
+                PreparedStatement ps;
+                ResultSet rs;
                 if (isStaff) {
+                    assert con != null;
                     ps = con.prepareStatement("SELECT M.name, M.lastName, MP.photo, SR.name, G.name AS 'gymName' FROM MEMBERS M LEFT JOIN MEMBERS_PHOTOS MP ON M.idMember = MP.idMember JOIN STAFF_MEMBERS SM on M.idMember = SM.idMember JOIN STAFF_ROLE SR on SM.idRole = SR.idRole JOIN GYMS G on M.idGym = G.idGym WHERE M.idMember = ?");
                     ps.setInt(1, idMember);
                     rs = ps.executeQuery();
@@ -39,6 +40,7 @@ public class DATA_CHECK_IN {
                         );
                     }
                 } else {
+                    assert con != null;
                     ps = con.prepareStatement("SELECT MP.photo, M.name, M.lastName, M.access, MS.description, PM.endDate, (SELECT COUNT(idDebt) > 0 FROM DEBTS WHERE idMember = M.idMember AND debtStatus = 1 AND flag = 1 ORDER BY dateTime DESC) AS 'haveDebts', M.idGym AS 'idGymMember', PM.idGym AS 'idGymPayment' FROM MEMBERS M LEFT JOIN MEMBERS_PHOTOS MP ON M.idMember = MP.idMember LEFT JOIN PAYMENTS_MEMBERSHIPS PM ON PM.idPaymentMembership = (SELECT idPaymentMembership FROM PAYMENTS_MEMBERSHIPS WHERE idMember = M.idMember AND flag = 1 ORDER BY startDate DESC LIMIT 1) LEFT JOIN MEMBERSHIPS MS ON PM.idMembership = MS.idMembership WHERE M.idMember = ? AND M.flag = 1");
                     ps.setInt(1, idMember);
                     rs = ps.executeQuery();
@@ -88,8 +90,9 @@ public class DATA_CHECK_IN {
                 ps.executeUpdate();
             } catch (SQLException sqlException) {
                 Notifications.catchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
+            } finally {
+                DataServer.closeConnection(con);
             }
-            System.out.println("false");
             DATA_MEMBERS_FINGERPRINTS.SCANNING = false;
         });
     }

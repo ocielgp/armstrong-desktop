@@ -13,14 +13,15 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class DATA_STAFF_MEMBERS {
-    public static Boolean Login(String username, String password) {
+    public static Boolean ReadLogin(String username, String password) {
         Connection con = DataServer.getConnection();
-        PreparedStatement ps;
-        ResultSet rs;
         try {
+            PreparedStatement ps;
+            ResultSet rs;
             String hash = Hash.generateHash(password);
             System.out.println("hash " + hash);
 
+            assert con != null;
             ps = con.prepareStatement("SELECT SM.idRole, M.idMember, M.name, M.lastName, M.access FROM STAFF_MEMBERS SM JOIN MEMBERS M ON SM.idMember = M.idMember WHERE (SM.flag = 1 AND M.flag = 1) AND (BINARY username = ? AND BINARY password = ?)");
             ps.setString(1, username);
             ps.setString(2, hash);
@@ -45,6 +46,8 @@ public class DATA_STAFF_MEMBERS {
             }
         } catch (SQLException sqlException) {
             Notifications.catchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
+        } finally {
+            DataServer.closeConnection(con);
         }
         return false;
     }

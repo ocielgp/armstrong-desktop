@@ -161,7 +161,7 @@ public class MemberDetailController implements Initializable {
                         this.modelMembers = model_members;
                         this.modelMembers.setIdMember(idMember);
                     }).thenRunAsync(() -> Fingerprint.loadFingerprints(idMember))
-                    .thenRunAsync(() -> DATA_PAYMENTS_MEMBERSHIPS.getLastPayment(idMember).thenAccept(model_payments_memberships -> {
+                    .thenRunAsync(() -> DATA_PAYMENTS_MEMBERSHIPS.ReadLastPayment(idMember).thenAccept(model_payments_memberships -> {
                         this.modelMembers.setModelPaymentsMemberships(model_payments_memberships);
                         if (model_payments_memberships == null) {
                             DATA_GYMS.ReadGym(this.modelMembers.getIdGym())

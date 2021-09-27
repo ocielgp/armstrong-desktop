@@ -3,9 +3,9 @@ package com.ocielgp.utilities;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
 import com.ocielgp.app.GlobalController;
+import com.ocielgp.configuration.AppPreferences;
 import com.ocielgp.database.members.DATA_MEMBERS;
 import com.ocielgp.database.members.MODEL_MEMBERS;
-import com.ocielgp.files.ConfigFiles;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -58,11 +58,11 @@ public class Pagination {
         });
         labelPreviusPage.setOnMouseClicked(this.previousPage());
         labelNextPage.setOnMouseClicked(this.nextPage());
-        this.rows = Integer.parseInt(ConfigFiles.readProperty(ConfigFiles.File.APP, "paginationRows"));
+        this.rows = AppPreferences.getPreferenceInt("PAGINATION_MAX_ROWS");
 
         // Listener on ComboBox GymModel
         EventHandler<ActionEvent> gymChange = actionEvent -> {
-            if (Boolean.parseBoolean(ConfigFiles.readProperty(ConfigFiles.File.APP, "memberAllGyms"))) {
+            if (AppPreferences.getPreferenceBool("FILTER_MEMBER_ALL_GYMS")) {
                 this.restartTable();
             }
         };
@@ -81,7 +81,7 @@ public class Pagination {
             int newRowsPerPage = Integer.parseInt(this.fieldRowsPerPage.getText());
             if (newRowsPerPage > 0) {
                 this.rows = Integer.parseInt(this.fieldRowsPerPage.getText());
-                ConfigFiles.saveProperty(ConfigFiles.File.APP, "paginationRows", this.fieldRowsPerPage.getText());
+                AppPreferences.setPreference("PAGINATION_MAX_ROWS", Integer.parseInt(this.fieldRowsPerPage.getText()));
                 this.restartTable();
             } else {
                 Notifications.danger("Error", "Cantidad de registros no válida.", 2);

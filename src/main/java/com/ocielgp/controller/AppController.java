@@ -2,10 +2,10 @@ package com.ocielgp.controller;
 
 import animatefx.animation.FadeIn;
 import com.jfoenix.controls.JFXComboBox;
-import com.ocielgp.database.DataServer;
+import com.ocielgp.app.GlobalController;
+import com.ocielgp.configuration.AppPreferences;
 import com.ocielgp.database.system.DATA_GYMS;
 import com.ocielgp.database.system.MODEL_GYMS;
-import com.ocielgp.files.ConfigFiles;
 import com.ocielgp.fingerprint.Fingerprint;
 import com.ocielgp.utilities.Notifications;
 import javafx.application.Platform;
@@ -37,7 +37,7 @@ public class AppController implements Initializable {
     private String theme; // Initial theme
 
     public AppController() {
-        this.theme = ConfigFiles.readProperty(ConfigFiles.File.APP, "theme");
+        this.theme = AppPreferences.getPreferenceString("THEME");
     }
 
     @Override
@@ -52,7 +52,7 @@ public class AppController implements Initializable {
                 this.borderPane.getStyleClass().set(1, "day-theme");
                 this.theme = "day-theme";
             }
-            ConfigFiles.saveProperty(ConfigFiles.File.APP, "theme", this.theme);
+            AppPreferences.setPreference("THEME", this.theme);
         });
 
         /*Node loginFXML = Loader.Load(
@@ -69,21 +69,19 @@ public class AppController implements Initializable {
 
             // Connect to data source
             CompletableFuture.runAsync(() -> {
-                if (DataServer.getConnection() != null) {
-                    ObservableList<MODEL_GYMS> gyms = DATA_GYMS.ReadGyms();
-                    Platform.runLater(() -> {
-                        comboBoxGyms.setItems(gyms);
-                        int previousIdGym = Integer.parseInt(ConfigFiles.readProperty(ConfigFiles.File.APP, "idGym"));
-                        for (MODEL_GYMS gym : gyms) {
-                            if (previousIdGym == gym.getIdGym()) {
-                                comboBoxGyms.getSelectionModel().select(gym);
-                                break;
-                            }
+                ObservableList<MODEL_GYMS> gyms = DATA_GYMS.ReadGyms();
+                Platform.runLater(() -> {
+                    comboBoxGyms.setItems(gyms);
+                    int previousIdGym = AppPreferences.getPreferenceInt("LAST_GYM");
+                    for (MODEL_GYMS gym : gyms) {
+                        if (previousIdGym == gym.getIdGym()) {
+                            comboBoxGyms.getSelectionModel().select(gym);
+                            break;
                         }
-                    });
-                    comboBoxGyms.valueProperty().addListener((observable, oldValue, newValue) -> ConfigFiles.saveProperty(ConfigFiles.File.APP, "idGym", String.valueOf(comboBoxGyms.getSelectionModel().getSelectedItem().getIdGym())));
-                    comboBoxGyms.focusedProperty().addListener((observableValue, oldValue, newValue) -> comboBoxGyms.getStyleClass().remove("red-border-input-line"));
-                }
+                    }
+                });
+                comboBoxGyms.valueProperty().addListener((observable, oldValue, newValue) -> AppPreferences.setPreference("LAST_GYM", GlobalController.getCurrentGym().getIdGym()));
+                comboBoxGyms.focusedProperty().addListener((observableValue, oldValue, newValue) -> comboBoxGyms.getStyleClass().remove("red-border-input-line"));
             });
 
             // Check if fingerprint scanner is connected

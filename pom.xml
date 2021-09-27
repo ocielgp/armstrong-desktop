@@ -12,8 +12,8 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <maven.compiler.source>16</maven.compiler.source>
-        <maven.compiler.target>16</maven.compiler.target>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
     </properties>
 
     <dependencies>
@@ -74,12 +74,23 @@
             <artifactId>mysql-connector-java</artifactId>
             <version>8.0.26</version>
         </dependency>
-
         <!-- https://mvnrepository.com/artifact/com.zaxxer/HikariCP -->
         <dependency>
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>
             <version>5.0.0</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-api -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.32</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>1.7.32</version>
         </dependency>
 
     </dependencies>
@@ -88,9 +99,6 @@
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
-            </resource>
-            <resource>
-                <directory>src/main/resources/config</directory>
             </resource>
             <resource>
                 <directory>src/main/resources/fonts</directory>
@@ -113,6 +121,7 @@
         </resources>
 
         <plugins>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -122,13 +131,16 @@
             <plugin>
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-maven-plugin</artifactId>
-                <version>0.0.6</version>
+                <version>0.0.7</version>
                 <configuration>
+                    <noHeaderFiles>true</noHeaderFiles>
+                    <stripDebug>true</stripDebug>
+                    <noManPages>true</noManPages>
                     <mainClass>app/com.ocielgp.RunApp</mainClass>
-                    <launcher>gym</launcher>
-                    <compress>2</compress>
-                    <jlinkZipName>gym-app</jlinkZipName>
-                    <jlinkImageName>gym-app</jlinkImageName>
+                    <launcher>launcher</launcher>
+                    <!--<compress>1</compress>
+                    <jlinkZipName>gym-app</jlinkZipName>-->
+                    <jlinkImageName>com.ocielgp.gym</jlinkImageName>
                     <options>
                         <option>--add-opens</option>
                         <option>java.base/java.lang.reflect=com.jfoenix</option>

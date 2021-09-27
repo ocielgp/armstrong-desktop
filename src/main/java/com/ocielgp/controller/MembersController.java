@@ -5,6 +5,7 @@ import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXCheckBox;
 import com.jfoenix.controls.JFXRadioButton;
 import com.jfoenix.controls.JFXTextField;
+import com.ocielgp.configuration.AppPreferences;
 import com.ocielgp.database.members.MODEL_MEMBERS;
 import com.ocielgp.files.ConfigFiles;
 import com.ocielgp.utilities.Loader;
@@ -105,24 +106,24 @@ public class MembersController implements Initializable {
 
         // filters
         this.pagination = new Pagination(this.fieldSearch, this.buttonSearch, this.labelTotalRows, this.tableViewMembers, this.fieldRowsPerPage, this.labelPreviousPage, this.labelCurrentPage, this.labelTotalPages, this.labelNextPage, Pagination.Sources.MEMBERS);
-        this.checkBoxAllGyms.setSelected(Boolean.parseBoolean(ConfigFiles.readProperty(ConfigFiles.File.APP, "memberAllGyms")));
-        this.checkBoxOnlyActiveMembers.setSelected(Boolean.parseBoolean(ConfigFiles.readProperty(ConfigFiles.File.APP, "memberOnlyActiveMembers")));
-        this.checkBoxOnlyDebtors.setSelected(Boolean.parseBoolean(ConfigFiles.readProperty(ConfigFiles.File.APP, "memberOnlyDebtors")));
+        this.checkBoxAllGyms.setSelected(AppPreferences.getPreferenceBool("FILTER_MEMBER_ALL_GYMS"));
+        this.checkBoxOnlyActiveMembers.setSelected(AppPreferences.getPreferenceBool("FILTER_MEMBER_ACTIVE_MEMBERS"));
+        this.checkBoxOnlyDebtors.setSelected(AppPreferences.getPreferenceBool("FILTER_MEMBER_DEBTORS"));
 
-        this.checkBoxAllGyms.selectedProperty().addListener(ConfigFiles.listenerSaver(ConfigFiles.File.APP, "memberAllGyms", pagination));
-        this.checkBoxOnlyActiveMembers.selectedProperty().addListener(ConfigFiles.listenerSaver(ConfigFiles.File.APP, "memberOnlyActiveMembers", pagination));
-        this.checkBoxOnlyDebtors.selectedProperty().addListener(ConfigFiles.listenerSaver(ConfigFiles.File.APP, "memberOnlyDebtors", pagination));
+        this.checkBoxAllGyms.selectedProperty().addListener(ConfigFiles.listenerSaver("FILTER_MEMBER_ALL_GYMS", pagination));
+        this.checkBoxOnlyActiveMembers.selectedProperty().addListener(ConfigFiles.listenerSaver("FILTER_MEMBER_ACTIVE_MEMBERS", pagination));
+        this.checkBoxOnlyDebtors.selectedProperty().addListener(ConfigFiles.listenerSaver("FILTER_MEMBER_DEBTORS", pagination));
 
         ToggleGroup toggleGender = new ToggleGroup();
         this.radioButtonGender0.setToggleGroup(toggleGender);
         this.radioButtonGender1.setToggleGroup(toggleGender);
         this.radioButtonGender2.setToggleGroup(toggleGender);
-        ConfigFiles.createSelectedToggleProperty(toggleGender, "radioButtonGender", "memberGender", pagination);
+        ConfigFiles.createSelectedToggleProperty(toggleGender, "radioButtonGender", "FILTER_MEMBER_GENDERS", pagination);
 
         ToggleGroup toggleOrderBy = new ToggleGroup();
         this.radioButtonOrderBy0.setToggleGroup(toggleOrderBy);
         this.radioButtonOrderBy1.setToggleGroup(toggleOrderBy);
-        ConfigFiles.createSelectedToggleProperty(toggleOrderBy, "radioButtonOrderBy", "memberOrderBy", pagination);
+        ConfigFiles.createSelectedToggleProperty(toggleOrderBy, "radioButtonOrderBy", "FILTER_MEMBER_ORDER_BY", pagination);
 
         Platform.runLater(() -> {
             new FadeIn(this.boxMembersPane).play();

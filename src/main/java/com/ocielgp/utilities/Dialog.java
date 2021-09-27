@@ -173,11 +173,11 @@ public class Dialog {
         private EventHandler<ActionEvent> eventHandlerButtonOk() {
             return actionEvent -> {
                 switch (dialogType) {
-                    case MESSAGE -> {
+                    case MESSAGE: {
                         this.controller.answerStatus = true;
                         this.controller.closeModal();
                     }
-                    case PASSWORD -> {
+                    case PASSWORD: {
                         if (Hash.generateHash(this.input.getText()).equals(GlobalController.getStaffUserModel().getModelStaffMembers().getPassword())) {
                             this.controller.answerStatus = true;
                             this.controller.closeModal();
@@ -186,7 +186,7 @@ public class Dialog {
                             new Shake(this.input).play();
                         }
                     }
-                    case DEBT -> {
+                    case DEBT: {
                         this.controller.closeModal();
                     }
                 }
@@ -202,17 +202,17 @@ public class Dialog {
 
         private void initUI() {
             switch (dialogType) {
-                case MESSAGE -> {
+                case MESSAGE: {
                     Input.createVisibleProperty(this.boxDebt);
                     Input.createVisibleProperty(this.input);
                 }
-                case PASSWORD -> {
+                case PASSWORD: {
                     Input.createVisibleProperty(this.boxDebt);
                     this.input.textProperty().addListener((observable, oldValue, newValue) -> {
                         this.buttonOk.setDisable(newValue.equals(""));
                     });
                 }
-                case DEBT -> {
+                case DEBT: {
                     this.boxDialog.setMinWidth(700);
                     this.boxDialog.setMaxWidth(700);
                     this.scrollPane.setPrefHeight(500);

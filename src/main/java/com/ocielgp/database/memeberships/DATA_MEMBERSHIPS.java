@@ -18,11 +18,11 @@ public class DATA_MEMBERSHIPS {
 
     public static CompletableFuture<ObservableList<MODEL_MEMBERSHIPS>> ReadMemberships() {
         return CompletableFuture.supplyAsync(() -> {
-            Connection con = DataServer.getConnection();
-            PreparedStatement ps;
-            ResultSet rs;
             ObservableList<MODEL_MEMBERSHIPS> modelMembershipsList = FXCollections.observableArrayList();
             try {
+                Connection con = DataServer.getConnection();
+                PreparedStatement ps;
+                ResultSet rs;
                 ps = con.prepareStatement("SELECT idMembership, days, price, description FROM MEMBERSHIPS WHERE flag = 1");
                 rs = ps.executeQuery();
                 while (rs.next()) {
@@ -36,6 +36,7 @@ public class DATA_MEMBERSHIPS {
                 if (modelMembershipsList.isEmpty()) {
                     Notifications.danger("Membresías", "No hay membresías registradas.");
                 }
+                con.close();
             } catch (SQLException sqlException) {
                 Notifications.catchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
             }
@@ -46,9 +47,9 @@ public class DATA_MEMBERSHIPS {
     /* Update section */
     public static void UpdateMembership(int idMember, MODEL_MEMBERSHIPS modelMemberships) {
         CompletableFuture.runAsync(() -> {
-            Connection con = DataServer.getConnection();
-            PreparedStatement ps;
             try {
+                Connection con = DataServer.getConnection();
+                PreparedStatement ps;
                 // Clear previous debt if exists
                 ps = con.prepareStatement("DELETE FROM DEBTS WHERE DATE(dateTime) = CURDATE() AND debtStatus = 1 AND flag = 1 ORDER BY dateTime DESC LIMIT 1");
                 ps.executeUpdate();
@@ -61,6 +62,7 @@ public class DATA_MEMBERSHIPS {
                 ps.setInt(5, modelMemberships.getIdMembership()); // idMembership
                 ps.setInt(6, idMember); // idMember
                 ps.executeUpdate();
+                con.close();
             } catch (SQLException sqlException) {
                 Notifications.catchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
             }

@@ -52,7 +52,7 @@ public class LoginController implements Initializable {
             if (Validator.emptyValidator(inputs.listIterator())) {
                 this.boxLoginPane.setDisable(true);
                 CompletableFuture.runAsync(() -> {
-                    Boolean answer = DATA_STAFF_MEMBERS.Login(this.fieldUsername.getText(), this.fieldPassword.getText());
+                    Boolean answer = DATA_STAFF_MEMBERS.ReadLogin(this.fieldUsername.getText(), this.fieldPassword.getText());
                     if (answer == null) {
                         Platform.runLater(() -> new Flash(this.boxLoginPane).play());
                         Notifications.warn("Bloqueado", "Esta cuenta se encuentra bloqueada.");

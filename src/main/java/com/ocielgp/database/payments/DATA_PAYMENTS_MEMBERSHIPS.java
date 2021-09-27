@@ -14,9 +14,10 @@ public class DATA_PAYMENTS_MEMBERSHIPS {
     public static CompletableFuture<Integer> CreatePaymentMembership(int idMember, MODEL_MEMBERSHIPS modelMemberships) {
         return CompletableFuture.supplyAsync(() -> {
             Connection con = DataServer.getConnection();
-            PreparedStatement ps;
-            ResultSet rs;
             try {
+                PreparedStatement ps;
+                ResultSet rs;
+                assert con != null;
                 ps = con.prepareStatement("INSERT INTO PAYMENTS_MEMBERSHIPS(payment, startDate, endDate, idGym, idStaff, idMember, idMembership) VALUE (?, ?, ?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
                 ps.setDouble(1, modelMemberships.getPrice()); // payment
                 ps.setString(2, String.valueOf(LocalDate.now())); // startDate
@@ -32,18 +33,21 @@ public class DATA_PAYMENTS_MEMBERSHIPS {
                 }
             } catch (SQLException sqlException) {
                 Notifications.catchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
+            } finally {
+                DataServer.closeConnection(con);
             }
             return 0;
         });
     }
 
-    public static CompletableFuture<MODEL_PAYMENTS_MEMBERSHIPS> getLastPayment(int idMember) {
+    public static CompletableFuture<MODEL_PAYMENTS_MEMBERSHIPS> ReadLastPayment(int idMember) {
         return CompletableFuture.supplyAsync(() -> {
-            Connection con = DataServer.getConnection();
-            PreparedStatement ps;
-            ResultSet rs;
             MODEL_PAYMENTS_MEMBERSHIPS modelPaymentsMemberships = null;
+            Connection con = DataServer.getConnection();
             try {
+                PreparedStatement ps;
+                ResultSet rs;
+                assert con != null;
                 ps = con.prepareStatement("SELECT idPaymentMembership, startDate, endDate, idGym, idStaff, idMembership FROM PAYMENTS_MEMBERSHIPS WHERE flag = 1 AND idMember = ? ORDER BY startDate DESC LIMIT 1");
                 ps.setInt(1, idMember);
                 rs = ps.executeQuery();
@@ -58,6 +62,8 @@ public class DATA_PAYMENTS_MEMBERSHIPS {
                 }
             } catch (SQLException sqlException) {
                 Notifications.catchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
+            } finally {
+                DataServer.closeConnection(con);
             }
             return modelPaymentsMemberships;
         });

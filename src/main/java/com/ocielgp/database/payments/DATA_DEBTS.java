@@ -15,9 +15,9 @@ import java.util.concurrent.CompletableFuture;
 public class DATA_DEBTS {
     public static void CreateDebt(MODEL_DEBTS modelDebts, int idMember, int debtType) {
         CompletableFuture.runAsync(() -> {
-            Connection con = DataServer.getConnection();
-            PreparedStatement ps;
             try {
+                Connection con = DataServer.getConnection();
+                PreparedStatement ps;
                 ps = con.prepareStatement("INSERT INTO DEBTS(dateTime, owe, paidOut, amount, description, idStaff, idMember, idDebtType) VALUE (NOW(), ?, ?, ?, ?, ?, ?, ?)");
                 ps.setDouble(1, modelDebts.getOwe()); // owe
                 ps.setDouble(2, modelDebts.getPaidOut()); // paidOut
@@ -35,11 +35,11 @@ public class DATA_DEBTS {
 
     public static CompletableFuture<ArrayList<MODEL_DEBTS>> ReadDebts(int idMember) {
         return CompletableFuture.supplyAsync(() -> {
-            Connection con = DataServer.getConnection();
-            PreparedStatement ps;
-            ResultSet rs;
             ArrayList<MODEL_DEBTS> debtsList = new ArrayList<>();
             try {
+                Connection con = DataServer.getConnection();
+                PreparedStatement ps;
+                ResultSet rs;
                 ps = con.prepareStatement("SELECT dateTime, owe, paidOut, amount, description FROM DEBTS WHERE idMember = ? AND debtStatus = 1");
                 ps.setInt(1, idMember);
                 rs = ps.executeQuery();
@@ -55,6 +55,7 @@ public class DATA_DEBTS {
                     modelDebts.setDescription(rs.getString("description"));
                     debtsList.add(modelDebts);
                 }
+                con.close();
             } catch (SQLException sqlException) {
                 Notifications.catchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
             }
@@ -64,16 +65,17 @@ public class DATA_DEBTS {
 
     public static CompletableFuture<Double> ReadTotalOwe(int idMember) {
         return CompletableFuture.supplyAsync(() -> {
-            Connection con = DataServer.getConnection();
-            PreparedStatement ps;
-            ResultSet rs;
             try {
+                Connection con = DataServer.getConnection();
+                PreparedStatement ps;
+                ResultSet rs;
                 ps = con.prepareStatement("SELECT SUM(owe) 'totalOwe' FROM DEBTS WHERE idMember = ? AND debtStatus = 1");
                 ps.setInt(1, idMember);
                 rs = ps.executeQuery();
                 if (rs.next()) {
                     return rs.getDouble("totalOwe");
                 }
+                con.close();
             } catch (SQLException sqlException) {
                 Notifications.catchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
             }

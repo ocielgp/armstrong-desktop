@@ -103,47 +103,35 @@ public class Input {
 
     public static String styleToColor(Styles style) {
         switch (style) {
-            case SUCCESS -> {
+            case SUCCESS:
                 return "success-style";
-            }
-            case WARN -> {
+            case WARN:
                 return "warn-style";
-            }
-            case DANGER -> {
+            case DANGER:
                 return "danger-style";
-            }
-            case EPIC -> {
+            case EPIC:
                 return "epic-style";
-            }
-            case CREATIVE -> {
+            case CREATIVE:
                 return "creative-style";
-            }
-            default -> {
+            default:
                 return "default-style";
-            }
         }
     }
 
     public static Styles colorToStyle(String style) {
         switch (style) {
-            case "success-style" -> {
+            case "success-style":
                 return Styles.SUCCESS;
-            }
-            case "warn-style" -> {
+            case "warn-style":
                 return Styles.WARN;
-            }
-            case "danger-style" -> {
+            case "danger-style":
                 return Styles.DANGER;
-            }
-            case "epic-style" -> {
+            case "epic-style":
                 return Styles.EPIC;
-            }
-            case "creative-style" -> {
+            case "creative-style":
                 return Styles.CREATIVE;
-            }
-            default -> {
+            default:
                 return Styles.DEFAULT;
-            }
         }
     }
 }

@@ -78,7 +78,7 @@ public class Capture
                         try {
                             Loading.show();
                             System.out.println("convertido");
-                            DATA_MEMBERS_FINGERPRINTS.SelectSearchFingerprints(
+                            DATA_MEMBERS_FINGERPRINTS.ReadFindFingerprint(
                                     UareUGlobal.GetEngine().CreateFmd(
                                             evt.capture_result.image, Fmd.Format.ANSI_378_2004
                                     )
