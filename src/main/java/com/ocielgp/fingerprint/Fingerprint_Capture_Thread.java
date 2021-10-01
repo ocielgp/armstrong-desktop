@@ -8,7 +8,7 @@ import javafx.application.Platform;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class CaptureThread extends Thread {
+public class Fingerprint_Capture_Thread extends Thread {
     public static final String ACT_CAPTURE = "capture_thread_captured";
 
     public static class CaptureEvent extends ActionEvent {
@@ -35,7 +35,7 @@ public class CaptureThread extends Thread {
     private final Reader.ImageProcessing proc;
     private CaptureEvent last_capture;
 
-    public CaptureThread(Reader reader, boolean bStream, Fid.Format img_format, Reader.ImageProcessing img_proc) {
+    public Fingerprint_Capture_Thread(Reader reader, boolean bStream, Fid.Format img_format, Reader.ImageProcessing img_proc) {
         bCancel = false;
         this.reader = reader;
         this.bStream = bStream;
@@ -93,7 +93,7 @@ public class CaptureThread extends Thread {
 
 
             if (bReady) {
-                // Capture
+                // Fingerprint_Capture
                 Reader.CaptureResult cr = reader.Capture(format, proc, 500, -1);
                 NotifyListener(cr, null, null);
             }
@@ -152,7 +152,7 @@ public class CaptureThread extends Thread {
     }
 
     private void NotifyListener(Reader.CaptureResult cr, Reader.Status st, UareUException ex) {
-        final CaptureEvent evt = new CaptureEvent(this, CaptureThread.ACT_CAPTURE, cr, st, ex);
+        final CaptureEvent evt = new CaptureEvent(this, Fingerprint_Capture_Thread.ACT_CAPTURE, cr, st, ex);
 
         // Store last capture event
         last_capture = evt;

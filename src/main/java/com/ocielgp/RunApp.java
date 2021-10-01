@@ -53,7 +53,7 @@ public class RunApp extends javafx.application.Application {
                 );
             });
         });
-        primaryStage.setTitle("Model_Gym Application");
+        primaryStage.setTitle("Gym App by Ociel");
         primaryStage.setScene(scene);
 //        primaryStage.setAlwaysOnTop(true);
 //        primaryStage.setMaximized(true);

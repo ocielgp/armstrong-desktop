@@ -1,14 +1,13 @@
 package com.ocielgp.dao;
 
 import com.ocielgp.app.Application;
-import com.ocielgp.database.DataServer;
 import com.ocielgp.models.Model_Membership;
 import com.ocielgp.models.Model_Payment_Membership;
 import com.ocielgp.utilities.Notifications;
 
 import java.lang.invoke.MethodHandles;
 import java.sql.*;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.concurrent.CompletableFuture;
 
 public class JDBC_Payment_Membership {
@@ -19,10 +18,10 @@ public class JDBC_Payment_Membership {
                 PreparedStatement ps;
                 ResultSet rs;
                 assert con != null;
-                ps = con.prepareStatement("INSERT INTO PAYMENTS_MEMBERSHIPS(payment, startDate, endDate, idGym, idStaff, idMember, idMembership) VALUE (?, ?, ?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
+                ps = con.prepareStatement("INSERT INTO PAYMENTS_MEMBERSHIPS(payment, startDateTime, endDateTime, idGym, idStaff, idMember, idMembership) VALUE (?, ?, ?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
                 ps.setBigDecimal(1, modelMembership.getPrice()); // payment
-                ps.setString(2, String.valueOf(LocalDate.now())); // startDate
-                ps.setString(3, String.valueOf(LocalDate.now().plusDays(modelMembership.getDays()))); // endDate
+                ps.setString(2, String.valueOf(LocalDateTime.now())); // startDate
+                ps.setString(3, String.valueOf(LocalDateTime.now().plusDays(modelMembership.getDays()))); // endDate
                 ps.setInt(4, Application.getCurrentGym().getIdGym()); // idGym
                 ps.setInt(5, Application.getStaffUserModel().getIdMember()); // idStaff
                 ps.setInt(6, idMember); // idMember
@@ -49,14 +48,14 @@ public class JDBC_Payment_Membership {
                 PreparedStatement ps;
                 ResultSet rs;
                 assert con != null;
-                ps = con.prepareStatement("SELECT idPaymentMembership, startDate, endDate, idGym, idStaff, idMembership FROM PAYMENTS_MEMBERSHIPS WHERE flag = 1 AND idMember = ? ORDER BY startDate DESC LIMIT 1");
+                ps = con.prepareStatement("SELECT idPaymentMembership, DATE(startDateTime) AS 'startDateTime', DATE(endDateTime) AS 'endDateTime', idGym, idStaff, idMembership FROM PAYMENTS_MEMBERSHIPS WHERE flag = 1 AND idMember = ? ORDER BY startDateTime DESC LIMIT 1");
                 ps.setInt(1, idMember);
                 rs = ps.executeQuery();
                 if (rs.next()) {
                     modelPaymentMembership = new Model_Payment_Membership();
                     modelPaymentMembership.setIdPaymentMembership(rs.getInt("idPaymentMembership"));
-                    modelPaymentMembership.setStartDate(rs.getString("startDate"));
-                    modelPaymentMembership.setEndDate(rs.getString("endDate"));
+                    modelPaymentMembership.setStartDate(rs.getString("startDateTime"));
+                    modelPaymentMembership.setEndDate(rs.getString("endDateTime"));
                     modelPaymentMembership.setIdGym(rs.getInt("idGym"));
                     modelPaymentMembership.setIdStaff(rs.getInt("idStaff"));
                     modelPaymentMembership.setIdMembership(rs.getInt("idMembership"));

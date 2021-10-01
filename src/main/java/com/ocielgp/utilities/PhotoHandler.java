@@ -2,7 +2,7 @@ package com.ocielgp.utilities;
 
 import com.jfoenix.controls.JFXButton;
 import com.ocielgp.app.Application;
-import com.ocielgp.fingerprint.Fingerprint;
+import com.ocielgp.fingerprint.Fingerprint_Controller;
 import javafx.event.ActionEvent;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -35,8 +35,8 @@ public class PhotoHandler {
 
 
     private void browseImage() {
-        if (Fingerprint.getStatusCode() != 0) {
-            Fingerprint.FB_StopReader();
+        if (Fingerprint_Controller.getStatusCode() != 0) {
+            Fingerprint_Controller.FB_StopReader();
         }
         FileChooser fileChooser = new FileChooser();
         FileChooser.ExtensionFilter extensionFilter = new FileChooser.ExtensionFilter("Imágenes", "*.png", "*.jpg", "*.jpeg");
@@ -65,8 +65,8 @@ public class PhotoHandler {
             }
         }
 
-        if (Fingerprint.getStatusCode() != 0) {
-            Fingerprint.StartCapture();
+        if (Fingerprint_Controller.getStatusCode() != 0) {
+            Fingerprint_Controller.StartCapture();
         }
     }
 

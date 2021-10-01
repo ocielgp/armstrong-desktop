@@ -5,7 +5,7 @@ import com.jfoenix.controls.JFXComboBox;
 import com.ocielgp.app.Application;
 import com.ocielgp.app.UserPreferences;
 import com.ocielgp.dao.JDBC_Gym;
-import com.ocielgp.fingerprint.Fingerprint;
+import com.ocielgp.fingerprint.Fingerprint_Controller;
 import com.ocielgp.models.Model_Gym;
 import com.ocielgp.utilities.Notifications;
 import javafx.application.Platform;
@@ -78,7 +78,7 @@ public class Controller_App implements Initializable {
             });
 
             // Check if fingerprint scanner is connected
-            CompletableFuture.runAsync(Fingerprint::Scanner);
+            CompletableFuture.runAsync(Fingerprint_Controller::Scanner);
         });
     }
 

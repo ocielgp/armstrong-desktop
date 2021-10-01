@@ -3,7 +3,7 @@ package com.ocielgp.controller;
 import animatefx.animation.FadeIn;
 import animatefx.animation.FadeInUp;
 import com.ocielgp.app.Application;
-import com.ocielgp.fingerprint.Fingerprint;
+import com.ocielgp.fingerprint.Fingerprint_Controller;
 import com.ocielgp.utilities.*;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
@@ -108,8 +108,8 @@ public class Controller_Dashboard implements Initializable {
         }
         /* End Routing */
 
-        // Fingerprint
-        Fingerprint.initializeUI(this.fontIconFingerprint, this.labelFingerprintStatus);
+        // Fingerprint_Controller
+        Fingerprint_Controller.initializeUI(this.fontIconFingerprint, this.labelFingerprintStatus);
 
         this.navSecureMode.setOnMouseClicked(this.eventHandlerSecureMode());
 
@@ -169,7 +169,7 @@ public class Controller_Dashboard implements Initializable {
                     Platform.runLater(() -> {
                         scrollPaneContent.setContent(navFXML);
                         Input.getScrollEvent(scrollPaneContent);
-                        Fingerprint.BackgroundReader();
+                        Fingerprint_Controller.BackgroundReader();
                     });
                 });
             }

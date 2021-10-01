@@ -1,7 +1,6 @@
 package com.ocielgp.dao;
 
 import com.ocielgp.app.Application;
-import com.ocielgp.database.DataServer;
 import com.ocielgp.models.Model_Member;
 import com.ocielgp.models.Model_Staff_Member;
 import com.ocielgp.utilities.Hash;

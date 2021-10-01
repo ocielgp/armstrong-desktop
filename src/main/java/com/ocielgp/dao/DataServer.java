@@ -1,4 +1,4 @@
-package com.ocielgp.database;
+package com.ocielgp.dao;
 
 import com.ocielgp.app.UserPreferences;
 import com.ocielgp.utilities.Notifications;
@@ -8,6 +8,8 @@ import com.zaxxer.hikari.HikariDataSource;
 
 import java.lang.invoke.MethodHandles;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class DataServer {
@@ -67,7 +69,7 @@ public class DataServer {
         return null;
     }
 
-    public static void closeConnection(Connection connection) {
+    synchronized public static void closeConnection(Connection connection) {
         try {
             if (connection != null && !connection.isClosed()) {
                 connection.close();
@@ -75,5 +77,17 @@ public class DataServer {
         } catch (SQLException sqlException) {
             Notifications.catchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
         }
+    }
+
+    public static int countRows(PreparedStatement ps) {
+        try {
+            ResultSet rs = ps.executeQuery();
+            if (rs.last()) {
+                return rs.getRow();
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return 0;
     }
 }

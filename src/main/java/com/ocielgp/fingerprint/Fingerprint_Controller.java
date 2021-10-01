@@ -17,14 +17,14 @@ import java.lang.invoke.MethodHandles;
 import java.util.ListIterator;
 import java.util.concurrent.CompletableFuture;
 
-public class Fingerprint {
+public class Fingerprint_Controller {
     private static Reader reader;
 
     /**
      * status
      * 0 = Disconnected
      * 1 = Background task
-     * 2 = Capture task
+     * 2 = Fingerprint_Capture task
      */
     private static int fingerprintStatusCode = 0;
     private static final String[] fingerprintStatusDescription = new String[]{
@@ -32,44 +32,30 @@ public class Fingerprint {
             "CONECTADO",
             "CAPTURANDO"
     };
-
-    private static Capture captureFingerprint;
+    private static final StringProperty fingerprintStatusProperty = new SimpleStringProperty(Fingerprint_Controller.getStatusDescription()); // Dashboard
     private static FontIcon fingerprintIcon;
-    private static final StringProperty fingerprintStatusProperty = new SimpleStringProperty(Fingerprint.getStatusDescription()); // Dashboard
-    private static FingerprintBox fingerprintBox;
-    private static final EventHandler<MouseEvent> fingerprintEvent = mouseEvent -> Fingerprint.Scanner();
+    private static Fingerprint_Capture captureFingerprint;
+    private static Fingerprint_Capture_Box fingerprintBox;
 
-    private static CompletableFuture<Boolean> Scan() {
-        return CompletableFuture.supplyAsync(() -> {
+    public static void Scanner() {
+        Platform.runLater(() -> {
             try {
                 ReaderCollection readerCollection = UareUGlobal.GetReaderCollection();
                 readerCollection.GetReaders();
                 reader = readerCollection.get(0); // catch exception
-                return true;
-            } catch (UareUException ignored) {
-                return false;
-            }
-        });
-    }
 
-    public static void Scanner() {
-        Fingerprint.Scan().thenAccept(scannerConnected -> {
-            if (scannerConnected) {
                 Notifications.success("gmi-fingerprint", "Lector de Huellas", "Lector de huellas conectado", 2);
                 StartCapture();
-            } else {
-                Fingerprint.setStatusCode(0);
+            } catch (Exception ignored) {
+                Fingerprint_Controller.setStatusCode(0);
                 Notifications.warn("gmi-fingerprint", "Lector de Huellas", "Lector de huellas no detectado", 2);
             }
+
             RefreshDashboard();
         });
     }
 
-    public static void initializeUI(FontIcon fontIconFingerprint, Label labelStatus) {
-        fingerprintIcon = fontIconFingerprint;
-        labelStatus.textProperty().bind(fingerprintStatusProperty);
-        RefreshDashboard();
-    }
+    private static final EventHandler<MouseEvent> fingerprintEvent = mouseEvent -> Fingerprint_Controller.Scanner();
 
     public static void RefreshDashboard() {
         Platform.runLater(() -> {
@@ -83,7 +69,7 @@ public class Fingerprint {
                     styleClass = "on";
                 }
                 fingerprintIcon.getStyleClass().set(2, styleClass);
-                fingerprintStatusProperty.set(Fingerprint.getStatusDescription());
+                fingerprintStatusProperty.set(Fingerprint_Controller.getStatusDescription());
             }
 
             if (fingerprintBox != null) {
@@ -96,13 +82,29 @@ public class Fingerprint {
         });
     }
 
+    public static void initializeUI(FontIcon fontIconFingerprint, Label labelStatus) {
+        fingerprintIcon = fontIconFingerprint;
+        labelStatus.textProperty().bind(fingerprintStatusProperty);
+        RefreshDashboard();
+    }
+
+    public static void setFingerprintBox(VBox container, VBox fmdContainer, Label labelCounter, JFXButton startCaptureButton, JFXButton restartCaptureButton) {
+        fingerprintBox = new Fingerprint_Capture_Box(container, fmdContainer, labelCounter, startCaptureButton, restartCaptureButton);
+        RefreshDashboard();
+    }
+
     public static void loadFingerprints(int idMember) {
         fingerprintBox.loadFingerprints(idMember);
     }
 
-    public static void setFingerprintBox(VBox container, VBox fmdContainer, Label labelCounter, JFXButton startCaptureButton, JFXButton restartCaptureButton) {
-        fingerprintBox = new FingerprintBox(container, fmdContainer, labelCounter, startCaptureButton, restartCaptureButton);
-        RefreshDashboard();
+    public static void BackgroundReader() {
+        if (fingerprintStatusCode > 1) { // verify background status
+            if (captureFingerprint != null) {
+                StopCapture();
+            }
+            captureFingerprint = Fingerprint_Capture.Run(reader);
+            Fingerprint_Controller.setStatusCode(1);
+        }
     }
 
     public static void setStatusCode(int statusCode) {
@@ -130,22 +132,12 @@ public class Fingerprint {
         }
     }
 
-    public static void BackgroundReader() {
-        if (fingerprintStatusCode > 1) { // verify background status
-            if (captureFingerprint != null) {
-                StopCapture();
-            }
-            captureFingerprint = Capture.Run(reader);
-            Fingerprint.setStatusCode(1);
-        }
-    }
-
     public static void StartCapture() { // start background task
         if (captureFingerprint != null) {
             StopCapture();
         }
-        captureFingerprint = Capture.Run(reader);
-        Fingerprint.setStatusCode(1);
+        captureFingerprint = Fingerprint_Capture.Run(reader);
+        Fingerprint_Controller.setStatusCode(1);
     }
 
     public static void StartCapture(VBox pane) { // start UI task
@@ -153,8 +145,15 @@ public class Fingerprint {
             StopCapture();
         }
         if (fingerprintStatusCode > 0 && fingerprintStatusCode != 2) {
-            captureFingerprint = Capture.Run(reader, pane);
-            Fingerprint.setStatusCode(2);
+            captureFingerprint = Fingerprint_Capture.Run(reader, pane);
+            Fingerprint_Controller.setStatusCode(2);
+        }
+    }
+
+    public static void FB_Shake() {
+        if (fingerprintBox != null) {
+            Platform.runLater(() -> new Shake(fingerprintBox.boxFingerprintPane).play());
+            Fingerprint_Controller.FB_ClearFingerprintPane();
         }
     }
 
@@ -170,11 +169,27 @@ public class Fingerprint {
         }
     }
 
-    public static void FB_Shake() {
-        if (fingerprintBox != null) {
-            Platform.runLater(() -> new Shake(fingerprintBox.boxFingerprintPane).play());
-            Fingerprint.FB_ClearFingerprintPane();
-        }
+    public static CompletableFuture<Boolean> FB_CompareLocalFingerprints(Fmd fmdMember) {
+        return CompletableFuture.supplyAsync(() -> {
+            if (fingerprintBox != null) {
+                ListIterator<Fmd> fingerprints = fingerprintBox.getFingerprints();
+                Engine engine = UareUGlobal.GetEngine();
+                while (fingerprints.hasNext()) {
+                    try {
+                        int falseMatchRate = engine.Compare(fmdMember, 0, fingerprints.next(), 0);
+                        int targetFalseMatchRate = Engine.PROBABILITY_ONE / 100000; // target rate is 0.00001
+                        if (falseMatchRate < targetFalseMatchRate) {
+                            Notifications.warn("Lector de Huellas", "Esa huella ya ha sido agregada.", 1.5);
+                            Fingerprint_Controller.FB_Shake();
+                            return false;
+                        }
+                    } catch (UareUException uareUException) {
+                        Notifications.catchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], uareUException.getMessage(), uareUException);
+                    }
+                }
+            }
+            return true;
+        });
     }
 
     public static void FB_AddFingerprint(Fmd fmd) {
@@ -191,28 +206,6 @@ public class Fingerprint {
 
     }
 
-    public static CompletableFuture<Boolean> FB_CompareLocalFingerprints(Fmd fmdMember) {
-        return CompletableFuture.supplyAsync(() -> {
-            if (fingerprintBox != null) {
-                ListIterator<Fmd> fingerprints = fingerprintBox.getFingerprints();
-                Engine engine = UareUGlobal.GetEngine();
-                while (fingerprints.hasNext()) {
-                    try {
-                        int falseMatchRate = engine.Compare(fmdMember, 0, fingerprints.next(), 0);
-                        int targetFalseMatchRate = Engine.PROBABILITY_ONE / 100000; // target rate is 0.00001
-                        if (falseMatchRate < targetFalseMatchRate) {
-                            Notifications.warn("Lector de Huellas", "Esa huella ya ha sido agregada.", 1.5);
-                            Fingerprint.FB_Shake();
-                            return false;
-                        }
-                    } catch (UareUException uareUException) {
-                        Notifications.catchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], uareUException.getMessage(), uareUException);
-                    }
-                }
-            }
-            return true;
-        });
-    }
 
     public static boolean CompareFingerprints(Fmd fingerprintCaptured, byte[] fingerprintDatabase) {
         Engine engine = UareUGlobal.GetEngine();

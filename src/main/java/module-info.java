@@ -26,7 +26,6 @@ module app {
     opens com.ocielgp.fingerprint;
     opens com.ocielgp.utilities;
 
-    opens com.ocielgp.database;
     opens com.ocielgp.dao;
     opens com.ocielgp.models;
 }

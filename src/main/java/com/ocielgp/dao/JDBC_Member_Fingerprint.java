@@ -4,8 +4,7 @@ import com.digitalpersona.uareu.Fmd;
 import com.digitalpersona.uareu.UareUException;
 import com.digitalpersona.uareu.UareUGlobal;
 import com.ocielgp.app.UserPreferences;
-import com.ocielgp.database.DataServer;
-import com.ocielgp.fingerprint.Fingerprint;
+import com.ocielgp.fingerprint.Fingerprint_Controller;
 import com.ocielgp.utilities.Loading;
 import com.ocielgp.utilities.Notifications;
 import javafx.util.Pair;
@@ -47,21 +46,20 @@ public class JDBC_Member_Fingerprint {
         });
     }
 
-    public static void ReadFindFingerprint(Fmd fingerprint) {
+    synchronized public static void ReadFindFingerprint(Fmd fingerprint) {
         if (!SCANNING) {
-            SCANNING = true;
             CompletableFuture.runAsync(() -> {
                 Connection con = DataServer.getConnection();
                 try {
                     PreparedStatement ps;
                     ResultSet rs;
                     assert con != null;
-                    ps = con.prepareStatement("SELECT MF.fingerprint, MF.idMember, SM.idStaffMember FROM MEMBERS_FINGERPRINTS MF JOIN PAYMENTS_MEMBERSHIPS PM on MF.idMember = PM.idMember LEFT JOIN STAFF_MEMBERS SM on MF.idMember = SM.idMember WHERE DATE_ADD(PM.endDate, INTERVAL ? DAY) >= CURDATE() ORDER BY PM.startDate");
+                    ps = con.prepareStatement("SELECT MF.fingerprint, MF.idMember, SM.idStaffMember FROM MEMBERS_FINGERPRINTS MF JOIN PAYMENTS_MEMBERSHIPS PM on MF.idMember = PM.idMember LEFT JOIN STAFF_MEMBERS SM on MF.idMember = SM.idMember WHERE DATE_ADD(PM.endDateTime, INTERVAL ? DAY) >= CURDATE() ORDER BY PM.startDateTime");
                     ps.setInt(1, UserPreferences.getPreferenceInt("MAX_DAYS_FINGERPRINTS"));
                     rs = ps.executeQuery();
 
                     while (rs.next()) {
-                        if (Fingerprint.CompareFingerprints(fingerprint, rs.getBytes("fingerprint"))) {
+                        if (Fingerprint_Controller.CompareFingerprints(fingerprint, rs.getBytes("fingerprint"))) {
                             JDBC_Check_In.CreateCheckIn(rs.getBoolean("idStaffMember"), rs.getInt("idMember"), 1);
                             return;
                         }

@@ -2,9 +2,6 @@ package com.ocielgp.dao;
 
 import com.ocielgp.app.Application;
 import com.ocielgp.app.UserPreferences;
-import com.ocielgp.database.DataServer;
-import com.ocielgp.database.QueryRows;
-import com.ocielgp.database.Utilities;
 import com.ocielgp.models.Model_Member;
 import com.ocielgp.utilities.DateFormatter;
 import com.ocielgp.utilities.Notifications;
@@ -62,7 +59,7 @@ public class JDBC_Member {
             PreparedStatement ps;
             ResultSet rs;
             assert con != null;
-            ps = con.prepareStatement("SELECT M.access, PM.endDate - CURRENT_DATE AS 'daysLeft', (SELECT COUNT(idDebt) > 0 FROM DEBTS WHERE idMember = M.idMember AND debtStatus = 1 AND flag = 1 ORDER BY dateTime DESC) AS 'haveDebts' FROM MEMBERS M JOIN PAYMENTS_MEMBERSHIPS PM on M.idMember = PM.idMember WHERE (M.flag = 1) AND M.idMember = ? ORDER BY M.idMember DESC");
+            ps = con.prepareStatement("SELECT M.access, DATE(PM.endDateTime) - CURRENT_DATE AS 'daysLeft', (SELECT COUNT(idDebt) > 0 FROM DEBTS WHERE idMember = M.idMember AND debtStatus = 1 AND flag = 1 ORDER BY dateTime DESC) AS 'haveDebts' FROM MEMBERS M JOIN PAYMENTS_MEMBERSHIPS PM on M.idMember = PM.idMember WHERE (M.flag = 1) AND M.idMember = ? ORDER BY M.idMember DESC");
             ps.setInt(1, idMember);
             rs = ps.executeQuery();
             if (rs.next()) {
@@ -143,7 +140,7 @@ public class JDBC_Member {
                 PreparedStatement statementLimited, statement;
                 ResultSet rs;
                 // query initial
-                String sqlQuery = "SELECT M.idMember, M.name, M.lastName, M.access, PM.endDate, (SELECT COUNT(idDebt) > 0 FROM DEBTS WHERE idMember = M.idMember AND debtStatus = 1 AND flag = 1 ORDER BY dateTime DESC) AS 'haveDebts', PM.flag AS 'flag' FROM MEMBERS M LEFT JOIN PAYMENTS_MEMBERSHIPS PM ON PM.idPaymentMembership = (SELECT idPaymentMembership FROM PAYMENTS_MEMBERSHIPS WHERE idMember = M.idMember AND flag = 1 ORDER BY startDate DESC LIMIT 1) WHERE M.idMember NOT IN (SELECT SM.idMember FROM STAFF_MEMBERS SM WHERE SM.flag = 1) AND M.flag = 1 ";
+                String sqlQuery = "SELECT M.idMember, M.name, M.lastName, M.access, DATE(PM.endDateTime) AS 'endDateTime', (SELECT COUNT(idDebt) > 0 FROM DEBTS WHERE idMember = M.idMember AND debtStatus = 1 AND flag = 1 ORDER BY dateTime DESC) AS 'haveDebts', PM.flag AS 'flag' FROM MEMBERS M LEFT JOIN PAYMENTS_MEMBERSHIPS PM ON PM.idPaymentMembership = (SELECT idPaymentMembership FROM PAYMENTS_MEMBERSHIPS WHERE idMember = M.idMember AND flag = 1 ORDER BY startDateTime DESC LIMIT 1) WHERE M.idMember NOT IN (SELECT SM.idMember FROM STAFF_MEMBERS SM WHERE SM.flag = 1) AND M.flag = 1 ";
 
                 // fieldSearchContent
                 if (query.length() > 0) {
@@ -160,7 +157,7 @@ public class JDBC_Member {
                     sqlQuery += "AND PM.idGym = " + Application.getCurrentGym().getIdGym() + " ";
                 }
                 if (UserPreferences.getPreferenceBool("FILTER_MEMBER_ACTIVE_MEMBERS")) {
-                    sqlQuery += "AND PM.endDate >= CURRENT_DATE ";
+                    sqlQuery += "AND PM.endDateTime >= CURRENT_DATE ";
                 }
                 if (UserPreferences.getPreferenceBool("FILTER_MEMBER_DEBTORS")) {
                     sqlQuery += "AND M.idMember IN (SELECT DISTINCT D.idMember FROM DEBTS D WHERE D.debtStatus = 1 AND D.flag = 1) ";
@@ -208,7 +205,7 @@ public class JDBC_Member {
                     }
                 }
 
-                int totalRows = Utilities.countRows(statement);
+                int totalRows = DataServer.countRows(statement);
                 int totalPages = (int) Math.ceil((double) totalRows / maxRows);
                 rs = statementLimited.executeQuery();
                 ObservableList<Model_Member> members = FXCollections.observableArrayList();
@@ -220,7 +217,7 @@ public class JDBC_Member {
                         modelMember.setLastName(rs.getString("lastName"));
                         modelMember.setAccess(rs.getBoolean("access"));
 
-                        LocalDate endDate = LocalDate.parse(rs.getString("endDate"));
+                        LocalDate endDate = LocalDate.parse(rs.getString("endDateTime"));
                         modelMember.setEndDate(DateFormatter.getDayMonthYearShort(endDate));
                         long daysLeft = DateFormatter.daysDifferenceToday(endDate);
                         modelMember.setStyle(JDBC_Member.ReadStyle(modelMember.isAccess(), daysLeft, rs.getBoolean("haveDebts")));

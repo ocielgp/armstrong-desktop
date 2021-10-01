@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.ListIterator;
 import java.util.concurrent.CompletableFuture;
 
-public class FingerprintBox {
+public class Fingerprint_Capture_Box {
     public final VBox boxFingerprintPane;
     private final VBox boxFingerprintView;
     private final Label labelFingerprintCounter;
@@ -21,7 +21,7 @@ public class FingerprintBox {
     private final JFXButton buttonRestartCapture;
     public ArrayList<Fmd> arrayFingerprints = new ArrayList<>();
 
-    public FingerprintBox(VBox boxFingerprintPane, VBox boxFingerprintPreview, Label labelFingerprintCounter, JFXButton buttonStartCapture, JFXButton buttonRestartCapture) {
+    public Fingerprint_Capture_Box(VBox boxFingerprintPane, VBox boxFingerprintPreview, Label labelFingerprintCounter, JFXButton buttonStartCapture, JFXButton buttonRestartCapture) {
         this.boxFingerprintPane = boxFingerprintPane;
         this.boxFingerprintView = boxFingerprintPreview;
         this.labelFingerprintCounter = labelFingerprintCounter;
@@ -76,7 +76,7 @@ public class FingerprintBox {
 
     // restart
     public void stopReader() {
-        Fingerprint.StopCapture();
+        Fingerprint_Controller.StopCapture();
         this.buttonStartCapture.setText("Iniciar captura");
     }
 
@@ -84,17 +84,17 @@ public class FingerprintBox {
     public void captureEvent() {
         if (this.buttonStartCapture.getText().equals("Iniciar captura")) {
             this.boxFingerprintView.requestFocus();
-            Fingerprint.StartCapture(this.boxFingerprintView);
+            Fingerprint_Controller.StartCapture(this.boxFingerprintView);
             this.buttonStartCapture.setText("Detener captura");
         } else {
-            Fingerprint.StartCapture(); // background reader
+            Fingerprint_Controller.StartCapture(); // background reader
             this.buttonStartCapture.setText("Iniciar captura");
         }
     }
 
     public void restartCaptureEvent() {
         this.boxFingerprintPane.requestFocus();
-        Fingerprint.BackgroundReader();
+        Fingerprint_Controller.BackgroundReader();
         this.buttonRestartCapture.setText("Iniciar captura");
         this.buttonRestartCapture.setDisable(true);
         this.clearFingerprintPane();

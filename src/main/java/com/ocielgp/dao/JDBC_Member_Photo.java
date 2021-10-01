@@ -1,6 +1,5 @@
 package com.ocielgp.dao;
 
-import com.ocielgp.database.DataServer;
 import com.ocielgp.models.Model_Member_Photo;
 import com.ocielgp.utilities.Notifications;
 

@@ -10,7 +10,7 @@ import com.jfoenix.controls.JFXTextField;
 import com.jfoenix.controls.JFXToggleButton;
 import com.ocielgp.app.Application;
 import com.ocielgp.dao.*;
-import com.ocielgp.fingerprint.Fingerprint;
+import com.ocielgp.fingerprint.Fingerprint_Controller;
 import com.ocielgp.models.Model_Debt;
 import com.ocielgp.models.Model_Member;
 import com.ocielgp.models.Model_Membership;
@@ -142,7 +142,7 @@ public class Controller_Member implements Initializable {
             JDBC_Member.ReadMember(idMember).thenAccept(model_members -> {
                         this.modelMember = model_members;
                         this.modelMember.setIdMember(idMember);
-                    }).thenRunAsync(() -> Fingerprint.loadFingerprints(idMember))
+                    }).thenRunAsync(() -> Fingerprint_Controller.loadFingerprints(idMember))
                     .thenRunAsync(() -> JDBC_Payment_Membership.ReadLastPayment(idMember).thenAccept(model_payments_memberships -> {
                         this.modelMember.setModelPaymentMembership(model_payments_memberships);
                         if (model_payments_memberships == null) {
@@ -297,12 +297,12 @@ public class Controller_Member implements Initializable {
         // quick view
         Input.createVisibleProperty(this.boxQuickView);
 
-        // shorcut
+        // shortcut
         Input.createVisibleProperty(this.boxShortcut);
         Input.createVisibleProperty(this.s_buttonPayDebt);
         this.s_buttonPayDebt.setOnAction(this.eventHandlerPayDebt()); // TODO
 
-        // Photo section
+        // photo section
         this.photoHandler = new PhotoHandler(this.booleanUpdater, this.ph_imgMemberPhoto, this.ph_buttonUploadPhoto, this.ph_buttonDeletePhoto);
 
         // personal information
@@ -318,7 +318,7 @@ public class Controller_Member implements Initializable {
         });
 
         // fingerprint
-        Fingerprint.setFingerprintBox(this.boxFingerprint, this.fp_boxFingerprint, this.fp_labelFingerprintCounter, this.fp_buttonCapture, this.fp_buttonRestartCapture);
+        Fingerprint_Controller.setFingerprintBox(this.boxFingerprint, this.fp_boxFingerprint, this.fp_labelFingerprintCounter, this.fp_buttonCapture, this.fp_buttonRestartCapture);
 
         // membership
         Input.createVisibleProperty(this.ms_boxRenewMembership);
@@ -399,9 +399,13 @@ public class Controller_Member implements Initializable {
         this.pym_fieldPaidOut.textProperty().addListener((observable, oldValue, newValue) -> {
             if (!this.pym_togglePayment.isSelected()) {
                 if (Validator.moneyValidator(new InputDetails(this.pym_fieldPaidOut, this.pym_fieldPaidOut.getText()), false)) {
-                    this.pym_fieldOwe.setText(String.valueOf(this.getMembershipPrice().subtract(new BigDecimal(newValue))));
+                    this.pym_fieldOwe.setText(
+                            this.ms_comboBoxMemberships.getSelectionModel().getSelectedItem().getPrice().subtract(new BigDecimal(newValue)).toString()
+                    );
                 } else {
-                    this.pym_fieldOwe.setText(this.getMembershipPrice().toString());
+                    this.pym_fieldOwe.setText(
+                            this.ms_comboBoxMemberships.getSelectionModel().getSelectedItem().getPrice().toString()
+                    );
                 }
             }
         });
@@ -431,10 +435,6 @@ public class Controller_Member implements Initializable {
         }
     }
 
-    private BigDecimal getMembershipPrice() {
-        return this.ms_comboBoxMemberships.getSelectionModel().getSelectedItem().getPrice();
-    }
-
     private void clearForm(boolean animation) {
         Platform.runLater(() -> {
             this.modelMember = null;
@@ -447,7 +447,7 @@ public class Controller_Member implements Initializable {
 
             this.photoHandler.resetHandler();
 
-            Fingerprint.FB_RestartCapture();
+            Fingerprint_Controller.FB_RestartCapture();
 
             Input.clearInputs(
                     this.pi_fieldName,
@@ -539,7 +539,7 @@ public class Controller_Member implements Initializable {
                 modelMember.setGender(this.pi_comboBoxGender.getSelectionModel().getSelectedItem());
 
                 modelMember.setPhone(Input.spaceRemover(this.pi_fieldPhone.getText()));
-                modelMember.setEmail(Input.spaceRemover(this.pi_fieldEmail.getText()));
+                modelMember.setEmail(Input.spaceRemover(this.pi_fieldEmail.getText().toLowerCase()));
                 modelMember.setNotes(Input.capitalizeFirstLetter(this.pi_fieldNotes.getText()));
                 modelMember.setIdGym(Application.getCurrentGym().getIdGym());
 
@@ -596,7 +596,7 @@ public class Controller_Member implements Initializable {
                             JDBC_Member.UpdateNotes(this.modelMember.getIdMember(), modelMember.getNotes());
                         }
                         if (this.booleanUpdater.isChanged("fingerprint")) {
-                            JDBC_Member_Fingerprint.CreateFingerprints(this.modelMember.getIdMember(), Fingerprint.getFingerprints());
+                            JDBC_Member_Fingerprint.CreateFingerprints(this.modelMember.getIdMember(), Fingerprint_Controller.getFingerprints());
                         }
                         if (this.booleanUpdater.isChanged("renewMembership")) {
                             JDBC_Payment_Membership.CreatePaymentMembership(this.modelMember.getIdMember(), modelMembership).thenAccept(idPaymentMembership -> {
@@ -617,7 +617,7 @@ public class Controller_Member implements Initializable {
                         JDBC_Member.CreateMember(modelMember).thenAccept(idMember -> {
                             if (idMember > 0) {
                                 JDBC_Member_Photo.CreatePhoto(idMember, photoHandler.getPhoto());
-                                JDBC_Member_Fingerprint.CreateFingerprints(idMember, Fingerprint.getFingerprints());
+                                JDBC_Member_Fingerprint.CreateFingerprints(idMember, Fingerprint_Controller.getFingerprints());
                                 JDBC_Payment_Membership.CreatePaymentMembership(idMember, finalModelMembership).thenAccept(idLastMembership -> {
                                     if (finalModelDebt != null && idLastMembership > 0) {
                                         JDBC_Debt.CreateDebt(finalModelDebt, idMember, 1);

@@ -88,7 +88,7 @@ public class Input {
                     JFXPasswordField field = (JFXPasswordField) input;
                     field.clear();
                 } else if (input.getClass() == JFXComboBox.class) { // JFXComboBox
-                    JFXComboBox comboBox = (JFXComboBox) input;
+                    JFXComboBox<?> comboBox = (JFXComboBox<?>) input;
                     comboBox.getSelectionModel().select(-1);
                 } else if (input.getClass() == JFXDatePicker.class) {
                     JFXDatePicker datePicker = (JFXDatePicker) input;

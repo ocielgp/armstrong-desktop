@@ -6,6 +6,7 @@ import com.jfoenix.controls.JFXCheckBox;
 import com.jfoenix.controls.JFXRadioButton;
 import com.jfoenix.controls.JFXTextField;
 import com.ocielgp.app.UserPreferences;
+import com.ocielgp.dao.JDBC_Member_Fingerprint;
 import com.ocielgp.models.Model_Member;
 import com.ocielgp.utilities.Loader;
 import com.ocielgp.utilities.Loading;
@@ -81,6 +82,12 @@ public class Controller_Members implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        JDBC_Member_Fingerprint.SCANNING = false;
+
+        this.tableColumnId.setSortable(false);
+        this.tableColumnName.setSortable(false);
+        this.tableColumnLastName.setSortable(false);
+        this.tableColumnEndDate.setSortable(false);
         this.tableColumnId.setCellValueFactory(new PropertyValueFactory<>("idMember"));
         this.tableColumnName.setCellValueFactory(new PropertyValueFactory<>("name"));
         this.tableColumnLastName.setCellValueFactory(new PropertyValueFactory<>("lastName"));
