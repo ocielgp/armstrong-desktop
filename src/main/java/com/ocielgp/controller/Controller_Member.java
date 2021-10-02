@@ -193,7 +193,7 @@ public class Controller_Member implements Initializable {
 
                 // shortcut
                 this.initButtonAccess();
-                this.s_buttonAccess.setOnAction(this.eventHandlerAccess());
+                this.s_buttonAccess.setOnAction(actionEvent -> CompletableFuture.runAsync(this::eventAccess));
 
                 this.s_buttonPayDebt.setVisible(Styles.CREATIVE == Input.colorToStyle(this.titlePane.getStyleClass().get(0)));
                 this.boxShortcut.setVisible(true);
@@ -411,7 +411,7 @@ public class Controller_Member implements Initializable {
         });
 
         // end buttons section
-        this.buttonAction.setOnAction(actionEvent -> CompletableFuture.runAsync(this::eventHandlerRegister));
+        this.buttonAction.setOnAction(actionEvent -> CompletableFuture.runAsync(this::eventRegister));
         this.buttonClear.setOnAction((actionEvent) -> {
             if (this.buttonClear.getText().equals("Cancelar")) {
                 this.boxPayment.setVisible(true);
@@ -476,19 +476,21 @@ public class Controller_Member implements Initializable {
 
     // Init shortcut pane
     private void initButtonAccess() {
-        if (this.modelMember.isAccess()) {
-            this.s_buttonAccess.getStyleClass().set(3, Input.styleToColor(Styles.DANGER));
-            this.s_buttonAccess.setText("Bloquear acceso");
-            this.s_buttonOpenDoor.setDisable(false);
-        } else {
-            this.s_buttonAccess.getStyleClass().set(3, Input.styleToColor(Styles.SUCCESS));
-            this.s_buttonAccess.setText("Desbloquear acceso");
-            this.s_buttonOpenDoor.setDisable(true);
-        }
+        Platform.runLater(() -> {
+            if (this.modelMember.isAccess()) {
+                this.s_buttonAccess.getStyleClass().set(3, Input.styleToColor(Styles.DANGER));
+                this.s_buttonAccess.setText("Bloquear acceso");
+                this.s_buttonOpenDoor.setDisable(false);
+            } else {
+                this.s_buttonAccess.getStyleClass().set(3, Input.styleToColor(Styles.SUCCESS));
+                this.s_buttonAccess.setText("Desbloquear acceso");
+                this.s_buttonOpenDoor.setDisable(true);
+            }
+        });
     }
 
     // Event Handlers
-    private void eventHandlerRegister() {
+    private void eventRegister() {
         ArrayList<InputDetails> nodesRequired = new ArrayList<>();
         // Personal information section
         nodesRequired.add(new InputDetails(this.pi_fieldName, this.pi_fieldName.getText()));
@@ -638,6 +640,7 @@ public class Controller_Member implements Initializable {
                     fadeOutDown.play();
 
                     // Clear memory data
+                    fadeOutDown = null;
                     nodesRequired = null;
                     formValid = null;
                     modelMember = null;
@@ -648,8 +651,8 @@ public class Controller_Member implements Initializable {
         }
     }
 
-    private EventHandler<ActionEvent> eventHandlerAccess() {
-        return actionEvent -> {
+    private void eventAccess() {
+        Platform.runLater(() -> {
             if (Styles.DANGER == Input.colorToStyle(this.s_buttonAccess.getStyleClass().get(3))) {
                 Dialog dialog = new Dialog(
                         Styles.DANGER,
@@ -661,12 +664,14 @@ public class Controller_Member implements Initializable {
                 if (dialog.show()) {
                     JDBC_Member.UpdateAccess(this.modelMember.getIdMember(), this.modelMember.isAccess()).thenAccept(bool_access -> {
                         if (bool_access) {
-                            this.modelMember.setAccess(!this.modelMember.isAccess());
-                            this.s_buttonOpenDoor.setDisable(true);
-                            this.s_buttonAccess.getStyleClass().set(3, Input.styleToColor(Styles.SUCCESS));
-                            this.s_buttonAccess.setText("Desbloquear acceso");
-                            Notifications.danger("Acceso bloqueado", this.modelMember.getName() + " ha perdido el acceso a los gimnasios.");
-                            // TODO: ABONAR MENSUALIDADES
+                            Platform.runLater(() -> {
+                                this.modelMember.setAccess(!this.modelMember.isAccess());
+                                this.s_buttonOpenDoor.setDisable(true);
+                                this.s_buttonAccess.getStyleClass().set(3, Input.styleToColor(Styles.SUCCESS));
+                                this.s_buttonAccess.setText("Desbloquear acceso");
+                                Notifications.danger("Acceso bloqueado", this.modelMember.getName() + " ha perdido el acceso a los gimnasios");
+                                this.boxScrollPane.requestFocus();
+                            });
                         }
                     });
                 }
@@ -680,15 +685,18 @@ public class Controller_Member implements Initializable {
                 );
                 if (dialog.show()) {
                     JDBC_Member.UpdateAccess(this.modelMember.getIdMember(), this.modelMember.isAccess()).thenAccept(bool_access -> {
-                        this.modelMember.setAccess(!this.modelMember.isAccess());
-                        this.s_buttonOpenDoor.setDisable(false);
-                        this.s_buttonAccess.getStyleClass().set(3, Input.styleToColor(Styles.DANGER));
-                        this.s_buttonAccess.setText("Bloquear acceso");
-                        Notifications.success("Acceso desbloqueado", this.modelMember.getName() + " puede entrar a los gimnasios nuevamente.");
+                        Platform.runLater(() -> {
+                            this.modelMember.setAccess(!this.modelMember.isAccess());
+                            this.s_buttonOpenDoor.setDisable(false);
+                            this.s_buttonAccess.getStyleClass().set(3, Input.styleToColor(Styles.DANGER));
+                            this.s_buttonAccess.setText("Bloquear acceso");
+                            Notifications.success("Acceso desbloqueado", this.modelMember.getName() + " puede entrar a los gimnasios nuevamente");
+                            this.boxScrollPane.requestFocus();
+                        });
                     });
                 }
             }
-        };
+        });
     }
 
     private EventHandler<ActionEvent> eventHandlerPayDebt() {

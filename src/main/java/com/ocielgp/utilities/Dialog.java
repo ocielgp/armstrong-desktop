@@ -55,6 +55,7 @@ public class Dialog {
     }
 
     public boolean show() {
+
         this.dialogView = (VBox) Loader.Load(
                 "dialog.fxml",
                 "Dialogs",
@@ -177,6 +178,7 @@ public class Dialog {
                         this.controller.answerStatus = true;
                         this.controller.closeModal();
                     }
+                    break;
                     case PASSWORD: {
                         if (Hash.generateHash(this.input.getText()).equals(Application.getStaffUserModel().getModelStaffMember().getPassword())) {
                             this.controller.answerStatus = true;
@@ -186,9 +188,11 @@ public class Dialog {
                             new Shake(this.input).play();
                         }
                     }
+                    break;
                     case DEBT: {
                         this.controller.closeModal();
                     }
+                    break;
                 }
             };
         }
@@ -206,12 +210,14 @@ public class Dialog {
                     Input.createVisibleProperty(this.boxDebt);
                     Input.createVisibleProperty(this.input);
                 }
+                break;
                 case PASSWORD: {
                     Input.createVisibleProperty(this.boxDebt);
                     this.input.textProperty().addListener((observable, oldValue, newValue) -> {
                         this.buttonOk.setDisable(newValue.equals(""));
                     });
                 }
+                break;
                 case DEBT: {
                     this.boxDialog.setMinWidth(700);
                     this.boxDialog.setMaxWidth(700);

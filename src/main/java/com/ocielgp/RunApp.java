@@ -42,7 +42,7 @@ public class RunApp extends javafx.application.Application {
         );
 
         // scene
-        Scene scene = new Scene(appView, 1366, 768); // HD
+        Scene scene = new Scene(appView, 1024, 720); // HD
         scene.getStylesheets().add(String.valueOf(RunApp.class.getClassLoader().getResource("styles.css")));
 
         // show app
