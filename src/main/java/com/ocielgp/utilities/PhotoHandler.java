@@ -2,6 +2,7 @@ package com.ocielgp.utilities;
 
 import com.jfoenix.controls.JFXButton;
 import com.ocielgp.app.Application;
+import com.ocielgp.app.UserPreferences;
 import com.ocielgp.fingerprint.Fingerprint_Controller;
 import javafx.event.ActionEvent;
 import javafx.scene.image.Image;
@@ -43,8 +44,14 @@ public class PhotoHandler {
         fileChooser.getExtensionFilters().add(extensionFilter);
 
         // TODO: OPEN LAST LOCATION
+        File folder = UserPreferences.getFolderPath();
+        if (folder != null) {
+            fileChooser.setInitialDirectory(folder);
+        }
+
         File file = fileChooser.showOpenDialog(Application.getPrimaryStage());
         if (file != null) {
+            UserPreferences.setFolderPath(file);
             this.imageViewPhoto.setImage(new Image(file.toURI().toString()));
             this.buttonDeletePhoto.setDisable(false);
             try {

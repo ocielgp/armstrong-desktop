@@ -5,6 +5,7 @@ import com.ocielgp.utilities.Pagination;
 import javafx.beans.value.ChangeListener;
 import javafx.scene.control.ToggleGroup;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.prefs.Preferences;
 
@@ -30,6 +31,7 @@ public class UserPreferences {
         // system
         DEFAULT_PREFERENCES.put("THEME", "day-theme"); // day-theme | night theme
 
+        DEFAULT_PREFERENCES.put("FOLDER_PATH", "");
         DEFAULT_PREFERENCES.put("LAST_GYM", 1);
         DEFAULT_PREFERENCES.put("MAX_DAYS_FINGERPRINTS", 7); // fingerprint scanner query
         DEFAULT_PREFERENCES.put("PAGINATION_MAX_ROWS", 20); // pagination
@@ -84,6 +86,24 @@ public class UserPreferences {
         return PREFERENCES.getBoolean(preference, (boolean) DEFAULT_PREFERENCES.get(preference));
     }
 
+    public static void setFolderPath(File file) {
+        File parentFile = file.getParentFile();
+        if (parentFile != null && file.exists() && file.isDirectory()) {
+            System.out.println(parentFile);
+            PREFERENCES.put("FOLDER_PATH", parentFile.toString());
+        }
+    }
+
+    public static File getFolderPath() {
+        String path = PREFERENCES.get("FOLDER_PATH", DEFAULT_PREFERENCES.get("FOLDER_PATH").toString());
+        File folder = new File(path);
+        if (folder.exists() && folder.isDirectory()) {
+            return folder;
+        } else {
+            return null;
+        }
+    }
+
     public static void createSelectedToggleProperty(ToggleGroup toggle, String radioButtonPrefix, String preference, Pagination pagination) {
         int selectPreviousState = getPreferenceInt(preference);
         for (byte i = 0; i < toggle.getToggles().size(); i++) {
@@ -106,4 +126,5 @@ public class UserPreferences {
             pagination.restartTable();
         };
     }
+
 }

@@ -61,7 +61,7 @@ public class Pagination {
 
         // Listener on ComboBox GymModel
         EventHandler<ActionEvent> gymChange = actionEvent -> {
-            if (UserPreferences.getPreferenceBool("FILTER_MEMBER_ALL_GYMS")) {
+            if (!UserPreferences.getPreferenceBool("FILTER_MEMBER_ALL_GYMS")) {
                 this.restartTable();
             }
         };

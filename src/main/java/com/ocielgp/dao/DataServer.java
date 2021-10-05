@@ -11,6 +11,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 public class DataServer {
     private static final HikariConfig hikariConfig;
@@ -59,12 +62,26 @@ public class DataServer {
     synchronized public static Connection getConnection() {
         System.out.println("getConnection()");
         try {
-            return hikariDataSource.getConnection();
-        } catch (SQLException sqlException) {
-            hikariDataSource = new HikariDataSource(hikariConfig);
-            if (!hikariDataSource.isRunning()) {
-                Notifications.catchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
-            }
+            return CompletableFuture.supplyAsync(() -> {
+                try {
+                    return hikariDataSource.getConnection();
+                } catch (SQLException sqlException) {
+                    // reconnecting
+                    System.out.println("[DataServer]: Reconectando a " + host + "...");
+                    hikariDataSource = new HikariDataSource(hikariConfig);
+                    try {
+                        Connection connection = hikariDataSource.getConnection();
+                        System.out.println("[DataServer]: Conectado a " + host);
+                        return connection;
+                    } catch (SQLException sqlException1) {
+                        Notifications.catchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
+                        System.out.println("[DataServer]: Desconectado");
+                    }
+                }
+                return null;
+            }).get();
+        } catch (InterruptedException | ExecutionException exception) {
+            Notifications.catchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], exception.getMessage(), exception);
         }
         return null;
     }
