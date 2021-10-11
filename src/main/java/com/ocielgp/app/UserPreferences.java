@@ -88,8 +88,7 @@ public class UserPreferences {
 
     public static void setFolderPath(File file) {
         File parentFile = file.getParentFile();
-        if (parentFile != null && file.exists() && file.isDirectory()) {
-            System.out.println(parentFile);
+        if (parentFile != null && file.exists() && parentFile.isDirectory()) {
             PREFERENCES.put("FOLDER_PATH", parentFile.toString());
         }
     }

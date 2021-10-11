@@ -9,7 +9,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox fx:id="boxDialog" style="-fx-border-color: -fx-color-border;" styleClass="day-theme" stylesheets="@../styles.css" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<VBox fx:id="boxDialog" style="-fx-border-color: -fx-color-border;" styleClass="day-theme" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <HBox fx:id="boxContent" alignment="CENTER" style="-fx-background-color: -fx-color-background;">
          <children>

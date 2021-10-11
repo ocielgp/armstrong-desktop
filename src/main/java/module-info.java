@@ -1,6 +1,7 @@
 module app {
-    requires javafx.controls;
+    requires javafx.swing;
     requires javafx.fxml;
+    requires javafx.controls;
     requires javafx.graphics;
     requires javafx.web;
 
@@ -13,7 +14,6 @@ module app {
     requires com.zaxxer.hikari;
 
     requires java.desktop;
-    requires javafx.swing;
     requires java.prefs;
 
     exports com.digitalpersona.uareu;
@@ -22,10 +22,9 @@ module app {
 
     opens com.ocielgp;
     opens com.ocielgp.app;
-    opens com.ocielgp.controller;
-    opens com.ocielgp.fingerprint;
-    opens com.ocielgp.utilities;
-
     opens com.ocielgp.dao;
+    opens com.ocielgp.fingerprint;
+    opens com.ocielgp.controller;
     opens com.ocielgp.models;
+    opens com.ocielgp.utilities;
 }

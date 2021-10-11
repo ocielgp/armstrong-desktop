@@ -1,6 +1,7 @@
 package com.ocielgp.utilities;
 
-public enum Styles {
+public class Styles {
+    public 
     DEFAULT,
     SUCCESS,
     WARN,

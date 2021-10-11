@@ -34,6 +34,7 @@
     -fx-background-radius: 5px;
     -fx-border-radius: 5px;
     -fx-icon-color: #fff;
+    /*-jfx-disable-visual-focus: true;*/
 }
 
 .jfx-button, .button {

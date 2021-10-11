@@ -2,6 +2,7 @@ package com.ocielgp;
 
 import com.ocielgp.app.Application;
 import com.ocielgp.controller.Controller_App;
+import com.ocielgp.controller.Controller_Popup;
 import com.ocielgp.models.Model_Member;
 import com.ocielgp.models.Model_Staff_Member;
 import com.ocielgp.utilities.FileLoader;
@@ -42,8 +43,10 @@ public class RunApp extends javafx.application.Application {
         );
 
         // scene
-        Scene scene = new Scene(appView, 1024, 720); // HD
+        Scene scene = new Scene(appView, 1280, 720); // HD
         scene.getStylesheets().add(String.valueOf(RunApp.class.getClassLoader().getResource("styles.css")));
+
+        Loader.Load("popup.fxml", "runapp", true, new Controller_Popup());
 
         // show app
         primaryStage.focusedProperty().addListener((observable, oldValue, newValue) -> {

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import java.lang.String?>
+<?import java.net.URL?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<VBox fx:id="popup" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="300.0" prefWidth="500.0" style="-fx-background-color: -fx-color-background; -fx-background-radius: 0 0 25 25;" styleClass="day-theme" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <AnchorPane fx:id="boxTitle" style="-fx-background-color: -fx-color-background;" styleClass="success-style">
+         <VBox.margin>
+            <Insets />
+         </VBox.margin>
+         <children>
+            <Label fx:id="labelTitle" alignment="CENTER" text="labelTitle" AnchorPane.bottomAnchor="-1.0" AnchorPane.leftAnchor="-1.0" AnchorPane.rightAnchor="-1.0" AnchorPane.topAnchor="-1.0" />
+            <VBox layoutX="579.0" layoutY="15.0" style="-fx-cursor: hand;" AnchorPane.bottomAnchor="-1.0" AnchorPane.rightAnchor="-1.0" AnchorPane.topAnchor="-1.0">
+               <children>
+                  <FontIcon fx:id="fontIconClose" iconLiteral="gmi-close" iconSize="30" />
+               </children>
+            </VBox>
+         </children>
+         <padding>
+            <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+         </padding>
+      </AnchorPane>
+      <HBox alignment="CENTER">
+         <children>
+            <Label fx:id="labelContent" text="labelContent" wrapText="true" />
+         </children>
+         <padding>
+            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+         </padding>
+      </HBox>
+      <HBox fx:id="boxButtons" alignment="CENTER" spacing="25.0">
+         <children>
+            <JFXButton text="Eliminar">
+               <styleClass>
+                  <String fx:value="btn-colorful" />
+                  <String fx:value="danger-style" />
+               </styleClass>
+            </JFXButton>
+            <JFXButton text="Cancelar">
+               <styleClass>
+                  <String fx:value="btn-colorful" />
+                  <String fx:value="default-style" />
+               </styleClass>
+            </JFXButton>
+         </children>
+         <padding>
+            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+         </padding>
+      </HBox>
+   </children>
+   <stylesheets>
+      <URL value="@../styles.css" />
+      <URL value="@../controls.css" />
+   </stylesheets>
+</VBox>
