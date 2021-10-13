@@ -46,11 +46,11 @@ public class Dialog {
         this.stage.close();
     }
 
-    public Dialog(Styles style, String title, String content, DialogTypes type, String... buttonsText) {
+    public Dialog(String style, String title, String content, DialogTypes type, String... buttonsText) {
         this.dialogController = new DialogView(this, style, title, content, type, buttonsText);
     }
 
-    public Dialog(Styles style, String title, List<Model_Debt> debtList, String... buttonsText) {
+    public Dialog(String style, String title, List<Model_Debt> debtList, String... buttonsText) {
         this.dialogController = new DialogView(this, style, title, DialogTypes.DEBT, debtList, buttonsText);
     }
 
@@ -111,7 +111,7 @@ public class Dialog {
 
         // Attributes
         private final Dialog controller;
-        private final Styles style;
+        private final String style;
         private final String title;
         private String content;
         public final DialogTypes dialogType;
@@ -119,7 +119,7 @@ public class Dialog {
 
         private List<Model_Debt> debtList;
 
-        public DialogView(Dialog controller, Styles style, String title, String content, DialogTypes dialogType, String... buttonText) {
+        public DialogView(Dialog controller, String style, String title, String content, DialogTypes dialogType, String... buttonText) {
             this.controller = controller;
             this.style = style;
             this.title = title;
@@ -128,7 +128,7 @@ public class Dialog {
             this.buttonsText = buttonText;
         }
 
-        public DialogView(Dialog controller, Styles style, String title, DialogTypes dialogType, List<Model_Debt> debtList, String... buttonText) {
+        public DialogView(Dialog controller, String style, String title, DialogTypes dialogType, List<Model_Debt> debtList, String... buttonText) {
             this.controller = controller;
             this.style = style;
             this.title = title;
@@ -143,8 +143,7 @@ public class Dialog {
             this.boxDialog.setMinWidth(500);
             this.boxDialog.setMaxWidth(500);
             this.boxDialog.getStyleClass().addAll(Application.getThemeType());
-            String style = Input.styleToColor(this.style);
-            this.boxContent.getStyleClass().add(style);
+            this.boxContent.getStyleClass().add(this.style);
             this.labelTitle.setText(this.title.toUpperCase());
             Input.getScrollEvent(this.scrollPane);
             this.labelContent.setText(this.content);

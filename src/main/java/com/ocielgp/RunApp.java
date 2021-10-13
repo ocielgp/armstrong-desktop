@@ -46,8 +46,6 @@ public class RunApp extends javafx.application.Application {
         Scene scene = new Scene(appView, 1280, 720); // HD
         scene.getStylesheets().add(String.valueOf(RunApp.class.getClassLoader().getResource("styles.css")));
 
-        Loader.Load("popup.fxml", "runapp", true, new Controller_Popup());
-
         // show app
         primaryStage.focusedProperty().addListener((observable, oldValue, newValue) -> {
             Platform.runLater(() -> {

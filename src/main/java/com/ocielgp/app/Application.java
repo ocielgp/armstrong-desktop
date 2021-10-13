@@ -62,7 +62,7 @@ public class Application {
         Application.controllerDashboard = controllerDashboard;
     }
 
-    public static void showUserInfo(Styles style, byte[] photo, int idMember, String name, String gym, String membership) {
+    public static void showUserInfo(String style, byte[] photo, int idMember, String name, String gym, String membership) {
         controllerDashboard.showUserInfo(style, photo, idMember, name, gym, membership);
     }
 

@@ -43,9 +43,9 @@ class NotificationView implements Initializable {
     private final double seconds;
     @FXML
     private GridPane gridPane;
-    private final Styles style;
+    private final String style;
 
-    public NotificationView(String icon, String title, String content, double seconds, Styles style) {
+    public NotificationView(String icon, String title, String content, double seconds, String style) {
         this.icon = icon;
         this.title = title;
         this.content = content;
@@ -58,7 +58,7 @@ class NotificationView implements Initializable {
         this.fontIcon.setIconLiteral(this.icon);
         this.labelTitle.setText(this.title);
         this.labelContent.setText(this.content);
-        this.gridPane.getStyleClass().addAll(Application.getThemeType(), Input.styleToColor(this.style));
+        this.gridPane.getStyleClass().addAll(Application.getThemeType(), this.style);
     }
 
     public String getTitle() {
@@ -90,7 +90,7 @@ public class Notifications {
 
     private static final double SECONDS = 3;
 
-    public static void createNotification(String icon, String title, String content, double seconds, Styles style) {
+    public static void createNotification(String icon, String title, String content, double seconds, String style) {
         NotificationView notificationController = new NotificationView(icon, title, content, seconds, style);
         GridPane notificationView = (GridPane) Loader.Load("notification.fxml", "Notifications", false, notificationController);
         notificationView.addEventHandler(EventType.ROOT, new EventHandler<>() {

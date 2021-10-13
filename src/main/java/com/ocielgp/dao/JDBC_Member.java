@@ -53,7 +53,7 @@ public class JDBC_Member {
         return CompletableFuture.supplyAsync(() -> FXCollections.observableArrayList("Hombre", "Mujer"));
     }
 
-    public static Styles ReadStyle(int idMember) {
+    public static String ReadStyle(int idMember) {
         Connection con = DataServer.getConnection();
         try {
             PreparedStatement ps;
@@ -76,7 +76,7 @@ public class JDBC_Member {
         return Styles.DANGER;
     }
 
-    public static Styles ReadStyle(boolean access, long daysLeft, boolean haveDebts) {
+    public static String ReadStyle(boolean access, long daysLeft, boolean haveDebts) {
         /* DATES
          *  - 0 DAYS = DANGER
          * 1-3 DAYS = WARN

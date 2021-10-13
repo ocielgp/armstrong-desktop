@@ -169,7 +169,7 @@ public class Controller_Member implements Initializable {
         if (this.modelMember != null) {
             Platform.runLater(() -> {
                 // init form
-                this.titlePane.getStyleClass().set(0, Input.styleToColor(JDBC_Member.ReadStyle(this.modelMember.getIdMember())));
+                this.titlePane.getStyleClass().set(0, JDBC_Member.ReadStyle(this.modelMember.getIdMember()));
                 this.t_labelTitle.setText("[ " + this.modelMember.getIdMember() + " ] " + this.modelMember.getName().toUpperCase());
 
                 // quick view
@@ -195,7 +195,7 @@ public class Controller_Member implements Initializable {
                 this.initButtonAccess();
                 this.s_buttonAccess.setOnAction(actionEvent -> CompletableFuture.runAsync(this::eventAccess));
 
-                this.s_buttonPayDebt.setVisible(Styles.CREATIVE == Input.colorToStyle(this.titlePane.getStyleClass().get(0)));
+                this.s_buttonPayDebt.setVisible(Styles.CREATIVE.equals(this.titlePane.getStyleClass().get(0)));
                 this.boxShortcut.setVisible(true);
 
                 // photo
@@ -478,11 +478,11 @@ public class Controller_Member implements Initializable {
     private void initButtonAccess() {
         Platform.runLater(() -> {
             if (this.modelMember.isAccess()) {
-                this.s_buttonAccess.getStyleClass().set(3, Input.styleToColor(Styles.DANGER));
+                this.s_buttonAccess.getStyleClass().set(3, Styles.DANGER);
                 this.s_buttonAccess.setText("Bloquear acceso");
                 this.s_buttonOpenDoor.setDisable(false);
             } else {
-                this.s_buttonAccess.getStyleClass().set(3, Input.styleToColor(Styles.SUCCESS));
+                this.s_buttonAccess.getStyleClass().set(3, Styles.SUCCESS);
                 this.s_buttonAccess.setText("Desbloquear acceso");
                 this.s_buttonOpenDoor.setDisable(true);
             }
@@ -653,21 +653,22 @@ public class Controller_Member implements Initializable {
 
     private void eventAccess() {
         Platform.runLater(() -> {
-            if (Styles.DANGER == Input.colorToStyle(this.s_buttonAccess.getStyleClass().get(3))) {
-                Dialog dialog = new Dialog(
-                        Styles.DANGER,
+            String style = this.s_buttonAccess.getStyleClass().get(3);
+            Controller_Popup popup = new Controller_Popup();
+            if (Styles.DANGER.equals(style)) {
+                popup.fillView(
+                        style,
                         "Bloquear acceso",
                         "Se le bloqueara el acceso a todos los gimnasios a " + this.modelMember.getName() + " " + this.modelMember.getLastName() + ", ¿quieres continuar?",
-                        DialogTypes.MESSAGE,
-                        Dialog.YES, Dialog.CANCEL
+                        Controller_Popup.POPUP_CONFIRM
                 );
-                if (dialog.show()) {
+                if (popup.showAndWait()) {
                     JDBC_Member.UpdateAccess(this.modelMember.getIdMember(), this.modelMember.isAccess()).thenAccept(bool_access -> {
                         if (bool_access) {
                             Platform.runLater(() -> {
                                 this.modelMember.setAccess(!this.modelMember.isAccess());
                                 this.s_buttonOpenDoor.setDisable(true);
-                                this.s_buttonAccess.getStyleClass().set(3, Input.styleToColor(Styles.SUCCESS));
+                                this.s_buttonAccess.getStyleClass().set(3, Styles.SUCCESS);
                                 this.s_buttonAccess.setText("Desbloquear acceso");
                                 Notifications.danger("Acceso bloqueado", this.modelMember.getName() + " ha perdido el acceso a los gimnasios");
                                 this.boxScrollPane.requestFocus();
@@ -676,19 +677,18 @@ public class Controller_Member implements Initializable {
                     });
                 }
             } else {
-                Dialog dialog = new Dialog(
-                        Styles.SUCCESS,
+                popup.fillView(
+                        style,
                         "Desbloquear acceso",
                         "Se desbloqueara el acceso a " + this.modelMember.getName() + " " + this.modelMember.getLastName() + ", ¿quieres continuar?",
-                        DialogTypes.MESSAGE,
-                        Dialog.YES, Dialog.CANCEL
+                        Controller_Popup.POPUP_CONFIRM
                 );
-                if (dialog.show()) {
+                if (popup.showAndWait()) {
                     JDBC_Member.UpdateAccess(this.modelMember.getIdMember(), this.modelMember.isAccess()).thenAccept(bool_access -> {
                         Platform.runLater(() -> {
                             this.modelMember.setAccess(!this.modelMember.isAccess());
                             this.s_buttonOpenDoor.setDisable(false);
-                            this.s_buttonAccess.getStyleClass().set(3, Input.styleToColor(Styles.DANGER));
+                            this.s_buttonAccess.getStyleClass().set(3, Styles.DANGER);
                             this.s_buttonAccess.setText("Bloquear acceso");
                             Notifications.success("Acceso desbloqueado", this.modelMember.getName() + " puede entrar a los gimnasios nuevamente");
                             this.boxScrollPane.requestFocus();
@@ -717,11 +717,11 @@ public class Controller_Member implements Initializable {
 
     private EventHandler<ActionEvent> eventHandlerChangeMembership() {
         return actionEvent -> {
-            if (Styles.SUCCESS == Input.colorToStyle(this.s_buttonAccess.getStyleClass().get(3))) {
+            if (Styles.SUCCESS.equals(this.s_buttonAccess.getStyleClass().get(3))) {
                 new Shake(this.ms_buttonRenewMembership).play();
                 Notifications.danger("Acceso bloqueado", "Para realizar esta acción, el usuario no debe tener bloqueos.");
             } else {
-                if (Input.colorToStyle(this.ms_buttonRenewMembership.getStyleClass().get(3)) == Styles.WARN) {
+                if (Styles.WARN.equals(this.ms_buttonRenewMembership.getStyleClass().get(3))) {
                     Dialog dialog = new Dialog(
                             Styles.WARN,
                             "Cambiar membresía",
@@ -731,7 +731,7 @@ public class Controller_Member implements Initializable {
                     );
                     if (dialog.show()) {
                         this.enableComboMemberships(true);
-                        this.ms_buttonRenewMembership.getStyleClass().set(3, Input.styleToColor(Styles.DANGER));
+                        this.ms_buttonRenewMembership.getStyleClass().set(3, Styles.DANGER);
                         this.ms_buttonRenewMembership.setText("Cancelar");
                     }
                 } else {
@@ -743,14 +743,14 @@ public class Controller_Member implements Initializable {
 
     private EventHandler<ActionEvent> eventHandlerRenewMembership() {
         return actionEvent -> {
-            if (Styles.SUCCESS == Input.colorToStyle(this.s_buttonAccess.getStyleClass().get(3))) {
+            if (Styles.SUCCESS.equals(this.s_buttonAccess.getStyleClass().get(3))) {
                 new Shake(this.ms_buttonRenewMembership).play();
                 Notifications.danger("Acceso bloqueado", "Para realizar esta acción, el usuario no debe tener bloqueos.");
             } else if (this.s_buttonPayDebt.isVisible()) {
                 new Shake(this.ms_buttonRenewMembership).play();
                 Notifications.danger("Error", "Para renovar una mensualidad el usuario no debe tener adeudos.");
             } else {
-                if (Input.colorToStyle(this.ms_buttonRenewMembership.getStyleClass().get(3)) == Styles.EPIC) {
+                if (Styles.EPIC.equals(this.ms_buttonRenewMembership.getStyleClass().get(3))) {
                     if (this.ms_comboBoxMemberships.getSelectionModel().getSelectedIndex() != -1) {
                         Dialog dialog = new Dialog(Styles.EPIC, "Renovar membresía", "¿La membresía es la misma?", DialogTypes.MESSAGE, Dialog.YES, Dialog.NO);
                         if (dialog.show()) {
@@ -769,7 +769,7 @@ public class Controller_Member implements Initializable {
                     }
                     this.enableComboMemberships(true);
 
-                    this.ms_buttonRenewMembership.getStyleClass().set(3, Input.styleToColor(Styles.DANGER));
+                    this.ms_buttonRenewMembership.getStyleClass().set(3, Styles.DANGER);
                     this.ms_buttonRenewMembership.setText("Cancelar");
                 } else {
                     this.restartRenewMembership(false);
@@ -811,11 +811,11 @@ public class Controller_Member implements Initializable {
         if (this.modelMember != null && this.modelMember.getModelPaymentMembership() != null) {
             if (DateFormatter.daysDifferenceToday(LocalDate.parse(this.modelMember.getModelPaymentMembership().getStartDate())) == 0) {
                 this.ms_buttonRenewMembership.setText("Cambiar");
-                this.ms_buttonRenewMembership.getStyleClass().set(3, Input.styleToColor(Styles.WARN));
+                this.ms_buttonRenewMembership.getStyleClass().set(3, Styles.WARN);
                 this.ms_buttonRenewMembership.setOnAction(this.eventHandlerChangeMembership());
             } else {
                 this.ms_buttonRenewMembership.setText("Renovar");
-                this.ms_buttonRenewMembership.getStyleClass().set(3, Input.styleToColor(Styles.EPIC));
+                this.ms_buttonRenewMembership.getStyleClass().set(3, Styles.EPIC);
                 this.ms_buttonRenewMembership.setOnAction(this.eventHandlerRenewMembership());
             }
         }

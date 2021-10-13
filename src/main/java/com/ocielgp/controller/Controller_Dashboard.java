@@ -124,7 +124,7 @@ public class Controller_Dashboard implements Initializable {
         });
     }
 
-    public void showUserInfo(Styles style, byte[] photo, Integer idMember, String name, String gym, String membership) {
+    public void showUserInfo(String style, byte[] photo, Integer idMember, String name, String gym, String membership) {
         Image loadImage;
         if (photo == null) {
             loadImage = FileLoader.getDefaultImage();
@@ -133,7 +133,7 @@ public class Controller_Dashboard implements Initializable {
         }
 
         Platform.runLater(() -> {
-            this.ci_box.getStyleClass().setAll(Application.getThemeType(), Input.styleToColor(style));
+            this.ci_box.getStyleClass().setAll(Application.getThemeType(), style);
             this.ci_imgPhoto.setImage(loadImage);
             this.ci_labelId.setText(idMember.toString());
             this.ci_labelName.setText(name);

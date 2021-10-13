@@ -142,7 +142,7 @@ public class Pagination {
                     public void updateItem(Model_Member modelMember, boolean empty) {
                         super.updateItem(modelMember, empty);
                         if (modelMember != null) {
-                            String style = Input.styleToColor(modelMember.getStyle());
+                            String style = modelMember.getStyle();
                             if (getStyleClass().size() == 5) {
                                 getStyleClass().set(4, style); // replace color style
                             } else {

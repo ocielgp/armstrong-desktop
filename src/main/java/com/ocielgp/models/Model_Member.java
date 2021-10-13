@@ -23,7 +23,7 @@ public class Model_Member {
     private final IntegerProperty idGym = new SimpleIntegerProperty();
 
     private final StringProperty endDate = new SimpleStringProperty();
-    private Styles style;
+    private String style;
 
     // members
     private Model_Member_Photo modelMemberPhoto;
@@ -173,11 +173,11 @@ public class Model_Member {
         this.endDate.set(endDate);
     }
 
-    public Styles getStyle() {
+    public String getStyle() {
         return style;
     }
 
-    public void setStyle(Styles style) {
+    public void setStyle(String style) {
         this.style = style;
     }
 
