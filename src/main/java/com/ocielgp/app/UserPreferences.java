@@ -22,7 +22,7 @@ public class UserPreferences {
         DEFAULT_PREFERENCES.put("DB_PORT_0", "3306");
         DEFAULT_PREFERENCES.put("DB_USER_0", "root");
         DEFAULT_PREFERENCES.put("DB_PASSWORD_0", "280580");
-        // database: - remote
+        // database: remote
         DEFAULT_PREFERENCES.put("DB_HOST_1", "142.93.81.100");
         DEFAULT_PREFERENCES.put("DB_PORT_1", "3306");
         DEFAULT_PREFERENCES.put("DB_USER_1", "ociel");
@@ -96,11 +96,7 @@ public class UserPreferences {
     public static File getFolderPath() {
         String path = PREFERENCES.get("FOLDER_PATH", DEFAULT_PREFERENCES.get("FOLDER_PATH").toString());
         File folder = new File(path);
-        if (folder.exists() && folder.isDirectory()) {
-            return folder;
-        } else {
-            return null;
-        }
+        return (folder.exists() && folder.isDirectory()) ? folder : null;
     }
 
     public static void createSelectedToggleProperty(ToggleGroup toggle, String radioButtonPrefix, String preference, Pagination pagination) {

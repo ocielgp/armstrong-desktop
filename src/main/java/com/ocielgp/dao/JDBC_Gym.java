@@ -39,30 +39,32 @@ public class JDBC_Gym {
         });
     }
 
-    public static ObservableList<Model_Gym> ReadGyms() {
-        Connection con = DataServer.getConnection();
-        ObservableList<Model_Gym> modelGymsList = FXCollections.observableArrayList();
-        try {
-            PreparedStatement ps;
-            ResultSet rs;
-            assert con != null;
-            ps = con.prepareStatement("SELECT idGym, name, address FROM GYMS WHERE flag = 1");
-            rs = ps.executeQuery();
-            while (rs.next()) {
-                Model_Gym modelGyms = new Model_Gym();
-                modelGyms.setIdGym(rs.getInt("idGym"));
-                modelGyms.setName(rs.getString("name"));
-                modelGyms.setAddress(rs.getString("address"));
-                modelGymsList.add(modelGyms);
+    public static CompletableFuture<ObservableList<Model_Gym>> ReadGyms() {
+        return CompletableFuture.supplyAsync(() -> {
+            Connection con = DataServer.getConnection();
+            ObservableList<Model_Gym> modelGymsList = FXCollections.observableArrayList();
+            try {
+                PreparedStatement ps;
+                ResultSet rs;
+                assert con != null;
+                ps = con.prepareStatement("SELECT idGym, name, address FROM GYMS WHERE flag = 1");
+                rs = ps.executeQuery();
+                while (rs.next()) {
+                    Model_Gym modelGym = new Model_Gym();
+                    modelGym.setIdGym(rs.getInt("idGym"));
+                    modelGym.setName(rs.getString("name"));
+                    modelGym.setAddress(rs.getString("address"));
+                    modelGymsList.add(modelGym);
+                }
+                if (modelGymsList.isEmpty()) {
+                    Notifications.warn("Gimnasios", "No hay gimnasios registrados", 5);
+                }
+            } catch (SQLException sqlException) {
+                Notifications.catchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
+            } finally {
+                DataServer.closeConnection(con);
             }
-            if (modelGymsList.isEmpty()) {
-                Notifications.warn(MethodHandles.lookup().lookupClass().getSimpleName(), "No hay gimnasios registrados.", 5);
-            }
-        } catch (SQLException sqlException) {
-            Notifications.catchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
-        } finally {
-            DataServer.closeConnection(con);
-        }
-        return modelGymsList;
+            return modelGymsList;
+        });
     }
 }

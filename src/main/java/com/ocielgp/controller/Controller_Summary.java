@@ -34,7 +34,6 @@ public class Controller_Summary implements Initializable {
 
         Platform.runLater(() -> {
             new FadeIn(this.rootPane).play();
-            Application.controllerDashboard.enableRoutes();
             Loading.close();
         });
     }

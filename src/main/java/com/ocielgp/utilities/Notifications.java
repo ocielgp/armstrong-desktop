@@ -3,6 +3,7 @@ package com.ocielgp.utilities;
 import animatefx.animation.FadeInRight;
 import animatefx.animation.FadeOutRight;
 import com.ocielgp.app.Application;
+import com.ocielgp.app.UserPreferences;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
@@ -58,7 +59,7 @@ class NotificationView implements Initializable {
         this.fontIcon.setIconLiteral(this.icon);
         this.labelTitle.setText(this.title);
         this.labelContent.setText(this.content);
-        this.gridPane.getStyleClass().addAll(Application.getThemeType(), this.style);
+        this.gridPane.getStyleClass().addAll(UserPreferences.getPreferenceString("THEME"), this.style);
     }
 
     public String getTitle() {

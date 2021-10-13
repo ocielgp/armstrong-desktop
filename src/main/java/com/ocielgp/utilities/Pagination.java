@@ -162,7 +162,6 @@ public class Pagination {
                 this.restartCounters();
             }
 
-            Application.controllerDashboard.enableRoutes();
             Loading.close();
             this.tableView.setDisable(false);
         }));

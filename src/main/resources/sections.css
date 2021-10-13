@@ -1,7 +1,12 @@
 /* Dashboard */
+/* Dashboard */
 
 .dashboard {
     -fx-background-color: -fx-color-background;
+}
+
+.dashboard .aside *:disabled {
+    -fx-opacity: 1;
 }
 
 .dashboard .aside .option {
@@ -48,14 +53,6 @@
     -fx-font: 2.5em "Roboto Thin";
 }
 
-.fingerprint .title {
-    -fx-font: 2.5em "Roboto Bold";
-}
-
-.fingerprint .icon {
-    -fx-icon-size: 50px;
-}
-
 .fingerprint .on {
     -fx-icon-color: #20950E;
 }
@@ -63,10 +60,6 @@
 .fingerprint .off {
     -fx-icon-color: #D20F25;
     -fx-cursor: hand;
-}
-
-.fingerprint .status {
-    -fx-font: 2em "Roboto Thin";
 }
 
 /* End Dashboard */
@@ -114,28 +107,3 @@
 /* End Model_Member */
 
 /* End Members */
-
-/* Footer */
-.footer {
-    -fx-border-width: 1px 0 0 0;
-    -fx-padding: 10px;
-    -fx-border-color: -fx-color-unfocus;
-}
-
-.footer .label {
-    -fx-font-family: "Roboto Thin";
-}
-
-.icon-theme-container {
-    -fx-background-color: transparent;
-    -fx-border-color: -fx-color-unfocus;
-    -fx-border-radius: 30px;
-    -fx-background-radius: 30px;
-    -fx-padding: 10px;
-}
-
-.icon-theme {
-    -fx-font-size: 2em;
-}
-
-/* End Footer */

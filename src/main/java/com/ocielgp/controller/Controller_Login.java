@@ -61,8 +61,8 @@ public class Controller_Login implements Initializable {
                         Platform.runLater(() -> {
                             FadeOutDown fadeOutDown = new FadeOutDown(this.boxLoginPane);
                             fadeOutDown.setOnFinished((action) -> {
-                                Application.controllerApp.borderPane.setCenter(dashboardFXML);
-                                new FadeIn(Application.controllerApp.borderPane.getCenter()).play();
+                                Application.controllerApp.borderPaneApp.setCenter(dashboardFXML);
+                                new FadeIn(Application.controllerApp.borderPaneApp.getCenter()).play();
                             });
                             fadeOutDown.play();
                         });

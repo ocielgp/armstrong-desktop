@@ -159,8 +159,6 @@
 
                         <option>--add-exports</option>
                         <option>javafx.controls/com.sun.javafx.scene.control.behavior=com.jfoenix</option>
-
-                        <option>-add-modules=javafx.fxml</option>
                     </options>
                 </configuration>
             </plugin>

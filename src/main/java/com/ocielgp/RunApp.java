@@ -44,7 +44,7 @@ public class RunApp extends javafx.application.Application {
 
         // scene
         Scene scene = new Scene(appView, 1280, 720); // HD
-        scene.getStylesheets().add(String.valueOf(RunApp.class.getClassLoader().getResource("styles.css")));
+        scene.getStylesheets().add("styles.css");
 
         // show app
         primaryStage.focusedProperty().addListener((observable, oldValue, newValue) -> {

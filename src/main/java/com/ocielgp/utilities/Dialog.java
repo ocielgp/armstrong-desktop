@@ -5,6 +5,7 @@ import animatefx.animation.Shake;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
 import com.ocielgp.app.Application;
+import com.ocielgp.app.UserPreferences;
 import com.ocielgp.models.Model_Debt;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -142,7 +143,7 @@ public class Dialog {
             this.boxDialog.requestFocus();
             this.boxDialog.setMinWidth(500);
             this.boxDialog.setMaxWidth(500);
-            this.boxDialog.getStyleClass().addAll(Application.getThemeType());
+            this.boxDialog.getStyleClass().addAll(UserPreferences.getPreferenceString("THEME"));
             this.boxContent.getStyleClass().add(this.style);
             this.labelTitle.setText(this.title.toUpperCase());
             Input.getScrollEvent(this.scrollPane);

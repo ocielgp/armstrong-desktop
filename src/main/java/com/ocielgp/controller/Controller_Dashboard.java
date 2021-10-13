@@ -3,6 +3,7 @@ package com.ocielgp.controller;
 import animatefx.animation.FadeIn;
 import animatefx.animation.FadeInUp;
 import com.ocielgp.app.Application;
+import com.ocielgp.app.UserPreferences;
 import com.ocielgp.fingerprint.Fingerprint_Controller;
 import com.ocielgp.utilities.*;
 import javafx.application.Platform;
@@ -17,6 +18,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.util.Pair;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.net.URL;
@@ -43,7 +45,7 @@ public class Controller_Dashboard implements Initializable {
     @FXML
     private Label labelFingerprintStatus;
 
-    // Routes
+    // routes
     @FXML
     private HBox navSummary;
     @FXML
@@ -65,25 +67,18 @@ public class Controller_Dashboard implements Initializable {
     @FXML
     private Label ci_labelMembership;
 
-    // attributes
+    // variables
     private boolean boolRoutesEnabled = true;
-    private HashMap<HBox, String> routes;
+    private HashMap<HBox, Pair<String, String>> routes;
+    private final String initialRoute;
 
-    public void enableRoutes() {
-        if (!boolRoutesEnabled) {
-            for (HBox nav : routes.keySet()) {
-                nav.setDisable(false);
-            }
-            this.boolRoutesEnabled = true;
-        }
+
+    public Controller_Dashboard() {
+        this.initialRoute = "summary.fxml"; // default route
     }
 
-    private void disableRoutes() {
-        Loading.show();
-        for (HBox nav : routes.keySet()) {
-            nav.setDisable(true);
-        }
-        this.boolRoutesEnabled = false;
+    public Controller_Dashboard(String initialRoute) {
+        this.initialRoute = initialRoute;
     }
 
     @Override
@@ -93,17 +88,25 @@ public class Controller_Dashboard implements Initializable {
         this.imageViewUser.setImage(FileLoader.loadImage("no-user-image.png"));
         this.imageViewLogo.setImage(FileLoader.loadImage("img.jpg"));
 
-        // Update scrollPaneContent
+        // update scrollPaneContent
         this.labelStaffName.setText(Application.getStaffUserModel().getName());
 
         /* Routing */
         this.routes = new HashMap<>();
-        routes.put(navSummary, "summary.fxml");
-        routes.put(navMembers, "members.fxml");
+        routes.put(navSummary, new Pair<>("summary.fxml", "Resumen"));
+        routes.put(navMembers, new Pair<>("members.fxml", "Socios"));
 
         for (HBox navBox : routes.keySet()) {
-            if (!navBox.getStyleClass().contains("selected")) {
-                navBox.addEventFilter(MouseEvent.MOUSE_CLICKED, eventEventHandlerNav());
+            navBox.setOnMouseClicked(mouseEvent -> eventChangeContent(navBox));
+            if (initialRoute.)
+            if (initialRoute.isEmpty()) {
+                navSummary.getStyleClass().add("selected");
+                navSummary.setDisable(false);
+            } else {
+                if (routes.get(navBox).getKey().equals(initialRoute)) {
+                    navBox.getStyleClass().add("selected");
+                    navSummary.setDisable(false);
+                }
             }
         }
         /* End Routing */
@@ -133,7 +136,7 @@ public class Controller_Dashboard implements Initializable {
         }
 
         Platform.runLater(() -> {
-            this.ci_box.getStyleClass().setAll(Application.getThemeType(), style);
+            this.ci_box.getStyleClass().setAll(UserPreferences.getPreferenceString("THEME"), style);
             this.ci_imgPhoto.setImage(loadImage);
             this.ci_labelId.setText(idMember.toString());
             this.ci_labelName.setText(name);
@@ -144,36 +147,24 @@ public class Controller_Dashboard implements Initializable {
     }
 
     // event handlers
-    private EventHandler<MouseEvent> eventEventHandlerNav() {
-        return new EventHandler<>() {
-            @Override
-            public void handle(MouseEvent mouseEvent) {
-                disableRoutes();
-                CompletableFuture.runAsync(() -> {
-                    for (HBox navBox : routes.keySet()) {
-                        if (navBox.getStyleClass().contains("selected")) {
-                            navBox.getStyleClass().remove("selected");
-                            navBox.addEventFilter(MouseEvent.MOUSE_CLICKED, this);
-                            break;
-                        }
-                    }
+    private void eventChangeContent(HBox navBox) {
+        navBox.getStyleClass().add("selected");
 
-                    HBox navBox = (HBox) mouseEvent.getSource();
-                    navBox.getStyleClass().add("selected");
-                    navBox.removeEventFilter(MouseEvent.MOUSE_CLICKED, this);
-                    Node navFXML = Loader.Load(
-                            routes.get(navBox),
-                            "Dashboard",
-                            false
-                    );
-                    Platform.runLater(() -> {
-                        scrollPaneContent.setContent(navFXML);
-                        Input.getScrollEvent(scrollPaneContent);
-                        Fingerprint_Controller.BackgroundReader();
-                    });
-                });
-            }
-        };
+
+        navBox.setDisable(true);
+        if (navBox.getStyleClass().contains("selected")) {
+            System.out.println("salio");
+        }
+        Node navFXML = Loader.Load(
+                null,
+                "Dashboard",
+                false
+        );
+        Platform.runLater(() -> {
+            scrollPaneContent.setContent(navFXML);
+            Input.getScrollEvent(scrollPaneContent);
+            Fingerprint_Controller.BackgroundReader();
+        });
     }
 
     private EventHandler<MouseEvent> eventHandlerSecureMode() {

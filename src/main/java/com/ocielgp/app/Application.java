@@ -42,9 +42,6 @@ public class Application {
     }
 
     /* Content methods */
-    public static String getThemeType() {
-        return controllerApp.getTheme();
-    }
 
     public static JFXComboBox<Model_Gym> getCurrentGymNode() {
         return controllerApp.getGymNode();
