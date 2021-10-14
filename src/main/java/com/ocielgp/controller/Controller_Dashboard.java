@@ -13,6 +13,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.effect.GaussianBlur;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -91,7 +92,7 @@ public class Controller_Dashboard implements Initializable {
         // Fingerprint_Controller
         Fingerprint_Controller.initializeUI(this.fontIconFingerprint, this.labelFingerprintStatus);
 
-        this.navSecureMode.setOnMouseClicked(this.eventHandlerSecureMode());
+        this.navSecureMode.setOnMouseClicked(mouseEvent -> eventSecureMode());
 
         Platform.runLater(() -> {
             new FadeInUp(Application.getCurrentGymNode()).play();
@@ -120,35 +121,33 @@ public class Controller_Dashboard implements Initializable {
     // event handlers
 
 
-    private EventHandler<MouseEvent> eventHandlerSecureMode() {
-        return mouseEvent -> {
-            if (Application.isSecureMode()) {
-                // TODO: DON'T LOST FOCUS
-                Dialog dialog = new Dialog(
-                        Styles.WARN,
-                        "Modo seguro",
-                        "Ingresa tu contraseña para desactivar el modo seguro",
-                        DialogTypes.PASSWORD,
-                        Dialog.OK, Dialog.NO
-                );
-                if (dialog.show()) {
-                    Application.setSecureMode(false);
-                }
-            } else {
-                Dialog dialog = new Dialog(
-                        Styles.WARN,
-                        "Modo seguro",
-                        "El modo seguro bloquea la interfaz pero el sistema sigue funcionando, útil para ausentarse con seguridad",
-                        DialogTypes.MESSAGE,
-                        Dialog.OK, Dialog.NO
-                );
-                if (dialog.show()) {
-                    Application.setSecureMode(true);
-                }
+    private void eventSecureMode() {
+        if (Application.isSecureMode()) {
+            Controller_Popup popup = new Controller_Popup();
+            popup.fillView(
+                    Styles.WARN,
+                    "Desbloquear modo seguro",
+                    "Ingresa tu contraseña para desbloquear",
+                    Controller_Popup.POPUP_SECURE_MODE
+            );
+            if (popup.showAndWait()) {
+                Application.setSecureMode(false);
             }
-
-            this.scrollPaneContent.setDisable(Application.isSecureMode());
-        };
+        } else {
+            Controller_Popup popup = new Controller_Popup();
+            popup.fillView(
+                    Styles.WARN,
+                    "Modo Seguro",
+                    "Bloquea la interfaz pero el sistema sigue funcionando",
+                    Controller_Popup.POPUP_CONFIRM
+            );
+            if (popup.showAndWait()) {
+                Application.setSecureMode(true);
+            }
+        }
+        Router.isRouterAvailable = !Application.isSecureMode();
+        this.scrollPaneContent.setEffect((Application.isSecureMode()) ? new GaussianBlur() : null);
+        this.scrollPaneContent.setDisable(Application.isSecureMode());
     }
 
 }
