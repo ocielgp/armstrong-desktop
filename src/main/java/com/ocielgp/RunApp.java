@@ -2,6 +2,7 @@ package com.ocielgp;
 
 import com.ocielgp.app.Application;
 import com.ocielgp.controller.Controller_App;
+import com.ocielgp.controller.Controller_Dashboard;
 import com.ocielgp.controller.Controller_Popup;
 import com.ocielgp.models.Model_Member;
 import com.ocielgp.models.Model_Staff_Member;

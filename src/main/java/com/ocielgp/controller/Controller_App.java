@@ -31,7 +31,9 @@ public class Controller_App implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-//        this.comboBoxGyms.setVisible(false);
+        this.comboBoxGyms.setOpacity(0);
+        this.comboBoxGyms.setVisible(false);
+
         this.boxTheme.setOnMouseClicked(mouseEvent -> changeTheme());
 
         // TODO: RESEARCH ABOUT THIS
@@ -52,6 +54,8 @@ public class Controller_App implements Initializable {
                         break;
                     }
                 }
+                this.comboBoxGyms.setVisible(true);
+                new FadeIn(this.comboBoxGyms).play();
                 this.comboBoxGyms.valueProperty().addListener((observable, oldValue, newValue) -> UserPreferences.setPreference("LAST_GYM", Application.getCurrentGym().getIdGym()));
                 this.comboBoxGyms.focusedProperty().addListener((observableValue, oldValue, newValue) -> comboBoxGyms.getStyleClass().remove("red-border-input-line"));
             });

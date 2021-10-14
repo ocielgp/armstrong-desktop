@@ -3,6 +3,7 @@ package com.ocielgp.controller;
 import animatefx.animation.FadeIn;
 import animatefx.animation.FadeInUp;
 import com.ocielgp.app.Application;
+import com.ocielgp.app.Router;
 import com.ocielgp.app.UserPreferences;
 import com.ocielgp.fingerprint.Fingerprint_Controller;
 import com.ocielgp.utilities.*;
@@ -10,7 +11,6 @@ import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
@@ -24,7 +24,6 @@ import org.kordamp.ikonli.javafx.FontIcon;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.ResourceBundle;
-import java.util.concurrent.CompletableFuture;
 
 public class Controller_Dashboard implements Initializable {
     @FXML
@@ -67,20 +66,6 @@ public class Controller_Dashboard implements Initializable {
     @FXML
     private Label ci_labelMembership;
 
-    // variables
-    private boolean boolRoutesEnabled = true;
-    private HashMap<HBox, Pair<String, String>> routes;
-    private final String initialRoute;
-
-
-    public Controller_Dashboard() {
-        this.initialRoute = "summary.fxml"; // default route
-    }
-
-    public Controller_Dashboard(String initialRoute) {
-        this.initialRoute = initialRoute;
-    }
-
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         Application.setDashboardController(this);
@@ -92,23 +77,15 @@ public class Controller_Dashboard implements Initializable {
         this.labelStaffName.setText(Application.getStaffUserModel().getName());
 
         /* Routing */
-        this.routes = new HashMap<>();
-        routes.put(navSummary, new Pair<>("summary.fxml", "Resumen"));
-        routes.put(navMembers, new Pair<>("members.fxml", "Socios"));
-
-        for (HBox navBox : routes.keySet()) {
-            navBox.setOnMouseClicked(mouseEvent -> eventChangeContent(navBox));
-            if (initialRoute.)
-            if (initialRoute.isEmpty()) {
-                navSummary.getStyleClass().add("selected");
-                navSummary.setDisable(false);
-            } else {
-                if (routes.get(navBox).getKey().equals(initialRoute)) {
-                    navBox.getStyleClass().add("selected");
-                    navSummary.setDisable(false);
-                }
-            }
-        }
+        HashMap<HBox, Pair<String, String>> routes = new HashMap<>();
+        routes.put(navSummary, new Pair<>(Router.SUMMARY, "Resumen"));
+        routes.put(navMembers, new Pair<>(Router.MEMBERS, "Socios"));
+        Router.initRouter(
+                Router.MEMBERS, // TODO: change to summary route
+                labelSection,
+                scrollPaneContent,
+                routes
+        );
         /* End Routing */
 
         // Fingerprint_Controller
@@ -117,12 +94,6 @@ public class Controller_Dashboard implements Initializable {
         this.navSecureMode.setOnMouseClicked(this.eventHandlerSecureMode());
 
         Platform.runLater(() -> {
-            Node summaryFXML = Loader.Load(
-                    "members.fxml",
-                    "Dashboard",
-                    true
-            );
-            this.scrollPaneContent.setContent(summaryFXML);
             new FadeInUp(Application.getCurrentGymNode()).play();
         });
     }
@@ -147,25 +118,7 @@ public class Controller_Dashboard implements Initializable {
     }
 
     // event handlers
-    private void eventChangeContent(HBox navBox) {
-        navBox.getStyleClass().add("selected");
 
-
-        navBox.setDisable(true);
-        if (navBox.getStyleClass().contains("selected")) {
-            System.out.println("salio");
-        }
-        Node navFXML = Loader.Load(
-                null,
-                "Dashboard",
-                false
-        );
-        Platform.runLater(() -> {
-            scrollPaneContent.setContent(navFXML);
-            Input.getScrollEvent(scrollPaneContent);
-            Fingerprint_Controller.BackgroundReader();
-        });
-    }
 
     private EventHandler<MouseEvent> eventHandlerSecureMode() {
         return mouseEvent -> {
