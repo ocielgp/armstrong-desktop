@@ -81,8 +81,27 @@ public class Notifications {
     private static FadeInRight fadeInRight;
 
     static {
+        // TODO: UPDATE notification system to work with tasks
         stage.initModality(Modality.NONE);
         stage.setAlwaysOnTop(true);
+        stage.focusedProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue) {
+                Application.getPrimaryStage().requestFocus();
+            }
+        });
+        stage.showingProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue) {
+                Platform.runLater(() -> {
+                    System.out.println("a");
+                    stage.setX(
+                            Screen.getPrimary().getVisualBounds().getWidth() - stage.getWidth() - margin
+                    );
+                    stage.setY(
+                            Screen.getPrimary().getVisualBounds().getHeight() - stage.getHeight() - margin
+                    );
+                });
+            }
+        });
     }
 
     public static void initializeNotificationSystem() {
@@ -129,22 +148,15 @@ public class Notifications {
 
     private static void showNotification(GridPane notificationView) {
         Scene scene = new Scene(notificationView);
-        scene.getStylesheets().add(String.valueOf(Notifications.class.getClassLoader().getResource("notifications.css")));
+        scene.getStylesheets().add("notifications.css");
         scene.setFill(Color.TRANSPARENT);
         stage.setScene(scene);
+        stage.show();
         Platform.runLater(() -> {
-            stage.show();
-            Application.getPrimaryStage().requestFocus();
-
-            // Set new position to Stage
-            stage.setX(
-                    Screen.getPrimary().getVisualBounds().getWidth() - stage.getWidth() - margin
-            );
-            stage.setY(
-                    Screen.getPrimary().getVisualBounds().getHeight() - stage.getHeight() - margin
-            );
+            System.out.println("b");
             fadeInRight = new FadeInRight(notificationView);
             fadeInRight.play();
+            Application.getPrimaryStage().requestFocus();
         });
 
     }

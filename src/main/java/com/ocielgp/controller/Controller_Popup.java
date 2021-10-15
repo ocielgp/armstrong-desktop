@@ -23,6 +23,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Modality;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import org.kordamp.ikonli.javafx.FontIcon;
@@ -108,8 +109,12 @@ public class Controller_Popup implements Initializable {
     public boolean showAndWait() {
         this.stage.showingProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue) {
-
-                System.out.println(this.popup.getHeight());
+                stage.setX(
+                        Screen.getPrimary().getVisualBounds().getWidth() / 2 - stage.getWidth() / 2
+                );
+                stage.setY(
+                        Screen.getPrimary().getVisualBounds().getHeight() / 2 - stage.getHeight() / 2
+                );
                 new FadeIn(this.popup).play();
             }
         });
