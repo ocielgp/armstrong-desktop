@@ -13,7 +13,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 
 public class DataServer {
     private static final HikariConfig hikariConfig;
@@ -50,7 +49,7 @@ public class DataServer {
         System.out.println("[DataServer]: Tratando de conectar a " + host + "...");
         hikariDataSource = new HikariDataSource(hikariConfig);
         System.out.println("[DataServer]: Conectado a " + host);
-        Notifications.createNotification(
+        Notifications.BuildNotification(
                 "gmi-cloud-done",
                 "Conexión establecida",
                 "Conexión con el servidor establecida.",
@@ -74,14 +73,14 @@ public class DataServer {
                         System.out.println("[DataServer]: Conectado a " + host);
                         return connection;
                     } catch (SQLException sqlException1) {
-                        Notifications.catchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
+                        Notifications.CatchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
                         System.out.println("[DataServer]: Desconectado");
                     }
                 }
                 return null;
             }).get();
         } catch (InterruptedException | ExecutionException exception) {
-            Notifications.catchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], exception.getMessage(), exception);
+            Notifications.CatchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], exception.getMessage(), exception);
         }
         return null;
     }
@@ -92,7 +91,7 @@ public class DataServer {
                 connection.close();
             }
         } catch (SQLException sqlException) {
-            Notifications.catchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
+            Notifications.CatchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
         }
     }
 
@@ -103,7 +102,7 @@ public class DataServer {
                 return rs.getRow();
             }
         } catch (SQLException sqlException) {
-            Notifications.catchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
+            Notifications.CatchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
         }
         return 0;
     }

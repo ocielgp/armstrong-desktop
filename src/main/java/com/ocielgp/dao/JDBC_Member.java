@@ -41,7 +41,7 @@ public class JDBC_Member {
                     return rs.getInt(1);
                 }
             } catch (SQLException sqlException) {
-                Notifications.catchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
+                Notifications.CatchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
             } finally {
                 DataServer.closeConnection(con);
             }
@@ -51,29 +51,6 @@ public class JDBC_Member {
 
     public static CompletableFuture<ObservableList<String>> ReadGenders() {
         return CompletableFuture.supplyAsync(() -> FXCollections.observableArrayList("Hombre", "Mujer"));
-    }
-
-    public static String ReadStyle(int idMember) {
-        Connection con = DataServer.getConnection();
-        try {
-            PreparedStatement ps;
-            ResultSet rs;
-            assert con != null;
-            ps = con.prepareStatement("SELECT M.access, DATE(PM.endDateTime) - CURRENT_DATE AS 'daysLeft', (SELECT COUNT(idDebt) > 0 FROM DEBTS WHERE idMember = M.idMember AND debtStatus = 1 AND flag = 1 ORDER BY dateTime DESC) AS 'haveDebts' FROM MEMBERS M JOIN PAYMENTS_MEMBERSHIPS PM on M.idMember = PM.idMember WHERE (M.flag = 1) AND M.idMember = ? ORDER BY M.idMember DESC");
-            ps.setInt(1, idMember);
-            rs = ps.executeQuery();
-            if (rs.next()) {
-                boolean access = rs.getBoolean("access");
-                long daysLeft = rs.getInt("daysLeft");
-                boolean haveDebts = rs.getBoolean("haveDebts");
-                return JDBC_Member.ReadStyle(access, daysLeft, haveDebts);
-            }
-        } catch (SQLException sqlException) {
-            Notifications.catchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
-        } finally {
-            DataServer.closeConnection(con);
-        }
-        return Styles.DANGER;
     }
 
     public static String ReadStyle(boolean access, long daysLeft, boolean haveDebts) {
@@ -121,11 +98,11 @@ public class JDBC_Member {
                     try {
                         JDBC_Member_Photo.ReadPhoto(idMember).thenAccept(modelMember::setModelMemberPhoto).get();
                     } catch (Exception exception) {
-                        Notifications.catchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], exception.getMessage(), exception);
+                        Notifications.CatchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], exception.getMessage(), exception);
                     }
                 }
             } catch (SQLException sqlException) {
-                Notifications.catchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
+                Notifications.CatchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
             } finally {
                 DataServer.closeConnection(con);
             }
@@ -232,7 +209,7 @@ public class JDBC_Member {
                 }
                 return new QueryRows(members, totalRows, totalPages);
             } catch (SQLException sqlException) {
-                Notifications.catchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
+                Notifications.CatchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
             } finally {
                 DataServer.closeConnection(con);
             }
@@ -251,7 +228,7 @@ public class JDBC_Member {
                 ps.setInt(2, idMember);
                 ps.executeUpdate();
             } catch (SQLException sqlException) {
-                Notifications.catchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
+                Notifications.CatchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
             } finally {
                 DataServer.closeConnection(con);
             }
@@ -269,7 +246,7 @@ public class JDBC_Member {
                 ps.setInt(2, idMember);
                 ps.executeUpdate();
             } catch (SQLException sqlException) {
-                Notifications.catchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
+                Notifications.CatchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
             } finally {
                 DataServer.closeConnection(con);
             }
@@ -287,7 +264,7 @@ public class JDBC_Member {
                 ps.setInt(2, idMember);
                 ps.executeUpdate();
             } catch (SQLException sqlException) {
-                Notifications.catchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
+                Notifications.CatchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
             } finally {
                 DataServer.closeConnection(con);
             }
@@ -305,7 +282,7 @@ public class JDBC_Member {
                 ps.setInt(2, idMember);
                 ps.executeUpdate();
             } catch (SQLException sqlException) {
-                Notifications.catchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
+                Notifications.CatchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
             } finally {
                 DataServer.closeConnection(con);
             }
@@ -323,7 +300,7 @@ public class JDBC_Member {
                 ps.setInt(2, idMember);
                 ps.executeUpdate();
             } catch (SQLException sqlException) {
-                Notifications.catchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
+                Notifications.CatchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
             } finally {
                 DataServer.closeConnection(con);
             }
@@ -341,7 +318,7 @@ public class JDBC_Member {
                 ps.setInt(2, idMember);
                 ps.executeUpdate();
             } catch (SQLException sqlException) {
-                Notifications.catchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
+                Notifications.CatchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
             } finally {
                 DataServer.closeConnection(con);
             }
@@ -360,7 +337,7 @@ public class JDBC_Member {
                 ps.executeUpdate();
                 return true;
             } catch (SQLException sqlException) {
-                Notifications.catchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
+                Notifications.CatchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
             } finally {
                 DataServer.closeConnection(con);
             }

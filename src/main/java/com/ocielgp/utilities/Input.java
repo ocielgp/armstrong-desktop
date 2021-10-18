@@ -5,6 +5,7 @@ import com.jfoenix.controls.JFXDatePicker;
 import com.jfoenix.controls.JFXPasswordField;
 import com.jfoenix.controls.JFXTextField;
 import javafx.scene.Node;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextInputControl;
@@ -21,12 +22,12 @@ public class Input {
         node.setVisible(false);
     }
 
-    public static void createVisibleProperty(Node node, boolean initialValue) {
+    public static void createVisibleProperty(Node node, boolean visible) {
         node.visibleProperty().addListener((observable, oldValue, newValue) -> {
             node.setVisible(newValue);
             node.setManaged(newValue);
         });
-        node.setVisible(initialValue);
+        node.setVisible(visible);
     }
 
     public static void createMaxLengthEvent(TextInputControl textInput, int maxLength) {
@@ -39,6 +40,17 @@ public class Input {
                 textInput.end();
             }
         });
+    }
+
+    public static void createComboBoxListener(ComboBox<?>... comboBox) {
+        for (ComboBox<?> box : comboBox) {
+            box.focusedProperty().addListener((observable, oldValue, newValue) -> {
+                box.getStyleClass().remove("red-border-input-line");
+                if (newValue && !box.isShowing()) {
+                    box.show();
+                }
+            });
+        }
     }
 
     public static void getScrollEvent(ScrollPane scrollPane) {

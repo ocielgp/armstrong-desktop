@@ -1,6 +1,8 @@
 package com.ocielgp.utilities;
 
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 
@@ -9,6 +11,12 @@ public class DateFormatter {
     private static final String dd_MM_yy = "dd/MM/yy";
     private static final String EEEE_dd_MMM_yyyy = "EEEE, dd/MMM/yyyy";
     private static final String yyyy_mm_dd = "yyyy-mm-dd";
+    private static final String yyyy_MM_dd_HH_mm_ss = "yyyy-MM-dd HH:mm:ss";
+
+    public static String mysqlDateTime(LocalDateTime localDateTime) {
+        return new SimpleDateFormat(yyyy_MM_dd_HH_mm_ss).format(localDateTime);
+    }
+
 
     public static LocalDate plusDaysToCurrentDate(long days) {
         return LocalDate.now().plusDays(days);

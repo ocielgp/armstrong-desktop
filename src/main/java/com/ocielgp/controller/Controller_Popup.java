@@ -2,9 +2,9 @@ package com.ocielgp.controller;
 
 import animatefx.animation.FadeIn;
 import animatefx.animation.Flash;
-import animatefx.animation.Tada;
+import animatefx.animation.Shake;
 import com.jfoenix.controls.JFXButton;
-import com.jfoenix.controls.JFXTextField;
+import com.jfoenix.controls.JFXPasswordField;
 import com.ocielgp.app.Application;
 import com.ocielgp.app.UserPreferences;
 import com.ocielgp.utilities.Hash;
@@ -13,6 +13,8 @@ import com.ocielgp.utilities.Loader;
 import com.ocielgp.utilities.Notifications;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
@@ -37,7 +39,7 @@ public class Controller_Popup implements Initializable {
     public static final String POPUP_SECURE_MODE = "SECURE_MODE";
 
     @FXML
-    private VBox popup;
+    private VBox boxPopup;
     @FXML
     private AnchorPane boxTitle;
     @FXML
@@ -49,61 +51,79 @@ public class Controller_Popup implements Initializable {
     @FXML
     private AnchorPane boxPassword;
     @FXML
-    private JFXTextField fieldPassword;
+    private JFXPasswordField fieldPassword;
     @FXML
     private HBox boxButtons;
 
-    private boolean boolAnswer;
-    private final Stage stage = new Stage(StageStyle.TRANSPARENT);
+    // attributes
+    private final String style;
+    private final StringProperty title = new SimpleStringProperty();
+    private final StringProperty content = new SimpleStringProperty();
+    private final String popupType;
 
-    public Controller_Popup() {
-        this.popup = (VBox) Loader.Load("popup.fxml", "Controller_Popup", true, this);
-        Scene scene = new Scene(this.popup);
+    private final Stage stage = new Stage(StageStyle.TRANSPARENT);
+    private boolean boolAnswer = false;
+    private int secureModeAttempts = 0;
+
+    public Controller_Popup(String style, String title, String content, String popupType) {
+        this.style = style;
+        this.title.set(title);
+        this.content.set(content);
+        this.popupType = popupType;
+
+        this.boxPopup = (VBox) Loader.Load("popup.fxml", "Controller_Popup", true, this);
+        Scene scene = new Scene(this.boxPopup);
+        scene.getStylesheets().add("styles.css");
         scene.setFill(Color.TRANSPARENT);
         this.stage.setScene(scene);
-        this.stage.initOwner(Application.getPrimaryStage());
+        this.stage.initOwner(Application.STAGE_PRIMARY);
         this.stage.initModality(Modality.APPLICATION_MODAL);
         this.stage.toFront();
+        Application.STAGE_POPUP = stage;
     }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        this.popup.getStylesheets().add("styles.css");
-        this.popup.getStyleClass().add(UserPreferences.getPreferenceString("THEME"));
-    }
-
-    public void fillView(String style, String title, String content, String popupType) {
-        this.boxTitle.getStyleClass().add(style);
-        this.labelTitle.setText(title);
-        this.labelContent.setText(content);
+        this.boxPopup.getStyleClass().addAll(UserPreferences.getPreferenceString("THEME"));
+        this.boxTitle.getStyleClass().add(this.style);
+        this.labelTitle.textProperty().bind(this.title);
+        this.labelContent.textProperty().bind(this.content);
 
         JFXButton buttonPrimary = new JFXButton("Aceptar");
         buttonPrimary.getStyleClass().addAll("btn-colorful", style);
-//        popup.getStyleClass().forEach(System.out::println);
-        this.boxButtons.getChildren().setAll(buttonPrimary);
-        if (!popupType.equals(POPUP_NOTIFY)) {
-            JFXButton buttonSecondary = new JFXButton("Cancelar");
-            buttonSecondary.getStyleClass().addAll("btn-secondary");
-            buttonSecondary.setOnAction(actionEvent -> this.eventCancel());
-            this.boxButtons.getChildren().add(buttonSecondary);
-
-            if (popupType.equals(POPUP_SECURE_MODE)) {
-                Platform.runLater(this.fieldPassword::requestFocus);
-                this.fieldPassword.setOnKeyPressed(keyEvent -> {
-                    if (keyEvent.getCode() == KeyCode.ENTER) eventSecureMode();
-                });
-                buttonPrimary.setOnAction(actionEvent -> this.eventSecureMode());
-            } else {
-                buttonPrimary.setOnAction(actionEvent -> this.eventConfirm());
-                Input.createVisibleProperty(this.boxPassword, false);
-                Platform.runLater(buttonPrimary::requestFocus);
+        this.boxPopup.setOnKeyPressed(keyEvent -> {
+            if (keyEvent.getCode() == KeyCode.ESCAPE) {
+                this.boolAnswer = false;
+                closeStage();
             }
-        }
+        });
         this.fontIconClose.setOnMouseClicked(mouseEvent -> this.eventCancel());
+        this.boxButtons.getChildren().setAll(buttonPrimary);
+        if (popupType.equals(POPUP_CONFIRM)) {
+            popupConfirm();
+            buttonPrimary.setOnAction(actionEvent -> eventConfirm());
+            Platform.runLater(buttonPrimary::requestFocus);
+        } else if (popupType.equals(POPUP_SECURE_MODE)) {
+            popUpSecureMode();
+            buttonPrimary.setOnAction(actionEvent -> eventSecureMode());
+        }
     }
 
-    private void closeStage() {
-        Platform.runLater(this.stage::close);
+    private void popupConfirm() {
+        JFXButton buttonSecondary = new JFXButton("Cancelar");
+        buttonSecondary.getStyleClass().addAll("btn-secondary");
+        buttonSecondary.setOnAction(actionEvent -> this.eventCancel());
+        this.boxButtons.getChildren().add(buttonSecondary);
+        Input.createVisibleProperty(this.boxPassword, false);
+    }
+
+    private void popUpSecureMode() {
+        this.boxPopup.setOnKeyPressed(null);
+        this.fieldPassword.setOnKeyPressed(keyEvent -> {
+            if (keyEvent.getCode() == KeyCode.ENTER) eventSecureMode();
+        });
+        Input.createVisibleProperty(this.fontIconClose, false);
+        Platform.runLater(this.fieldPassword::requestFocus);
     }
 
     public boolean showAndWait() {
@@ -115,7 +135,7 @@ public class Controller_Popup implements Initializable {
                 stage.setY(
                         Screen.getPrimary().getVisualBounds().getHeight() / 2 - stage.getHeight() / 2
                 );
-                new FadeIn(this.popup).play();
+                new FadeIn(this.boxPopup).play();
             }
         });
         this.stage.showAndWait();
@@ -132,27 +152,28 @@ public class Controller_Popup implements Initializable {
         closeStage();
     }
 
-    private int attempts = 0;
-
     private void eventSecureMode() { // compare input password to admin stored password
         if (Hash.generateHash(this.fieldPassword.getText()).equals(Application.getStaffUserModel().getModelStaffMember().getPassword())) {
-            Application.setSecureMode(false);
             this.boolAnswer = true;
             closeStage();
         } else {
             this.boolAnswer = false;
-            attempts++;
+            secureModeAttempts++;
             this.fieldPassword.requestFocus();
-            if (attempts == 3) {
-                Notifications.danger("Contraseña incorrecta (" + attempts + " / 3)", "Aplicación bloqueada");
-                this.popup.setDisable(true);
-                Flash applicationBlockedAnimation = new Flash(this.popup);
+            if (secureModeAttempts == 3) {
+                Notifications.Danger("Modo Seguro", "Intentos excedidos", 60);
+                this.boxPopup.setDisable(true);
+                Flash applicationBlockedAnimation = new Flash(this.boxPopup);
                 applicationBlockedAnimation.setCycleCount(Timeline.INDEFINITE);
                 applicationBlockedAnimation.play();
             } else {
-                Notifications.danger("Contraseña incorrecta (" + attempts + " / 3)", "Vuelve a intentarlo");
+                Platform.runLater(() -> new Shake(this.fieldPassword).play());
                 Platform.runLater(this.fieldPassword::requestFocus);
             }
         }
+    }
+
+    private void closeStage() {
+        Platform.runLater(this.stage::close);
     }
 }

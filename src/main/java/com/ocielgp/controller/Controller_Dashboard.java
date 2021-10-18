@@ -6,9 +6,9 @@ import com.ocielgp.app.Application;
 import com.ocielgp.app.Router;
 import com.ocielgp.app.UserPreferences;
 import com.ocielgp.fingerprint.Fingerprint_Controller;
-import com.ocielgp.utilities.*;
+import com.ocielgp.utilities.FileLoader;
+import com.ocielgp.utilities.Styles;
 import javafx.application.Platform;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
@@ -16,7 +16,6 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.effect.GaussianBlur;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.util.Pair;
@@ -118,36 +117,38 @@ public class Controller_Dashboard implements Initializable {
         });
     }
 
-    // event handlers
-
-
+    // events
     private void eventSecureMode() {
-        if (Application.isSecureMode()) {
-            Controller_Popup popup = new Controller_Popup();
-            popup.fillView(
+        Controller_Popup popupEnableSecureMode = new Controller_Popup(
+                Styles.WARN,
+                "Modo Seguro",
+                "Bloquea la interfaz pero el sistema sigue funcionando",
+                Controller_Popup.POPUP_CONFIRM
+        );
+        if (popupEnableSecureMode.showAndWait()) {
+            eventDisableDashboard();
+            this.scrollPaneContent.setEffect(new GaussianBlur());
+            Controller_Popup popupSecureMode = new Controller_Popup(
                     Styles.WARN,
                     "Desbloquear modo seguro",
                     "Ingresa tu contraseña para desbloquear",
                     Controller_Popup.POPUP_SECURE_MODE
             );
-            if (popup.showAndWait()) {
-                Application.setSecureMode(false);
-            }
-        } else {
-            Controller_Popup popup = new Controller_Popup();
-            popup.fillView(
-                    Styles.WARN,
-                    "Modo Seguro",
-                    "Bloquea la interfaz pero el sistema sigue funcionando",
-                    Controller_Popup.POPUP_CONFIRM
-            );
-            if (popup.showAndWait()) {
-                Application.setSecureMode(true);
+            if (popupSecureMode.showAndWait()) {
+                eventEnableDashboard();
+                this.scrollPaneContent.setEffect(null);
             }
         }
-        Router.isRouterAvailable = !Application.isSecureMode();
-        this.scrollPaneContent.setEffect((Application.isSecureMode()) ? new GaussianBlur() : null);
-        this.scrollPaneContent.setDisable(Application.isSecureMode());
+    }
+
+    public void eventEnableDashboard() {
+        Router.isRouterAvailable = true;
+        this.scrollPaneContent.setDisable(false);
+    }
+
+    public void eventDisableDashboard() {
+        Router.isRouterAvailable = false;
+        this.scrollPaneContent.setDisable(true);
     }
 
 }

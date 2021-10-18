@@ -16,13 +16,13 @@ import java.nio.file.Files;
 
 
 public class PhotoHandler {
-    private final BooleanUpdater booleanUpdater;
+    private final FormChangeListener formChangeListener;
     private final ImageView imageViewPhoto;
     private byte[] bytes;
     private final JFXButton buttonDeletePhoto;
 
-    public PhotoHandler(BooleanUpdater booleanUpdater, ImageView imageViewPhoto, JFXButton buttonUploadPhoto, JFXButton buttonDeletePhoto) {
-        this.booleanUpdater = booleanUpdater;
+    public PhotoHandler(FormChangeListener formChangeListener, ImageView imageViewPhoto, JFXButton buttonUploadPhoto, JFXButton buttonDeletePhoto) {
+        this.formChangeListener = formChangeListener;
         this.imageViewPhoto = imageViewPhoto;
         this.buttonDeletePhoto = buttonDeletePhoto;
 
@@ -49,21 +49,21 @@ public class PhotoHandler {
             fileChooser.setInitialDirectory(folder);
         }
 
-        File file = fileChooser.showOpenDialog(Application.getPrimaryStage());
+        File file = fileChooser.showOpenDialog(Application.STAGE_PRIMARY);
         if (file != null) {
             UserPreferences.setFolderPath(file);
             this.imageViewPhoto.setImage(new Image(file.toURI().toString()));
             this.buttonDeletePhoto.setDisable(false);
             try {
                 this.bytes = Files.readAllBytes(file.toPath());
-                if (this.booleanUpdater.isListener()) {
-                    this.booleanUpdater.change("photo", false);
+                if (this.formChangeListener.isListener()) {
+                    this.formChangeListener.change("photo", false);
                 }
 
                 fileChooser = null;
                 file = null;
             } catch (Exception exception) {
-                Notifications.catchError(
+                Notifications.CatchError(
                         MethodHandles.lookup().lookupClass().getSimpleName(),
                         Thread.currentThread().getStackTrace()[1],
                         exception.getMessage(),

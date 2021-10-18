@@ -103,9 +103,8 @@ public class Controller_Members implements Initializable {
 
         this.tableViewMembers.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
-                this.tableViewMembers.setDisable(true);
                 Loading.show();
-                CompletableFuture.runAsync(() -> controllerMember.loadMember(newValue.getIdMember()));
+                CompletableFuture.runAsync(() -> controllerMember.getMemberData(newValue.getIdMember(), newValue.getStyle()));
             }
         });
         this.memberPane.getChildren().setAll(memberFXML);
@@ -135,14 +134,6 @@ public class Controller_Members implements Initializable {
             new FadeIn(this.boxMembersPane).play();
             this.pagination.restartTable();
         });
-    }
-
-    public void enableTable() {
-        this.tableViewMembers.setDisable(false);
-    }
-
-    public void disableTable() {
-        this.tableViewMembers.setDisable(true);
     }
 
     public void refreshTable() {

@@ -30,7 +30,14 @@ public class Loading {
         scene.setFill(Color.TRANSPARENT);
         stage.setScene(scene);
         stage.initModality(Modality.NONE);
-        stage.initOwner(Application.getPrimaryStage());
+        stage.initOwner(Application.STAGE_PRIMARY);
+        stage.showingProperty().addListener(((observableValue, oldValue, newValue) -> {
+            if (newValue) {
+                Application.DisableDashboard();
+            } else {
+                Application.EnableDashboard();
+            }
+        }));
     }
 
     public static void show() {

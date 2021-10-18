@@ -51,7 +51,7 @@ public class Controller_Login implements Initializable {
                     Boolean answer = JDBC_Staff_Member.ReadLogin(this.fieldUsername.getText(), this.fieldPassword.getText());
                     if (answer == null) {
                         Platform.runLater(() -> new Flash(this.boxLoginPane).play());
-                        Notifications.warn("Bloqueado", "Esta cuenta se encuentra bloqueada.");
+                        Notifications.Warn("Bloqueado", "Esta cuenta se encuentra bloqueada.");
                     } else if (answer) {
                         Node dashboardFXML = Loader.Load(
                                 "dashboard.fxml",
@@ -69,10 +69,10 @@ public class Controller_Login implements Initializable {
                     } else {
                         this.attempts++;
                         if (attempts == 3) {
-                            Notifications.danger("Intentos excedidos", "Si no recuerdas la contraseña, contacte con el encargado");
+                            Notifications.Danger("Intentos excedidos", "Si no recuerdas la contraseña, contacte con el encargado");
                             Platform.runLater(() -> new Flash(this.boxLoginPane).play());
                         } else {
-                            Notifications.danger("Error", "Usuario / Contraseña incorrectos", 2);
+                            Notifications.Danger("Error", "Usuario / Contraseña incorrectos", 2);
                             Platform.runLater(() -> {
                                 new Shake(this.boxLoginPane).play();
                                 this.boxLoginPane.setDisable(false);

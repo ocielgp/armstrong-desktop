@@ -31,7 +31,7 @@ public class JDBC_Debt {
                 ps.setInt(7, debtType); // idDebtType
                 ps.executeUpdate();
             } catch (SQLException sqlException) {
-                Notifications.catchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
+                Notifications.CatchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
             } finally {
                 DataServer.closeConnection(con);
             }
@@ -63,7 +63,7 @@ public class JDBC_Debt {
                 }
                 con.close();
             } catch (SQLException sqlException) {
-                Notifications.catchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
+                Notifications.CatchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
             } finally {
                 DataServer.closeConnection(con);
             }
@@ -85,7 +85,7 @@ public class JDBC_Debt {
                     return rs.getBigDecimal("totalOwe");
                 }
             } catch (SQLException sqlException) {
-                Notifications.catchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
+                Notifications.CatchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
             } finally {
                 DataServer.closeConnection(con);
             }

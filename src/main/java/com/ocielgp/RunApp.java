@@ -2,8 +2,6 @@ package com.ocielgp;
 
 import com.ocielgp.app.Application;
 import com.ocielgp.controller.Controller_App;
-import com.ocielgp.controller.Controller_Dashboard;
-import com.ocielgp.controller.Controller_Popup;
 import com.ocielgp.models.Model_Member;
 import com.ocielgp.models.Model_Staff_Member;
 import com.ocielgp.utilities.FileLoader;
@@ -33,7 +31,7 @@ public class RunApp extends javafx.application.Application {
         primaryStage.getIcons().setAll(FileLoader.getIconApp());
         Controller_App controllerApp = new Controller_App();
 
-        Application.setPrimaryStage(primaryStage);
+        Application.STAGE_PRIMARY = primaryStage;
         Application.setAppController(controllerApp);
 
         BorderPane appView = (BorderPane) Loader.Load(

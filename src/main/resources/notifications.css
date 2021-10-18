@@ -1,105 +1,52 @@
 @import "global.css";
 
-* {
-    -fx-font-size: 10px;
-    -fx-color-unfocus: #d3d3d3;
-    -fx-color-border: #d3d3d3;
-}
-
-* .label, .jfx-text-field, .jfx-password-field, .jfx-button {
-    -fx-font: 2em "Roboto";
+.ikonli-font-icon {
+    -fx-icon-color: -fx-color-text;
 }
 
 /* Colors */
 
 .day-theme {
-    -fx-color-background: #ffffff;
+    -fx-color-background: #fff;
     -fx-color-text: #3c3c3c;
-
-    -fx-background-color: -fx-color-background;
-    -fx-text-fill: -fx-color-text;
+    -fx-border-color: -fx-color-background;
 }
 
 .night-theme {
-    -fx-color-background: #3c3c3c;
-    -fx-color-text: #ffffff;
+    -fx-color-background: #343a40;
+    -fx-color-text: #fff;
+    -fx-border-color: -fx-color-background;
+}
 
-    -fx-background-color: -fx-color-background;
-    -fx-text-fill: -fx-color-text;
+.success-style {
+    -fx-color-background: hsb(152, 81%, 43%);
+    -fx-color-text: #fff;
+}
+
+.warn-style {
+    -fx-color-background: hsb(45, 97%, 90%);
+    -fx-color-text: #fff;
+}
+
+.danger-style {
+    -fx-color-background: hsb(354, 76%, 76%);
+    -fx-color-text: #fff;
+}
+
+.creative-style {
+    -fx-color-background: hsb(263, 93%, 85%);
+    -fx-color-text: #fff;
+}
+
+.epic-style {
+    -fx-color-background: hsb(190, 95%, 84%);
+    -fx-color-text: #fff;
 }
 
 .default-style {
     -fx-background-color: -fx-color-text;
+}
+
+.default-style .label {
     -fx-text-fill: -fx-color-background;
-    -fx-border-color: -fx-color-border;
-}
-
-.ikonli-font-icon {
-    -fx-icon-color: -fx-color-text;
-}
-
-.success-style {
-    -fx-color-background: hsb(152, 81%, 53%);
-    -fx-color-text: #fff;
-    -fx-color-border: #198754;
-}
-
-.warn-style {
-    -fx-color-background: hsb(45, 97%, 100%);
-    -fx-color-text: #333;
-    -fx-color-border: #ffc107;
-}
-
-.danger-style {
-    -fx-color-background: hsb(354, 76%, 86%);
-    -fx-color-text: #fff;
-    -fx-color-border: #dc3545;
-}
-
-.creative-style {
-    -fx-color-background: hsb(263, 93%, 95%);
-    -fx-color-text: #fff;
-    -fx-color-border: #6610f2;
-}
-
-.epic-style {
-    -fx-color-background: hsb(190, 95%, 94%);
-    -fx-color-text: #fff;
-    -fx-color-border: #0dcaf0;
-}
-
-.notification-container {
-    -fx-background-color: -fx-color-background;
-    -fx-text-fill: -fx-color-text;
-    -fx-border-color: -fx-color-border;
-    -fx-cursor: hand;
-    -fx-border-radius: 5px;
-    -fx-background-radius: 5px;
-}
-
-.notification-container .label {
-    -fx-background-color: -fx-color-background;
-    -fx-text-fill: -fx-color-text;
-}
-
-.notification-icon-container {
-    -fx-padding: 20px;
-    -fx-background-radius: 50px;
-    -fx-border-radius: 50px;
-    -fx-font-size: 0px;
-    -fx-border-color: -fx-color-text;
-
-}
-
-.notification-container .ikonli-font-icon {
-    -fx-icon-size: 30px;
-}
-
-.notification-container .title {
-    -fx-font: 20px 'Roboto Bold';
-}
-
-.notification-container .content {
-    -fx-font: 14px 'Roboto';
-
 }

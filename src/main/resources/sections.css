@@ -93,6 +93,10 @@
 /* End Summary */
 
 /* Members */
+.table-row-cell {
+    -fx-border-width: 0;
+}
+
 .member-cell .table-cell {
     -fx-background-color: -fx-color-background;
     -fx-text-fill: -fx-color-text;

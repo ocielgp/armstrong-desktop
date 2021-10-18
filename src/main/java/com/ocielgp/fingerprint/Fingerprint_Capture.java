@@ -96,7 +96,7 @@ public class Fingerprint_Capture implements ActionListener {
                                         )
                                 );
                             } catch (UareUException uareUException) {
-                                Notifications.catchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], uareUException.getMessage(), uareUException);
+                                Notifications.CatchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], uareUException.getMessage(), uareUException);
                             }
                         }
                         System.out.println("[Data]: " + evt.capture_result.image.getData());
@@ -112,7 +112,7 @@ public class Fingerprint_Capture implements ActionListener {
                     System.out.println("murio 1");
                     bCanceled = true;
                     Fingerprint_Controller.setStatusCode(0); // fingerprint off
-                    Notifications.warn("gmi-fingerprint", "Lector de Huellas", "Lector de huellas desconectado", 2);
+                    Notifications.Warn("gmi-fingerprint", "Lector de Huellas", "Lector de huellas desconectado", 2);
                 } else if (evt.reader_status != null) {
                     System.out.println(evt.reader_status);
                     bCanceled = true;
@@ -146,13 +146,13 @@ public class Fingerprint_Capture implements ActionListener {
                                     int targetFalseMatchRate = Engine.PROBABILITY_ONE / 100000; // target rate is 0.00001
                                     if (falseMatchRate < targetFalseMatchRate) {
                                         Fingerprint_Controller.FB_AddFingerprint(fingerprintsArray[0]);
-                                        Notifications.success("Lector de Huellas ( 2 / 2 )", "Huella guardada", 1.5);
+                                        Notifications.Success("Lector de Huellas ( 2 / 2 )", "Huella guardada", 1.5);
                                     } else {
                                         Fingerprint_Controller.FB_Shake();
-                                        Notifications.danger("Lector de huellas", "Las huellas son diferentes, vuelve a intentar", 2);
+                                        Notifications.Danger("Lector de huellas", "Las huellas son diferentes, vuelve a intentar", 2);
                                     }
                                 } catch (UareUException uareUException) {
-                                    Notifications.catchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], uareUException.getMessage(), uareUException);
+                                    Notifications.CatchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], uareUException.getMessage(), uareUException);
                                 }
 
                                 // discard FMDs
@@ -161,7 +161,7 @@ public class Fingerprint_Capture implements ActionListener {
                                 // the new loop starts
                             } else {
                                 // The loop continues
-                                Notifications.buildNotification("gmi-fingerprint", "Lector de huellas ( 1 / 2 )", "Colocar de nuevo la huella", 1.5);
+                                Notifications.Default("gmi-fingerprint", "Lector de huellas ( 1 / 2 )", "Colocar de nuevo la huella", 1.5);
                             }
                         } else {
                             // discard FMDs
@@ -170,7 +170,7 @@ public class Fingerprint_Capture implements ActionListener {
                         }
                     });
                 } catch (UareUException uareUException) {
-                    Notifications.catchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], uareUException.getMessage(), uareUException);
+                    Notifications.CatchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], uareUException.getMessage(), uareUException);
                 }
             } else if (Reader.CaptureQuality.CANCELED == evt.capture_result.quality) {
                 // capture or streaming was canceled, just quit
@@ -180,7 +180,7 @@ public class Fingerprint_Capture implements ActionListener {
             }
         } else if (evt.exception != null) {
             // exception during capture
-            Notifications.catchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], evt.exception.getMessage(), evt.exception);
+            Notifications.CatchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], evt.exception.getMessage(), evt.exception);
             Fingerprint_Controller.setStatusCode(0); // fingerprint Off
         } else if (null != evt.reader_status) {
             // reader failure
@@ -193,7 +193,7 @@ public class Fingerprint_Capture implements ActionListener {
         try {
             reader.Open(Reader.Priority.COOPERATIVE);
         } catch (UareUException uareUException) {
-            Notifications.catchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], uareUException.getMessage(), uareUException);
+            Notifications.CatchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], uareUException.getMessage(), uareUException);
         }
         StartCaptureThread();
     }

@@ -2,34 +2,34 @@ package com.ocielgp.utilities;
 
 import animatefx.animation.FadeInRight;
 import animatefx.animation.FadeOutRight;
+import animatefx.animation.ZoomOutRight;
 import com.ocielgp.app.Application;
 import com.ocielgp.app.UserPreferences;
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
 import javafx.application.Platform;
-import javafx.event.Event;
-import javafx.event.EventHandler;
-import javafx.event.EventType;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Modality;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import javafx.util.Duration;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.net.URL;
 import java.util.LinkedList;
 import java.util.ResourceBundle;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.CompletableFuture;
 
 class NotificationView implements Initializable {
+    @FXML
+    private GridPane gridPaneNotification;
     @FXML
     private FontIcon fontIcon;
     @FXML
@@ -37,203 +37,186 @@ class NotificationView implements Initializable {
     @FXML
     private Label labelContent;
 
-    // Attributes
+    // attributes
     private final String icon;
-    private final String title;
-    private final String content;
-    private final double seconds;
-    @FXML
-    private GridPane gridPane;
+    private final SimpleStringProperty title = new SimpleStringProperty();
+    private final SimpleStringProperty content = new SimpleStringProperty();
     private final String style;
 
-    public NotificationView(String icon, String title, String content, double seconds, String style) {
-        this.icon = icon;
-        this.title = title;
-        this.content = content;
-        this.seconds = seconds;
+    public NotificationView(String fontIcon, String title, String content, String style) {
+        this.icon = fontIcon;
+        this.title.set(title);
+        this.content.set(content);
         this.style = style;
     }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        this.fontIcon.setIconLiteral(this.icon);
-        this.labelTitle.setText(this.title);
-        this.labelContent.setText(this.content);
-        this.gridPane.getStyleClass().addAll(UserPreferences.getPreferenceString("THEME"), this.style);
+        this.gridPaneNotification.getStyleClass().addAll(UserPreferences.getPreferenceString("THEME"), style);
+        this.fontIcon.setIconLiteral(icon);
+        this.labelTitle.textProperty().bind(title);
+        this.labelContent.textProperty().bind(content);
     }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public double getSeconds() {
-        return seconds;
-    }
-
 }
 
 public class Notifications {
     private static final Stage stage = new Stage(StageStyle.TRANSPARENT);
+    private static final Scene scene = new Scene(new GridPane());
     private static final LinkedList<GridPane> notificationViews = new LinkedList<>();
-    private static final LinkedList<NotificationView> notificationControllers = new LinkedList<>();
+    private static final LinkedList<Double> notificationSeconds = new LinkedList<>();
     private static final int margin = 20;
-    private static Timeline threadHandler;
-    private static FadeInRight fadeInRight;
+    private static Timer timer = new Timer("Notification Thread");
+    private static FadeInRight fadeInRightNotification;
+    private static final double DEFAULT_SECONDS = 3;
 
     static {
-        // TODO: UPDATE notification system to work with tasks
+        stage.initOwner(Application.STAGE_PRIMARY);
         stage.initModality(Modality.NONE);
         stage.setAlwaysOnTop(true);
-        stage.focusedProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue) {
-                Application.getPrimaryStage().requestFocus();
-            }
-        });
         stage.showingProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue) {
-                Platform.runLater(() -> {
-                    System.out.println("a");
-                    stage.setX(
-                            Screen.getPrimary().getVisualBounds().getWidth() - stage.getWidth() - margin
-                    );
-                    stage.setY(
-                            Screen.getPrimary().getVisualBounds().getHeight() - stage.getHeight() - margin
-                    );
-                });
+                Application.RequestFocus();
             }
         });
-    }
-
-    public static void initializeNotificationSystem() {
-        stage.initOwner(Application.getPrimaryStage());
-    }
-
-    private static final double SECONDS = 3;
-
-    public static void createNotification(String icon, String title, String content, double seconds, String style) {
-        NotificationView notificationController = new NotificationView(icon, title, content, seconds, style);
-        GridPane notificationView = (GridPane) Loader.Load("notification.fxml", "Notifications", false, notificationController);
-        notificationView.addEventHandler(EventType.ROOT, new EventHandler<>() {
-            @Override
-            public void handle(Event event) {
-                if (event.getEventType() == MouseEvent.MOUSE_CLICKED && ((MouseEvent) event).getButton() == MouseButton.PRIMARY) {
-                    if (fadeInRight != null) {
-                        fadeInRight.stop();
-                        fadeInRight = null;
-                    }
-                    threadHandler.stop();
-                    hiddenNotification(false);
-                    notificationView.removeEventHandler(EventType.ROOT, this);
-                } else if (event.getEventType() == MouseEvent.MOUSE_CLICKED && ((MouseEvent) event).getButton() == MouseButton.SECONDARY) {
-                    if (fadeInRight != null) {
-                        fadeInRight.stop();
-                        fadeInRight = null;
-                    }
-                    threadHandler.stop();
-                    hiddenNotification(true);
-                    notificationView.removeEventHandler(EventType.ROOT, this);
-                }
-            }
-        });
-        notificationViews.add(notificationView);
-        notificationControllers.add(notificationController);
-        if (notificationViews.size() == 1) {
-            // Run thread
-            Platform.runLater(() -> {
-                threadHandler = new Timeline(scheduleNotification(Notifications.notificationControllers.getFirst().getSeconds()));
-                threadHandler.play();
-            });
-        }
-    }
-
-    private static void showNotification(GridPane notificationView) {
-        Scene scene = new Scene(notificationView);
         scene.getStylesheets().add("notifications.css");
         scene.setFill(Color.TRANSPARENT);
         stage.setScene(scene);
-        stage.show();
-        Platform.runLater(() -> {
-            System.out.println("b");
-            fadeInRight = new FadeInRight(notificationView);
-            fadeInRight.play();
-            Application.getPrimaryStage().requestFocus();
-        });
-
     }
 
-    public static void hiddenNotification(boolean clearAll) {
-        notificationViews.getFirst().setDisable(true);
-        FadeOutRight fadeOutRight = new FadeOutRight(notificationViews.getFirst());
-        fadeOutRight.setOnFinished(actionEvent -> {
+    synchronized public static void BuildNotification(String icon, String title, String content, double seconds, String style) {
+        CompletableFuture.runAsync(() -> {
+            NotificationView notificationController = new NotificationView(icon, title, content, style);
+            GridPane notificationView = (GridPane) Loader.Load("notification.fxml", "Notifications", false, notificationController);
+            scene.setOnMouseClicked(mouseEvent -> {
+                if (!scene.getRoot().isDisable()) {
+                    timer.cancel();
+                    timer = new Timer("Notification Thread");
+                    if (mouseEvent.getButton() == MouseButton.PRIMARY) {
+                        if (fadeInRightNotification != null) {
+                            Platform.runLater(() -> {
+                                scene.getRoot().setDisable(true);
+                                fadeInRightNotification.stop();
+                                fadeInRightNotification = null;
+                            });
+                        }
+                        HideNotification();
+                    } else if (mouseEvent.getButton() == MouseButton.SECONDARY) {
+                        if (fadeInRightNotification != null) {
+                            Platform.runLater(() -> {
+                                scene.getRoot().setDisable(true);
+                                fadeInRightNotification.stop();
+                                fadeInRightNotification = null;
+                            });
+                        }
+                        ClearNotifications();
+                    }
+                }
+            });
+            notificationViews.add(notificationView);
+            notificationSeconds.add(seconds);
+            if (notificationViews.size() == 1 && !stage.isShowing()) {
+                showNotification();
+            }
+        });
+    }
+
+    synchronized private static void showNotification() {
+        CompletableFuture.runAsync(() -> {
+            GridPane notificationView = notificationViews.getFirst();
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    HideNotification();
+                }
+            }, notificationSeconds.getFirst().longValue() * 1000);
+            Platform.runLater(() -> {
+                scene.setRoot(notificationView);
+                stage.show();
+                stage.setX(
+                        Screen.getPrimary().getVisualBounds().getWidth() - stage.getWidth() - margin
+                );
+                stage.setY(
+                        Screen.getPrimary().getVisualBounds().getHeight() - stage.getHeight() - margin
+                );
+                fadeInRightNotification = new FadeInRight(notificationView);
+                fadeInRightNotification.play();
+            });
+        });
+    }
+
+    synchronized public static void HideNotification() {
+        CompletableFuture.runAsync(() -> {
+            Platform.runLater(() -> scene.getRoot().setDisable(true));
             notificationViews.pop();
-            notificationControllers.pop();
-            stage.hide();
+            notificationSeconds.pop();
+            FadeOutRight fadeOutRightNotification = new FadeOutRight(scene.getRoot());
+            fadeOutRightNotification.setOnFinished(actionEvent -> {
+                Platform.runLater(stage::close);
 
-            if (clearAll) {
-                notificationViews.clear();
-                notificationControllers.clear();
-            }
-
-            if (!notificationViews.isEmpty()) {
-                threadHandler = new Timeline(scheduleNotification(notificationControllers.getFirst().getSeconds()));
-                threadHandler.play(); // Run thread
-            }
+                if (!notificationViews.isEmpty()) {
+                    showNotification();
+                }
+            });
+            Platform.runLater(fadeOutRightNotification::play);
         });
-        fadeOutRight.play();
     }
 
-    public static KeyFrame scheduleNotification(double seconds) {
-        GridPane notificationView = notificationViews.getFirst();
-        showNotification(notificationView);
-        return new KeyFrame(Duration.seconds(seconds), evt -> hiddenNotification(false));
+    private static void ClearNotifications() {
+        CompletableFuture.runAsync(() -> {
+            notificationViews.clear();
+            notificationSeconds.clear();
+            ZoomOutRight zoomOutRightNotification = new ZoomOutRight(scene.getRoot());
+            zoomOutRightNotification.setOnFinished(actionEvent -> Platform.runLater(stage::close));
+            Platform.runLater(zoomOutRightNotification::play);
+        });
     }
 
-    public static void buildNotification(String icon, String title, String content, double seconds) {
-        Notifications.createNotification(icon, title, content, seconds, Styles.DEFAULT);
+    public static void Default(String icon, String title, String content, double seconds) {
+        Notifications.BuildNotification(icon, title, content, seconds, Styles.DEFAULT);
     }
 
-    public static void buildNotification(String icon, String title, String content) {
-        Notifications.createNotification(icon, title, content, SECONDS, Styles.DEFAULT);
+    public static void Default(String icon, String title, String content) {
+        Notifications.BuildNotification(icon, title, content, DEFAULT_SECONDS, Styles.DEFAULT);
     }
 
-    public static void success(String icon, String title, String content, double seconds) {
-        Notifications.createNotification(icon, title, content, seconds, Styles.SUCCESS);
+    public static void Success(String icon, String title, String content, double seconds) {
+        Notifications.BuildNotification(icon, title, content, seconds, Styles.SUCCESS);
     }
 
-    public static void success(String title, String content, double seconds) {
-        Notifications.createNotification("gmi-check", title, content + ".", seconds, Styles.SUCCESS);
+    public static void Success(String title, String content, double seconds) {
+        Notifications.BuildNotification("gmi-check", title, content + ".", seconds, Styles.SUCCESS);
     }
 
-    public static void success(String title, String content) {
-        Notifications.createNotification("gmi-check", title, content, SECONDS, Styles.SUCCESS);
+    public static void Success(String title, String content) {
+        Notifications.BuildNotification("gmi-check", title, content, DEFAULT_SECONDS, Styles.SUCCESS);
     }
 
-    public static void warn(String icon, String title, String content, double seconds) {
-        Notifications.createNotification(icon, title, content, seconds, Styles.WARN);
+    public static void Warn(String icon, String title, String content, double seconds) {
+        Notifications.BuildNotification(icon, title, content, seconds, Styles.WARN);
     }
 
-    public static void warn(String title, String content, double seconds) {
-        Notifications.createNotification("gmi-priority-high", title, content, seconds, Styles.WARN);
+    public static void Warn(String title, String content, double seconds) {
+        Notifications.BuildNotification("gmi-priority-high", title, content, seconds, Styles.WARN);
     }
 
-    public static void warn(String title, String content) {
-        Notifications.createNotification("gmi-priority-high", title, content, SECONDS, Styles.WARN);
+    public static void Warn(String title, String content) {
+        Notifications.BuildNotification("gmi-priority-high", title, content, DEFAULT_SECONDS, Styles.WARN);
     }
 
-    public static void danger(String icon, String title, String content, double seconds) {
-        Notifications.createNotification(icon, title, content, seconds, Styles.DANGER);
+    public static void Danger(String icon, String title, String content, double seconds) {
+        Notifications.BuildNotification(icon, title, content, seconds, Styles.DANGER);
     }
 
-    public static void danger(String title, String content, double seconds) {
-        Notifications.createNotification("gmi-close", title, content, seconds, Styles.DANGER);
+    public static void Danger(String title, String content, double seconds) {
+        Notifications.BuildNotification("gmi-close", title, content, seconds, Styles.DANGER);
     }
 
-    public static void danger(String title, String content) {
-        Notifications.createNotification("gmi-close", title, content, SECONDS, Styles.DANGER);
+    public static void Danger(String title, String content) {
+        Notifications.BuildNotification("gmi-close", title, content, DEFAULT_SECONDS, Styles.DANGER);
     }
 
-    public static void catchError(String className, StackTraceElement exceptionMetaData, String body, Exception exception) {
-        Notifications.createNotification(
+    public static void CatchError(String className, StackTraceElement exceptionMetaData, String body, Exception exception) {
+        Notifications.BuildNotification(
                 "gmi-sync-problem",
                 className,
                 "[" + exceptionMetaData.getMethodName() + " : " + exceptionMetaData.getLineNumber() + " line]\n" + body,
@@ -243,8 +226,8 @@ public class Notifications {
         exception.printStackTrace();
     }
 
-    public static void catchError(String className, StackTraceElement exceptionMetaData, String body, Exception exception, String icon) {
-        Notifications.createNotification(
+    public static void CatchError(String className, StackTraceElement exceptionMetaData, String body, Exception exception, String icon) {
+        Notifications.BuildNotification(
                 icon,
                 className,
                 "[" + exceptionMetaData.getMethodName() + " : " + exceptionMetaData.getLineNumber() + " line]\n" + body,

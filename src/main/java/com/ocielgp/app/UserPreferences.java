@@ -23,7 +23,7 @@ public class UserPreferences {
         DEFAULT_PREFERENCES.put("DB_USER_0", "root");
         DEFAULT_PREFERENCES.put("DB_PASSWORD_0", "280580");
         // database: remote
-        DEFAULT_PREFERENCES.put("DB_HOST_1", "142.93.81.100");
+        DEFAULT_PREFERENCES.put("DB_HOST_1", "db-gym-dev.ctxmkfz7w6pq.us-east-2.rds.amazonaws.com");
         DEFAULT_PREFERENCES.put("DB_PORT_1", "3306");
         DEFAULT_PREFERENCES.put("DB_USER_1", "ociel");
         DEFAULT_PREFERENCES.put("DB_PASSWORD_1", "Ociel4580");

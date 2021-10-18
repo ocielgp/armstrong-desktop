@@ -94,7 +94,7 @@ public class JDBC_Check_In {
                 System.out.println("Libre");
             } catch (SQLException sqlException) {
                 if (sqlException.getErrorCode() != 1062) {
-                    Notifications.catchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
+                    Notifications.CatchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
                 }
                 Loading.close();
             } finally {

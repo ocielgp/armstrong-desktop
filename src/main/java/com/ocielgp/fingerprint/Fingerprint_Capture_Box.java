@@ -11,7 +11,6 @@ import javafx.scene.layout.VBox;
 
 import java.util.ArrayList;
 import java.util.ListIterator;
-import java.util.concurrent.CompletableFuture;
 
 public class Fingerprint_Capture_Box {
     public final VBox boxFingerprintPane;
@@ -61,13 +60,11 @@ public class Fingerprint_Capture_Box {
 
     public void loadFingerprints(int idMember) {
         if (this.boxFingerprintPane.isVisible()) {
-            CompletableFuture.runAsync(() -> {
-                JDBC_Member_Fingerprint.ReadFingerprints(idMember).thenAccept(fingerprints -> {
-                    Platform.runLater(() -> {
-                        this.labelFingerprintCounter.setText(fingerprints.getKey().toString());
-                        this.arrayFingerprints = fingerprints.getValue();
-                        this.buttonRestartCapture.setDisable(!(fingerprints.getKey() > 0));
-                    });
+            JDBC_Member_Fingerprint.ReadFingerprints(idMember).thenAccept(fingerprints -> {
+                Platform.runLater(() -> {
+                    this.labelFingerprintCounter.setText(fingerprints.getKey().toString());
+                    this.arrayFingerprints = fingerprints.getValue();
+                    this.buttonRestartCapture.setDisable(!(fingerprints.getKey() > 0));
                 });
             });
         }

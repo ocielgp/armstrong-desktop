@@ -83,7 +83,7 @@ public class Pagination {
                 UserPreferences.setPreference("PAGINATION_MAX_ROWS", Integer.parseInt(this.fieldRowsPerPage.getText()));
                 this.restartTable();
             } else {
-                Notifications.danger("Error", "Cantidad de registros no válida.", 2);
+                Notifications.Danger("Error", "Cantidad de registros no válida.", 2);
                 Validator.shakeInput(this.fieldRowsPerPage);
             }
         }

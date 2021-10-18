@@ -31,7 +31,7 @@ public class JDBC_Gym {
                     modelGym.setAddress(rs.getString("address"));
                 }
             } catch (SQLException sqlException) {
-                Notifications.catchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
+                Notifications.CatchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
             } finally {
                 DataServer.closeConnection(con);
             }
@@ -57,10 +57,10 @@ public class JDBC_Gym {
                     modelGymsList.add(modelGym);
                 }
                 if (modelGymsList.isEmpty()) {
-                    Notifications.warn("Gimnasios", "No hay gimnasios registrados", 5);
+                    Notifications.Warn("Gimnasios", "No hay gimnasios registrados", 5);
                 }
             } catch (SQLException sqlException) {
-                Notifications.catchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
+                Notifications.CatchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
             } finally {
                 DataServer.closeConnection(con);
             }

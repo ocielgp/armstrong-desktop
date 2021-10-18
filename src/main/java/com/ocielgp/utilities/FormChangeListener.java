@@ -5,12 +5,12 @@ import com.jfoenix.controls.JFXButton;
 import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
 
-public class BooleanUpdater {
+public class FormChangeListener {
     private final HashMap<String, Boolean> booleanUpdaters = new HashMap<>();
     private boolean listener = false;
     private final JFXButton buttonUpdater;
 
-    public BooleanUpdater(JFXButton buttonUpdater) {
+    public FormChangeListener(JFXButton buttonUpdater) {
         this.buttonUpdater = buttonUpdater;
     }
 

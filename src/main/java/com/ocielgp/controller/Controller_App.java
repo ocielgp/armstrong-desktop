@@ -7,14 +7,11 @@ import com.ocielgp.app.UserPreferences;
 import com.ocielgp.dao.JDBC_Gym;
 import com.ocielgp.fingerprint.Fingerprint_Controller;
 import com.ocielgp.models.Model_Gym;
-import com.ocielgp.utilities.Notifications;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
-import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -37,7 +34,6 @@ public class Controller_App implements Initializable {
         this.boxTheme.setOnMouseClicked(mouseEvent -> changeTheme());
 
         // TODO: RESEARCH ABOUT THIS
-        Notifications.initializeNotificationSystem();
         Platform.runLater(() -> {
             this.borderPaneApp.getStyleClass().set(1, UserPreferences.getPreferenceString("THEME"));
             new FadeIn(this.borderPaneApp).play();

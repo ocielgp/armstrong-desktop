@@ -104,6 +104,7 @@
     -fx-prompt-text-fill: -fx-color-unfocus;
     -jfx-unfocus-color: -fx-color-unfocus;
     -jfx-focus-color: -fx-color-text;
+    -fx-border-width: 0;
 }
 
 .jfx-combo-box .cell {
@@ -112,7 +113,8 @@
 }
 
 .jfx-combo-box .cell:hover {
-    -fx-opacity: 0.6;
+    -fx-background-color: -fx-color-text;
+    -fx-text-fill: -fx-color-background;
 }
 
 .jfx-date-picker {

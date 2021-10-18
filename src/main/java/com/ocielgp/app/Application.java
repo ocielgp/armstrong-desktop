@@ -5,7 +5,6 @@ import com.ocielgp.controller.Controller_App;
 import com.ocielgp.controller.Controller_Dashboard;
 import com.ocielgp.models.Model_Gym;
 import com.ocielgp.models.Model_Member;
-import com.ocielgp.utilities.Styles;
 import javafx.stage.Stage;
 
 import java.util.Locale;
@@ -14,19 +13,22 @@ public class Application {
     public static Controller_App controllerApp;
     public static Controller_Dashboard controllerDashboard;
     private static Model_Member staffUserModel;
-    private static Stage primaryStage;
-    private static boolean secureMode = false;
+    public static Stage STAGE_PRIMARY;
+    public static Stage STAGE_SECONDARY;
+    public static Stage STAGE_POPUP;
 
     static {
         Locale.setDefault(new Locale("es", "MX"));
     }
 
-    public static Stage getPrimaryStage() {
-        return primaryStage;
-    }
-
-    public static void setPrimaryStage(Stage primaryStage) {
-        Application.primaryStage = primaryStage;
+    public static void RequestFocus() {
+        if (STAGE_POPUP != null) {
+            STAGE_POPUP.requestFocus();
+        } else if (STAGE_SECONDARY != null) {
+            STAGE_SECONDARY.requestFocus();
+        } else if (STAGE_PRIMARY != null) {
+            STAGE_PRIMARY.requestFocus();
+        }
     }
 
     public static void setAppController(Controller_App controllerApp) {
@@ -63,11 +65,15 @@ public class Application {
         controllerDashboard.showUserInfo(style, photo, idMember, name, gym, membership);
     }
 
-    public static boolean isSecureMode() {
-        return secureMode;
+    public static void EnableDashboard() {
+        if (controllerDashboard != null) {
+            controllerDashboard.eventEnableDashboard();
+        }
     }
 
-    public static void setSecureMode(boolean secureMode) {
-        Application.secureMode = secureMode;
+    public static void DisableDashboard() {
+        if (controllerDashboard != null) {
+            controllerDashboard.eventDisableDashboard();
+        }
     }
 }
