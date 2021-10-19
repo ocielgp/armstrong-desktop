@@ -162,7 +162,6 @@ public class Pagination {
                 this.restartCounters();
             }
 
-            Loading.close();
             this.tableView.setDisable(false);
         }));
     }

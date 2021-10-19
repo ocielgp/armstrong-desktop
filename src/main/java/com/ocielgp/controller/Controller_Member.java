@@ -1,6 +1,8 @@
 package com.ocielgp.controller;
 
 import animatefx.animation.FadeIn;
+import animatefx.animation.FadeInRight;
+import animatefx.animation.FadeOutRight;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXTextField;
@@ -11,6 +13,7 @@ import com.ocielgp.fingerprint.Fingerprint_Controller;
 import com.ocielgp.models.Model_Debt;
 import com.ocielgp.models.Model_Member;
 import com.ocielgp.models.Model_Membership;
+import com.ocielgp.models.Model_Staff_Member;
 import com.ocielgp.utilities.*;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -140,15 +143,13 @@ public class Controller_Member implements Initializable {
 
     private void configureForm() {
         Input.getScrollEvent(this.scrollPane);
-        this.scrollPane.opacityProperty().addListener(((observableValue, oldValue, newValue) -> {
-            if (this.modelMember != null) {
-                if (newValue.doubleValue() > 0) {
-                    this.scrollPane.setVvalue(1d);
-                }
+        this.boxMember.heightProperty().addListener((observableValue, oldValue, newValue) -> {
+            if (newValue.doubleValue() > oldValue.doubleValue() && oldValue.doubleValue() != 0) {
+                Platform.runLater(() -> this.scrollPane.setVvalue(1d));
             } else {
-                this.scrollPane.setVvalue(0d);
+                if (this.modelMember != null) Platform.runLater(() -> this.scrollPane.setVvalue(0d));
             }
-        }));
+        });
 
         // set max length
         Input.createMaxLengthEvent(this.pi_fieldName, Model_Member.nameLength);
@@ -163,7 +164,6 @@ public class Controller_Member implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         configureForm();
         createFormChangeListener();
-
         Input.createComboBoxListener(this.pi_comboBoxGender, this.ms_comboBoxMemberships);
 
         // quick view
@@ -188,15 +188,10 @@ public class Controller_Member implements Initializable {
         // membership
         JDBC_Membership.ReadMemberships().thenAccept(model_memberships -> this.ms_comboBoxMemberships.setItems(model_memberships));
         Input.createVisibleProperty(this.ms_boxEndDate, false);
-        this.ms_comboBoxMemberships.setDisableAnimation(true);
         this.ms_comboBoxMemberships.valueProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
                 Platform.runLater(() -> {
-                    this.ms_labelEndDate.setText(
-                            DateFormatter.getDateWithDayName(
-                                    DateFormatter.plusDaysToCurrentDate(newValue.getDays())
-                            )
-                    );
+                    this.ms_labelEndDate.setText(DateFormatter.getDateWithDayName(DateFormatter.plusDaysToCurrentDate(newValue.getDays())));
                     this.ms_boxEndDate.setVisible(true);
                     this.boxPayment.setVisible(true);
                 });
@@ -208,39 +203,29 @@ public class Controller_Member implements Initializable {
             }
         });
 
-        // payment
+        // payment -> hide
         Input.createVisibleProperty(this.boxPayment, false);
+        Input.createVisibleProperty(this.pym_boxOwe, false);
         this.boxPayment.visibleProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue) {
-                Input.clearInputs(
-                        this.pym_fieldPaidOut,
-                        this.pym_fieldOwe
-                );
-                this.pym_togglePayment.setSelected(false);
-                this.pym_togglePayment.setSelected(true);
-            }
+            if (newValue) Platform.runLater(() -> this.pym_togglePayment.setSelected(true));
         });
         this.pym_togglePayment.selectedProperty().addListener((observableValue, oldValue, newValue) -> {
-            this.pym_boxOwe.setVisible(!newValue);
-            this.pym_boxOwe.setManaged(!newValue);
-            if (newValue) { // has debt
-                Input.clearInputs(
-                        this.pym_fieldPaidOut,
-                        this.pym_fieldOwe
-                );
-            } else {
-                this.pym_fieldPaidOut.requestFocus();
+            Platform.runLater(() -> this.pym_boxOwe.setVisible(!newValue));
+            if (newValue) { // hide boxOwe
+                Input.clearInputs(this.pym_fieldPaidOut, this.pym_fieldOwe);
+            } else { // show boxOwe
+                Platform.runLater(() -> {
+                    this.pym_fieldOwe.setText(this.ms_comboBoxMemberships.getSelectionModel().getSelectedItem().getPrice().toString());
+                    this.pym_fieldPaidOut.requestFocus();
+                    Platform.runLater(() -> this.scrollPane.setVvalue(1d));
+                });
             }
         });
         this.pym_fieldPaidOut.textProperty().addListener((observable, oldValue, newValue) -> {
             if (Validator.moneyValidator(new InputDetails(this.pym_fieldPaidOut, this.pym_fieldPaidOut.getText()), false)) {
-                this.pym_fieldOwe.setText(
-                        this.ms_comboBoxMemberships.getSelectionModel().getSelectedItem().getPrice().subtract(new BigDecimal(newValue)).toString()
-                );
+                this.pym_fieldOwe.setText(this.ms_comboBoxMemberships.getSelectionModel().getSelectedItem().getPrice().subtract(new BigDecimal(newValue)).toString());
             } else {
-                this.pym_fieldOwe.setText(
-                        this.ms_comboBoxMemberships.getSelectionModel().getSelectedItem().getPrice().toString()
-                );
+                this.pym_fieldOwe.setText(this.ms_comboBoxMemberships.getSelectionModel().getSelectedItem().getPrice().toString());
             }
         });
 
@@ -249,13 +234,11 @@ public class Controller_Member implements Initializable {
         Input.createVisibleProperty(this.s_buttonPayDebt, false);
 
         // end buttons
-        this.buttonAction.setOnAction(actionEvent -> eventRegister());
+        this.buttonAction.setOnAction(actionEvent -> createMember());
         this.buttonClear.setOnAction((actionEvent) -> {
-            eventClearForm(true);
+            eventClearForm(false);
             this.controllerMembers.unselectTable();
         });
-
-        Platform.runLater(() -> new FadeIn(this.controllerMembers.boxMembersPane));
     }
 
     public Controller_Member(Controller_Members controllerMembers, int idMember, String style) {
@@ -264,11 +247,7 @@ public class Controller_Member implements Initializable {
     }
 
     public void getMemberData(int idMember, String style) {
-        if (modelMember != null) {
-            eventClearForm(false);
-        } else {
-            this.scrollPane.setOpacity(0);
-        }
+        new FadeOutRight(this.scrollPane).play();
         JDBC_Member.ReadMember(idMember).thenAccept(model_member -> {
             this.modelMember = model_member;
             this.modelMember.setIdMember(idMember);
@@ -282,15 +261,19 @@ public class Controller_Member implements Initializable {
                             JDBC_Gym.ReadGym(this.modelMember.getIdGym())
                                     .thenAccept(model_gyms -> {
                                         this.modelMember.setModelGyms(model_gyms);
-                                        fillMemberForm();
+                                        eventClearForm(true);
                                     });
                         } else {
-                            JDBC_Member.ReadMember(model_payments_memberships.getIdStaff()).thenAccept(model_staff -> {
+                            JDBC_Member.ReadMember(model_payments_memberships.getIdStaff()).thenAccept(model_member_staff -> {
                                 JDBC_Gym.ReadGym(model_payments_memberships.getIdGym())
                                         .thenAccept(model_gyms -> {
                                             this.modelMember.setModelGyms(model_gyms);
-                                            Platform.runLater(() -> this.qv_staffName.setText(model_staff.getName() + " " + model_staff.getLastName()));
-                                            fillMemberForm();
+                                            Model_Staff_Member modelStaffMember = new Model_Staff_Member();
+                                            modelStaffMember.setIdMember(model_member_staff.getIdMember());
+                                            modelStaffMember.setName(model_member_staff.getName());
+                                            modelStaffMember.setLastName(model_member_staff.getLastName());
+                                            this.modelMember.setModelStaffMember(modelStaffMember);
+                                            eventClearForm(true);
                                         });
                             });
                         }
@@ -300,11 +283,9 @@ public class Controller_Member implements Initializable {
 
     private void fillMemberForm() {
         Platform.runLater(() -> {
-            this.scrollPane.setOpacity(0); // hide
-
             // init form
             this.boxTitle.getStyleClass().set(0, this.modelMember.getStyle());
-            this.t_labelTitle.setText("[ " + this.modelMember.getIdMember() + " ] " + this.modelMember.getName().toUpperCase());
+            this.t_labelTitle.setText("[ID: " + this.modelMember.getIdMember() + "] " + this.modelMember.getName());
 
             // quick view
             this.qv_labelRegistrationDate.setText(
@@ -312,15 +293,12 @@ public class Controller_Member implements Initializable {
                             LocalDate.parse(this.modelMember.getRegistrationDate())
                     )
             );
-            if (this.modelMember.getModelPaymentMembership() != null) {
-                this.qv_labelLastPayment.setText(
-                        DateFormatter.getDateWithDayName(
-                                LocalDate.parse(this.modelMember.getModelPaymentMembership().getStartDate())
-                        )
-                );
-            } else {
-                this.qv_labelLastPayment.setText("N / A");
-            }
+            this.qv_staffName.setText(this.modelMember.getModelStaffMember().getName() + " " + this.modelMember.getModelStaffMember().getLastName());
+            this.qv_labelLastPayment.setText(
+                    DateFormatter.getDateWithDayName(
+                            LocalDate.parse(this.modelMember.getModelPaymentMembership().getStartDate())
+                    )
+            );
             this.qv_labelGym.setText(this.modelMember.getModelGyms().getName());
             this.boxQuickView.setVisible(true);
 
@@ -341,16 +319,15 @@ public class Controller_Member implements Initializable {
                 this.ms_comboBoxMemberships.getItems().forEach(model_membership -> { // select current membership
                     if (model_membership.getIdMembership() == this.modelMember.getModelPaymentMembership().getIdMembership()) {
                         this.ms_comboBoxMemberships.getSelectionModel().select(model_membership);
+                        // set endDate
+                        Platform.runLater(() -> {
+                            this.ms_labelEndDate.setText(DateFormatter.getDateWithDayName(LocalDate.parse(this.modelMember.getModelPaymentMembership().getEndDate())));
+                            this.boxPayment.setVisible(false);
+                        });
                     }
                 });
-                this.ms_labelEndDate.setText( // show endDate
-                        DateFormatter.getDateWithDayName(LocalDate.parse(this.modelMember.getModelPaymentMembership().getEndDate()
-                        ))
-                );
-            }
-            this.boxPayment.setVisible(false);
-
-            if (this.ms_comboBoxMemberships.getSelectionModel().getSelectedIndex() == -1) {
+            } else {
+                this.qv_labelLastPayment.setText("N / A");
                 Notifications.Warn("Pago no encontrado", "Último pago no encontrado");
             }
 
@@ -365,30 +342,31 @@ public class Controller_Member implements Initializable {
                 this.s_buttonOpenDoor.setDisable(true);
             }
             this.s_buttonAccess.setOnAction(actionEvent -> eventAccess());
-            this.s_buttonPayDebt.setVisible(this.boxTitle.getStyleClass().get(0).equals(Styles.CREATIVE));
+            this.s_buttonPayDebt.setVisible(this.modelMember.getStyle().equals(Styles.CREATIVE));
             this.boxShortcut.setVisible(true);
+
 
             // end buttons
             this.buttonAction.setText("Guardar cambios");
             this.buttonAction.setDisable(true);
             this.buttonClear.setText("Cancelar");
 
-            Loading.close();
-            new FadeIn(this.scrollPane).play();
-            this.formChangeListener.setListener(true);
+            FadeInRight fadeInRightScrollPane = new FadeInRight(this.scrollPane);
+            fadeInRightScrollPane.setOnFinished(actionEvent -> {
+                Loading.close();
+                this.formChangeListener.setListener(true);
+            });
+            fadeInRightScrollPane.play();
         });
     }
 
-    private void eventClearForm(boolean animation) {
+    private void eventClearForm(boolean fillMemberForm) {
         this.formChangeListener.setListener(false);
-        this.modelMember = null;
         Platform.runLater(() -> {
-            this.scrollPane.setOpacity(0);
             this.boxTitle.getStyleClass().set(0, Styles.DEFAULT);
-            this.t_labelTitle.setText("NUEVO SOCIO");
+            this.t_labelTitle.setText("Socio nuevo");
 
             this.boxQuickView.setVisible(false);
-            this.boxShortcut.setVisible(false);
 
             this.photoHandler.resetHandler();
 
@@ -404,21 +382,25 @@ public class Controller_Member implements Initializable {
                     this.ms_comboBoxMemberships
             );
 
-            this.ms_comboBoxMemberships.getSelectionModel().select(-1);
             this.ms_comboBoxMemberships.setDisable(false);
-            this.ms_boxEndDate.setVisible(false);
-
-            if (animation) {
-                new FadeIn(this.scrollPane).play();
-            }
+            this.boxShortcut.setVisible(false);
 
             this.buttonAction.setDisable(false);
             this.buttonAction.setText("Registrar");
             this.buttonClear.setText("Limpiar");
+
+            if (fillMemberForm) {
+                fillMemberForm();
+            } else {
+                this.modelMember = null;
+                this.scrollPane.setVvalue(0d);
+                new FadeIn(this.scrollPane).play();
+                this.ph_buttonUploadPhoto.requestFocus();
+            }
         });
     }
 
-    private void eventRegister() {
+    private void createMember() {
         CompletableFuture.runAsync(() -> {
             ArrayList<InputDetails> nodesRequired = new ArrayList<>();
             // personal information
@@ -544,7 +526,7 @@ public class Controller_Member implements Initializable {
                         }
 
                         this.controllerMembers.refreshTable();
-                        eventClearForm(true);
+                        eventClearForm(false);
 
                         // clear memory
                         nodesRequired = null;
@@ -555,7 +537,7 @@ public class Controller_Member implements Initializable {
         });
     }
 
-    private void eventAccess() {
+    private void eventAccess() { // TODO: REFRESH TABLE AFTER CHANGE
         Platform.runLater(() -> {
             String style = this.s_buttonAccess.getStyleClass().get(3);
             if (Styles.DANGER.equals(style)) {

@@ -12,8 +12,6 @@ import javafx.scene.control.TextInputControl;
 import javafx.scene.input.KeyEvent;
 
 public class Input {
-    private static final double SPEED_SCROLL = 0.003;
-
     public static void createVisibleProperty(Node node) {
         node.visibleProperty().addListener((observable, oldValue, newValue) -> {
             node.setVisible(newValue);
@@ -54,9 +52,13 @@ public class Input {
     }
 
     public static void getScrollEvent(ScrollPane scrollPane) {
+        double SPEED_SCROLL = 0.003;
         scrollPane.getContent().setOnScroll(scrollEvent -> {
             double deltaY = scrollEvent.getDeltaY() * SPEED_SCROLL;
-            scrollPane.setVvalue(scrollPane.getVvalue() - deltaY);
+            double scrollPosition = scrollPane.getVvalue() - deltaY;
+            if (scrollPosition >= 0 && scrollPosition <= 1) {
+                scrollPane.setVvalue(scrollPane.getVvalue() - deltaY);
+            }
         });
     }
 

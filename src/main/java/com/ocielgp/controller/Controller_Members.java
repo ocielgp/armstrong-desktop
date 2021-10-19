@@ -132,7 +132,7 @@ public class Controller_Members implements Initializable {
 
         Platform.runLater(() -> {
             new FadeIn(this.boxMembersPane).play();
-            this.pagination.restartTable();
+            refreshTable();
         });
     }
 
