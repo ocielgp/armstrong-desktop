@@ -244,7 +244,7 @@
 
 .table-row-cell:selected .table-cell {
     -fx-background-color: #2D2B36 !important;
-    -fx-text-fill: #FFF !important;
+    -fx-text-fill: #fff !important;
     -fx-font: 14px "Roboto Bold";
 }
 

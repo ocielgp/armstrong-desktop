@@ -1,7 +1,8 @@
 package com.ocielgp.models;
 
-import com.ocielgp.utilities.Styles;
 import javafx.beans.property.*;
+
+import java.time.LocalDateTime;
 
 public class Model_Member {
     // Max length
@@ -18,7 +19,7 @@ public class Model_Member {
     private final StringProperty phone = new SimpleStringProperty();
     private final StringProperty email = new SimpleStringProperty();
     private final StringProperty notes = new SimpleStringProperty();
-    private final StringProperty registrationDate = new SimpleStringProperty();
+    private final ObjectProperty<LocalDateTime> registrationDateTime = new SimpleObjectProperty<>();
     private final BooleanProperty access = new SimpleBooleanProperty();
     private final IntegerProperty idGym = new SimpleIntegerProperty();
 
@@ -125,16 +126,16 @@ public class Model_Member {
         this.notes.set(notes);
     }
 
-    public String getRegistrationDate() {
-        return registrationDate.get();
+    public LocalDateTime getRegistrationDateTime() {
+        return registrationDateTime.get();
     }
 
-    public StringProperty registrationDateProperty() {
-        return registrationDate;
+    public ObjectProperty<LocalDateTime> registrationDateTimeProperty() {
+        return registrationDateTime;
     }
 
-    public void setRegistrationDate(String registrationDate) {
-        this.registrationDate.set(registrationDate);
+    public void setRegistrationDateTime(LocalDateTime registrationDateTime) {
+        this.registrationDateTime.set(registrationDateTime);
     }
 
     public boolean isAccess() {

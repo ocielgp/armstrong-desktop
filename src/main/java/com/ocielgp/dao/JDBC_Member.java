@@ -4,6 +4,7 @@ import com.ocielgp.app.Application;
 import com.ocielgp.app.UserPreferences;
 import com.ocielgp.models.Model_Member;
 import com.ocielgp.utilities.DateFormatter;
+import com.ocielgp.utilities.DateTime;
 import com.ocielgp.utilities.Notifications;
 import com.ocielgp.utilities.Styles;
 import javafx.collections.FXCollections;
@@ -23,7 +24,7 @@ public class JDBC_Member {
                 PreparedStatement ps;
                 ResultSet rs;
                 assert con != null;
-                ps = con.prepareStatement("INSERT INTO MEMBERS(name, lastName, gender, phone, email, notes, registrationDate, idGym) VALUE (?, ?, ?, ?, ?, ?, CURDATE(), ?);", Statement.RETURN_GENERATED_KEYS);
+                ps = con.prepareStatement("INSERT INTO MEMBERS(name, lastName, gender, phone, email, notes, registrationDateTime, idGym) VALUE (?, ?, ?, ?, ?, ?, NOW(), ?);", Statement.RETURN_GENERATED_KEYS);
                 ps.setString(1, modelMember.getName()); // name
                 ps.setString(2, modelMember.getLastName()); // lastName
                 ps.setString(3, modelMember.getGender()); // gender
@@ -92,7 +93,7 @@ public class JDBC_Member {
                     modelMember.setPhone(rs.getString("phone") == null ? "" : rs.getString("phone"));
                     modelMember.setEmail(rs.getString("email") == null ? "" : rs.getString("email"));
                     modelMember.setNotes(rs.getString("notes") == null ? "" : rs.getString("notes"));
-                    modelMember.setRegistrationDate(rs.getString("registrationDate"));
+                    modelMember.setRegistrationDateTime(DateTime.MySQLToJava(rs.getString("registrationDate")));
                     modelMember.setAccess(rs.getBoolean("access"));
                     modelMember.setIdGym(rs.getInt("idGym"));
                     try {

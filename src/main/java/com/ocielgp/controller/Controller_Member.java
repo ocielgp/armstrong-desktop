@@ -27,7 +27,6 @@ import javafx.scene.layout.VBox;
 
 import java.math.BigDecimal;
 import java.net.URL;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 import java.util.concurrent.CompletableFuture;
@@ -190,7 +189,7 @@ public class Controller_Member implements Initializable {
         Input.createVisibleProperty(this.ms_boxEndDate, false);
         this.ms_comboBoxMemberships.valueProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
-                Platform.runLater(() -> {
+                Platform.runLater(() -> { // TODO: SUPPORTS MONTHS, DAYS, THEN ADD THE AMOUNT IF IS MONTH
                     this.ms_labelEndDate.setText(DateFormatter.getDateWithDayName(DateFormatter.plusDaysToCurrentDate(newValue.getDays())));
                     this.ms_boxEndDate.setVisible(true);
                     this.boxPayment.setVisible(true);
@@ -289,14 +288,14 @@ public class Controller_Member implements Initializable {
 
             // quick view
             this.qv_labelRegistrationDate.setText(
-                    DateFormatter.getDateWithDayName(
-                            LocalDate.parse(this.modelMember.getRegistrationDate())
+                    DateTime.getDateWithDayName(
+                            this.modelMember.getRegistrationDateTime()
                     )
             );
             this.qv_staffName.setText(this.modelMember.getModelStaffMember().getName() + " " + this.modelMember.getModelStaffMember().getLastName());
             this.qv_labelLastPayment.setText(
-                    DateFormatter.getDateWithDayName(
-                            LocalDate.parse(this.modelMember.getModelPaymentMembership().getStartDate())
+                    DateTime.getDateWithDayName(
+                            this.modelMember.getModelPaymentMembership().getStartDateTime()
                     )
             );
             this.qv_labelGym.setText(this.modelMember.getModelGyms().getName());
@@ -321,7 +320,7 @@ public class Controller_Member implements Initializable {
                         this.ms_comboBoxMemberships.getSelectionModel().select(model_membership);
                         // set endDate
                         Platform.runLater(() -> {
-                            this.ms_labelEndDate.setText(DateFormatter.getDateWithDayName(LocalDate.parse(this.modelMember.getModelPaymentMembership().getEndDate())));
+                            this.ms_labelEndDate.setText(DateTime.getDateWithDayName(this.modelMember.getModelPaymentMembership().getEndDateTime()));
                             this.boxPayment.setVisible(false);
                         });
                     }

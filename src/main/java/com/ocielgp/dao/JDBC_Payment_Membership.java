@@ -4,6 +4,7 @@ import com.ocielgp.app.Application;
 import com.ocielgp.models.Model_Membership;
 import com.ocielgp.models.Model_Payment_Membership;
 import com.ocielgp.utilities.DateFormatter;
+import com.ocielgp.utilities.DateTime;
 import com.ocielgp.utilities.Notifications;
 
 import java.lang.invoke.MethodHandles;
@@ -19,14 +20,15 @@ public class JDBC_Payment_Membership {
                 PreparedStatement ps;
                 ResultSet rs;
                 assert con != null;
-                ps = con.prepareStatement("INSERT INTO PAYMENTS_MEMBERSHIPS(payment, startDateTime, endDateTime, idGym, idStaff, idMember, idMembership) VALUE (?, ?, ?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
-                ps.setBigDecimal(1, modelMembership.getPrice()); // payment
-                ps.setString(2, String.valueOf(LocalDateTime.now())); // startDate
-                ps.setString(3, String.valueOf(LocalDateTime.now().plusDays(modelMembership.getDays()))); // endDate
-                ps.setInt(4, Application.getCurrentGym().getIdGym()); // idGym
-                ps.setInt(5, Application.getStaffUserModel().getIdMember()); // idStaff
-                ps.setInt(6, idMember); // idMember
-                ps.setInt(7, modelMembership.getIdMembership()); // idMembership
+                ps = con.prepareStatement("INSERT INTO PAYMENTS_MEMBERSHIPS(days, price, idGym, idStaff, idMember, idMembership)" +
+                                "VALUE (?, ?, ?, ?, ?, ?)",
+                        Statement.RETURN_GENERATED_KEYS);
+                ps.setLong(1, modelMembership.getDays()); // days
+                ps.setBigDecimal(2, modelMembership.getPrice()); // payment
+                ps.setInt(3, Application.getCurrentGym().getIdGym()); // idGym
+                ps.setInt(4, Application.getStaffUserModel().getIdMember()); // idStaff
+                ps.setInt(5, idMember); // idMember
+                ps.setInt(6, modelMembership.getIdMembership()); // idMembership
                 ps.executeUpdate();
                 rs = ps.getGeneratedKeys();
                 if (rs.next()) { // Return new idPaymentMembership
@@ -49,14 +51,14 @@ public class JDBC_Payment_Membership {
                 PreparedStatement ps;
                 ResultSet rs;
                 assert con != null;
-                ps = con.prepareStatement("SELECT idPaymentMembership, DATE(startDateTime) AS 'startDateTime', DATE(endDateTime) AS 'endDateTime', idGym, idStaff, idMembership FROM PAYMENTS_MEMBERSHIPS WHERE flag = 1 AND idMember = ? ORDER BY startDateTime DESC LIMIT 1");
+                ps = con.prepareStatement("SELECT idPaymentMembership, startDateTime, endDateTime, idGym, idStaff, idMembership FROM PAYMENTS_MEMBERSHIPS WHERE flag = 1 AND idMember = ? ORDER BY startDateTime DESC LIMIT 1");
                 ps.setInt(1, idMember);
                 rs = ps.executeQuery();
                 if (rs.next()) {
                     modelPaymentMembership = new Model_Payment_Membership();
                     modelPaymentMembership.setIdPaymentMembership(rs.getInt("idPaymentMembership"));
-                    modelPaymentMembership.setStartDate(rs.getString("startDateTime"));
-                    modelPaymentMembership.setEndDate(rs.getString("endDateTime"));
+                    modelPaymentMembership.setStartDateTime(DateTime.MySQLToJava(rs.getString("startDateTime")));
+                    modelPaymentMembership.setEndDateTime(DateTime.MySQLToJava(rs.getString("endDateTime")));
                     modelPaymentMembership.setIdGym(rs.getInt("idGym"));
                     modelPaymentMembership.setIdStaff(rs.getInt("idStaff"));
                     modelPaymentMembership.setIdMembership(rs.getInt("idMembership"));
