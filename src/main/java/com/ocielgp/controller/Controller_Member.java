@@ -71,10 +71,6 @@ public class Controller_Member implements Initializable {
     @FXML
     private JFXComboBox<String> pi_comboBoxGender;
     @FXML
-    private JFXTextField pi_fieldPhone;
-    @FXML
-    private JFXTextField pi_fieldEmail;
-    @FXML
     private JFXTextField pi_fieldNotes;
 
 
@@ -153,8 +149,6 @@ public class Controller_Member implements Initializable {
         // set max length
         Input.createMaxLengthEvent(this.pi_fieldName, Model_Member.nameLength);
         Input.createMaxLengthEvent(this.pi_fieldLastName, Model_Member.lastNameLength);
-        Input.createMaxLengthEvent(this.pi_fieldPhone, Model_Member.phoneLength);
-        Input.createMaxLengthEvent(this.pi_fieldEmail, Model_Member.emailLength);
         Input.createMaxLengthEvent(this.pi_fieldNotes, Model_Member.notesLength);
         // todo: ADD ALL MAX LENGTH RESTANTES
     }
@@ -190,7 +184,7 @@ public class Controller_Member implements Initializable {
         this.ms_comboBoxMemberships.valueProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
                 Platform.runLater(() -> { // TODO: SUPPORTS MONTHS, DAYS, THEN ADD THE AMOUNT IF IS MONTH
-                    this.ms_labelEndDate.setText(DateFormatter.getDateWithDayName(DateFormatter.plusDaysToCurrentDate(newValue.getDays())));
+                    this.ms_labelEndDate.setText(DateTime.getEndDate(newValue.getDays()));
                     this.ms_boxEndDate.setVisible(true);
                     this.boxPayment.setVisible(true);
                 });
@@ -308,8 +302,6 @@ public class Controller_Member implements Initializable {
             this.pi_fieldName.setText(this.modelMember.getName());
             this.pi_fieldLastName.setText(this.modelMember.getLastName());
             this.pi_comboBoxGender.getSelectionModel().select(this.modelMember.getGender());
-            this.pi_fieldPhone.setText(this.modelMember.getPhone());
-            this.pi_fieldEmail.setText(this.modelMember.getEmail());
             this.pi_fieldNotes.setText(this.modelMember.getNotes());
 
             // membership
@@ -375,8 +367,6 @@ public class Controller_Member implements Initializable {
                     this.pi_fieldName,
                     this.pi_fieldLastName,
                     this.pi_comboBoxGender,
-                    this.pi_fieldPhone,
-                    this.pi_fieldEmail,
                     this.pi_fieldNotes,
                     this.ms_comboBoxMemberships
             );
@@ -423,18 +413,6 @@ public class Controller_Member implements Initializable {
                 nodesRequired.add(new InputDetails(this.pi_fieldLastName, this.pi_fieldLastName.getText()));
                 formValid = Validator.textValidator(nodesRequired.listIterator());
 
-                if (formValid) { // number validator
-                    if (this.pi_fieldPhone.getText().length() != 0) { // phone validator
-                        formValid = Validator.phoneValidator(new InputDetails(this.pi_fieldPhone, this.pi_fieldPhone.getText()));
-                    }
-                }
-
-                if (formValid) {
-                    if (this.pi_fieldEmail.getText().length() != 0) { // email validator
-                        formValid = Validator.emailValidator(new InputDetails(this.pi_fieldEmail, this.pi_fieldEmail.getText()));
-                    }
-                }
-
                 if (formValid) { // money validator
                     nodesRequired.clear();
                     if (!this.pym_togglePayment.isSelected()) {
@@ -450,8 +428,6 @@ public class Controller_Member implements Initializable {
                     modelMember.setLastName(Input.capitalizeFirstLetterPerWord(this.pi_fieldLastName.getText()));
                     modelMember.setGender(this.pi_comboBoxGender.getSelectionModel().getSelectedItem());
 
-                    modelMember.setPhone(Input.spaceRemover(this.pi_fieldPhone.getText()));
-                    modelMember.setEmail(Input.spaceRemover(this.pi_fieldEmail.getText().toLowerCase()));
                     modelMember.setNotes(Input.capitalizeFirstLetter(this.pi_fieldNotes.getText()));
                     modelMember.setIdGym(Application.getCurrentGym().getIdGym());
 
@@ -494,12 +470,6 @@ public class Controller_Member implements Initializable {
                             }
                             if (this.formChangeListener.isChanged("gender")) {
                                 JDBC_Member.UpdateGender(this.modelMember.getIdMember(), modelMember.getGender());
-                            }
-                            if (this.formChangeListener.isChanged("phone")) {
-                                JDBC_Member.UpdatePhone(this.modelMember.getIdMember(), modelMember.getPhone());
-                            }
-                            if (this.formChangeListener.isChanged("email")) {
-                                JDBC_Member.UpdateEmail(this.modelMember.getIdMember(), modelMember.getEmail());
                             }
                             if (this.formChangeListener.isChanged("notes")) {
                                 JDBC_Member.UpdateNotes(this.modelMember.getIdMember(), modelMember.getNotes());
@@ -615,22 +585,6 @@ public class Controller_Member implements Initializable {
                 this.formChangeListener.change(
                         "gender",
                         Validator.compare(this.pi_comboBoxGender.getSelectionModel().getSelectedItem(), this.modelMember.getGender())
-                );
-            }
-        });
-        this.pi_fieldPhone.setOnKeyTyped(keyEvent -> {
-            if (this.formChangeListener.isListener()) {
-                this.formChangeListener.change(
-                        "phone",
-                        Validator.compare(this.pi_fieldPhone.getText(), this.modelMember.getPhone())
-                );
-            }
-        });
-        this.pi_fieldEmail.setOnKeyTyped(keyEvent -> {
-            if (this.formChangeListener.isListener()) {
-                this.formChangeListener.change(
-                        "email",
-                        Validator.compare(this.pi_fieldEmail.getText(), this.modelMember.getEmail())
                 );
             }
         });

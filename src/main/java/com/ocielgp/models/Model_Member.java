@@ -16,8 +16,6 @@ public class Model_Member {
     private final StringProperty name = new SimpleStringProperty();
     private final StringProperty lastName = new SimpleStringProperty();
     private final StringProperty gender = new SimpleStringProperty();
-    private final StringProperty phone = new SimpleStringProperty();
-    private final StringProperty email = new SimpleStringProperty();
     private final StringProperty notes = new SimpleStringProperty();
     private final ObjectProperty<LocalDateTime> registrationDateTime = new SimpleObjectProperty<>();
     private final BooleanProperty access = new SimpleBooleanProperty();
@@ -88,30 +86,6 @@ public class Model_Member {
 
     public void setGender(String gender) {
         this.gender.set(gender);
-    }
-
-    public String getPhone() {
-        return phone.get();
-    }
-
-    public StringProperty phoneProperty() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone.set(phone);
-    }
-
-    public String getEmail() {
-        return email.get();
-    }
-
-    public StringProperty emailProperty() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email.set(email);
     }
 
     public String getNotes() {

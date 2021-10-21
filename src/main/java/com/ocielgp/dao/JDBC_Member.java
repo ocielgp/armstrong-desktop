@@ -24,17 +24,13 @@ public class JDBC_Member {
                 PreparedStatement ps;
                 ResultSet rs;
                 assert con != null;
-                ps = con.prepareStatement("INSERT INTO MEMBERS(name, lastName, gender, phone, email, notes, registrationDateTime, idGym) VALUE (?, ?, ?, ?, ?, ?, NOW(), ?);", Statement.RETURN_GENERATED_KEYS);
+                ps = con.prepareStatement("INSERT INTO MEMBERS(name, lastName, gender, notes, idGym) VALUE (?, ?, ?, ?, ?);", Statement.RETURN_GENERATED_KEYS);
                 ps.setString(1, modelMember.getName()); // name
                 ps.setString(2, modelMember.getLastName()); // lastName
                 ps.setString(3, modelMember.getGender()); // gender
-                if (modelMember.getPhone().equals("")) ps.setNull(4, Types.NULL); // phone
-                else ps.setString(4, modelMember.getPhone());
-                if (modelMember.getEmail().equals("")) ps.setNull(5, Types.NULL); // email
-                else ps.setString(5, modelMember.getEmail());
-                if (modelMember.getNotes().equals("")) ps.setNull(6, Types.NULL); // notes
-                else ps.setString(6, modelMember.getNotes());
-                ps.setInt(7, modelMember.getIdGym()); // idGym
+                if (modelMember.getNotes().equals("")) ps.setNull(4, Types.NULL); // notes
+                else ps.setString(4, modelMember.getNotes());
+                ps.setInt(5, modelMember.getIdGym()); // idGym
                 ps.executeUpdate();
 
                 rs = ps.getGeneratedKeys();
@@ -90,8 +86,6 @@ public class JDBC_Member {
                     modelMember.setName(rs.getString("name"));
                     modelMember.setLastName(rs.getString("lastName"));
                     modelMember.setGender(rs.getString("gender"));
-                    modelMember.setPhone(rs.getString("phone") == null ? "" : rs.getString("phone"));
-                    modelMember.setEmail(rs.getString("email") == null ? "" : rs.getString("email"));
                     modelMember.setNotes(rs.getString("notes") == null ? "" : rs.getString("notes"));
                     modelMember.setRegistrationDateTime(DateTime.MySQLToJava(rs.getString("registrationDate")));
                     modelMember.setAccess(rs.getBoolean("access"));

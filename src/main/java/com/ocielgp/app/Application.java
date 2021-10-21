@@ -8,6 +8,7 @@ import com.ocielgp.models.Model_Member;
 import javafx.stage.Stage;
 
 import java.util.Locale;
+import java.util.TimeZone;
 
 public class Application {
     public static Controller_App controllerApp;
@@ -18,7 +19,17 @@ public class Application {
     public static Stage STAGE_POPUP;
 
     static {
-        Locale.setDefault(new Locale("es", "MX"));
+        Locale.setDefault(
+                new Locale(
+                        UserPreferences.getPreferenceString("LANGUAGE"),
+                        UserPreferences.getPreferenceString("COUNTRY")
+                )
+        );
+        TimeZone.setDefault(
+                TimeZone.getTimeZone(
+                        UserPreferences.getPreferenceString("TIMEZONE")
+                )
+        );
     }
 
     public static void RequestFocus() {

@@ -30,6 +30,9 @@ public class UserPreferences {
 
         // system
         DEFAULT_PREFERENCES.put("THEME", "day-theme"); // day-theme | night theme
+        DEFAULT_PREFERENCES.put("LANGUAGE", "es");
+        DEFAULT_PREFERENCES.put("COUNTRY", "MX");
+        DEFAULT_PREFERENCES.put("TIMEZONE", "America/Mexico_City");
 
         DEFAULT_PREFERENCES.put("FOLDER_PATH", "");
         DEFAULT_PREFERENCES.put("LAST_GYM", 1);
