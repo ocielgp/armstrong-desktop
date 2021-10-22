@@ -10,14 +10,15 @@ import com.jfoenix.controls.JFXToggleButton;
 import com.ocielgp.app.Application;
 import com.ocielgp.dao.*;
 import com.ocielgp.fingerprint.Fingerprint_Controller;
+import com.ocielgp.models.Model_Admin;
 import com.ocielgp.models.Model_Debt;
 import com.ocielgp.models.Model_Member;
 import com.ocielgp.models.Model_Membership;
-import com.ocielgp.models.Model_Staff_Member;
 import com.ocielgp.utilities.*;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.*;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
@@ -56,13 +57,11 @@ public class Controller_Member implements Initializable {
     @FXML
     private Label qv_labelGym;
     @FXML
-    private Label qv_staffName;
+    private Label qv_labelAdmin;
 
     // -> photo [ph]
     @FXML
     private ImageView ph_imgMemberPhoto;
-    @FXML
-    private JFXButton ph_buttonUploadPhoto;
     @FXML
     private JFXButton ph_buttonDeletePhoto;
 
@@ -94,7 +93,9 @@ public class Controller_Member implements Initializable {
     @FXML
     private JFXComboBox<Model_Membership> ms_comboBoxMemberships;
     @FXML
-    private HBox ms_boxEndDate;
+    private VBox ms_boxEndDate;
+    @FXML
+    private HBox ms_boxMonths;
     @FXML
     private FontIcon ms_iconSubtractMonth;
     @FXML
@@ -138,7 +139,7 @@ public class Controller_Member implements Initializable {
     private JFXButton buttonClear;
 
     // attributes
-    private final LongProperty totalMonths = new SimpleLongProperty(1);
+    private long totalMonths = 1;
     private final ObjectProperty<BigDecimal> membershipPrice = new SimpleObjectProperty<>(new BigDecimal(0));
     private FormChangeListener formChangeListener;
     private PhotoHandler photoHandler;
@@ -176,7 +177,7 @@ public class Controller_Member implements Initializable {
         Input.createVisibleProperty(this.boxQuickView, false);
 
         // photo section
-        this.photoHandler = new PhotoHandler(this.formChangeListener, this.ph_imgMemberPhoto, this.ph_buttonUploadPhoto, this.ph_buttonDeletePhoto);
+        this.photoHandler = new PhotoHandler(this.formChangeListener, this.ph_imgMemberPhoto, this.ph_buttonDeletePhoto);
 
         // personal information
         JDBC_Member.ReadGenders().thenAccept(genders -> this.pi_comboBoxGender.setItems(genders));
@@ -194,13 +195,11 @@ public class Controller_Member implements Initializable {
         // membership
         JDBC_Membership.ReadMemberships().thenAccept(model_memberships -> this.ms_comboBoxMemberships.setItems(model_memberships));
         Input.createVisibleProperty(this.ms_boxEndDate, false);
+        Input.createVisibleProperty(this.ms_boxMonths, false);
         this.ms_comboBoxMemberships.valueProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
-                Platform.runLater(() -> { // TODO: SUPPORTS MONTHS, DAYS, THEN ADD THE AMOUNT IF IS MONTH
-                    this.totalMonths.set(1);
-                    this.ms_labelEndDate.setText(DateTime.getEndDate(newValue.getDays()));
-                    this.ms_boxEndDate.setVisible(true);
-                    this.boxPayment.setVisible(true);
+                Platform.runLater(() -> {
+                    eventUpdatePrice(true);
                 });
             } else {
                 Platform.runLater(() -> {
@@ -210,20 +209,8 @@ public class Controller_Member implements Initializable {
             }
         });
         this.ms_iconSubtractMonth.setOnMouseClicked(mouseEvent -> eventSubtractMonth());
-        this.totalMonths.addListener((observable, oldValue, newValue) -> {
-            Platform.runLater(() -> {
-                this.ms_labelMonth.setText(newValue + ((newValue.longValue() == 1) ? " MES" : " MESES"));
-                this.ms_labelEndDate.setText(
-                        DateTime.getEndDate(newValue.longValue())
-                );
-                this.membershipPrice.set(
-                        this.ms_comboBoxMemberships.getSelectionModel().getSelectedItem().getPrice().multiply(
-                                BigDecimal.valueOf(newValue.longValue())
-                        )
-                );
-            });
-        });
         this.ms_iconAddMonth.setOnMouseClicked(mouseEvent -> eventAddMonth());
+        Input.createVisibleProperty(this.ms_boxButtons, false);
 
         // payment -> hide
         Input.createVisibleProperty(this.boxPayment, false);
@@ -232,11 +219,6 @@ public class Controller_Member implements Initializable {
             if (newValue) {
                 Platform.runLater(() -> {
                     this.pym_togglePayment.setSelected(true);
-                    this.membershipPrice.set(
-                            this.ms_comboBoxMemberships.getSelectionModel().getSelectedItem().getPrice().multiply(
-                                    BigDecimal.valueOf(this.totalMonths.get())
-                            )
-                    );
                 });
             }
         });
@@ -246,16 +228,12 @@ public class Controller_Member implements Initializable {
                 Input.clearInputs(this.pym_fieldPaidOut, this.pym_fieldOwe);
             } else { // show boxOwe
                 Platform.runLater(() -> {
-                    this.pym_fieldOwe.setText(this.ms_comboBoxMemberships.getSelectionModel().getSelectedItem().getPrice().toString());
                     this.pym_fieldPaidOut.requestFocus();
                     Platform.runLater(() -> this.scrollPane.setVvalue(1d));
                 });
             }
         });
-        this.membershipPrice.addListener((observableValue, oldValue, newValue) -> {
-            // ADD CURRENCIES
-            this.pym_labelPrice.setText("$ " + newValue + " MXN");
-        });
+        this.pym_labelPrice.textProperty().bind(Bindings.concat("$ ", membershipPrice.asString(), " MXN"));
         this.pym_fieldPaidOut.textProperty().addListener((observable, oldValue, newValue) -> {
             if (Validator.moneyValidator(new InputDetails(this.pym_fieldPaidOut, this.pym_fieldPaidOut.getText()), false)) {
                 this.pym_fieldOwe.setText(this.ms_comboBoxMemberships.getSelectionModel().getSelectedItem().getPrice().subtract(new BigDecimal(newValue)).toString());
@@ -299,11 +277,11 @@ public class Controller_Member implements Initializable {
                                         eventClearForm(true);
                                     });
                         } else {
-                            JDBC_Member.ReadMember(model_payments_memberships.getIdStaff()).thenAccept(model_member_staff -> {
+                            JDBC_Member.ReadMember(model_payments_memberships.getIdAdmin()).thenAccept(model_member_staff -> {
                                 JDBC_Gym.ReadGym(model_payments_memberships.getIdGym())
                                         .thenAccept(model_gyms -> {
                                             this.modelMember.setModelGyms(model_gyms);
-                                            Model_Staff_Member modelStaffMember = new Model_Staff_Member();
+                                            Model_Admin modelStaffMember = new Model_Admin();
                                             modelStaffMember.setIdMember(model_member_staff.getIdMember());
                                             modelStaffMember.setName(model_member_staff.getName());
                                             modelStaffMember.setLastName(model_member_staff.getLastName());
@@ -328,7 +306,7 @@ public class Controller_Member implements Initializable {
                             this.modelMember.getRegistrationDateTime()
                     )
             );
-            this.qv_staffName.setText(this.modelMember.getModelStaffMember().getName() + " " + this.modelMember.getModelStaffMember().getLastName());
+            this.qv_labelAdmin.setText(this.modelMember.getModelStaffMember().getName() + " " + this.modelMember.getModelStaffMember().getLastName());
             this.qv_labelLastPayment.setText(
                     DateTime.getDateWithDayName(
                             this.modelMember.getModelPaymentMembership().getStartDateTime()
@@ -426,7 +404,6 @@ public class Controller_Member implements Initializable {
                 this.modelMember = null;
                 this.scrollPane.setVvalue(0d);
                 new FadeIn(this.scrollPane).play();
-                this.ph_buttonUploadPhoto.requestFocus();
             }
         });
     }
@@ -475,6 +452,7 @@ public class Controller_Member implements Initializable {
 
                     // modelMembership
                     Model_Membership modelMembership = this.ms_comboBoxMemberships.getSelectionModel().getSelectedItem();
+                    modelMembership.setMonths(this.totalMonths);
 
                     // modelDebt
                     final Model_Debt modelDebt = new Model_Debt();
@@ -493,8 +471,8 @@ public class Controller_Member implements Initializable {
                         } else {
                             modelDebt.setPaidOut(paidOut);
                             modelDebt.setOwe(owe);
-                            modelDebt.setAmount(1);
-                            modelDebt.setDescription(modelMembership.getDescription() + " (" + modelMembership.getDays() + ") días");
+                            modelDebt.setAmount(Math.toIntExact(this.totalMonths));
+                            modelDebt.setDescription(modelMembership.getDescription());
                         }
                     }
 
@@ -549,13 +527,43 @@ public class Controller_Member implements Initializable {
     }
 
     private void eventAddMonth() {
-        this.totalMonths.set(this.totalMonths.get() + 1);
+        this.totalMonths++;
+        eventUpdatePrice(false);
     }
 
     private void eventSubtractMonth() {
-        if (this.totalMonths.get() != 1) {
-            this.totalMonths.set(this.totalMonths.get() - 1);
+        if (this.totalMonths != 1) {
+            this.totalMonths--;
+            eventUpdatePrice(false);
         }
+    }
+
+    private void eventUpdatePrice(boolean restartMonth) {
+        Platform.runLater(() -> {
+            if (restartMonth) {
+                this.totalMonths = 1;
+            }
+            if (modelMember == null) {
+                this.ms_boxEndDate.setVisible(true);
+                this.ms_boxMonths.setVisible(true);
+            } else {
+                this.ms_boxEndDate.setVisible(true);
+                this.ms_boxMonths.setVisible(false);
+            }
+            this.ms_labelMonth.setText(this.totalMonths + ((this.totalMonths == 1) ? " MES" : " MESES"));
+            this.ms_labelEndDate.setText(
+                    DateTime.getEndDate(this.totalMonths)
+            );
+            if (this.boxPayment.isVisible()) {
+                this.membershipPrice.set(
+                        this.ms_comboBoxMemberships.getSelectionModel().getSelectedItem().getPrice().multiply(
+                                BigDecimal.valueOf(this.totalMonths)
+                        )
+                );
+                Input.clearInputs(this.pym_fieldPaidOut);
+                this.pym_fieldOwe.setText(this.membershipPrice.get().toString());
+            }
+        });
     }
 
     private void eventAccess() { // TODO: REFRESH TABLE AFTER CHANGE

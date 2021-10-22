@@ -65,6 +65,10 @@
 /* End Dashboard */
 
 /* Summary */
+.image-input:hover, .image-input:focused {
+    -fx-opacity: 0.5;
+}
+
 .summary {
     -fx-background-color: -fx-color-dashboard;
 }
@@ -102,11 +106,40 @@
     -fx-text-fill: -fx-color-text;
 }
 
-/* Model_Member */
-
-.member-section {
-    -fx-border-color: -fx-color-border;
+.form {
+    -fx-background-color: -fx-color-background;
+    -fx-padding: 5px;
 }
+
+.form > VBox {
+    -fx-spacing: 5px;
+}
+
+.form-header {
+    -fx-background-color: -fx-color-text;
+    -fx-padding: 10px;
+
+}
+
+.form-header .label {
+    -fx-text-fill: -fx-color-background !important;
+}
+
+.form-section {
+    -fx-border-color: -fx-color-border;
+    -fx-padding: 10px;
+    -fx-spacing: 10px;
+}
+
+.form-section .jfx-text-field {
+    -fx-text-box-border: red;
+}
+
+.form-input {
+    -fx-font: 1.5em "Roboto Bold";
+}
+
+/* Model_Member */
 
 /* End Model_Member */
 

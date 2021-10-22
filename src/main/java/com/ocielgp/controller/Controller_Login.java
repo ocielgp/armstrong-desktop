@@ -5,7 +5,7 @@ import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXPasswordField;
 import com.jfoenix.controls.JFXTextField;
 import com.ocielgp.app.Application;
-import com.ocielgp.dao.JDBC_Staff_Member;
+import com.ocielgp.dao.JDBC_Admins;
 import com.ocielgp.utilities.*;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
@@ -48,7 +48,7 @@ public class Controller_Login implements Initializable {
             if (Validator.emptyValidator(inputs.listIterator())) {
                 this.boxLoginPane.setDisable(true);
                 CompletableFuture.runAsync(() -> {
-                    Boolean answer = JDBC_Staff_Member.ReadLogin(this.fieldUsername.getText(), this.fieldPassword.getText());
+                    Boolean answer = JDBC_Admins.ReadLogin(this.fieldUsername.getText(), this.fieldPassword.getText());
                     if (answer == null) {
                         Platform.runLater(() -> new Flash(this.boxLoginPane).play());
                         Notifications.Warn("Bloqueado", "Esta cuenta se encuentra bloqueada.");

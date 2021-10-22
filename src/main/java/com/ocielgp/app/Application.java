@@ -3,6 +3,7 @@ package com.ocielgp.app;
 import com.jfoenix.controls.JFXComboBox;
 import com.ocielgp.controller.Controller_App;
 import com.ocielgp.controller.Controller_Dashboard;
+import com.ocielgp.models.Model_Admin;
 import com.ocielgp.models.Model_Gym;
 import com.ocielgp.models.Model_Member;
 import javafx.stage.Stage;
@@ -13,7 +14,7 @@ import java.util.TimeZone;
 public class Application {
     public static Controller_App controllerApp;
     public static Controller_Dashboard controllerDashboard;
-    private static Model_Member staffUserModel;
+    private static Model_Admin modelAdmin;
     public static Stage STAGE_PRIMARY;
     public static Stage STAGE_SECONDARY;
     public static Stage STAGE_POPUP;
@@ -46,12 +47,12 @@ public class Application {
         Application.controllerApp = controllerApp;
     }
 
-    public static Model_Member getStaffUserModel() {
-        return staffUserModel;
+    public static Model_Member getModelAdmin() {
+        return modelAdmin;
     }
 
-    public static void setStaffUserModel(Model_Member staffUserModel) {
-        Application.staffUserModel = staffUserModel;
+    public static void setModelAdmin(Model_Admin modelAdmin) {
+        Application.modelAdmin = modelAdmin;
     }
 
     /* Content methods */

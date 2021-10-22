@@ -26,7 +26,7 @@ public class JDBC_Debt {
                 ps.setBigDecimal(2, modelDebt.getPaidOut()); // paidOut
                 ps.setInt(3, modelDebt.getAmount()); // amount
                 ps.setString(4, modelDebt.getDescription()); // description
-                ps.setInt(5, Application.getStaffUserModel().getIdMember()); // idStaff
+                ps.setInt(5, Application.getModelAdmin().getIdMember()); // idStaff
                 ps.setInt(6, idMember); // idMember
                 ps.setInt(7, debtType); // idDebtType
                 ps.executeUpdate();

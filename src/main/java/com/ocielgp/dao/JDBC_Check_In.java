@@ -1,7 +1,7 @@
 package com.ocielgp.dao;
 
 import com.ocielgp.app.Application;
-import com.ocielgp.utilities.DateFormatter;
+import com.ocielgp.utilities.DateTime;
 import com.ocielgp.utilities.Loading;
 import com.ocielgp.utilities.Notifications;
 import com.ocielgp.utilities.Styles;
@@ -11,7 +11,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDate;
 import java.util.concurrent.CompletableFuture;
 
 public class JDBC_Check_In {
@@ -50,7 +49,7 @@ public class JDBC_Check_In {
                     if (rs.next()) {
                         byte[] photo = rs.getBytes("photo");
                         String name = rs.getString("name") + " " + rs.getString("lastName");
-                        String membership = rs.getString("description") + " (" + DateFormatter.getDateWithDayName(LocalDate.parse(rs.getString("endDateTime"))) + ")";
+                        String membership = rs.getString("description");
 
                         if (rs.getString("description") == null) { // no payment found
                             JDBC_Gym.ReadGym(rs.getInt("idGymMember")).thenAccept(model_gyms -> {
@@ -65,7 +64,7 @@ public class JDBC_Check_In {
                             });
                         } else { // payment found
                             boolean access = rs.getBoolean("access");
-                            long daysLeft = DateFormatter.daysDifferenceToday(LocalDate.parse(rs.getString("endDateTime")));
+                            long daysLeft = DateTime.getDaysLeft(rs.getString("endDateTime"));
                             boolean haveDebts = rs.getBoolean("haveDebts");
                             JDBC_Gym.ReadGym(rs.getInt("idGymPayment")).thenAccept(model_gyms -> {
                                 Application.showUserInfo(

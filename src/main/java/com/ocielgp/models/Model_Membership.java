@@ -10,9 +10,9 @@ public class Model_Membership {
     public static final byte descriptionLength = 60;
 
     private final IntegerProperty idMembership = new SimpleIntegerProperty();
+    private final LongProperty months = new SimpleLongProperty();
     private final ObjectProperty<BigDecimal> price = new SimpleObjectProperty<>();
     private final StringProperty description = new SimpleStringProperty();
-    private final LongProperty days = new SimpleLongProperty();
 
     public int getIdMembership() {
         return idMembership.get();
@@ -26,16 +26,28 @@ public class Model_Membership {
         this.idMembership.set(idMembership);
     }
 
+    public long getMonths() {
+        return months.get();
+    }
+
+    public LongProperty monthsProperty() {
+        return months;
+    }
+
+    public void setMonths(long months) {
+        this.months.set(months);
+    }
+
     public BigDecimal getPrice() {
         return price.get();
     }
 
-    public void setPrice(BigDecimal price) {
-        this.price.set(price);
-    }
-
     public ObjectProperty<BigDecimal> priceProperty() {
         return price;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price.set(price);
     }
 
     public String getDescription() {
@@ -50,20 +62,8 @@ public class Model_Membership {
         this.description.set(description);
     }
 
-    public long getDays() {
-        return days.get();
-    }
-
-    public LongProperty daysProperty() {
-        return days;
-    }
-
-    public void setDays(long days) {
-        this.days.set(days);
-    }
-
     @Override
     public String toString() {
-        return "[$" + getPrice() + "]: " + getDescription() + " (" + getDays() + ") dias";
+        return "[$" + getPrice() + "]: " + getDescription();
     }
 }

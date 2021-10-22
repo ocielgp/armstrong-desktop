@@ -7,7 +7,7 @@ import com.ocielgp.fingerprint.Fingerprint_Controller;
 import javafx.event.ActionEvent;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.input.KeyCode;
 import javafx.stage.FileChooser;
 
 import java.io.File;
@@ -21,13 +21,17 @@ public class PhotoHandler {
     private byte[] bytes;
     private final JFXButton buttonDeletePhoto;
 
-    public PhotoHandler(FormChangeListener formChangeListener, ImageView imageViewPhoto, JFXButton buttonUploadPhoto, JFXButton buttonDeletePhoto) {
+    public PhotoHandler(FormChangeListener formChangeListener, ImageView imageViewPhoto, JFXButton buttonDeletePhoto) {
         this.formChangeListener = formChangeListener;
         this.imageViewPhoto = imageViewPhoto;
         this.buttonDeletePhoto = buttonDeletePhoto;
 
-        imageViewPhoto.addEventFilter(MouseEvent.MOUSE_CLICKED, mouseEvent -> browseImage());
-        buttonUploadPhoto.addEventFilter(ActionEvent.ACTION, actionEvent -> browseImage());
+        imageViewPhoto.setOnMouseClicked(mouseEvent -> browseImage());
+        imageViewPhoto.setOnKeyPressed(keyEvent -> {
+            if (keyEvent.getCode() == KeyCode.SPACE || keyEvent.getCode() == KeyCode.ENTER) {
+                browseImage();
+            }
+        });
         buttonDeletePhoto.addEventFilter(ActionEvent.ACTION, actionEvent -> deleteImage());
 
         this.imageViewPhoto.setStyle("-fx-cursor: hand");

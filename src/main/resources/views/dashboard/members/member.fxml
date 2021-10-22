@@ -1,259 +1,273 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import com.jfoenix.controls.JFXButton?>
-<?import com.jfoenix.controls.JFXComboBox?>
-<?import com.jfoenix.controls.JFXTextField?>
-<?import com.jfoenix.controls.JFXToggleButton?>
-<?import java.lang.String?>
-<?import java.net.URL?>
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ScrollPane?>
+<?import com.jfoenix.controls.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
-<?import org.kordamp.ikonli.javafx.FontIcon?>
-
-<ScrollPane fx:id="scrollPane" fitToHeight="true" fitToWidth="true" maxWidth="412.0" style="-fx-background-color: -fx-color-background; -fx-border-width: 0 0 0 1; -fx-border-color: -fx-color-border;" styleClass="day-theme" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<?import javafx.scene.layout.*?>
+<?import org.kordamp.ikonli.javafx.*?>
+<?import java.lang.*?>
+<ScrollPane fx:id="scrollPane" fitToHeight="true" fitToWidth="true" maxWidth="412.0"
+            xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1">
     <content>
-        <VBox fx:id="boxMember" maxWidth="412.0">
-            <HBox fx:id="boxTitle" alignment="CENTER" style="-fx-background-color: -fx-color-background; -fx-border-color: -fx-color-border; -fx-border-width: 0 0 1px 0;" styleClass="default-style">
+        <VBox fx:id="boxMember" maxWidth="412.0" styleClass="form">
+            <HBox fx:id="boxTitle" alignment="CENTER">
                 <VBox.margin>
-                    <Insets />
+                    <Insets/>
                 </VBox.margin>
-                <Label fx:id="t_labelTitle" style="-fx-text-fill: -fx-color-text;" text="Socio nuevo">
-                    <padding>
-                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                    </padding>
-                </Label>
+                <Label fx:id="t_labelTitle" style="-fx-text-fill: -fx-color-text;" text="Socio nuevo"/>
+                <styleClass>
+                    <String fx:value="default-style"/>
+                    <String fx:value="form-header"/>
+                </styleClass>
             </HBox>
-            <VBox spacing="10.0">
+            <VBox>
                 <VBox.margin>
-                    <Insets />
+                    <Insets/>
                 </VBox.margin>
-                <padding>
-                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                </padding>
-                <VBox fx:id="boxQuickView" spacing="10.0" styleClass="member-section" VBox.vgrow="ALWAYS">
-                    <padding>
-                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                    </padding>
+                <VBox fx:id="boxQuickView" styleClass="form-section">
                     <children>
                         <HBox alignment="CENTER">
                             <children>
-                                <Label styleClass="bold" text="Vista rápida">
+                                <Label alignment="CENTER" styleClass="bold" text="HISTÓRICO">
                                     <graphic>
-                                        <FontIcon iconLiteral="gmi-swap-horizontal-circle" />
+                                        <FontIcon iconLiteral="gmi-description"/>
                                     </graphic>
                                 </Label>
                             </children>
                         </HBox>
                         <HBox spacing="5.0">
                             <children>
-                                <Label styleClass="bold" text="Registro" />
-                                <Label fx:id="qv_labelRegistrationDate" text="date" />
+                                <Label styleClass="bold" text="Registro"/>
+                                <Label fx:id="qv_labelRegistrationDate" text="date"/>
                             </children>
                         </HBox>
                         <HBox spacing="5.0">
                             <children>
-                                <Label styleClass="bold" text="Último pago" />
-                                <Label fx:id="qv_labelLastPayment" text="N / A" />
+                                <Label styleClass="bold" text="Último pago"/>
+                                <Label fx:id="qv_labelLastPayment" text="N / A"/>
                             </children>
                         </HBox>
                         <HBox spacing="5.0">
                             <children>
-                                <Label styleClass="bold" text="Gimnasio" />
-                                <Label fx:id="qv_labelGym" text="gymName" />
+                                <Label styleClass="bold" text="Gimnasio"/>
+                                <Label fx:id="qv_labelGym" text="gymName"/>
                             </children>
                         </HBox>
                         <VBox alignment="CENTER">
                             <children>
-                                <Label styleClass="bold" text="Atendido por" />
-                                <Label fx:id="qv_staffName" text="N / A" textAlignment="CENTER" wrapText="true" />
+                                <Label styleClass="bold" text="Atendido por"/>
+                                <Label fx:id="qv_labelAdmin" text="N / A" textAlignment="CENTER" wrapText="true"/>
                             </children>
                         </VBox>
                     </children>
                 </VBox>
-                <VBox spacing="10.0" styleClass="member-section">
-                    <padding>
-                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                    </padding>
-                    <HBox alignment="CENTER">
-                        <Label styleClass="bold" text="Información personal">
-                            <graphic>
-                                <FontIcon iconLiteral="gmi-person" />
-                            </graphic>
-                        </Label>
-                    </HBox>
-                    <VBox>
-                        <Label styleClass="bold" text="Nombres *">
-                            <graphic>
-                                <FontIcon iconLiteral="gmi-create" />
-                            </graphic>
-                        </Label>
-                        <JFXTextField fx:id="pi_fieldName" />
-                    </VBox>
-                    <VBox>
-                        <Label styleClass="bold" text="Apellidos *">
-                            <graphic>
-                                <FontIcon iconLiteral="gmi-create" />
-                            </graphic>
-                        </Label>
-                        <JFXTextField fx:id="pi_fieldLastName" />
-                    </VBox>
-                    <VBox>
-                        <Label styleClass="bold" text="Género *">
-                            <graphic>
-                                <FontIcon iconLiteral="gmi-wc" />
-                            </graphic>
-                        </Label>
-                        <JFXComboBox fx:id="pi_comboBoxGender" promptText="Selecciona uno" />
-                    </VBox>
-                    <VBox>
-                        <Label styleClass="bold" text="Notas">
-                            <graphic>
-                                <FontIcon iconLiteral="gmi-info" />
-                            </graphic>
-                        </Label>
-                        <JFXTextField fx:id="pi_fieldNotes" promptText="Enfermedades / Lesiones" />
-                    </VBox>
-                </VBox>
-                <VBox fx:id="boxFingerprint" spacing="5.0" styleClass="member-section">
-                    <padding>
-                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                    </padding>
-                    <HBox alignment="CENTER">
-                        <HBox HBox.hgrow="ALWAYS">
-                            <Label styleClass="bold" text="Lector de Huellas">
-                                <graphic>
-                                    <FontIcon iconLiteral="gmi-fingerprint" />
-                                </graphic>
-                            </Label>
+                <VBox styleClass="form-section">
+                    <children>
+                        <HBox alignment="CENTER">
+                            <children>
+                                <Label styleClass="bold" text="INFORMACIÓN PERSONAL">
+                                    <graphic>
+                                        <FontIcon iconLiteral="gmi-person"/>
+                                    </graphic>
+                                </Label>
+                            </children>
                         </HBox>
-                        <Label styleClass="thin" text="opcional" />
-                    </HBox>
-                    <HBox>
-                        <VBox fx:id="fp_boxFingerprint" alignment="CENTER" fillWidth="false" maxHeight="152.0" maxWidth="152.0" minHeight="152.0" minWidth="152.0" style="-fx-border-color: -fx-color-border;" HBox.hgrow="NEVER" />
-                        <VBox alignment="CENTER" HBox.hgrow="ALWAYS">
-                            <HBox alignment="CENTER" spacing="5.0" VBox.vgrow="ALWAYS">
-                                <Label text="Huellas:" />
-                                <Label fx:id="fp_labelFingerprintCounter" text="0" />
+                        <VBox>
+                            <children>
+                                <Label styleClass="form-input" text="Nombres *">
+                                    <graphic>
+                                        <FontIcon iconLiteral="gmi-create"/>
+                                    </graphic>
+                                </Label>
+                                <JFXTextField fx:id="pi_fieldName"/>
+                            </children>
+                        </VBox>
+                        <VBox>
+                            <children>
+                                <Label styleClass="form-input" text="Apellidos *">
+                                    <graphic>
+                                        <FontIcon iconLiteral="gmi-create"/>
+                                    </graphic>
+                                </Label>
+                                <JFXTextField fx:id="pi_fieldLastName"/>
+                            </children>
+                        </VBox>
+                        <VBox>
+                            <children>
+                                <Label alignment="CENTER" styleClass="form-input" text="Género *">
+                                    <graphic>
+                                        <FontIcon iconLiteral="gmi-wc"/>
+                                    </graphic>
+                                </Label>
+                                <JFXComboBox fx:id="pi_comboBoxGender" promptText="Selecciona uno"/>
+                            </children>
+                        </VBox>
+                        <VBox>
+                            <children>
+                                <Label styleClass="form-input" text="Notas">
+                                    <graphic>
+                                        <FontIcon iconLiteral="gmi-info"/>
+                                    </graphic>
+                                </Label>
+                                <JFXTextField fx:id="pi_fieldNotes"/>
+                            </children>
+                        </VBox>
+                    </children>
+                </VBox>
+                <VBox fx:id="boxFingerprint" styleClass="form-section">
+                    <children>
+                        <HBox>
+                            <children>
+                                <Label styleClass="bold" text="LECTOR DE HUELLAS">
+                                    <graphic>
+                                        <FontIcon iconLiteral="gmi-fingerprint"/>
+                                    </graphic>
+                                </Label>
+                                <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
+                                    <children>
+                                        <Label alignment="CENTER_RIGHT" styleClass="thin" text="opcional"/>
+                                    </children>
+                                </HBox>
+                            </children>
+                        </HBox>
+                        <HBox alignment="CENTER_LEFT">
+                            <children>
+                                <VBox fx:id="fp_boxFingerprint" alignment="CENTER" fillWidth="false" maxHeight="152.0"
+                                      maxWidth="152.0" minHeight="152.0" minWidth="152.0"
+                                      style="-fx-border-color: -fx-color-border;"/>
+                                <HBox alignment="CENTER" spacing="5.0" HBox.hgrow="ALWAYS">
+                                    <Label text="Huellas:"/>
+                                    <Label fx:id="fp_labelFingerprintCounter" text="0"/>
+                                </HBox>
+                            </children>
+                        </HBox>
+                        <HBox alignment="CENTER" spacing="5.0">
+                            <JFXButton fx:id="fp_buttonCapture" styleClass="btn-primary" text="Iniciar captura">
+                                <HBox.margin>
+                                    <Insets/>
+                                </HBox.margin>
+                            </JFXButton>
+                            <JFXButton fx:id="fp_buttonRestartCapture" disable="true" text="Reiniciar huellas">
+                                <styleClass>
+                                    <String fx:value="btn-colorful"/>
+                                    <String fx:value="default-style"/>
+                                </styleClass>
+                            </JFXButton>
+                        </HBox>
+                    </children>
+                    <VBox.margin>
+                        <Insets/>
+                    </VBox.margin>
+                </VBox>
+                <VBox styleClass="form-section">
+                    <children>
+                        <HBox alignment="CENTER" VBox.vgrow="ALWAYS">
+                            <children>
+                                <Label alignment="CENTER" styleClass="bold" text="MEMBRESÍA">
+                                    <graphic>
+                                        <FontIcon iconLiteral="gmi-event"/>
+                                    </graphic>
+                                </Label>
+                            </children>
+                        </HBox>
+                        <AnchorPane>
+                            <children>
+                                <JFXComboBox fx:id="ms_comboBoxMemberships" promptText="Selecciona uno"
+                                             AnchorPane.leftAnchor="-1.0" AnchorPane.rightAnchor="-1.0"/>
+                            </children>
+                        </AnchorPane>
+                        <VBox fx:id="ms_boxEndDate" alignment="CENTER" spacing="5.0">
+                            <children>
+                                <HBox alignment="CENTER" spacing="5.0">
+                                    <children>
+                                        <Label text="Termina"/>
+                                        <Label fx:id="ms_labelEndDate" styleClass="bold" text="date"/>
+                                    </children>
+                                </HBox>
+                                <HBox fx:id="ms_boxMonths" alignment="CENTER">
+                                    <children>
+                                        <FontIcon fx:id="ms_iconSubtractMonth" focusTraversable="true"
+                                                  iconLiteral="gmi-remove-circle" iconSize="30">
+                                            <styleClass>
+                                                <String fx:value="ikonli-icon"/>
+                                                <String fx:value="danger-style"/>
+                                            </styleClass>
+                                        </FontIcon>
+                                        <Label fx:id="ms_labelMonth" alignment="CENTER" prefWidth="100.0" text="1 MES"/>
+                                        <FontIcon fx:id="ms_iconAddMonth" focusTraversable="true"
+                                                  iconLiteral="gmi-add-circle" iconSize="30">
+                                            <styleClass>
+                                                <String fx:value="ikonli-icon"/>
+                                                <String fx:value="success-style"/>
+                                            </styleClass>
+                                        </FontIcon>
+                                    </children>
+                                </HBox>
+                            </children>
+                        </VBox>
+                        <HBox fx:id="ms_boxButtons" alignment="CENTER" spacing="10.0"/>
+                    </children>
+                </VBox>
+                <VBox fx:id="boxPayment" styleClass="form-section">
+                    <VBox.margin>
+                        <Insets/>
+                    </VBox.margin>
+                    <children>
+                        <HBox alignment="CENTER">
+                            <children>
+                                <Label alignment="CENTER" styleClass="bold" text="PAGO">
+                                    <graphic>
+                                        <FontIcon iconLiteral="gmi-payment"/>
+                                    </graphic>
+                                </Label>
+                            </children>
+                        </HBox>
+                        <HBox alignment="CENTER_LEFT">
+                            <children>
+                                <JFXToggleButton fx:id="pym_togglePayment" selected="true" text="Pago completo"/>
+                                <VBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
+                                    <children>
+                                        <Label fx:id="pym_labelPrice" text="labelPrice"/>
+                                    </children>
+                                </VBox>
+                            </children>
+                        </HBox>
+                        <VBox fx:id="pym_boxOwe">
+                            <HBox alignment="CENTER_LEFT">
+                                <Label text="Abono *">
+                                    <HBox.margin>
+                                        <Insets right="10.0"/>
+                                    </HBox.margin>
+                                    <graphic>
+                                        <FontIcon iconLiteral="gmi-add-circle"/>
+                                    </graphic>
+                                </Label>
+                                <JFXTextField fx:id="pym_fieldPaidOut" HBox.hgrow="ALWAYS"/>
+                            </HBox>
+                            <HBox alignment="CENTER_LEFT" disable="true">
+                                <Label minWidth="96.0" text="Debe">
+                                    <HBox.margin>
+                                        <Insets right="10.0"/>
+                                    </HBox.margin>
+                                    <graphic>
+                                        <FontIcon iconLiteral="gmi-remove-circle"/>
+                                    </graphic>
+                                </Label>
+                                <JFXTextField fx:id="pym_fieldOwe" HBox.hgrow="ALWAYS"/>
                             </HBox>
                         </VBox>
-                    </HBox>
-                    <VBox />
-                    <HBox alignment="CENTER" spacing="5.0">
-                        <JFXButton fx:id="fp_buttonCapture" styleClass="btn-primary" text="Iniciar captura">
-                            <HBox.margin>
-                                <Insets />
-                            </HBox.margin>
-                        </JFXButton>
-                        <JFXButton fx:id="fp_buttonRestartCapture" disable="true" text="Reiniciar huellas">
-                            <styleClass>
-                                <String fx:value="btn-colorful" />
-                                <String fx:value="default-style" />
-                            </styleClass>
-                        </JFXButton>
-                    </HBox>
+                    </children>
                 </VBox>
-                <VBox spacing="5.0" styleClass="member-section">
-                    <padding>
-                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                    </padding>
-                    <HBox alignment="CENTER">
-                        <Label styleClass="bold" text="Membresía">
-                            <graphic>
-                                <FontIcon iconLiteral="gmi-event" />
-                            </graphic>
-                        </Label>
-                    </HBox>
-                    <VBox fx:id="ms_boxComboBox" spacing="10.0">
-                        <children>
-                     <VBox alignment="CENTER" spacing="5.0">
-                        <children>
-                           <AnchorPane>
-                              <children>
-                                        <JFXComboBox fx:id="ms_comboBoxMemberships" promptText="Selecciona uno" AnchorPane.bottomAnchor="-1.0" AnchorPane.leftAnchor="25.0" AnchorPane.rightAnchor="25.0" AnchorPane.topAnchor="-1.0" />
-                              </children>
-                           </AnchorPane>
-                           <HBox alignment="CENTER" spacing="10.0">
-                              <children>
-                                 <FontIcon fx:id="ms_iconSubtractMonth" focusTraversable="true" iconLiteral="gmi-remove-circle" iconSize="30">
-                                    <styleClass>
-                                       <String fx:value="ikonli-icon" />
-                                       <String fx:value="warn-style" />
-                                    </styleClass>
-                                 </FontIcon>
-                                 <Label fx:id="ms_labelMonth" alignment="CENTER" prefWidth="100.0" text="1 MES" />
-                                 <FontIcon fx:id="ms_iconAddMonth" focusTraversable="true" iconLiteral="gmi-add-circle" iconSize="30">
-                                    <styleClass>
-                                       <String fx:value="ikonli-icon" />
-                                       <String fx:value="success-style" />
-                                    </styleClass>
-                                 </FontIcon>
-                              </children>
-                           </HBox>
-                        </children>
-                     </VBox>
-                            <HBox fx:id="ms_boxEndDate" alignment="CENTER" spacing="5.0">
-                                <children>
-                                    <Label styleClass="bold" text="Termina" />
-                                    <Label fx:id="ms_labelEndDate" text="date" />
-                                </children>
-                            </HBox>
-                        </children>
-                    </VBox>
-                    <HBox fx:id="ms_boxButtons" alignment="CENTER" />
-                </VBox>
-                <VBox fx:id="boxPayment" spacing="5.0" styleClass="member-section">
-                    <VBox.margin>
-                        <Insets />
-                    </VBox.margin>
-                    <padding>
-                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                    </padding>
-                    <HBox alignment="CENTER">
-                        <Label styleClass="bold" text="Pago">
-                            <graphic>
-                                <FontIcon iconLiteral="gmi-payment" />
-                            </graphic>
-                        </Label>
-                    </HBox>
-                    <JFXToggleButton fx:id="pym_togglePayment" selected="true" text="Pago completo" />
-               <Label fx:id="pym_labelPrice" text="\$ 240" />
-                    <VBox fx:id="pym_boxOwe">
-                        <HBox alignment="CENTER_LEFT">
-                            <Label text="Abono *">
-                                <HBox.margin>
-                                    <Insets right="10.0" />
-                                </HBox.margin>
-                                <graphic>
-                                    <FontIcon iconLiteral="gmi-add-circle" />
-                                </graphic>
-                            </Label>
-                            <JFXTextField fx:id="pym_fieldPaidOut" HBox.hgrow="ALWAYS" />
-                        </HBox>
-                        <HBox alignment="CENTER_LEFT" disable="true">
-                            <Label minWidth="96.0" text="Debe">
-                                <HBox.margin>
-                                    <Insets right="10.0" />
-                                </HBox.margin>
-                                <graphic>
-                                    <FontIcon iconLiteral="gmi-remove-circle" />
-                                </graphic>
-                            </Label>
-                            <JFXTextField fx:id="pym_fieldOwe" HBox.hgrow="ALWAYS" />
-                        </HBox>
-                    </VBox>
-                </VBox>
-                <VBox alignment="CENTER" spacing="10.0" styleClass="member-section">
+                <VBox alignment="CENTER" styleClass="form-section">
                     <HBox alignment="CENTER">
                         <VBox>
-                            <ImageView fx:id="ph_imgMemberPhoto" fitHeight="150.0" fitWidth="150.0" pickOnBounds="true" preserveRatio="true">
+                            <ImageView fx:id="ph_imgMemberPhoto" fitHeight="150.0" fitWidth="150.0"
+                                       focusTraversable="true" pickOnBounds="true" preserveRatio="true"
+                                       styleClass="image-input">
                                 <image>
-                                    <Image url="@../../../img.jpg" />
+                                    <Image url="@../../../img.jpg"/>
                                 </image>
                             </ImageView>
                         </VBox>
@@ -262,11 +276,6 @@
                         <VBox.margin>
                             <Insets />
                         </VBox.margin>
-                        <JFXButton fx:id="ph_buttonUploadPhoto" styleClass="btn-primary" text="Subir foto">
-                            <graphic>
-                                <FontIcon iconLiteral="gmi-file-upload" />
-                            </graphic>
-                        </JFXButton>
                         <JFXButton fx:id="ph_buttonDeletePhoto" disable="true" text="Borrar foto">
                             <graphic>
                                 <FontIcon iconLiteral="gmi-delete-forever" />
@@ -277,20 +286,14 @@
                             </styleClass>
                         </JFXButton>
                     </HBox>
-                    <padding>
-                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                    </padding>
                 </VBox>
-                <VBox fx:id="boxShortcut" spacing="10.0" styleClass="member-section">
-                    <padding>
-                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                    </padding>
+                <VBox fx:id="boxShortcut" styleClass="form-section">
                     <children>
                         <HBox alignment="CENTER">
                             <children>
                                 <Label styleClass="bold" text="Acciones rápidas">
                                     <graphic>
-                                        <FontIcon iconLiteral="gmi-swap-horizontal-circle" />
+                                        <FontIcon iconLiteral="gmi-swap-horizontal-circle"/>
                                     </graphic>
                                 </Label>
                             </children>
@@ -332,8 +335,4 @@
             </VBox>
         </VBox>
     </content>
-   <stylesheets>
-      <URL value="@../../../styles.css" />
-      <URL value="@../../../controls.css" />
-   </stylesheets>
 </ScrollPane>

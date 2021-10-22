@@ -32,7 +32,7 @@ public class Model_Member {
     private Model_Gym modelGyms;
 
     // staff
-    private Model_Staff_Member modelStaffMember;
+    private Model_Admin modelStaffMember;
 
     // payments
     private Model_Payment_Membership modelPaymentMembership;
@@ -180,11 +180,11 @@ public class Model_Member {
         this.modelGyms = modelGyms;
     }
 
-    public Model_Staff_Member getModelStaffMember() {
+    public Model_Admin getModelStaffMember() {
         return modelStaffMember;
     }
 
-    public void setModelStaffMember(Model_Staff_Member modelStaffMember) {
+    public void setModelStaffMember(Model_Admin modelStaffMember) {
         this.modelStaffMember = modelStaffMember;
     }
 

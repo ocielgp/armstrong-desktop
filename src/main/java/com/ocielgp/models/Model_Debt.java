@@ -16,7 +16,7 @@ public class Model_Debt {
     private final IntegerProperty amount = new SimpleIntegerProperty();
     private final SimpleStringProperty description = new SimpleStringProperty();
     private final BooleanProperty debtStatus = new SimpleBooleanProperty();
-    private final SimpleIntegerProperty idStaff = new SimpleIntegerProperty();
+    private final SimpleIntegerProperty idAdmin = new SimpleIntegerProperty();
     private final SimpleIntegerProperty idMember = new SimpleIntegerProperty();
     private final SimpleIntegerProperty idDebtType = new SimpleIntegerProperty();
 
@@ -106,16 +106,16 @@ public class Model_Debt {
         this.debtStatus.set(debtStatus);
     }
 
-    public int getIdStaff() {
-        return idStaff.get();
+    public int getIdAdmin() {
+        return idAdmin.get();
     }
 
-    public SimpleIntegerProperty idStaffProperty() {
-        return idStaff;
+    public SimpleIntegerProperty idAdminProperty() {
+        return idAdmin;
     }
 
-    public void setIdStaff(int idStaff) {
-        this.idStaff.set(idStaff);
+    public void setIdAdmin(int idAdmin) {
+        this.idAdmin.set(idAdmin);
     }
 
     public int getIdMember() {

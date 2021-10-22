@@ -4,7 +4,7 @@ import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 
-public class Model_Staff_Member extends Model_Member {
+public class Model_Admin extends Model_Member {
     private final IntegerProperty idStaffMember = new SimpleIntegerProperty();
     private final SimpleStringProperty username = new SimpleStringProperty();
     private final SimpleStringProperty password = new SimpleStringProperty();

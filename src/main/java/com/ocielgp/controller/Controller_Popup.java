@@ -153,7 +153,7 @@ public class Controller_Popup implements Initializable {
     }
 
     private void eventSecureMode() { // compare input password to admin stored password
-        if (Hash.generateHash(this.fieldPassword.getText()).equals(Application.getStaffUserModel().getModelStaffMember().getPassword())) {
+        if (Hash.generateHash(this.fieldPassword.getText()).equals(Application.getModelAdmin().getModelStaffMember().getPassword())) {
             this.boolAnswer = true;
             closeStage();
         } else {

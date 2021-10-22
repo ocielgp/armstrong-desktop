@@ -2,8 +2,7 @@ package com.ocielgp;
 
 import com.ocielgp.app.Application;
 import com.ocielgp.controller.Controller_App;
-import com.ocielgp.models.Model_Member;
-import com.ocielgp.models.Model_Staff_Member;
+import com.ocielgp.models.Model_Admin;
 import com.ocielgp.utilities.FileLoader;
 import com.ocielgp.utilities.Loader;
 import javafx.application.Platform;
@@ -67,18 +66,16 @@ public class RunApp extends javafx.application.Application {
         });
 
         // TODO: FIX BUG WINDOWS IS BLANK
-        Model_Staff_Member modelStaffMember = new Model_Staff_Member();
-        modelStaffMember.setPassword("a94cbdca65dd4582c45c2b8dd97aec782baa8fbad32b73b547bf5b0e52ef58f3");
-        modelStaffMember.setIdRole(2);
-        Model_Member modelMembers = new Model_Member();
-        modelMembers.setIdMember(2);
-        modelMembers.setName("Ociel");
-        modelMembers.setLastName("Garcia");
-        modelMembers.setModelStaffMember(modelStaffMember);
+        Model_Admin modelAdmin = new Model_Admin();
+        modelAdmin.setPassword("a94cbdca65dd4582c45c2b8dd97aec782baa8fbad32b73b547bf5b0e52ef58f3");
+        modelAdmin.setIdRole(2);
+        modelAdmin.setIdMember(2);
+        modelAdmin.setName("Ociel");
+        modelAdmin.setLastName("Garcia");
 
-        Application.setStaffUserModel(modelMembers);
+        Application.setModelAdmin(modelAdmin);
         Node loginFXML = Loader.Load(
-                "dashboard.fxml",
+                "login.fxml",
                 "Login",
                 true
         );

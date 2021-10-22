@@ -3,7 +3,6 @@ package com.ocielgp.dao;
 import com.ocielgp.app.Application;
 import com.ocielgp.app.UserPreferences;
 import com.ocielgp.models.Model_Member;
-import com.ocielgp.utilities.DateFormatter;
 import com.ocielgp.utilities.DateTime;
 import com.ocielgp.utilities.Notifications;
 import com.ocielgp.utilities.Styles;
@@ -12,7 +11,7 @@ import javafx.collections.ObservableList;
 
 import java.lang.invoke.MethodHandles;
 import java.sql.*;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -56,6 +55,7 @@ public class JDBC_Member {
          * 1-3 DAYS = WARN
          * + 3 DAYS = SUCCESS
          */
+        System.out.println(daysLeft);
         if (haveDebts) {
             return Styles.CREATIVE;
         } else if (!access) {
@@ -79,7 +79,7 @@ public class JDBC_Member {
                 PreparedStatement ps;
                 ResultSet rs;
                 assert con != null;
-                ps = con.prepareStatement("SELECT name, lastName, gender, phone, email, notes, registrationDate, access, idGym FROM MEMBERS WHERE idMember = ? ORDER BY idMember DESC");
+                ps = con.prepareStatement("SELECT name, lastName, gender, notes, registrationDateTime, access, idGym FROM MEMBERS WHERE idMember = ? ORDER BY idMember DESC");
                 ps.setInt(1, idMember);
                 rs = ps.executeQuery();
                 if (rs.next()) {
@@ -87,7 +87,7 @@ public class JDBC_Member {
                     modelMember.setLastName(rs.getString("lastName"));
                     modelMember.setGender(rs.getString("gender"));
                     modelMember.setNotes(rs.getString("notes") == null ? "" : rs.getString("notes"));
-                    modelMember.setRegistrationDateTime(DateTime.MySQLToJava(rs.getString("registrationDate")));
+                    modelMember.setRegistrationDateTime(DateTime.MySQLToJava(rs.getString("registrationDateTime")));
                     modelMember.setAccess(rs.getBoolean("access"));
                     modelMember.setIdGym(rs.getInt("idGym"));
                     try {
@@ -112,7 +112,7 @@ public class JDBC_Member {
                 PreparedStatement statementLimited, statement;
                 ResultSet rs;
                 // query initial
-                String sqlQuery = "SELECT M.idMember, M.name, M.lastName, M.access, DATE(PM.endDateTime) AS 'endDateTime', (SELECT COUNT(idDebt) > 0 FROM DEBTS WHERE idMember = M.idMember AND debtStatus = 1 AND flag = 1 ORDER BY dateTime DESC) AS 'haveDebts', PM.flag AS 'flag' FROM MEMBERS M LEFT JOIN PAYMENTS_MEMBERSHIPS PM ON PM.idPaymentMembership = (SELECT idPaymentMembership FROM PAYMENTS_MEMBERSHIPS WHERE idMember = M.idMember AND flag = 1 ORDER BY startDateTime DESC LIMIT 1) WHERE M.idMember NOT IN (SELECT SM.idMember FROM STAFF_MEMBERS SM WHERE SM.flag = 1) AND M.flag = 1 ";
+                String sqlQuery = "SELECT M.idMember, M.name, M.lastName, M.access, endDateTime, (SELECT COUNT(idDebt) > 0 FROM DEBTS WHERE idMember = M.idMember AND debtStatus = 1 AND flag = 1 ORDER BY dateTime DESC) AS 'haveDebts', PM.flag AS 'flag' FROM MEMBERS M LEFT JOIN PAYMENTS_MEMBERSHIPS PM ON PM.idPaymentMembership = (SELECT idPaymentMembership FROM PAYMENTS_MEMBERSHIPS WHERE idMember = M.idMember AND flag = 1 ORDER BY startDateTime DESC LIMIT 1) WHERE M.idMember NOT IN (SELECT A.idMember FROM ADMINS A WHERE A.flag = 1) AND M.flag = 1 ";
 
                 // fieldSearchContent
                 if (query.length() > 0) {
@@ -189,9 +189,9 @@ public class JDBC_Member {
                         modelMember.setLastName(rs.getString("lastName"));
                         modelMember.setAccess(rs.getBoolean("access"));
 
-                        LocalDate endDate = LocalDate.parse(rs.getString("endDateTime"));
-                        modelMember.setEndDate(DateFormatter.getDayMonthYearShort(endDate));
-                        long daysLeft = DateFormatter.daysDifferenceToday(endDate);
+                        LocalDateTime endDateTime = DateTime.MySQLToJava(rs.getString("endDateTime"));
+                        modelMember.setEndDate(DateTime.getDateShort(endDateTime));
+                        long daysLeft = DateTime.getDaysLeft(endDateTime);
                         modelMember.setStyle(JDBC_Member.ReadStyle(modelMember.isAccess(), daysLeft, rs.getBoolean("haveDebts")));
                     } else {
                         modelMember.setIdMember(rs.getInt("idMember"));

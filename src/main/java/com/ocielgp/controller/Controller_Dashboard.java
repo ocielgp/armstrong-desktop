@@ -74,7 +74,7 @@ public class Controller_Dashboard implements Initializable {
         this.imageViewLogo.setImage(FileLoader.loadImage("img.jpg"));
 
         // update scrollPaneContent
-        this.labelStaffName.setText(Application.getStaffUserModel().getName());
+        this.labelStaffName.setText(Application.getModelAdmin().getName());
 
         /* Routing */
         HashMap<HBox, Pair<String, String>> routes = new HashMap<>();
