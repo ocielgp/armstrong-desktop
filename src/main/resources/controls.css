@@ -48,6 +48,15 @@
     -fx-border-color: -fx-color-text;
 }
 
+.ikonli-icon {
+    -fx-cursor: hand;
+    -fx-icon-color: -fx-color-background;
+}
+
+.ikonli-icon:hover, .ikonli-icon:focused {
+    -fx-opacity: 0.5;
+}
+
 .btn-primary .ikonli-font-icon {
     -fx-icon-color: -fx-color-background;
 }

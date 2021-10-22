@@ -21,9 +21,9 @@ public class DateTime {
         return localDateTime.format(DateTimeFormatter.ofPattern(DATE_WITH_DAY_NAME, new Locale("es", "MX")));
     }
 
-    public static String getEndDate(long days) {
+    public static String getEndDate(long months) {
         return getDateWithDayName(
-                LocalDateTime.now().plusDays(days)
+                LocalDateTime.now().plusMonths(months)
         );
     }
 }

@@ -16,6 +16,8 @@ import com.ocielgp.models.Model_Membership;
 import com.ocielgp.models.Model_Staff_Member;
 import com.ocielgp.utilities.*;
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.*;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
@@ -24,6 +26,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.math.BigDecimal;
 import java.net.URL;
@@ -93,6 +96,12 @@ public class Controller_Member implements Initializable {
     @FXML
     private HBox ms_boxEndDate;
     @FXML
+    private FontIcon ms_iconSubtractMonth;
+    @FXML
+    private Label ms_labelMonth;
+    @FXML
+    private FontIcon ms_iconAddMonth;
+    @FXML
     private Label ms_labelEndDate;
     @FXML
     private HBox ms_boxButtons;
@@ -100,6 +109,8 @@ public class Controller_Member implements Initializable {
     // -> payment [pym]
     @FXML
     private VBox boxPayment;
+    @FXML
+    private Label pym_labelPrice;
     @FXML
     private JFXToggleButton pym_togglePayment;
     @FXML
@@ -127,6 +138,8 @@ public class Controller_Member implements Initializable {
     private JFXButton buttonClear;
 
     // attributes
+    private final LongProperty totalMonths = new SimpleLongProperty(1);
+    private final ObjectProperty<BigDecimal> membershipPrice = new SimpleObjectProperty<>(new BigDecimal(0));
     private FormChangeListener formChangeListener;
     private PhotoHandler photoHandler;
     private Model_Member modelMember = null;
@@ -184,6 +197,7 @@ public class Controller_Member implements Initializable {
         this.ms_comboBoxMemberships.valueProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
                 Platform.runLater(() -> { // TODO: SUPPORTS MONTHS, DAYS, THEN ADD THE AMOUNT IF IS MONTH
+                    this.totalMonths.set(1);
                     this.ms_labelEndDate.setText(DateTime.getEndDate(newValue.getDays()));
                     this.ms_boxEndDate.setVisible(true);
                     this.boxPayment.setVisible(true);
@@ -195,12 +209,36 @@ public class Controller_Member implements Initializable {
                 });
             }
         });
+        this.ms_iconSubtractMonth.setOnMouseClicked(mouseEvent -> eventSubtractMonth());
+        this.totalMonths.addListener((observable, oldValue, newValue) -> {
+            Platform.runLater(() -> {
+                this.ms_labelMonth.setText(newValue + ((newValue.longValue() == 1) ? " MES" : " MESES"));
+                this.ms_labelEndDate.setText(
+                        DateTime.getEndDate(newValue.longValue())
+                );
+                this.membershipPrice.set(
+                        this.ms_comboBoxMemberships.getSelectionModel().getSelectedItem().getPrice().multiply(
+                                BigDecimal.valueOf(newValue.longValue())
+                        )
+                );
+            });
+        });
+        this.ms_iconAddMonth.setOnMouseClicked(mouseEvent -> eventAddMonth());
 
         // payment -> hide
         Input.createVisibleProperty(this.boxPayment, false);
         Input.createVisibleProperty(this.pym_boxOwe, false);
         this.boxPayment.visibleProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue) Platform.runLater(() -> this.pym_togglePayment.setSelected(true));
+            if (newValue) {
+                Platform.runLater(() -> {
+                    this.pym_togglePayment.setSelected(true);
+                    this.membershipPrice.set(
+                            this.ms_comboBoxMemberships.getSelectionModel().getSelectedItem().getPrice().multiply(
+                                    BigDecimal.valueOf(this.totalMonths.get())
+                            )
+                    );
+                });
+            }
         });
         this.pym_togglePayment.selectedProperty().addListener((observableValue, oldValue, newValue) -> {
             Platform.runLater(() -> this.pym_boxOwe.setVisible(!newValue));
@@ -213,6 +251,10 @@ public class Controller_Member implements Initializable {
                     Platform.runLater(() -> this.scrollPane.setVvalue(1d));
                 });
             }
+        });
+        this.membershipPrice.addListener((observableValue, oldValue, newValue) -> {
+            // ADD CURRENCIES
+            this.pym_labelPrice.setText("$ " + newValue + " MXN");
         });
         this.pym_fieldPaidOut.textProperty().addListener((observable, oldValue, newValue) -> {
             if (Validator.moneyValidator(new InputDetails(this.pym_fieldPaidOut, this.pym_fieldPaidOut.getText()), false)) {
@@ -504,6 +546,16 @@ public class Controller_Member implements Initializable {
                 }
             }
         });
+    }
+
+    private void eventAddMonth() {
+        this.totalMonths.set(this.totalMonths.get() + 1);
+    }
+
+    private void eventSubtractMonth() {
+        if (this.totalMonths.get() != 1) {
+            this.totalMonths.set(this.totalMonths.get() - 1);
+        }
     }
 
     private void eventAccess() { // TODO: REFRESH TABLE AFTER CHANGE
