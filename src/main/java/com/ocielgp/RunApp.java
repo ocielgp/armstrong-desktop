@@ -75,7 +75,7 @@ public class RunApp extends javafx.application.Application {
 
         Application.setModelAdmin(modelAdmin);
         Node loginFXML = Loader.Load(
-                "login.fxml",
+                "dashboard.fxml",
                 "Login",
                 true
         );
