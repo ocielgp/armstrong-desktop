@@ -68,12 +68,12 @@ public class RunApp extends javafx.application.Application {
         // TODO: FIX BUG WINDOWS IS BLANK
         Model_Admin modelAdmin = new Model_Admin();
         modelAdmin.setPassword("a94cbdca65dd4582c45c2b8dd97aec782baa8fbad32b73b547bf5b0e52ef58f3");
-        modelAdmin.setIdRole(2);
+        modelAdmin.setIdRole(Short.valueOf("1"));
         modelAdmin.setIdMember(2);
         modelAdmin.setName("Ociel");
         modelAdmin.setLastName("Garcia");
-
         Application.setModelAdmin(modelAdmin);
+
         Node loginFXML = Loader.Load(
                 "dashboard.fxml",
                 "Login",

@@ -1,6 +1,5 @@
 package com.ocielgp.controller;
 
-import animatefx.animation.FadeIn;
 import animatefx.animation.FadeInRight;
 import animatefx.animation.FadeOutRight;
 import com.jfoenix.controls.JFXButton;
@@ -10,7 +9,6 @@ import com.jfoenix.controls.JFXToggleButton;
 import com.ocielgp.app.Application;
 import com.ocielgp.dao.*;
 import com.ocielgp.fingerprint.Fingerprint_Controller;
-import com.ocielgp.models.Model_Admin;
 import com.ocielgp.models.Model_Debt;
 import com.ocielgp.models.Model_Member;
 import com.ocielgp.models.Model_Membership;
@@ -29,6 +27,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import org.kordamp.ikonli.javafx.FontIcon;
 
+import java.lang.invoke.MethodHandles;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.util.ArrayList;
@@ -139,11 +138,12 @@ public class Controller_Member implements Initializable {
     private JFXButton buttonClear;
 
     // attributes
-    private long totalMonths = 1;
+    private short totalMonths = 1;
     private final ObjectProperty<BigDecimal> membershipPrice = new SimpleObjectProperty<>(new BigDecimal(0));
     private FormChangeListener formChangeListener;
     private PhotoHandler photoHandler;
     private Model_Member modelMember = null;
+    private Model_Member modelAdmin = null;
     private final Controller_Members controllerMembers;
 
     public Controller_Member(Controller_Members controllerMembers) {
@@ -156,7 +156,9 @@ public class Controller_Member implements Initializable {
             if (newValue.doubleValue() > oldValue.doubleValue() && oldValue.doubleValue() != 0) {
                 Platform.runLater(() -> this.scrollPane.setVvalue(1d));
             } else {
-                if (this.modelMember != null) Platform.runLater(() -> this.scrollPane.setVvalue(0d));
+                if (this.modelMember == null) {
+                    Platform.runLater(() -> this.scrollPane.setVvalue(0d));
+                }
             }
         });
 
@@ -164,7 +166,6 @@ public class Controller_Member implements Initializable {
         Input.createMaxLengthEvent(this.pi_fieldName, Model_Member.nameLength);
         Input.createMaxLengthEvent(this.pi_fieldLastName, Model_Member.lastNameLength);
         Input.createMaxLengthEvent(this.pi_fieldNotes, Model_Member.notesLength);
-        // todo: ADD ALL MAX LENGTH RESTANTES
     }
 
     @Override
@@ -198,9 +199,7 @@ public class Controller_Member implements Initializable {
         Input.createVisibleProperty(this.ms_boxMonths, false);
         this.ms_comboBoxMemberships.valueProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
-                Platform.runLater(() -> {
-                    eventUpdatePrice(true);
-                });
+                Platform.runLater(() -> eventUpdatePrice(true));
             } else {
                 Platform.runLater(() -> {
                     this.ms_boxEndDate.setVisible(false);
@@ -217,9 +216,7 @@ public class Controller_Member implements Initializable {
         Input.createVisibleProperty(this.pym_boxOwe, false);
         this.boxPayment.visibleProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue) {
-                Platform.runLater(() -> {
-                    this.pym_togglePayment.setSelected(true);
-                });
+                Platform.runLater(() -> this.pym_togglePayment.setSelected(true));
             }
         });
         this.pym_togglePayment.selectedProperty().addListener((observableValue, oldValue, newValue) -> {
@@ -236,9 +233,9 @@ public class Controller_Member implements Initializable {
         this.pym_labelPrice.textProperty().bind(Bindings.concat("$ ", membershipPrice.asString(), " MXN"));
         this.pym_fieldPaidOut.textProperty().addListener((observable, oldValue, newValue) -> {
             if (Validator.moneyValidator(new InputDetails(this.pym_fieldPaidOut, this.pym_fieldPaidOut.getText()), false)) {
-                this.pym_fieldOwe.setText(this.ms_comboBoxMemberships.getSelectionModel().getSelectedItem().getPrice().subtract(new BigDecimal(newValue)).toString());
+                this.pym_fieldOwe.setText(this.membershipPrice.get().subtract(new BigDecimal(newValue)).toString());
             } else {
-                this.pym_fieldOwe.setText(this.ms_comboBoxMemberships.getSelectionModel().getSelectedItem().getPrice().toString());
+                this.pym_fieldOwe.setText(this.membershipPrice.get().toString());
             }
         });
 
@@ -272,23 +269,17 @@ public class Controller_Member implements Initializable {
                         this.modelMember.setModelPaymentMembership(model_payments_memberships);
                         if (model_payments_memberships == null) {
                             JDBC_Gym.ReadGym(this.modelMember.getIdGym())
-                                    .thenAccept(model_gyms -> {
-                                        this.modelMember.setModelGyms(model_gyms);
+                                    .thenAccept(model_gym -> {
+                                        this.modelMember.setModelGym(model_gym);
                                         eventClearForm(true);
                                     });
                         } else {
-                            JDBC_Member.ReadMember(model_payments_memberships.getIdAdmin()).thenAccept(model_member_staff -> {
-                                JDBC_Gym.ReadGym(model_payments_memberships.getIdGym())
-                                        .thenAccept(model_gyms -> {
-                                            this.modelMember.setModelGyms(model_gyms);
-                                            Model_Admin modelStaffMember = new Model_Admin();
-                                            modelStaffMember.setIdMember(model_member_staff.getIdMember());
-                                            modelStaffMember.setName(model_member_staff.getName());
-                                            modelStaffMember.setLastName(model_member_staff.getLastName());
-                                            this.modelMember.setModelStaffMember(modelStaffMember);
-                                            eventClearForm(true);
-                                        });
-                            });
+                            JDBC_Member.ReadMember(model_payments_memberships.getIdAdmin()).thenAccept(model_admin -> JDBC_Gym.ReadGym(model_payments_memberships.getIdGym())
+                                    .thenAccept(model_gym -> {
+                                        this.modelMember.setModelGym(model_gym);
+                                        this.modelAdmin = model_admin;
+                                        eventClearForm(true);
+                                    }));
                         }
                     });
         });
@@ -306,13 +297,7 @@ public class Controller_Member implements Initializable {
                             this.modelMember.getRegistrationDateTime()
                     )
             );
-            this.qv_labelAdmin.setText(this.modelMember.getModelStaffMember().getName() + " " + this.modelMember.getModelStaffMember().getLastName());
-            this.qv_labelLastPayment.setText(
-                    DateTime.getDateWithDayName(
-                            this.modelMember.getModelPaymentMembership().getStartDateTime()
-                    )
-            );
-            this.qv_labelGym.setText(this.modelMember.getModelGyms().getName());
+            this.qv_labelGym.setText(this.modelMember.getModelGym().getName());
             this.boxQuickView.setVisible(true);
 
             // photo
@@ -326,15 +311,18 @@ public class Controller_Member implements Initializable {
 
             // membership
             if (this.modelMember.getModelPaymentMembership() != null) {
+                this.qv_labelAdmin.setText(this.modelAdmin.getName() + " " + this.modelAdmin.getLastName());
+                this.qv_labelLastPayment.setText(
+                        DateTime.getDateWithDayName(
+                                this.modelMember.getModelPaymentMembership().getStartDateTime()
+                        )
+                );
                 this.ms_comboBoxMemberships.setDisable(true);
                 this.ms_comboBoxMemberships.getItems().forEach(model_membership -> { // select current membership
                     if (model_membership.getIdMembership() == this.modelMember.getModelPaymentMembership().getIdMembership()) {
                         this.ms_comboBoxMemberships.getSelectionModel().select(model_membership);
-                        // set endDate
-                        Platform.runLater(() -> {
-                            this.ms_labelEndDate.setText(DateTime.getDateWithDayName(this.modelMember.getModelPaymentMembership().getEndDateTime()));
-                            this.boxPayment.setVisible(false);
-                        });
+                        this.ms_labelEndDate.setText(DateTime.getDateWithDayName(this.modelMember.getModelPaymentMembership().getEndDateTime()));
+                        createMembershipButtons();
                     }
                 });
             } else {
@@ -365,14 +353,14 @@ public class Controller_Member implements Initializable {
             FadeInRight fadeInRightScrollPane = new FadeInRight(this.scrollPane);
             fadeInRightScrollPane.setOnFinished(actionEvent -> {
                 Loading.close();
-                this.formChangeListener.setListener(true);
+                this.formChangeListener.setListen(true);
             });
             fadeInRightScrollPane.play();
         });
     }
 
     private void eventClearForm(boolean fillMemberForm) {
-        this.formChangeListener.setListener(false);
+        this.formChangeListener.setListen(false);
         Platform.runLater(() -> {
             this.boxTitle.getStyleClass().set(0, Styles.DEFAULT);
             this.t_labelTitle.setText("Socio nuevo");
@@ -392,7 +380,11 @@ public class Controller_Member implements Initializable {
             );
 
             this.ms_comboBoxMemberships.setDisable(false);
+            this.ms_boxMonths.setVisible(false);
+            this.ms_boxButtons.getChildren().clear();
+            this.ms_boxButtons.setDisable(false);
             this.boxShortcut.setVisible(false);
+            this.ms_labelEndDate.getStyleClass().remove("strikethrough");
 
             this.buttonAction.setDisable(false);
             this.buttonAction.setText("Registrar");
@@ -402,14 +394,22 @@ public class Controller_Member implements Initializable {
                 fillMemberForm();
             } else {
                 this.modelMember = null;
+                this.modelAdmin = null;
                 this.scrollPane.setVvalue(0d);
-                new FadeIn(this.scrollPane).play();
+                FadeInRight fadeInRightScrollPane = new FadeInRight(this.scrollPane);
+                fadeInRightScrollPane.setOnFinished(actionEvent -> {
+                    Loading.close();
+                    this.formChangeListener.setListen(true);
+                });
+                fadeInRightScrollPane.play();
             }
         });
     }
 
     private void createMember() {
         CompletableFuture.runAsync(() -> {
+            Loading.show();
+            new FadeOutRight(this.scrollPane).play();
             ArrayList<InputDetails> nodesRequired = new ArrayList<>();
             // personal information
             nodesRequired.add(new InputDetails(this.pi_fieldName, this.pi_fieldName.getText()));
@@ -452,7 +452,7 @@ public class Controller_Member implements Initializable {
 
                     // modelMembership
                     Model_Membership modelMembership = this.ms_comboBoxMemberships.getSelectionModel().getSelectedItem();
-                    modelMembership.setMonths(this.totalMonths);
+                    modelMembership.setPrice(this.membershipPrice.get());
 
                     // modelDebt
                     final Model_Debt modelDebt = new Model_Debt();
@@ -471,64 +471,135 @@ public class Controller_Member implements Initializable {
                         } else {
                             modelDebt.setPaidOut(paidOut);
                             modelDebt.setOwe(owe);
-                            modelDebt.setAmount(Math.toIntExact(this.totalMonths));
-                            modelDebt.setDescription(modelMembership.getDescription());
+                            modelDebt.setAmount(this.totalMonths);
+                            modelDebt.setDescription(modelMembership.getName());
+                            modelDebt.setIsMembership(true);
                         }
                     }
 
                     if (formValid) { // insert into database
-                        if (this.formChangeListener.isListener()) { // update changes
-                            if (this.formChangeListener.isChanged("photo")) {
-                                JDBC_Member_Photo.UpdatePhoto(this.modelMember.getIdMember(), this.photoHandler.getPhoto());
-                            }
-                            if (this.formChangeListener.isChanged("name")) {
-                                JDBC_Member.UpdateName(this.modelMember.getIdMember(), modelMember.getName());
-                            }
+                        try {
+                            if (this.formChangeListener.isListen()) { // update changes
+                                boolean isOk = true;
+                                if (this.formChangeListener.isChanged("membershipRenew")) {
+                                    int newIdMembership = JDBC_Payment_Membership.CreatePaymentMembership(this.modelMember.getIdMember(), modelMembership, this.totalMonths);
+                                    isOk = newIdMembership > 0;
+                                    if (modelDebt.getAmount() > 0 && newIdMembership > 0) {
+                                        isOk = JDBC_Debt.CreateDebt(this.modelMember.getIdMember(), modelDebt);
+                                    }
+                                }
+                                if (isOk && this.formChangeListener.isChanged("membershipChange")) {
+                                    isOk = JDBC_Payment_Membership.UpdatePaymentMembership(modelMembership, this.modelMember.getModelPaymentMembership());
+                                    if (modelDebt.getAmount() > 0) {
+                                        isOk = JDBC_Debt.CreateDebt(this.modelMember.getIdMember(), modelDebt);
+                                    }
+                                }
+                                if (isOk && this.formChangeListener.isChanged("membershipRemove")) {
+                                    isOk = JDBC_Payment_Membership.DeletePaymentMembership(this.modelMember.getModelPaymentMembership());
+                                }
+                                if (isOk && this.formChangeListener.isChanged("photo")) {
+                                    isOk = JDBC_Member_Photo.UpdatePhoto(this.modelMember.getIdMember(), this.photoHandler.getPhoto());
+                                }
+                                if (isOk && this.formChangeListener.isChanged("name")) {
+                                    isOk = JDBC_Member.UpdateName(this.modelMember.getIdMember(), modelMember.getName());
+                                }
 
-                            if (this.formChangeListener.isChanged("lastName")) {
-                                JDBC_Member.UpdateLastName(this.modelMember.getIdMember(), modelMember.getLastName());
-                            }
-                            if (this.formChangeListener.isChanged("gender")) {
-                                JDBC_Member.UpdateGender(this.modelMember.getIdMember(), modelMember.getGender());
-                            }
-                            if (this.formChangeListener.isChanged("notes")) {
-                                JDBC_Member.UpdateNotes(this.modelMember.getIdMember(), modelMember.getNotes());
-                            }
-                            if (this.formChangeListener.isChanged("fingerprint")) {
-                                JDBC_Member_Fingerprint.CreateFingerprints(this.modelMember.getIdMember(), Fingerprint_Controller.getFingerprints());
-                            }
-                            Notifications.Success("Información actualizada", "[ID:  " + this.modelMember.getIdMember() + "] " + modelMember.getName() + " información actualizada");
-                        } else { // new member
-                            JDBC_Member.CreateMember(modelMember).thenAccept(idMember -> {
+                                if (isOk && this.formChangeListener.isChanged("lastName")) {
+                                    isOk = JDBC_Member.UpdateLastName(this.modelMember.getIdMember(), modelMember.getLastName());
+                                }
+                                if (isOk && this.formChangeListener.isChanged("gender")) {
+                                    isOk = JDBC_Member.UpdateGender(this.modelMember.getIdMember(), modelMember.getGender());
+                                }
+                                if (isOk && this.formChangeListener.isChanged("notes")) {
+                                    isOk = JDBC_Member.UpdateNotes(this.modelMember.getIdMember(), modelMember.getNotes());
+                                }
+                                if (isOk && this.formChangeListener.isChanged("fingerprint")) {
+                                    isOk = JDBC_Member_Fingerprint.CreateFingerprints(this.modelMember.getIdMember(), Fingerprint_Controller.getFingerprints());
+                                }
+                                if (isOk) {
+                                    Notifications.Success("Nuevos cambios", "[ID:  " + this.modelMember.getIdMember() + "] " + modelMember.getName() + " información actualizada");
+                                }
+                            } else { // new member
+                                int idMember = JDBC_Member.CreateMember(modelMember);
                                 if (idMember > 0) {
                                     JDBC_Member_Photo.CreatePhoto(idMember, photoHandler.getPhoto());
                                     JDBC_Member_Fingerprint.CreateFingerprints(idMember, Fingerprint_Controller.getFingerprints());
-                                    JDBC_Payment_Membership.CreatePaymentMembership(idMember, modelMembership).thenAccept(idLastMembership -> {
-                                        if (modelDebt.getAmount() != 0 && idLastMembership > 0) {
-                                            JDBC_Debt.CreateDebt(modelDebt, idMember, 1);
-                                        }
-                                    });
-
-                                    Notifications.Success("Nuevo socio", "[ " + idMember + " ] " + modelMember.getName() + " ha sido registrado.");
+                                    int idNewMembership = JDBC_Payment_Membership.CreatePaymentMembership(idMember, modelMembership, this.totalMonths);
+                                    if (modelDebt.getAmount() != 0 && idNewMembership > 0) {
+                                        JDBC_Debt.CreateDebt(idMember, modelDebt);
+                                    }
+                                    Notifications.Success("Nuevo socio", "[ID: " + idMember + " ] " + modelMember.getName() + " ha sido registrado");
                                 }
-                            });
+                            }
+
+                            this.controllerMembers.refreshTable();
+                            eventClearForm(false);
+                        } catch (Exception exception) {
+                            Notifications.CatchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], exception.getMessage(), exception);
                         }
-
-                        this.controllerMembers.refreshTable();
-                        eventClearForm(false);
-
-                        // clear memory
-                        nodesRequired = null;
-                        formValid = null;
                     }
                 }
             }
         });
     }
 
+    private void createMembershipButtons() {
+        if (DateTime.isToday(this.modelMember.getModelPaymentMembership().getStartDateTime())) { // today's payment
+            JFXButton buttonChangeMembership = new JFXButton("Cambiar");
+            buttonChangeMembership.getStyleClass().addAll("btn-colorful", "warn-style");
+            buttonChangeMembership.setOnAction(actionEvent -> eventMembershipChange());
+            JFXButton buttonRemoveMembership = new JFXButton("Quitar");
+            buttonRemoveMembership.getStyleClass().addAll("btn-colorful", "danger-style");
+            buttonRemoveMembership.setOnAction(actionEvent -> eventMembershipRemove());
+            this.ms_boxButtons.getChildren().setAll(buttonChangeMembership, buttonRemoveMembership);
+            this.ms_boxButtons.setVisible(true);
+        } else {
+            JFXButton buttonRenewMembership = new JFXButton("Renovar");
+            buttonRenewMembership.getStyleClass().addAll("btn-colorful", "epic-style");
+            buttonRenewMembership.setOnAction(actionEvent -> eventMembershipRenew());
+            this.ms_boxButtons.getChildren().setAll(buttonRenewMembership);
+            this.ms_boxButtons.setVisible(true);
+        }
+    }
+
+    private void eventMembershipRenew() {
+        this.ms_boxButtons.setDisable(true);
+        this.ms_comboBoxMemberships.setDisable(false);
+        this.ms_boxMonths.setVisible(true);
+        this.boxPayment.setVisible(true);
+        eventUpdatePrice(true);
+        formChangeListener.change("membershipRenew", false);
+    }
+
+    private void eventMembershipChange() {
+        Popup popup = new Popup();
+        popup.password();
+        if (popup.showAndWait()) {
+            Notifications.Default("gmi-event", "Membresía", "Selecciona un nuevo plan");
+            this.ms_boxButtons.setDisable(true);
+            this.ms_comboBoxMemberships.setDisable(false);
+            this.ms_boxMonths.setVisible(true);
+            this.boxPayment.setVisible(true);
+            eventUpdatePrice(true);
+            formChangeListener.change("membershipChange", false);
+        }
+    }
+
+    private void eventMembershipRemove() {
+        Popup popup = new Popup();
+        popup.password();
+        if (popup.showAndWait()) {
+            this.ms_labelEndDate.getStyleClass().add("strikethrough");
+            formChangeListener.change("membershipRemove", false);
+            this.ms_boxButtons.setDisable(true);
+        }
+    }
+
     private void eventAddMonth() {
-        this.totalMonths++;
-        eventUpdatePrice(false);
+        if (this.totalMonths <= Model_Debt.MAX_AMOUNT) {
+            this.totalMonths++;
+            eventUpdatePrice(false);
+        }
     }
 
     private void eventSubtractMonth() {
@@ -543,17 +614,29 @@ public class Controller_Member implements Initializable {
             if (restartMonth) {
                 this.totalMonths = 1;
             }
-            if (modelMember == null) {
-                this.ms_boxEndDate.setVisible(true);
+            this.ms_boxEndDate.setVisible(true);
+
+            if (this.modelMember == null || this.modelMember.getModelPaymentMembership() == null) {
                 this.ms_boxMonths.setVisible(true);
+                this.boxPayment.setVisible(true);
+
+            }
+            if (this.formChangeListener.isListen()) {
+                if (this.modelMember != null && this.modelMember.getModelPaymentMembership() == null) {
+                    this.formChangeListener.change("membershipRenew", false);
+
+                }
+                if (this.formChangeListener.isChanged("membershipRenew") || this.formChangeListener.isChanged("membershipChange") || this.formChangeListener.isChanged("membershipRemove")) {
+                    this.ms_labelEndDate.setText(
+                            DateTime.getEndDate(this.totalMonths)
+                    );
+                }
             } else {
-                this.ms_boxEndDate.setVisible(true);
-                this.ms_boxMonths.setVisible(false);
+                this.ms_labelEndDate.setText(
+                        DateTime.getEndDate(this.totalMonths)
+                );
             }
             this.ms_labelMonth.setText(this.totalMonths + ((this.totalMonths == 1) ? " MES" : " MESES"));
-            this.ms_labelEndDate.setText(
-                    DateTime.getEndDate(this.totalMonths)
-            );
             if (this.boxPayment.isVisible()) {
                 this.membershipPrice.set(
                         this.ms_comboBoxMemberships.getSelectionModel().getSelectedItem().getPrice().multiply(
@@ -567,14 +650,14 @@ public class Controller_Member implements Initializable {
     }
 
     private void eventAccess() { // TODO: REFRESH TABLE AFTER CHANGE
+        Popup popup = new Popup();
         Platform.runLater(() -> {
             String style = this.s_buttonAccess.getStyleClass().get(3);
             if (Styles.DANGER.equals(style)) {
-                Controller_Popup popup = new Controller_Popup(
+                popup.confirm(
                         style,
                         "Bloquear acceso",
-                        "Se le bloqueara el acceso a todos los gimnasios a " + this.modelMember.getName() + " " + this.modelMember.getLastName() + ", ¿quieres continuar?",
-                        Controller_Popup.POPUP_CONFIRM
+                        "Se le bloqueara el acceso a todos los gimnasios a " + this.modelMember.getName() + " " + this.modelMember.getLastName() + ", ¿quieres continuar?"
                 );
                 if (popup.showAndWait()) {
                     JDBC_Member.UpdateAccess(this.modelMember.getIdMember(), this.modelMember.isAccess()).thenAccept(bool_access -> {
@@ -591,23 +674,20 @@ public class Controller_Member implements Initializable {
                     });
                 }
             } else {
-                Controller_Popup popup = new Controller_Popup(
+                popup.confirm(
                         style,
                         "Desbloquear acceso",
-                        "Se desbloqueara el acceso a " + this.modelMember.getName() + " " + this.modelMember.getLastName() + ", ¿quieres continuar?",
-                        Controller_Popup.POPUP_CONFIRM
+                        "Se desbloqueara el acceso a " + this.modelMember.getName() + " " + this.modelMember.getLastName() + ", ¿quieres continuar?"
                 );
                 if (popup.showAndWait()) {
-                    JDBC_Member.UpdateAccess(this.modelMember.getIdMember(), this.modelMember.isAccess()).thenAccept(bool_access -> {
-                        Platform.runLater(() -> {
-                            this.modelMember.setAccess(!this.modelMember.isAccess());
-                            this.s_buttonOpenDoor.setDisable(false);
-                            this.s_buttonAccess.getStyleClass().set(3, Styles.DANGER);
-                            this.s_buttonAccess.setText("Bloquear acceso");
-                            Notifications.Success("Acceso desbloqueado", this.modelMember.getName() + " puede entrar a los gimnasios nuevamente");
-                            this.scrollPane.requestFocus();
-                        });
-                    });
+                    JDBC_Member.UpdateAccess(this.modelMember.getIdMember(), this.modelMember.isAccess()).thenAccept(bool_access -> Platform.runLater(() -> {
+                        this.modelMember.setAccess(!this.modelMember.isAccess());
+                        this.s_buttonOpenDoor.setDisable(false);
+                        this.s_buttonAccess.getStyleClass().set(3, Styles.DANGER);
+                        this.s_buttonAccess.setText("Bloquear acceso");
+                        Notifications.Success("Acceso desbloqueado", this.modelMember.getName() + " puede entrar a los gimnasios nuevamente");
+                        this.scrollPane.requestFocus();
+                    }));
                 }
             }
         });
@@ -620,12 +700,13 @@ public class Controller_Member implements Initializable {
         formChangeListener.add("name");
         formChangeListener.add("lastName");
         formChangeListener.add("gender");
-        formChangeListener.add("phone");
-        formChangeListener.add("email");
         formChangeListener.add("notes");
         formChangeListener.add("fingerprint");
+        formChangeListener.add("membershipRenew");
+        formChangeListener.add("membershipChange");
+        formChangeListener.add("membershipRemove");
         this.pi_fieldName.setOnKeyTyped(keyEvent -> {
-            if (this.formChangeListener.isListener()) {
+            if (this.formChangeListener.isListen()) {
                 this.formChangeListener.change(
                         "name",
                         Validator.compare(this.pi_fieldName.getText(), this.modelMember.getName())
@@ -633,7 +714,7 @@ public class Controller_Member implements Initializable {
             }
         });
         this.pi_fieldLastName.setOnKeyTyped(keyEvent -> {
-            if (this.formChangeListener.isListener()) {
+            if (this.formChangeListener.isListen()) {
                 this.formChangeListener.change(
                         "lastName",
                         Validator.compare(this.pi_fieldLastName.getText(), this.modelMember.getLastName())
@@ -641,7 +722,7 @@ public class Controller_Member implements Initializable {
             }
         });
         this.pi_comboBoxGender.setOnAction(keyEvent -> {
-            if (this.formChangeListener.isListener()) {
+            if (this.formChangeListener.isListen()) {
                 this.formChangeListener.change(
                         "gender",
                         Validator.compare(this.pi_comboBoxGender.getSelectionModel().getSelectedItem(), this.modelMember.getGender())
@@ -649,7 +730,7 @@ public class Controller_Member implements Initializable {
             }
         });
         this.pi_fieldNotes.setOnKeyTyped(keyEvent -> {
-            if (this.formChangeListener.isListener()) {
+            if (this.formChangeListener.isListen()) {
                 this.formChangeListener.change(
                         "notes",
                         Validator.compare(this.pi_fieldNotes.getText(), this.modelMember.getNotes())
@@ -657,7 +738,7 @@ public class Controller_Member implements Initializable {
             }
         });
         this.fp_labelFingerprintCounter.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (this.formChangeListener.isListener() && !oldValue.equals(newValue)) {
+            if (this.formChangeListener.isListen() && !oldValue.equals(newValue)) {
                 this.formChangeListener.change(
                         "fingerprint",
                         false

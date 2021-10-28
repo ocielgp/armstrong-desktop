@@ -22,6 +22,10 @@
     -fx-font: 2em "Roboto Bold";
 }
 
+.strikethrough .text {
+    -fx-strikethrough: true;
+}
+
 .jfx-text-field, .jfx-password-field {
     -fx-text-fill: -fx-color-text;
     -fx-prompt-text-fill: -fx-color-unfocus;

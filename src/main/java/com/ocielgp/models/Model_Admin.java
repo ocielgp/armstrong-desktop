@@ -1,34 +1,19 @@
 package com.ocielgp.models;
 
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.*;
 
 public class Model_Admin extends Model_Member {
-    private final IntegerProperty idStaffMember = new SimpleIntegerProperty();
-    private final SimpleStringProperty username = new SimpleStringProperty();
-    private final SimpleStringProperty password = new SimpleStringProperty();
+    private final StringProperty username = new SimpleStringProperty();
+    private final StringProperty password = new SimpleStringProperty();
     private final IntegerProperty idMember = new SimpleIntegerProperty();
     private final IntegerProperty addedByIdMember = new SimpleIntegerProperty();
-    private final IntegerProperty idRole = new SimpleIntegerProperty();
-
-    public int getIdStaffMember() {
-        return idStaffMember.get();
-    }
-
-    public IntegerProperty idStaffMemberProperty() {
-        return idStaffMember;
-    }
-
-    public void setIdStaffMember(int idStaffMember) {
-        this.idStaffMember.set(idStaffMember);
-    }
+    private final ObjectProperty<Short> idRole = new SimpleObjectProperty<>();
 
     public String getUsername() {
         return username.get();
     }
 
-    public SimpleStringProperty usernameProperty() {
+    public StringProperty usernameProperty() {
         return username;
     }
 
@@ -40,7 +25,7 @@ public class Model_Admin extends Model_Member {
         return password.get();
     }
 
-    public SimpleStringProperty passwordProperty() {
+    public StringProperty passwordProperty() {
         return password;
     }
 
@@ -48,10 +33,12 @@ public class Model_Admin extends Model_Member {
         this.password.set(password);
     }
 
+    @Override
     public int getIdMember() {
         return idMember.get();
     }
 
+    @Override
     public IntegerProperty idMemberProperty() {
         return idMember;
     }
@@ -72,15 +59,15 @@ public class Model_Admin extends Model_Member {
         this.addedByIdMember.set(addedByIdMember);
     }
 
-    public int getIdRole() {
+    public Short getIdRole() {
         return idRole.get();
     }
 
-    public IntegerProperty idRoleProperty() {
+    public ObjectProperty<Short> idRoleProperty() {
         return idRole;
     }
 
-    public void setIdRole(int idRole) {
+    public void setIdRole(Short idRole) {
         this.idRole.set(idRole);
     }
 }

@@ -6,13 +6,12 @@ import java.math.BigDecimal;
 
 public class Model_Membership {
     // Max length
-    public static final byte priceLength = 10;
-    public static final byte descriptionLength = 60;
+    public static final byte MAX_PRICE = 10;
+    public static final byte MAX_NAME = 60;
 
     private final IntegerProperty idMembership = new SimpleIntegerProperty();
-    private final LongProperty months = new SimpleLongProperty();
     private final ObjectProperty<BigDecimal> price = new SimpleObjectProperty<>();
-    private final StringProperty description = new SimpleStringProperty();
+    private final StringProperty name = new SimpleStringProperty();
 
     public int getIdMembership() {
         return idMembership.get();
@@ -24,18 +23,6 @@ public class Model_Membership {
 
     public void setIdMembership(int idMembership) {
         this.idMembership.set(idMembership);
-    }
-
-    public long getMonths() {
-        return months.get();
-    }
-
-    public LongProperty monthsProperty() {
-        return months;
-    }
-
-    public void setMonths(long months) {
-        this.months.set(months);
     }
 
     public BigDecimal getPrice() {
@@ -50,20 +37,20 @@ public class Model_Membership {
         this.price.set(price);
     }
 
-    public String getDescription() {
-        return description.get();
+    public String getName() {
+        return name.get();
     }
 
-    public StringProperty descriptionProperty() {
-        return description;
+    public StringProperty nameProperty() {
+        return name;
     }
 
-    public void setDescription(String description) {
-        this.description.set(description);
+    public void setName(String name) {
+        this.name.set(name);
     }
 
     @Override
     public String toString() {
-        return "[$" + getPrice() + "]: " + getDescription();
+        return "[$" + getPrice() + "]: " + getName();
     }
 }

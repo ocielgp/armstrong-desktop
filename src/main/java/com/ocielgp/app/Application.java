@@ -5,7 +5,6 @@ import com.ocielgp.controller.Controller_App;
 import com.ocielgp.controller.Controller_Dashboard;
 import com.ocielgp.models.Model_Admin;
 import com.ocielgp.models.Model_Gym;
-import com.ocielgp.models.Model_Member;
 import javafx.stage.Stage;
 
 import java.util.Locale;
@@ -18,6 +17,7 @@ public class Application {
     public static Stage STAGE_PRIMARY;
     public static Stage STAGE_SECONDARY;
     public static Stage STAGE_POPUP;
+    public static boolean isSecureMode = false;
 
     static {
         Locale.setDefault(
@@ -47,7 +47,7 @@ public class Application {
         Application.controllerApp = controllerApp;
     }
 
-    public static Model_Member getModelAdmin() {
+    public static Model_Admin getModelAdmin() {
         return modelAdmin;
     }
 

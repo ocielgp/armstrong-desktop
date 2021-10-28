@@ -60,12 +60,9 @@ public class PhotoHandler {
             this.buttonDeletePhoto.setDisable(false);
             try {
                 this.bytes = Files.readAllBytes(file.toPath());
-                if (this.formChangeListener.isListener()) {
+                if (this.formChangeListener.isListen()) {
                     this.formChangeListener.change("photo", false);
                 }
-
-                fileChooser = null;
-                file = null;
             } catch (Exception exception) {
                 Notifications.CatchError(
                         MethodHandles.lookup().lookupClass().getSimpleName(),
@@ -86,6 +83,7 @@ public class PhotoHandler {
         this.buttonDeletePhoto.setDisable(true);
         this.bytes = null;
         this.imageViewPhoto.requestFocus();
+        formChangeListener.change("photo", false);
     }
 
     public void setPhoto(byte[] bytes) {

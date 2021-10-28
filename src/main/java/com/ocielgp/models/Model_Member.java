@@ -8,8 +8,6 @@ public class Model_Member {
     // Max length
     public static final byte nameLength = 30;
     public static final byte lastNameLength = 30;
-    public static final byte phoneLength = 10;
-    public static final short emailLength = 254;
     public static final byte notesLength = 80;
 
     private final IntegerProperty idMember = new SimpleIntegerProperty();
@@ -29,10 +27,7 @@ public class Model_Member {
     private Model_Member_Fingerprint modelMemberFingerprint;
 
     // gym
-    private Model_Gym modelGyms;
-
-    // staff
-    private Model_Admin modelStaffMember;
+    private Model_Gym modelGym;
 
     // payments
     private Model_Payment_Membership modelPaymentMembership;
@@ -164,28 +159,12 @@ public class Model_Member {
         this.modelMemberPhoto = modelMemberPhoto;
     }
 
-    public Model_Member_Fingerprint getModelMemberFingerprint() {
-        return modelMemberFingerprint;
+    public Model_Gym getModelGym() {
+        return modelGym;
     }
 
-    public void setModelMemberFingerprint(Model_Member_Fingerprint modelMemberFingerprint) {
-        this.modelMemberFingerprint = modelMemberFingerprint;
-    }
-
-    public Model_Gym getModelGyms() {
-        return modelGyms;
-    }
-
-    public void setModelGyms(Model_Gym modelGyms) {
-        this.modelGyms = modelGyms;
-    }
-
-    public Model_Admin getModelStaffMember() {
-        return modelStaffMember;
-    }
-
-    public void setModelStaffMember(Model_Admin modelStaffMember) {
-        this.modelStaffMember = modelStaffMember;
+    public void setModelGym(Model_Gym modelGym) {
+        this.modelGym = modelGym;
     }
 
     public Model_Payment_Membership getModelPaymentMembership() {

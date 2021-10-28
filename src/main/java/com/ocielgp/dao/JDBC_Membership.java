@@ -22,13 +22,13 @@ public class JDBC_Membership {
                 PreparedStatement ps;
                 ResultSet rs;
                 assert con != null;
-                ps = con.prepareStatement("SELECT idMembership, price, description FROM MEMBERSHIPS WHERE flag = 1");
+                ps = con.prepareStatement("SELECT idMembership, price, name FROM MEMBERSHIPS WHERE flag = 1");
                 rs = ps.executeQuery();
                 while (rs.next()) {
                     Model_Membership modelMembership = new Model_Membership();
                     modelMembership.setIdMembership(rs.getInt("idMembership"));
                     modelMembership.setPrice(rs.getBigDecimal("price"));
-                    modelMembership.setDescription(rs.getString("description"));
+                    modelMembership.setName(rs.getString("name"));
                     modelMembershipsList.add(modelMembership);
                 }
                 if (modelMembershipsList.isEmpty()) {

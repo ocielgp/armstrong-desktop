@@ -1,13 +1,16 @@
 package com.ocielgp.utilities;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
 public class DateTime {
     private static final String DATETIME_MYSQL = "yyyy-MM-dd HH:mm:ss";
-    private static final String DATE_WITH_DAY_NAME = "EEEE, dd/MMM/yyyy";
+    private static final String DATE_MYSQL = "y-MM-dd";
+    private static final String DATE_WITH_DAY_NAME = "EEEE, dd/MMMM/yyyy";
+    private static final String DATE = "dd/MM/y";
     private static final String DATE_SHORT = "dd/MM/yyyy";
 
     public static LocalDateTime MySQLToJava(String dateTime) {
@@ -17,12 +20,24 @@ public class DateTime {
         );
     }
 
+    public static String JavaToMySQLDateTime(LocalDateTime dateTime) {
+        return dateTime.format(DateTimeFormatter.ofPattern(DATETIME_MYSQL));
+    }
+
+    public static String JavaToMySQLDate(LocalDateTime dateTime) {
+        return dateTime.format(DateTimeFormatter.ofPattern(DATE_MYSQL));
+    }
+
+    public static boolean isToday(LocalDateTime localDateTime) {
+        return localDateTime.format(DateTimeFormatter.ofPattern(DATE_MYSQL, Locale.getDefault())).equals(LocalDate.now().toString());
+    }
+
     public static String getDateWithDayName(LocalDateTime localDateTime) {
-        return localDateTime.format(DateTimeFormatter.ofPattern(DATE_WITH_DAY_NAME, new Locale("es", "MX")));
+        return localDateTime.format(DateTimeFormatter.ofPattern(DATE_WITH_DAY_NAME, Locale.getDefault()));
     }
 
     public static String getDateShort(LocalDateTime localDateTime) {
-        return localDateTime.format(DateTimeFormatter.ofPattern(DATE_SHORT, new Locale("es", "MX")));
+        return localDateTime.format(DateTimeFormatter.ofPattern(DATE_SHORT, Locale.getDefault()));
     }
 
     public static String getEndDate(long months) {

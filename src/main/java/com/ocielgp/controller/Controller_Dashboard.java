@@ -93,9 +93,7 @@ public class Controller_Dashboard implements Initializable {
 
         this.navSecureMode.setOnMouseClicked(mouseEvent -> eventSecureMode());
 
-        Platform.runLater(() -> {
-            new FadeInUp(Application.getCurrentGymNode()).play();
-        });
+        Platform.runLater(() -> new FadeInUp(Application.getCurrentGymNode()).play());
     }
 
     public void showUserInfo(String style, byte[] photo, Integer idMember, String name, String gym, String membership) {
@@ -119,24 +117,24 @@ public class Controller_Dashboard implements Initializable {
 
     // events
     private void eventSecureMode() {
-        Controller_Popup popupEnableSecureMode = new Controller_Popup(
-                Styles.WARN,
-                "Modo Seguro",
-                "Bloquea la interfaz pero el sistema sigue funcionando",
-                Controller_Popup.POPUP_CONFIRM
-        );
-        if (popupEnableSecureMode.showAndWait()) {
-            eventDisableDashboard();
-            this.scrollPaneContent.setEffect(new GaussianBlur());
-            Controller_Popup popupSecureMode = new Controller_Popup(
-                    Styles.WARN,
-                    "Desbloquear modo seguro",
-                    "Ingresa tu contraseña para desbloquear",
-                    Controller_Popup.POPUP_SECURE_MODE
-            );
-            if (popupSecureMode.showAndWait()) {
+        Popup popup = new Popup();
+        if (Application.isSecureMode) {
+            popup.password();
+            if (popup.showAndWait()) {
                 eventEnableDashboard();
                 this.scrollPaneContent.setEffect(null);
+                Application.isSecureMode = false;
+            }
+        } else {
+            popup.confirm(
+                    Styles.WARN,
+                    "Modo Seguro",
+                    "Bloquea la interfaz pero el sistema sigue funcionando"
+            );
+            if (popup.showAndWait()) {
+                eventDisableDashboard();
+                this.scrollPaneContent.setEffect(new GaussianBlur());
+                Application.isSecureMode = true;
             }
         }
     }

@@ -1,0 +1,8 @@
+byte:       1-byte 128 and a maximum value of 127
+short:      2-byte 32,768 and a maximum value of 32,767
+int:        4-byte -2^31 and a maximum value of 2^31-1
+long:       8-byte -2^63 and a maximum value of 2^63-1
+float:      4-byte IEEE 754 floating point
+double:     8-byte IEEE 754 floating point. Its range of values is beyond the scope of this discussion, but is specified in the Floating-Point Types, Formats, and Values section of the Java Language Specification. For decimal values, this data type is generally the default choice. As mentioned above, this data type should never be used for precise values, such as currency.
+boolean:    1-bit
+char:       2-byte

@@ -21,29 +21,29 @@ import java.util.concurrent.CompletableFuture;
 public class JDBC_Member_Fingerprint {
     public static boolean SCANNING = false;
 
-    public static void CreateFingerprints(int idMember, ListIterator<Fmd> fingerprints) {
-        CompletableFuture.runAsync(() -> {
-            Connection con = DataServer.getConnection();
-            try {
-                PreparedStatement ps;
-                // remove all previous fingerprints if exists
-                assert con != null;
-                ps = con.prepareStatement("DELETE FROM MEMBERS_FINGERPRINTS WHERE idMember = ?");
-                ps.setInt(1, idMember);
-                ps.executeUpdate();
+    public static boolean CreateFingerprints(int idMember, ListIterator<Fmd> fingerprints) {
+        Connection con = DataServer.getConnection();
+        try {
+            PreparedStatement ps;
+            // remove all previous fingerprints if exists
+            assert con != null;
+            ps = con.prepareStatement("DELETE FROM MEMBERS_FINGERPRINTS WHERE idMember = ?");
+            ps.setInt(1, idMember);
+            ps.executeUpdate();
 
-                while (fingerprints.hasNext()) {
-                    ps = con.prepareStatement("INSERT INTO MEMBERS_FINGERPRINTS(fingerprint, idMember) VALUE (?, ?)");
-                    ps.setBytes(1, fingerprints.next().getData());
-                    ps.setInt(2, idMember);
-                    ps.executeUpdate();
-                }
-            } catch (SQLException sqlException) {
-                Notifications.CatchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
-            } finally {
-                DataServer.closeConnection(con);
+            while (fingerprints.hasNext()) {
+                ps = con.prepareStatement("INSERT INTO MEMBERS_FINGERPRINTS(fingerprint, idMember) VALUE (?, ?)");
+                ps.setBytes(1, fingerprints.next().getData());
+                ps.setInt(2, idMember);
+                ps.executeUpdate();
             }
-        });
+            return true;
+        } catch (SQLException sqlException) {
+            Notifications.CatchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
+            return false;
+        } finally {
+            DataServer.closeConnection(con);
+        }
     }
 
     synchronized public static void ReadFindFingerprint(Fmd fingerprint) {
@@ -54,13 +54,13 @@ public class JDBC_Member_Fingerprint {
                     PreparedStatement ps;
                     ResultSet rs;
                     assert con != null;
-                    ps = con.prepareStatement("SELECT MF.fingerprint, MF.idMember, SM.idStaffMember FROM MEMBERS_FINGERPRINTS MF JOIN PAYMENTS_MEMBERSHIPS PM on MF.idMember = PM.idMember LEFT JOIN STAFF_MEMBERS SM on MF.idMember = SM.idMember WHERE DATE_ADD(PM.endDateTime, INTERVAL ? DAY) >= CURDATE() ORDER BY PM.startDateTime");
+                    ps = con.prepareStatement("SELECT MF.fingerprint, MF.idMember, A.idMember AS 'idAdmin' FROM MEMBERS_FINGERPRINTS MF JOIN PAYMENTS_MEMBERSHIPS PM on MF.idMember = PM.idMember LEFT JOIN ADMINS A on MF.idMember = A.idMember WHERE DATE_ADD(PM.endDateTime, INTERVAL ? DAY) >= CURDATE() ORDER BY PM.startDateTime");
                     ps.setInt(1, UserPreferences.getPreferenceInt("MAX_DAYS_FINGERPRINTS"));
                     rs = ps.executeQuery();
 
                     while (rs.next()) {
                         if (Fingerprint_Controller.CompareFingerprints(fingerprint, rs.getBytes("fingerprint"))) {
-                            JDBC_Check_In.CreateCheckIn(rs.getBoolean("idStaffMember"), rs.getInt("idMember"), 1);
+                            JDBC_Check_In.CreateCheckIn(rs.getBoolean("idAdmin"), rs.getInt("idMember"), 1);
                             return;
                         }
                     }

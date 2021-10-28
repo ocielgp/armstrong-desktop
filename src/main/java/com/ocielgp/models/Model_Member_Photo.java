@@ -1,17 +1,18 @@
 package com.ocielgp.models;
 
+import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 
 public class Model_Member_Photo {
-    private final SimpleIntegerProperty idPhoto = new SimpleIntegerProperty();
+    private final IntegerProperty idPhoto = new SimpleIntegerProperty();
     private byte[] photo;
-    private final SimpleIntegerProperty idMember = new SimpleIntegerProperty();
+    private final IntegerProperty idMember = new SimpleIntegerProperty();
 
     public int getIdPhoto() {
         return idPhoto.get();
     }
 
-    public SimpleIntegerProperty idPhotoProperty() {
+    public IntegerProperty idPhotoProperty() {
         return idPhoto;
     }
 
@@ -31,7 +32,7 @@ public class Model_Member_Photo {
         return idMember.get();
     }
 
-    public SimpleIntegerProperty idMemberProperty() {
+    public IntegerProperty idMemberProperty() {
         return idMember;
     }
 

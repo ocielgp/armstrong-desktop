@@ -2,6 +2,7 @@ package com.ocielgp.dao;
 
 import com.ocielgp.app.Application;
 import com.ocielgp.models.Model_Debt;
+import com.ocielgp.utilities.DateTime;
 import com.ocielgp.utilities.Notifications;
 
 import java.lang.invoke.MethodHandles;
@@ -15,27 +16,27 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public class JDBC_Debt {
-    public static void CreateDebt(Model_Debt modelDebt, int idMember, int debtType) {
-        CompletableFuture.runAsync(() -> {
-            Connection con = DataServer.getConnection();
-            try {
-                PreparedStatement ps;
-                assert con != null;
-                ps = con.prepareStatement("INSERT INTO DEBTS(dateTime, owe, paidOut, amount, description, idStaff, idMember, idDebtType) VALUE (NOW(), ?, ?, ?, ?, ?, ?, ?)");
-                ps.setBigDecimal(1, modelDebt.getOwe()); // owe
-                ps.setBigDecimal(2, modelDebt.getPaidOut()); // paidOut
-                ps.setInt(3, modelDebt.getAmount()); // amount
-                ps.setString(4, modelDebt.getDescription()); // description
-                ps.setInt(5, Application.getModelAdmin().getIdMember()); // idStaff
-                ps.setInt(6, idMember); // idMember
-                ps.setInt(7, debtType); // idDebtType
-                ps.executeUpdate();
-            } catch (SQLException sqlException) {
-                Notifications.CatchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
-            } finally {
-                DataServer.closeConnection(con);
-            }
-        });
+    public static boolean CreateDebt(int idMember, Model_Debt modelDebt) {
+        Connection con = DataServer.getConnection();
+        try {
+            PreparedStatement ps;
+            assert con != null;
+            ps = con.prepareStatement("INSERT INTO DEBTS(dateTime, owe, paidOut, amount, description, idAdmin, idMember, isMembership) VALUE (NOW(), ?, ?, ?, ?, ?, ?, ?)");
+            ps.setBigDecimal(1, modelDebt.getOwe()); // owe
+            ps.setBigDecimal(2, modelDebt.getPaidOut()); // paidOut
+            ps.setInt(3, modelDebt.getAmount()); // amount
+            ps.setString(4, modelDebt.getDescription()); // description
+            ps.setInt(5, Application.getModelAdmin().getIdMember()); // idAdmin
+            ps.setInt(6, idMember); // idMember
+            ps.setBoolean(7, modelDebt.isMembership()); // idMember
+            ps.executeUpdate();
+            return true;
+        } catch (SQLException sqlException) {
+            Notifications.CatchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
+            return false;
+        } finally {
+            DataServer.closeConnection(con);
+        }
     }
 
     public static CompletableFuture<List<Model_Debt>> ReadDebts(int idMember) {
@@ -51,13 +52,10 @@ public class JDBC_Debt {
                 rs = ps.executeQuery();
                 while (rs.next()) {
                     Model_Debt modelDebt = new Model_Debt();
-                    if (debtList.size() == 0) {
-                        JDBC_Debt.ReadTotalOwe(idMember).thenAccept(modelDebt::setTotalOwe);
-                    }
-                    modelDebt.setDateTime(rs.getString("dateTime"));
+                    modelDebt.setDateTime(DateTime.MySQLToJava(rs.getString("dateTime")));
                     modelDebt.setOwe(rs.getBigDecimal("owe"));
                     modelDebt.setPaidOut(rs.getBigDecimal("paidOut"));
-                    modelDebt.setAmount(rs.getInt("amount"));
+                    modelDebt.setAmount(rs.getShort("amount"));
                     modelDebt.setDescription(rs.getString("description"));
                     debtList.add(modelDebt);
                 }

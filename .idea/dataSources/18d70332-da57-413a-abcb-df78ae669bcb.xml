@@ -1006,16 +1006,16 @@ sys|schema||mysql.sys|localhost|TRIGGER|G</Grants>
       <DataType>mediumint unsigned|0s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="301" parent="284" name="flag">
+    <column id="301" parent="284" name="idRole">
       <Position>5</Position>
+      <DataType>tinyint unsigned|0s</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="302" parent="284" name="flag">
+      <Position>6</Position>
       <DataType>tinyint|0s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>1</DefaultExpression>
-    </column>
-    <column id="302" parent="284" name="idRole">
-      <Position>6</Position>
-      <DataType>tinyint unsigned|0s</DataType>
-      <NotNull>1</NotNull>
     </column>
     <index id="303" parent="284" name="fk_STAFF_MEMBERS_MEMBERS1_idx">
       <ColNames>idMember</ColNames>
@@ -1055,7 +1055,7 @@ sys|schema||mysql.sys|localhost|TRIGGER|G</Grants>
       <NotNull>1</NotNull>
       <SequenceIdentity>null</SequenceIdentity>
     </column>
-    <column id="311" parent="285" name="description">
+    <column id="311" parent="285" name="name">
       <Position>2</Position>
       <DataType>varchar(45)|0s</DataType>
       <NotNull>1</NotNull>
@@ -1088,7 +1088,7 @@ sys|schema||mysql.sys|localhost|TRIGGER|G</Grants>
     </column>
     <column id="317" parent="286" name="idGym">
       <Position>4</Position>
-      <DataType>smallint unsigned|0s</DataType>
+      <DataType>tinyint unsigned|0s</DataType>
       <NotNull>1</NotNull>
     </column>
     <index id="318" parent="286" name="fk_CHECK_IN_MEMBERS1_idx">
@@ -1138,12 +1138,12 @@ idMember</ColNames>
     </column>
     <column id="327" parent="287" name="owe">
       <Position>3</Position>
-      <DataType>decimal(10,2 digit)|0s</DataType>
+      <DataType>decimal(9,2 digit)|0s</DataType>
       <NotNull>1</NotNull>
     </column>
     <column id="328" parent="287" name="paidOut">
       <Position>4</Position>
-      <DataType>decimal(10,2 digit) unsigned zerofill|0s</DataType>
+      <DataType>decimal(9,2 digit) unsigned zerofill|0s</DataType>
       <NotNull>1</NotNull>
     </column>
     <column id="329" parent="287" name="amount">
@@ -1172,386 +1172,387 @@ idMember</ColNames>
       <DataType>mediumint unsigned|0s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="334" parent="287" name="flag">
+    <column id="334" parent="287" name="isMembership">
       <Position>10</Position>
+      <DataType>tinyint|0s</DataType>
+      <NotNull>1</NotNull>
+      <DefaultExpression>0</DefaultExpression>
+    </column>
+    <column id="335" parent="287" name="flag">
+      <Position>11</Position>
       <DataType>tinyint|0s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>1</DefaultExpression>
     </column>
-    <index id="335" parent="287" name="fk_DEBTS_MEMBERSHIPS_MEMBERS1_idx">
+    <index id="336" parent="287" name="fk_DEBTS_MEMBERSHIPS_MEMBERS1_idx">
       <ColNames>idAdmin</ColNames>
       <Type>btree</Type>
     </index>
-    <index id="336" parent="287" name="fk_DEBTS_MEMBERS1_idx">
+    <index id="337" parent="287" name="fk_DEBTS_MEMBERS1_idx">
       <ColNames>idMember</ColNames>
       <Type>btree</Type>
     </index>
-    <key id="337" parent="287" name="PRIMARY">
+    <key id="338" parent="287" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <ColNames>idDebt</ColNames>
       <Primary>1</Primary>
     </key>
-    <foreign-key id="338" parent="287" name="fk_DEBTS_MEMBERSHIPS_MEMBERS1">
+    <foreign-key id="339" parent="287" name="fk_DEBTS_MEMBERSHIPS_MEMBERS1">
       <ColNames>idAdmin</ColNames>
       <RefTableName>members</RefTableName>
       <RefColNames>idMember</RefColNames>
     </foreign-key>
-    <foreign-key id="339" parent="287" name="fk_DEBTS_MEMBERS1">
+    <foreign-key id="340" parent="287" name="fk_DEBTS_MEMBERS1">
       <ColNames>idMember</ColNames>
       <RefTableName>members</RefTableName>
       <RefColNames>idMember</RefColNames>
     </foreign-key>
-    <column id="340" parent="288" name="idGym">
+    <column id="341" parent="288" name="idGym">
       <Position>1</Position>
-      <DataType>smallint unsigned|0s</DataType>
+      <DataType>tinyint unsigned|0s</DataType>
       <NotNull>1</NotNull>
       <SequenceIdentity>null</SequenceIdentity>
     </column>
-    <column id="341" parent="288" name="name">
+    <column id="342" parent="288" name="name">
       <Position>2</Position>
       <DataType>varchar(45)|0s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="342" parent="288" name="address">
+    <column id="343" parent="288" name="address">
       <Position>3</Position>
       <DataType>varchar(80)|0s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="343" parent="288" name="flag">
+    <column id="344" parent="288" name="flag">
       <Position>4</Position>
       <DataType>tinyint|0s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>1</DefaultExpression>
     </column>
-    <key id="344" parent="288" name="PRIMARY">
+    <key id="345" parent="288" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <ColNames>idGym</ColNames>
       <Primary>1</Primary>
     </key>
-    <column id="345" parent="289" name="idMember">
+    <column id="346" parent="289" name="idMember">
       <Position>1</Position>
       <DataType>mediumint unsigned|0s</DataType>
       <NotNull>1</NotNull>
       <SequenceIdentity>null</SequenceIdentity>
     </column>
-    <column id="346" parent="289" name="name">
+    <column id="347" parent="289" name="name">
       <Position>2</Position>
       <DataType>varchar(30)|0s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="347" parent="289" name="lastName">
+    <column id="348" parent="289" name="lastName">
       <Position>3</Position>
       <DataType>varchar(30)|0s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="348" parent="289" name="gender">
+    <column id="349" parent="289" name="gender">
       <Position>4</Position>
       <DataType>varchar(6)|0s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="349" parent="289" name="notes">
+    <column id="350" parent="289" name="notes">
       <Position>5</Position>
       <DataType>varchar(80)|0s</DataType>
     </column>
-    <column id="350" parent="289" name="registrationDateTime">
+    <column id="351" parent="289" name="registrationDateTime">
       <Position>6</Position>
       <DataType>datetime|0s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
     </column>
-    <column id="351" parent="289" name="access">
+    <column id="352" parent="289" name="access">
       <Position>7</Position>
       <DataType>tinyint|0s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>1</DefaultExpression>
     </column>
-    <column id="352" parent="289" name="idGym">
+    <column id="353" parent="289" name="idGym">
       <Position>8</Position>
-      <DataType>smallint unsigned|0s</DataType>
+      <DataType>tinyint unsigned|0s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="353" parent="289" name="flag">
+    <column id="354" parent="289" name="flag">
       <Position>9</Position>
       <DataType>tinyint|0s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>1</DefaultExpression>
     </column>
-    <index id="354" parent="289" name="fk_MEMBERS_GYMS1_idx">
+    <index id="355" parent="289" name="fk_MEMBERS_GYMS1_idx">
       <ColNames>idGym</ColNames>
       <Type>btree</Type>
     </index>
-    <key id="355" parent="289" name="PRIMARY">
+    <key id="356" parent="289" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <ColNames>idMember</ColNames>
       <Primary>1</Primary>
     </key>
-    <foreign-key id="356" parent="289" name="fk_MEMBERS_GYMS1">
+    <foreign-key id="357" parent="289" name="fk_MEMBERS_GYMS1">
       <ColNames>idGym</ColNames>
       <RefTableName>gyms</RefTableName>
       <RefColNames>idGym</RefColNames>
     </foreign-key>
-    <column id="357" parent="290" name="idFingerprint">
+    <column id="358" parent="290" name="idFingerprint">
       <Position>1</Position>
-      <DataType>bigint unsigned|0s</DataType>
+      <DataType>mediumint unsigned|0s</DataType>
       <NotNull>1</NotNull>
       <SequenceIdentity>null</SequenceIdentity>
     </column>
-    <column id="358" parent="290" name="fingerprint">
+    <column id="359" parent="290" name="fingerprint">
       <Position>2</Position>
       <DataType>blob|0s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="359" parent="290" name="idMember">
+    <column id="360" parent="290" name="idMember">
       <Position>3</Position>
       <DataType>mediumint unsigned|0s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <index id="360" parent="290" name="fk_MEMBERS_FINGERPRINTS_MEMBERS1_idx">
+    <index id="361" parent="290" name="fk_MEMBERS_FINGERPRINTS_MEMBERS1_idx">
       <ColNames>idMember</ColNames>
       <Type>btree</Type>
     </index>
-    <key id="361" parent="290" name="PRIMARY">
+    <key id="362" parent="290" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <ColNames>idFingerprint</ColNames>
       <Primary>1</Primary>
     </key>
-    <foreign-key id="362" parent="290" name="fk_MEMBERS_FINGERPRINTS_MEMBERS1">
+    <foreign-key id="363" parent="290" name="fk_MEMBERS_FINGERPRINTS_MEMBERS1">
       <ColNames>idMember</ColNames>
       <RefTableName>members</RefTableName>
       <RefColNames>idMember</RefColNames>
       <OnUpdate>cascade</OnUpdate>
       <OnDelete>cascade</OnDelete>
     </foreign-key>
-    <column id="363" parent="291" name="idPhoto">
+    <column id="364" parent="291" name="idPhoto">
       <Position>1</Position>
       <DataType>mediumint unsigned|0s</DataType>
       <NotNull>1</NotNull>
       <SequenceIdentity>null</SequenceIdentity>
     </column>
-    <column id="364" parent="291" name="photo">
+    <column id="365" parent="291" name="photo">
       <Position>2</Position>
       <DataType>longblob|0s</DataType>
     </column>
-    <column id="365" parent="291" name="idMember">
+    <column id="366" parent="291" name="idMember">
       <Position>3</Position>
       <DataType>mediumint unsigned|0s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <index id="366" parent="291" name="fk_MEMBERS_PHOTOS_MEMBERS1_idx">
+    <index id="367" parent="291" name="fk_MEMBERS_PHOTOS_MEMBERS1_idx">
       <ColNames>idMember</ColNames>
       <Type>btree</Type>
     </index>
-    <key id="367" parent="291" name="PRIMARY">
+    <key id="368" parent="291" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <ColNames>idPhoto</ColNames>
       <Primary>1</Primary>
     </key>
-    <foreign-key id="368" parent="291" name="fk_MEMBERS_PHOTOS_MEMBERS1">
+    <foreign-key id="369" parent="291" name="fk_MEMBERS_PHOTOS_MEMBERS1">
       <ColNames>idMember</ColNames>
       <RefTableName>members</RefTableName>
       <RefColNames>idMember</RefColNames>
       <OnUpdate>cascade</OnUpdate>
       <OnDelete>cascade</OnDelete>
     </foreign-key>
-    <column id="369" parent="292" name="idMembership">
+    <column id="370" parent="292" name="idMembership">
       <Position>1</Position>
       <DataType>smallint unsigned|0s</DataType>
       <NotNull>1</NotNull>
       <SequenceIdentity>null</SequenceIdentity>
     </column>
-    <column id="370" parent="292" name="price">
+    <column id="371" parent="292" name="price">
       <Position>2</Position>
-      <DataType>decimal(10,2 digit)|0s</DataType>
+      <DataType>decimal(9,2 digit)|0s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="371" parent="292" name="description">
+    <column id="372" parent="292" name="name">
       <Position>3</Position>
       <DataType>varchar(60)|0s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="372" parent="292" name="flag">
+    <column id="373" parent="292" name="flag">
       <Position>4</Position>
       <DataType>tinyint|0s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>1</DefaultExpression>
     </column>
-    <key id="373" parent="292" name="PRIMARY">
+    <key id="374" parent="292" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <ColNames>idMembership</ColNames>
       <Primary>1</Primary>
     </key>
-    <column id="374" parent="293" name="idMembership">
+    <column id="375" parent="293" name="idMembership">
       <Position>1</Position>
       <DataType>smallint unsigned|0s</DataType>
       <NotNull>1</NotNull>
       <SequenceIdentity>null</SequenceIdentity>
     </column>
-    <column id="375" parent="293" name="price">
+    <column id="376" parent="293" name="price">
       <Position>2</Position>
-      <DataType>decimal(10,2 digit)|0s</DataType>
+      <DataType>decimal(9,2 digit)|0s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="376" parent="293" name="description">
+    <column id="377" parent="293" name="name">
       <Position>3</Position>
       <DataType>varchar(45)|0s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="377" parent="293" name="flag">
+    <column id="378" parent="293" name="flag">
       <Position>4</Position>
       <DataType>tinyint|0s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>1</DefaultExpression>
     </column>
-    <key id="378" parent="293" name="PRIMARY">
+    <key id="379" parent="293" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <ColNames>idMembership</ColNames>
       <Primary>1</Primary>
     </key>
-    <column id="379" parent="294" name="idPayment">
+    <column id="380" parent="294" name="idPayment">
       <Position>1</Position>
       <DataType>mediumint unsigned|0s</DataType>
       <NotNull>1</NotNull>
       <SequenceIdentity>null</SequenceIdentity>
     </column>
-    <column id="380" parent="294" name="dateTime">
+    <column id="381" parent="294" name="dateTime">
       <Position>2</Position>
       <DataType>datetime|0s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
     </column>
-    <column id="381" parent="294" name="payment">
+    <column id="382" parent="294" name="payment">
       <Position>3</Position>
       <DataType>decimal(10,2 digit)|0s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="382" parent="294" name="idDebt">
+    <column id="383" parent="294" name="idDebt">
       <Position>4</Position>
       <DataType>mediumint unsigned|0s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <index id="383" parent="294" name="fk_PAYMENTS_DEBTS_DEBTS1_idx">
+    <index id="384" parent="294" name="fk_PAYMENTS_DEBTS_DEBTS1_idx">
       <ColNames>idDebt</ColNames>
       <Type>btree</Type>
     </index>
-    <key id="384" parent="294" name="PRIMARY">
+    <key id="385" parent="294" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <ColNames>idPayment</ColNames>
       <Primary>1</Primary>
     </key>
-    <foreign-key id="385" parent="294" name="fk_PAYMENTS_DEBTS_DEBTS1">
+    <foreign-key id="386" parent="294" name="fk_PAYMENTS_DEBTS_DEBTS1">
       <ColNames>idDebt</ColNames>
       <RefTableName>debts</RefTableName>
       <RefColNames>idDebt</RefColNames>
     </foreign-key>
-    <column id="386" parent="295" name="idPaymentMembership">
+    <column id="387" parent="295" name="idPaymentMembership">
       <Position>1</Position>
       <DataType>mediumint unsigned|0s</DataType>
       <NotNull>1</NotNull>
       <SequenceIdentity>null</SequenceIdentity>
     </column>
-    <column id="387" parent="295" name="months">
+    <column id="388" parent="295" name="months">
       <Position>2</Position>
       <DataType>smallint unsigned|0s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="388" parent="295" name="price">
+    <column id="389" parent="295" name="price">
       <Position>3</Position>
-      <DataType>decimal(10,2 digit)|0s</DataType>
+      <DataType>decimal(9,2 digit)|0s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="389" parent="295" name="startDateTime">
+    <column id="390" parent="295" name="startDateTime">
       <Position>4</Position>
       <DataType>datetime|0s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
     </column>
-    <column id="390" parent="295" name="endDateTime">
+    <column id="391" parent="295" name="endDateTime">
       <Position>5</Position>
       <DataType>datetime|0s</DataType>
       <DefaultExpression>(`startDateTime` + interval `months` month)</DefaultExpression>
       <ColumnKind>generated-virtual</ColumnKind>
     </column>
-    <column id="391" parent="295" name="idGym">
+    <column id="392" parent="295" name="idGym">
       <Position>6</Position>
-      <DataType>smallint unsigned|0s</DataType>
+      <DataType>tinyint unsigned|0s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="392" parent="295" name="idAdmin">
+    <column id="393" parent="295" name="idAdmin">
       <Position>7</Position>
       <DataType>mediumint unsigned|0s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="393" parent="295" name="idMember">
+    <column id="394" parent="295" name="idMember">
       <Position>8</Position>
       <DataType>mediumint unsigned|0s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="394" parent="295" name="idMembership">
+    <column id="395" parent="295" name="idMembership">
       <Position>9</Position>
       <DataType>smallint unsigned|0s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="395" parent="295" name="flag">
+    <column id="396" parent="295" name="flag">
       <Position>10</Position>
       <DataType>tinyint unsigned|0s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>&apos;1&apos;</DefaultExpression>
     </column>
-    <index id="396" parent="295" name="fk_PAYMENTS_MEMBERSHIPS_GYMS1_idx">
+    <index id="397" parent="295" name="fk_PAYMENTS_MEMBERSHIPS_GYMS1_idx">
       <ColNames>idGym</ColNames>
       <Type>btree</Type>
     </index>
-    <index id="397" parent="295" name="fk_PAYMENTS_MEMBERSHIPS_MEMBERS2_idx">
+    <index id="398" parent="295" name="fk_PAYMENTS_MEMBERSHIPS_MEMBERS2_idx">
       <ColNames>idAdmin</ColNames>
       <Type>btree</Type>
     </index>
-    <index id="398" parent="295" name="fk_PAYMENTS_MEMBERSHIPS_MEMBERS1_idx">
+    <index id="399" parent="295" name="fk_PAYMENTS_MEMBERSHIPS_MEMBERS1_idx">
       <ColNames>idMember</ColNames>
       <Type>btree</Type>
     </index>
-    <index id="399" parent="295" name="fk_PAYMENTS_MEMBERSHIPS_MEMBERSHIPS1_idx">
+    <index id="400" parent="295" name="fk_PAYMENTS_MEMBERSHIPS_MEMBERSHIPS1_idx">
       <ColNames>idMembership</ColNames>
       <Type>btree</Type>
     </index>
-    <key id="400" parent="295" name="PRIMARY">
+    <key id="401" parent="295" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <ColNames>idPaymentMembership</ColNames>
       <Primary>1</Primary>
     </key>
-    <foreign-key id="401" parent="295" name="fk_PAYMENTS_MEMBERSHIPS_GYMS1">
+    <foreign-key id="402" parent="295" name="fk_PAYMENTS_MEMBERSHIPS_GYMS1">
       <ColNames>idGym</ColNames>
       <RefTableName>gyms</RefTableName>
       <RefColNames>idGym</RefColNames>
     </foreign-key>
-    <foreign-key id="402" parent="295" name="fk_PAYMENTS_MEMBERSHIPS_MEMBERS2">
+    <foreign-key id="403" parent="295" name="fk_PAYMENTS_MEMBERSHIPS_MEMBERS2">
       <ColNames>idAdmin</ColNames>
       <RefTableName>members</RefTableName>
       <RefColNames>idMember</RefColNames>
     </foreign-key>
-    <foreign-key id="403" parent="295" name="fk_PAYMENTS_MEMBERSHIPS_MEMBERS1">
+    <foreign-key id="404" parent="295" name="fk_PAYMENTS_MEMBERSHIPS_MEMBERS1">
       <ColNames>idMember</ColNames>
       <RefTableName>members</RefTableName>
       <RefColNames>idMember</RefColNames>
     </foreign-key>
-    <foreign-key id="404" parent="295" name="fk_PAYMENTS_MEMBERSHIPS_MEMBERSHIPS1">
+    <foreign-key id="405" parent="295" name="fk_PAYMENTS_MEMBERSHIPS_MEMBERSHIPS1">
       <ColNames>idMembership</ColNames>
       <RefTableName>memberships</RefTableName>
       <RefColNames>idMembership</RefColNames>
     </foreign-key>
-    <column id="405" parent="296" name="dateTime">
+    <column id="406" parent="296" name="dateTime">
       <Position>1</Position>
       <DataType>datetime|0s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
     </column>
-    <column id="406" parent="296" name="ip">
+    <column id="407" parent="296" name="ip">
       <Position>2</Position>
       <DataType>varchar(28)|0s</DataType>
-      <NotNull>1</NotNull>
-    </column>
-    <column id="407" parent="296" name="idStaffMember">
-      <Position>3</Position>
-      <DataType>smallint unsigned|0s</DataType>
       <NotNull>1</NotNull>
     </column>
     <key id="408" parent="296" name="PRIMARY">

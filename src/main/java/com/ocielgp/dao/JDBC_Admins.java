@@ -31,11 +31,10 @@ public class JDBC_Admins {
                 } else {
                     Model_Admin modelAdmin = new Model_Admin();
                     modelAdmin.setPassword(hash);
-                    modelAdmin.setIdRole(rs.getInt("idRole"));
+                    modelAdmin.setIdRole(rs.getShort("idRole"));
                     modelAdmin.setIdMember(rs.getInt("idMember"));
                     modelAdmin.setName(rs.getString("name"));
                     modelAdmin.setLastName(rs.getString("lastName"));
-                    modelAdmin.setModelStaffMember(modelAdmin);
 
                     Application.setModelAdmin(modelAdmin);
                     return true;

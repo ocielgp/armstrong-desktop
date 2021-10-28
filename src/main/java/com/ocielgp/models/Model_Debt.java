@@ -3,30 +3,31 @@ package com.ocielgp.models;
 import javafx.beans.property.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 public class Model_Debt {
-    // Max length
-    public static final byte oweLength = 10;
-    public static final byte notesLength = 80;
+    // max length
+    public static final byte MAX_OWE = 9;
+    public static final byte MAX_PAID_OUT = 9;
+    public static final short MAX_AMOUNT = 255;
+    public static final byte MAX_DESCRIPTION = 80;
 
-    private final SimpleIntegerProperty idDebt = new SimpleIntegerProperty();
-    private final SimpleStringProperty dateTime = new SimpleStringProperty();
-    private final ObjectProperty<BigDecimal> paidOut = new SimpleObjectProperty<>();
+    private final IntegerProperty idDebt = new SimpleIntegerProperty();
+    private final ObjectProperty<LocalDateTime> dateTime = new SimpleObjectProperty<>();
     private final ObjectProperty<BigDecimal> owe = new SimpleObjectProperty<>();
-    private final IntegerProperty amount = new SimpleIntegerProperty();
-    private final SimpleStringProperty description = new SimpleStringProperty();
+    private final ObjectProperty<BigDecimal> paidOut = new SimpleObjectProperty<>();
+    private final ObjectProperty<Short> amount = new SimpleObjectProperty<>(Short.valueOf("0"));
+    private final StringProperty description = new SimpleStringProperty();
+    private final BooleanProperty isMembership = new SimpleBooleanProperty();
     private final BooleanProperty debtStatus = new SimpleBooleanProperty();
-    private final SimpleIntegerProperty idAdmin = new SimpleIntegerProperty();
-    private final SimpleIntegerProperty idMember = new SimpleIntegerProperty();
-    private final SimpleIntegerProperty idDebtType = new SimpleIntegerProperty();
-
-    private final ObjectProperty<BigDecimal> totalOwe = new SimpleObjectProperty<>();
+    private final IntegerProperty idAdmin = new SimpleIntegerProperty();
+    private final IntegerProperty idMember = new SimpleIntegerProperty();
 
     public int getIdDebt() {
         return idDebt.get();
     }
 
-    public SimpleIntegerProperty idDebtProperty() {
+    public IntegerProperty idDebtProperty() {
         return idDebt;
     }
 
@@ -34,51 +35,51 @@ public class Model_Debt {
         this.idDebt.set(idDebt);
     }
 
-    public String getDateTime() {
+    public LocalDateTime getDateTime() {
         return dateTime.get();
     }
 
-    public SimpleStringProperty dateTimeProperty() {
+    public ObjectProperty<LocalDateTime> dateTimeProperty() {
         return dateTime;
     }
 
-    public void setDateTime(String dateTime) {
+    public void setDateTime(LocalDateTime dateTime) {
         this.dateTime.set(dateTime);
-    }
-
-    public BigDecimal getPaidOut() {
-        return paidOut.get();
-    }
-
-    public void setPaidOut(BigDecimal paidOut) {
-        this.paidOut.set(paidOut);
-    }
-
-    public ObjectProperty<BigDecimal> paidOutProperty() {
-        return paidOut;
     }
 
     public BigDecimal getOwe() {
         return owe.get();
     }
 
-    public void setOwe(BigDecimal owe) {
-        this.owe.set(owe);
-    }
-
     public ObjectProperty<BigDecimal> oweProperty() {
         return owe;
     }
 
-    public int getAmount() {
+    public void setOwe(BigDecimal owe) {
+        this.owe.set(owe);
+    }
+
+    public BigDecimal getPaidOut() {
+        return paidOut.get();
+    }
+
+    public ObjectProperty<BigDecimal> paidOutProperty() {
+        return paidOut;
+    }
+
+    public void setPaidOut(BigDecimal paidOut) {
+        this.paidOut.set(paidOut);
+    }
+
+    public Short getAmount() {
         return amount.get();
     }
 
-    public IntegerProperty amountProperty() {
+    public ObjectProperty<Short> amountProperty() {
         return amount;
     }
 
-    public void setAmount(int amount) {
+    public void setAmount(Short amount) {
         this.amount.set(amount);
     }
 
@@ -86,12 +87,24 @@ public class Model_Debt {
         return description.get();
     }
 
-    public SimpleStringProperty descriptionProperty() {
+    public StringProperty descriptionProperty() {
         return description;
     }
 
     public void setDescription(String description) {
         this.description.set(description);
+    }
+
+    public boolean isMembership() {
+        return isMembership.get();
+    }
+
+    public BooleanProperty isMembershipProperty() {
+        return isMembership;
+    }
+
+    public void setIsMembership(boolean isMembership) {
+        this.isMembership.set(isMembership);
     }
 
     public boolean isDebtStatus() {
@@ -110,7 +123,7 @@ public class Model_Debt {
         return idAdmin.get();
     }
 
-    public SimpleIntegerProperty idAdminProperty() {
+    public IntegerProperty idAdminProperty() {
         return idAdmin;
     }
 
@@ -122,35 +135,11 @@ public class Model_Debt {
         return idMember.get();
     }
 
-    public SimpleIntegerProperty idMemberProperty() {
+    public IntegerProperty idMemberProperty() {
         return idMember;
     }
 
     public void setIdMember(int idMember) {
         this.idMember.set(idMember);
-    }
-
-    public int getIdDebtType() {
-        return idDebtType.get();
-    }
-
-    public SimpleIntegerProperty idDebtTypeProperty() {
-        return idDebtType;
-    }
-
-    public void setIdDebtType(int idDebtType) {
-        this.idDebtType.set(idDebtType);
-    }
-
-    public BigDecimal getTotalOwe() {
-        return totalOwe.get();
-    }
-
-    public void setTotalOwe(BigDecimal totalOwe) {
-        this.totalOwe.set(totalOwe);
-    }
-
-    public ObjectProperty<BigDecimal> totalOweProperty() {
-        return totalOwe;
     }
 }

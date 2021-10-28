@@ -11,34 +11,32 @@ import java.sql.*;
 import java.util.concurrent.CompletableFuture;
 
 public class JDBC_Payment_Membership {
-    public static CompletableFuture<Integer> CreatePaymentMembership(int idMember, Model_Membership modelMembership) {
-        return CompletableFuture.supplyAsync(() -> {
-            Connection con = DataServer.getConnection();
-            try {
-                PreparedStatement ps;
-                ResultSet rs;
-                assert con != null;
-                ps = con.prepareStatement("INSERT INTO PAYMENTS_MEMBERSHIPS(months, price, idGym, idAdmin, idMember, idMembership)" +
-                                "VALUE (?, ?, ?, ?, ?, ?)",
-                        Statement.RETURN_GENERATED_KEYS);
-                ps.setLong(1, modelMembership.getMonths()); // months
-                ps.setBigDecimal(2, modelMembership.getPrice()); // price
-                ps.setInt(3, Application.getCurrentGym().getIdGym()); // idGym
-                ps.setInt(4, Application.getModelAdmin().getIdMember()); // idStaff
-                ps.setInt(5, idMember); // idMember
-                ps.setInt(6, modelMembership.getIdMembership()); // idMembership
-                ps.executeUpdate();
-                rs = ps.getGeneratedKeys();
-                if (rs.next()) { // Return new idPaymentMembership
-                    return rs.getInt(1);
-                }
-            } catch (SQLException sqlException) {
-                Notifications.CatchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
-            } finally {
-                DataServer.closeConnection(con);
+    public static int CreatePaymentMembership(int idMember, Model_Membership modelMembership, short months) {
+        Connection con = DataServer.getConnection();
+        try {
+            PreparedStatement ps;
+            ResultSet rs;
+            assert con != null;
+            ps = con.prepareStatement("INSERT INTO PAYMENTS_MEMBERSHIPS(months, price, idGym, idAdmin, idMember, idMembership)" +
+                            "VALUE (?, ?, ?, ?, ?, ?)",
+                    Statement.RETURN_GENERATED_KEYS);
+            ps.setShort(1, months); // months
+            ps.setBigDecimal(2, modelMembership.getPrice()); // price
+            ps.setInt(3, Application.getCurrentGym().getIdGym()); // idGym
+            ps.setInt(4, Application.getModelAdmin().getIdMember()); // idAdmin
+            ps.setInt(5, idMember); // idMember
+            ps.setInt(6, modelMembership.getIdMembership()); // idMembership
+            ps.executeUpdate();
+            rs = ps.getGeneratedKeys();
+            if (rs.next()) { // return new idPaymentMembership
+                return rs.getInt(1);
             }
-            return 0;
-        });
+        } catch (SQLException sqlException) {
+            Notifications.CatchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
+        } finally {
+            DataServer.closeConnection(con);
+        }
+        return 0;
     }
 
     public static CompletableFuture<Model_Payment_Membership> ReadLastPayment(int idMember) {
@@ -49,16 +47,18 @@ public class JDBC_Payment_Membership {
                 PreparedStatement ps;
                 ResultSet rs;
                 assert con != null;
-                ps = con.prepareStatement("SELECT idPaymentMembership, startDateTime, endDateTime, idGym, idAdmin, idMembership FROM PAYMENTS_MEMBERSHIPS WHERE flag = 1 AND idMember = ? ORDER BY startDateTime DESC LIMIT 1");
+                ps = con.prepareStatement("SELECT idPaymentMembership, price, startDateTime, endDateTime, idGym, idAdmin, idMembership FROM PAYMENTS_MEMBERSHIPS WHERE flag = 1 AND idMember = ? ORDER BY startDateTime DESC LIMIT 1");
                 ps.setInt(1, idMember);
                 rs = ps.executeQuery();
                 if (rs.next()) {
                     modelPaymentMembership = new Model_Payment_Membership();
                     modelPaymentMembership.setIdPaymentMembership(rs.getInt("idPaymentMembership"));
+                    modelPaymentMembership.setPrice(rs.getBigDecimal("price"));
                     modelPaymentMembership.setStartDateTime(DateTime.MySQLToJava(rs.getString("startDateTime")));
                     modelPaymentMembership.setEndDateTime(DateTime.MySQLToJava(rs.getString("endDateTime")));
-                    modelPaymentMembership.setIdGym(rs.getInt("idGym"));
+                    modelPaymentMembership.setIdGym(rs.getShort("idGym"));
                     modelPaymentMembership.setIdAdmin(rs.getInt("idAdmin"));
+                    modelPaymentMembership.setIdMember(idMember);
                     modelPaymentMembership.setIdMembership(rs.getInt("idMembership"));
                 }
             } catch (SQLException sqlException) {
@@ -70,30 +70,53 @@ public class JDBC_Payment_Membership {
         });
     }
 
-    public static void UpdatePaymentMembership(int idMember, Model_Payment_Membership modelPaymentMembership) {
-        CompletableFuture.runAsync(() -> {
-            Connection con = DataServer.getConnection();
-            try {
-                PreparedStatement ps;
-                // clear previous debt if exists
-                assert con != null;
-                ps = con.prepareStatement("DELETE FROM DEBTS WHERE DATE(dateTime) = CURRENT_DATE AND idMember = ? AND debtStatus = 1 AND flag = 1 ORDER BY dateTime DESC LIMIT 1");
-                ps.setInt(1, idMember);
-                ps.executeUpdate();
+    public static boolean UpdatePaymentMembership(Model_Membership modelMembership, Model_Payment_Membership modelPaymentMembership) {
+        Connection con = DataServer.getConnection();
+        try {
+            PreparedStatement ps;
+            // disable previous debt if exists
+            assert con != null;
+            ps = con.prepareStatement("UPDATE DEBTS SET flag = 0 WHERE DATE(dateTime) = ? AND idMember = ? AND isMembership = 1 ORDER BY dateTime DESC");
+            ps.setString(1, DateTime.JavaToMySQLDate(modelPaymentMembership.getStartDateTime()));
+            ps.setInt(2, modelPaymentMembership.getIdMember());
+            ps.executeUpdate();
 
-                ps = con.prepareStatement("UPDATE PAYMENTS_MEMBERSHIPS SET price = ?, startDateTime = NOW(), idGym = ?, idStaff = ?, idMembership = ? WHERE idPaymentMembership = ?");
-                ps.setBigDecimal(1, modelPaymentMembership.getPrice()); // price
-                ps.setInt(2, Application.getCurrentGym().getIdGym()); // idGym
-                ps.setInt(3, Application.getModelAdmin().getIdMember()); // idStaff
-                ps.setInt(4, modelPaymentMembership.getIdMembership()); // idMembership
-                ps.setInt(5, modelPaymentMembership.getIdPaymentMembership());
-                ps.executeUpdate();
-                System.out.println("actualizar");
-            } catch (SQLException sqlException) {
-                Notifications.CatchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
-            } finally {
-                DataServer.closeConnection(con);
-            }
-        });
+            ps = con.prepareStatement("UPDATE PAYMENTS_MEMBERSHIPS SET price = ?, startDateTime = NOW(), idGym = ?, idAdmin = ?, idMembership = ? WHERE idPaymentMembership = ?");
+            ps.setBigDecimal(1, modelMembership.getPrice()); // price
+            ps.setInt(2, Application.getCurrentGym().getIdGym()); // idGym
+            ps.setInt(3, Application.getModelAdmin().getIdMember()); // idAdmin
+            ps.setInt(4, modelMembership.getIdMembership()); // idMembership
+            ps.setInt(5, modelPaymentMembership.getIdPaymentMembership());
+            ps.executeUpdate();
+            return true;
+        } catch (SQLException sqlException) {
+            Notifications.CatchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
+            return false;
+        } finally {
+            DataServer.closeConnection(con);
+        }
+    }
+
+    public static boolean DeletePaymentMembership(Model_Payment_Membership modelPaymentMembership) {
+        Connection con = DataServer.getConnection();
+        try {
+            PreparedStatement ps;
+            assert con != null;
+            // disable previous debt if exists
+            ps = con.prepareStatement("UPDATE DEBTS SET flag = 0 WHERE DATE(dateTime) = ? AND idMember = ? AND isMembership = 1 ORDER BY dateTime DESC");
+            ps.setString(1, DateTime.JavaToMySQLDate(modelPaymentMembership.getStartDateTime()));
+            ps.setInt(2, modelPaymentMembership.getIdMember());
+            ps.executeUpdate();
+
+            ps = con.prepareStatement("UPDATE PAYMENTS_MEMBERSHIPS SET flag = 0 WHERE idPaymentMembership = ?");
+            ps.setInt(1, modelPaymentMembership.getIdPaymentMembership());
+            ps.executeUpdate();
+            return true;
+        } catch (SQLException sqlException) {
+            Notifications.CatchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
+            return false;
+        } finally {
+            DataServer.closeConnection(con);
+        }
     }
 }

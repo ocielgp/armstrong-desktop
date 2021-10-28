@@ -1,24 +1,27 @@
 package com.ocielgp.models;
 
-import javafx.beans.property.*;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleObjectProperty;
 
 import java.time.LocalDateTime;
 
 public class Model_Payment_Membership extends Model_Membership {
-    private final SimpleIntegerProperty idPaymentMembership = new SimpleIntegerProperty();
-    private final LongProperty months = new SimpleLongProperty();
+    private final IntegerProperty idPaymentMembership = new SimpleIntegerProperty();
+    private final ObjectProperty<Short> months = new SimpleObjectProperty<>();
     private final ObjectProperty<LocalDateTime> startDateTime = new SimpleObjectProperty<>();
     private final ObjectProperty<LocalDateTime> endDateTime = new SimpleObjectProperty<>();
-    private final SimpleIntegerProperty idGym = new SimpleIntegerProperty();
-    private final SimpleIntegerProperty idAdmin = new SimpleIntegerProperty();
-    private final SimpleIntegerProperty idMember = new SimpleIntegerProperty();
-    private final SimpleIntegerProperty idMembership = new SimpleIntegerProperty();
+    private final ObjectProperty<Short> idGym = new SimpleObjectProperty<>();
+    private final IntegerProperty idAdmin = new SimpleIntegerProperty();
+    private final IntegerProperty idMember = new SimpleIntegerProperty();
+    private final IntegerProperty idMembership = new SimpleIntegerProperty();
 
     public int getIdPaymentMembership() {
         return idPaymentMembership.get();
     }
 
-    public SimpleIntegerProperty idPaymentMembershipProperty() {
+    public IntegerProperty idPaymentMembershipProperty() {
         return idPaymentMembership;
     }
 
@@ -26,15 +29,15 @@ public class Model_Payment_Membership extends Model_Membership {
         this.idPaymentMembership.set(idPaymentMembership);
     }
 
-    public long getMonths() {
+    public Short getMonths() {
         return months.get();
     }
 
-    public LongProperty monthsProperty() {
+    public ObjectProperty<Short> monthsProperty() {
         return months;
     }
 
-    public void setMonths(long months) {
+    public void setMonths(Short months) {
         this.months.set(months);
     }
 
@@ -62,15 +65,15 @@ public class Model_Payment_Membership extends Model_Membership {
         this.endDateTime.set(endDateTime);
     }
 
-    public int getIdGym() {
+    public Short getIdGym() {
         return idGym.get();
     }
 
-    public SimpleIntegerProperty idGymProperty() {
+    public ObjectProperty<Short> idGymProperty() {
         return idGym;
     }
 
-    public void setIdGym(int idGym) {
+    public void setIdGym(Short idGym) {
         this.idGym.set(idGym);
     }
 
@@ -78,7 +81,7 @@ public class Model_Payment_Membership extends Model_Membership {
         return idAdmin.get();
     }
 
-    public SimpleIntegerProperty idAdminProperty() {
+    public IntegerProperty idAdminProperty() {
         return idAdmin;
     }
 
@@ -90,7 +93,7 @@ public class Model_Payment_Membership extends Model_Membership {
         return idMember.get();
     }
 
-    public SimpleIntegerProperty idMemberProperty() {
+    public IntegerProperty idMemberProperty() {
         return idMember;
     }
 
@@ -98,11 +101,13 @@ public class Model_Payment_Membership extends Model_Membership {
         this.idMember.set(idMember);
     }
 
+    @Override
     public int getIdMembership() {
         return idMembership.get();
     }
 
-    public SimpleIntegerProperty idMembershipProperty() {
+    @Override
+    public IntegerProperty idMembershipProperty() {
         return idMembership;
     }
 

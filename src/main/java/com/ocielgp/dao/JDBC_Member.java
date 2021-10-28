@@ -16,33 +16,31 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class JDBC_Member {
-    public static CompletableFuture<Integer> CreateMember(Model_Member modelMember) {
-        return CompletableFuture.supplyAsync(() -> {
-            Connection con = DataServer.getConnection();
-            try {
-                PreparedStatement ps;
-                ResultSet rs;
-                assert con != null;
-                ps = con.prepareStatement("INSERT INTO MEMBERS(name, lastName, gender, notes, idGym) VALUE (?, ?, ?, ?, ?);", Statement.RETURN_GENERATED_KEYS);
-                ps.setString(1, modelMember.getName()); // name
-                ps.setString(2, modelMember.getLastName()); // lastName
-                ps.setString(3, modelMember.getGender()); // gender
-                if (modelMember.getNotes().equals("")) ps.setNull(4, Types.NULL); // notes
-                else ps.setString(4, modelMember.getNotes());
-                ps.setInt(5, modelMember.getIdGym()); // idGym
-                ps.executeUpdate();
+    public static int CreateMember(Model_Member modelMember) {
+        Connection con = DataServer.getConnection();
+        try {
+            PreparedStatement ps;
+            ResultSet rs;
+            assert con != null;
+            ps = con.prepareStatement("INSERT INTO MEMBERS(name, lastName, gender, notes, idGym) VALUE (?, ?, ?, ?, ?);", Statement.RETURN_GENERATED_KEYS);
+            ps.setString(1, modelMember.getName()); // name
+            ps.setString(2, modelMember.getLastName()); // lastName
+            ps.setString(3, modelMember.getGender()); // gender
+            if (modelMember.getNotes().equals("")) ps.setNull(4, Types.NULL); // notes
+            else ps.setString(4, modelMember.getNotes());
+            ps.setInt(5, modelMember.getIdGym()); // idGym
+            ps.executeUpdate();
 
-                rs = ps.getGeneratedKeys();
-                if (rs.next()) { // return new id member
-                    return rs.getInt(1);
-                }
-            } catch (SQLException sqlException) {
-                Notifications.CatchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
-            } finally {
-                DataServer.closeConnection(con);
+            rs = ps.getGeneratedKeys();
+            if (rs.next()) { // return new id member
+                return rs.getInt(1);
             }
-            return 0;
-        });
+        } catch (SQLException sqlException) {
+            Notifications.CatchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
+        } finally {
+            DataServer.closeConnection(con);
+        }
+        return 0;
     }
 
     public static CompletableFuture<ObservableList<String>> ReadGenders() {
@@ -145,7 +143,7 @@ public class JDBC_Member {
                 if (UserPreferences.getPreferenceInt("FILTER_MEMBER_ORDER_BY") == 0) {
                     sqlQuery += "ORDER BY M.idMember DESC ";
                 } else { // 1
-                    sqlQuery += "ORDER BY M.registrationDate ";
+                    sqlQuery += "ORDER BY M.idMember ";
                 }
 
                 assert con != null;
@@ -212,58 +210,58 @@ public class JDBC_Member {
         });
     }
 
-    public static void UpdateName(int idMember, String newName) {
-        CompletableFuture.runAsync(() -> {
-            Connection con = DataServer.getConnection();
-            try {
-                PreparedStatement ps;
-                assert con != null;
-                ps = con.prepareStatement("UPDATE MEMBERS SET name = ? WHERE idMember = ?");
-                ps.setString(1, newName);
-                ps.setInt(2, idMember);
-                ps.executeUpdate();
-            } catch (SQLException sqlException) {
-                Notifications.CatchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
-            } finally {
-                DataServer.closeConnection(con);
-            }
-        });
+    public static boolean UpdateName(int idMember, String newName) {
+        Connection con = DataServer.getConnection();
+        try {
+            PreparedStatement ps;
+            assert con != null;
+            ps = con.prepareStatement("UPDATE MEMBERS SET name = ? WHERE idMember = ?");
+            ps.setString(1, newName);
+            ps.setInt(2, idMember);
+            ps.executeUpdate();
+            return true;
+        } catch (SQLException sqlException) {
+            Notifications.CatchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
+            return false;
+        } finally {
+            DataServer.closeConnection(con);
+        }
     }
 
-    public static void UpdateLastName(int idMember, String newLastName) {
-        CompletableFuture.runAsync(() -> {
-            Connection con = DataServer.getConnection();
-            try {
-                PreparedStatement ps;
-                assert con != null;
-                ps = con.prepareStatement("UPDATE MEMBERS SET lastName = ? WHERE idMember = ?");
-                ps.setString(1, newLastName);
-                ps.setInt(2, idMember);
-                ps.executeUpdate();
-            } catch (SQLException sqlException) {
-                Notifications.CatchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
-            } finally {
-                DataServer.closeConnection(con);
-            }
-        });
+    public static boolean UpdateLastName(int idMember, String newLastName) {
+        Connection con = DataServer.getConnection();
+        try {
+            PreparedStatement ps;
+            assert con != null;
+            ps = con.prepareStatement("UPDATE MEMBERS SET lastName = ? WHERE idMember = ?");
+            ps.setString(1, newLastName);
+            ps.setInt(2, idMember);
+            ps.executeUpdate();
+            return true;
+        } catch (SQLException sqlException) {
+            Notifications.CatchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
+            return false;
+        } finally {
+            DataServer.closeConnection(con);
+        }
     }
 
-    public static void UpdateGender(int idMember, String newGender) {
-        CompletableFuture.runAsync(() -> {
-            Connection con = DataServer.getConnection();
-            try {
-                PreparedStatement ps;
-                assert con != null;
-                ps = con.prepareStatement("UPDATE MEMBERS SET gender = ? WHERE idMember = ?");
-                ps.setString(1, newGender);
-                ps.setInt(2, idMember);
-                ps.executeUpdate();
-            } catch (SQLException sqlException) {
-                Notifications.CatchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
-            } finally {
-                DataServer.closeConnection(con);
-            }
-        });
+    public static boolean UpdateGender(int idMember, String newGender) {
+        Connection con = DataServer.getConnection();
+        try {
+            PreparedStatement ps;
+            assert con != null;
+            ps = con.prepareStatement("UPDATE MEMBERS SET gender = ? WHERE idMember = ?");
+            ps.setString(1, newGender);
+            ps.setInt(2, idMember);
+            ps.executeUpdate();
+            return true;
+        } catch (SQLException sqlException) {
+            Notifications.CatchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
+            return false;
+        } finally {
+            DataServer.closeConnection(con);
+        }
     }
 
     public static void UpdatePhone(int idMember, String newPhone) {
@@ -302,22 +300,22 @@ public class JDBC_Member {
         });
     }
 
-    public static void UpdateNotes(int idMember, String newNotes) {
-        CompletableFuture.runAsync(() -> {
-            Connection con = DataServer.getConnection();
-            try {
-                PreparedStatement ps;
-                assert con != null;
-                ps = con.prepareStatement("UPDATE MEMBERS SET notes = ? WHERE idMember = ?");
-                ps.setString(1, newNotes);
-                ps.setInt(2, idMember);
-                ps.executeUpdate();
-            } catch (SQLException sqlException) {
-                Notifications.CatchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
-            } finally {
-                DataServer.closeConnection(con);
-            }
-        });
+    public static boolean UpdateNotes(int idMember, String newNotes) {
+        Connection con = DataServer.getConnection();
+        try {
+            PreparedStatement ps;
+            assert con != null;
+            ps = con.prepareStatement("UPDATE MEMBERS SET notes = ? WHERE idMember = ?");
+            ps.setString(1, newNotes);
+            ps.setInt(2, idMember);
+            ps.executeUpdate();
+            return true;
+        } catch (SQLException sqlException) {
+            Notifications.CatchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
+            return false;
+        } finally {
+            DataServer.closeConnection(con);
+        }
     }
 
     public static CompletableFuture<Boolean> UpdateAccess(int idMember, boolean access) {

@@ -12,21 +12,19 @@ import java.util.concurrent.CompletableFuture;
 
 public class JDBC_Member_Photo {
     public static void CreatePhoto(int idMember, byte[] photoBytes) {
-        CompletableFuture.runAsync(() -> {
-            Connection con = DataServer.getConnection();
-            try {
-                PreparedStatement ps;
-                assert con != null;
-                ps = con.prepareStatement("INSERT INTO MEMBERS_PHOTOS(photo, idMember) VALUE (?, ?)");
-                ps.setBytes(1, photoBytes); // photo
-                ps.setInt(2, idMember); // idMember
-                ps.executeUpdate();
-            } catch (SQLException sqlException) {
-                Notifications.CatchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
-            } finally {
-                DataServer.closeConnection(con);
-            }
-        });
+        Connection con = DataServer.getConnection();
+        try {
+            PreparedStatement ps;
+            assert con != null;
+            ps = con.prepareStatement("INSERT INTO MEMBERS_PHOTOS(photo, idMember) VALUE (?, ?)");
+            ps.setBytes(1, photoBytes); // photo
+            ps.setInt(2, idMember); // idMember
+            ps.executeUpdate();
+        } catch (SQLException sqlException) {
+            Notifications.CatchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
+        } finally {
+            DataServer.closeConnection(con);
+        }
     }
 
     public static CompletableFuture<Model_Member_Photo> ReadPhoto(int idMember) {
@@ -54,21 +52,21 @@ public class JDBC_Member_Photo {
         });
     }
 
-    public static void UpdatePhoto(int idMember, byte[] photoBytes) {
-        CompletableFuture.runAsync(() -> {
-            Connection con = DataServer.getConnection();
-            try {
-                PreparedStatement ps;
-                assert con != null;
-                ps = con.prepareStatement("UPDATE MEMBERS_PHOTOS SET photo = ? WHERE idMember = ?");
-                ps.setBytes(1, photoBytes);
-                ps.setInt(2, idMember);
-                ps.executeUpdate();
-            } catch (SQLException sqlException) {
-                Notifications.CatchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
-            } finally {
-                DataServer.closeConnection(con);
-            }
-        });
+    public static boolean UpdatePhoto(int idMember, byte[] photoBytes) {
+        Connection con = DataServer.getConnection();
+        try {
+            PreparedStatement ps;
+            assert con != null;
+            ps = con.prepareStatement("UPDATE MEMBERS_PHOTOS SET photo = ? WHERE idMember = ?");
+            ps.setBytes(1, photoBytes);
+            ps.setInt(2, idMember);
+            ps.executeUpdate();
+            return true;
+        } catch (SQLException sqlException) {
+            Notifications.CatchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
+            return false;
+        } finally {
+            DataServer.closeConnection(con);
+        }
     }
 }
