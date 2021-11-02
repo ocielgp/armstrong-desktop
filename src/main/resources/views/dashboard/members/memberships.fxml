@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+<?import java.lang.*?>
+<ScrollPane fx:id="scrollPane" fitToHeight="true" fitToWidth="true" maxWidth="412.0" styleClass="day-theme"
+            stylesheets="@../../../styles.css" xmlns="http://javafx.com/javafx/15.0.1"
+            xmlns:fx="http://javafx.com/fxml/1">
+    <content>
+        <VBox fx:id="boxRoot" maxWidth="412.0" styleClass="form">
+            <HBox alignment="CENTER">
+                <VBox.margin>
+                    <Insets/>
+                </VBox.margin>
+                <Label style="-fx-text-fill: -fx-color-text;" text="MEMBRESÍAS"/>
+                <styleClass>
+                    <String fx:value="default-style"/>
+                    <String fx:value="form-header"/>
+                </styleClass>
+            </HBox>
+            <VBox>
+                <VBox.margin>
+                    <Insets/>
+                </VBox.margin>
+                <VBox alignment="CENTER" styleClass="form-section">
+                    <children>
+                        <HBox alignment="CENTER" spacing="5.0">
+                            <children>
+                                <JFXButton fx:id="buttonCreate" styleClass="btn-primary" text="Crear"/>
+                                <JFXButton fx:id="buttonEdit" styleClass="btn-secondary" text="Editar"/>
+                            </children>
+                        </HBox>
+                    </children>
+                </VBox>
+                <VBox fx:id="boxMemberships" styleClass="form-section">
+                    <children>
+                        <HBox alignment="CENTER" VBox.vgrow="ALWAYS"/>
+                        <AnchorPane>
+                            <children>
+                                <JFXComboBox fx:id="comboBoxMemberships" promptText="Selecciona uno"
+                                             AnchorPane.leftAnchor="-1.0" AnchorPane.rightAnchor="-1.0"/>
+                            </children>
+                        </AnchorPane>
+                    </children>
+                </VBox>
+                <VBox fx:id="boxHistorical" styleClass="form-section">
+                    <children>
+                        <HBox alignment="CENTER">
+                            <children>
+                                <Label styleClass="bold" text="HISTÓRICO">
+                                    <graphic>
+                                        <FontIcon iconLiteral="gmi-description"/>
+                                    </graphic>
+                                </Label>
+                            </children>
+                        </HBox>
+                        <HBox spacing="5.0">
+                            <children>
+                                <Label styleClass="bold" text="Modificado"/>
+                                <Label fx:id="labelModified" text="Label"/>
+                            </children>
+                        </HBox>
+                        <VBox alignment="CENTER">
+                            <children>
+                                <Label styleClass="bold" text="Por"/>
+                                <Label fx:id="labelAdmin" text="labelAdmin"/>
+                            </children>
+                        </VBox>
+                    </children>
+                </VBox>
+                <VBox fx:id="boxMembershipDetail" styleClass="form-section">
+                    <children>
+                        <HBox alignment="CENTER">
+                            <children>
+                                <Label styleClass="bold" text="MEMBRESÍA">
+                                    <graphic>
+                                        <FontIcon iconLiteral="gmi-calendar-today"/>
+                                    </graphic>
+                                </Label>
+                            </children>
+                        </HBox>
+                        <VBox>
+                            <children>
+                                <Label styleClass="form-input" text="Nombre *">
+                                    <graphic>
+                                        <FontIcon iconLiteral="gmi-create"/>
+                                    </graphic>
+                                </Label>
+                                <JFXTextField fx:id="fieldName"/>
+                            </children>
+                        </VBox>
+                        <VBox>
+                            <children>
+                                <Label styleClass="form-input" text="Precio *">
+                                    <graphic>
+                                        <FontIcon iconLiteral="gmi-create"/>
+                                    </graphic>
+                                </Label>
+                                <JFXTextField fx:id="fieldPrice"/>
+                            </children>
+                        </VBox>
+                        <JFXToggleButton fx:id="toggleMonthly" selected="true" text="Mensualidad"/>
+                        <JFXButton fx:id="buttonDelete" text="Borrar">
+                            <styleClass>
+                                <String fx:value="btn-colorful"/>
+                                <String fx:value="danger-style"/>
+                            </styleClass>
+                        </JFXButton>
+                    </children>
+                </VBox>
+                <HBox fx:id="boxEndButtons" alignment="CENTER" spacing="10.0" styleClass="form-section">
+                    <JFXButton fx:id="buttonSave" text="Crear">
+                        <styleClass>
+                            <String fx:value="btn-colorful"/>
+                            <String fx:value="success-style"/>
+                        </styleClass>
+                    </JFXButton>
+                    <JFXButton fx:id="buttonClear" text="Limpiar">
+                        <styleClass>
+                            <String fx:value="btn-colorful"/>
+                            <String fx:value="danger-style"/>
+                        </styleClass>
+                    </JFXButton>
+                </HBox>
+            </VBox>
+        </VBox>
+    </content>
+</ScrollPane>

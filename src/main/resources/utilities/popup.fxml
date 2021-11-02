@@ -16,8 +16,9 @@
             <Insets/>
          </VBox.margin>
          <children>
-            <Label fx:id="labelTitle" alignment="CENTER" text="labelTitle" AnchorPane.bottomAnchor="-1.0"
-                   AnchorPane.leftAnchor="-1.0" AnchorPane.rightAnchor="-1.0" AnchorPane.topAnchor="-1.0"/>
+            <Label fx:id="labelTitle" alignment="CENTER" styleClass="bold" text="labelTitle"
+                   AnchorPane.bottomAnchor="-1.0" AnchorPane.leftAnchor="-1.0" AnchorPane.rightAnchor="-1.0"
+                   AnchorPane.topAnchor="-1.0"/>
             <HBox layoutX="456.0" layoutY="14.0" AnchorPane.bottomAnchor="-1.0" AnchorPane.rightAnchor="-1.0"
                   AnchorPane.topAnchor="-1.0">
                <children>

@@ -81,7 +81,7 @@ public class Popup implements Initializable {
 
     private void createPopup(String style, String title, String body, String popupType) {
         this.style = style;
-        this.title = title;
+        this.title = title.toUpperCase();
         this.body = body;
         this.popupType = popupType;
 
@@ -129,7 +129,7 @@ public class Popup implements Initializable {
             this.boxButtons.getChildren().add(buttonSecondary);
 
             if (this.popupType.equals(POPUP_CONFIRM)) {
-                Input.createVisibleProperty(this.boxPassword, false);
+                Input.createVisibleEvent(this.boxPassword, false);
                 buttonPrimary.setOnAction(actionEvent -> eventConfirm());
                 Platform.runLater(buttonPrimary::requestFocus);
             } else if (this.popupType.equals(POPUP_PASSWORD)) {

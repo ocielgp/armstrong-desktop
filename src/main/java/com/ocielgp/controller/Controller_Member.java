@@ -175,7 +175,7 @@ public class Controller_Member implements Initializable {
         Input.createComboBoxListener(this.pi_comboBoxGender, this.ms_comboBoxMemberships);
 
         // quick view
-        Input.createVisibleProperty(this.boxQuickView, false);
+        Input.createVisibleEvent(this.boxQuickView, false);
 
         // photo section
         this.photoHandler = new PhotoHandler(this.formChangeListener, this.ph_imgMemberPhoto, this.ph_buttonDeletePhoto);
@@ -194,9 +194,9 @@ public class Controller_Member implements Initializable {
         Fingerprint_Controller.setFingerprintBox(this.boxFingerprint, this.fp_boxFingerprint, this.fp_labelFingerprintCounter, this.fp_buttonCapture, this.fp_buttonRestartCapture);
 
         // membership
-        JDBC_Membership.ReadMemberships().thenAccept(model_memberships -> this.ms_comboBoxMemberships.setItems(model_memberships));
-        Input.createVisibleProperty(this.ms_boxEndDate, false);
-        Input.createVisibleProperty(this.ms_boxMonths, false);
+        JDBC_Membership.ReadMemberships(Model_Membership.MONTHLY).thenAccept(model_memberships -> this.ms_comboBoxMemberships.setItems(model_memberships));
+        Input.createVisibleEvent(this.ms_boxEndDate, false);
+        Input.createVisibleEvent(this.ms_boxMonths, false);
         this.ms_comboBoxMemberships.valueProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
                 Platform.runLater(() -> eventUpdatePrice(true));
@@ -209,11 +209,11 @@ public class Controller_Member implements Initializable {
         });
         this.ms_iconSubtractMonth.setOnMouseClicked(mouseEvent -> eventSubtractMonth());
         this.ms_iconAddMonth.setOnMouseClicked(mouseEvent -> eventAddMonth());
-        Input.createVisibleProperty(this.ms_boxButtons, false);
+        Input.createVisibleEvent(this.ms_boxButtons, false);
 
         // payment -> hide
-        Input.createVisibleProperty(this.boxPayment, false);
-        Input.createVisibleProperty(this.pym_boxOwe, false);
+        Input.createVisibleEvent(this.boxPayment, false);
+        Input.createVisibleEvent(this.pym_boxOwe, false);
         this.boxPayment.visibleProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue) {
                 Platform.runLater(() -> this.pym_togglePayment.setSelected(true));
@@ -240,8 +240,8 @@ public class Controller_Member implements Initializable {
         });
 
         // shortcut
-        Input.createVisibleProperty(this.boxShortcut, false);
-        Input.createVisibleProperty(this.s_buttonPayDebt, false);
+        Input.createVisibleEvent(this.boxShortcut, false);
+        Input.createVisibleEvent(this.s_buttonPayDebt, false);
 
         // end buttons
         this.buttonAction.setOnAction(actionEvent -> createMember());

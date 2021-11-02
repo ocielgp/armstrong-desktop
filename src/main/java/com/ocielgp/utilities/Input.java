@@ -1,5 +1,6 @@
 package com.ocielgp.utilities;
 
+import animatefx.animation.FadeIn;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXDatePicker;
 import com.jfoenix.controls.JFXPasswordField;
@@ -12,7 +13,7 @@ import javafx.scene.control.TextInputControl;
 import javafx.scene.input.KeyEvent;
 
 public class Input {
-    public static void createVisibleProperty(Node node) {
+    public static void createVisibleEvent(Node node) {
         node.visibleProperty().addListener((observable, oldValue, newValue) -> {
             node.setVisible(newValue);
             node.setManaged(newValue);
@@ -20,12 +21,24 @@ public class Input {
         node.setVisible(false);
     }
 
-    public static void createVisibleProperty(Node node, boolean visible) {
+    public static void createVisibleEvent(Node node, boolean visible) {
         node.visibleProperty().addListener((observable, oldValue, newValue) -> {
             node.setVisible(newValue);
             node.setManaged(newValue);
         });
         node.setVisible(visible);
+    }
+
+    public static void createVisibleAnimation(Node node, boolean visible) {
+        node.setVisible(visible);
+        node.setManaged(visible);
+        node.visibleProperty().addListener((observable, oldValue, newValue) -> {
+            node.setVisible(newValue);
+            node.setManaged(newValue);
+            if (newValue) {
+                new FadeIn(node).play();
+            }
+        });
     }
 
     public static void createMaxLengthEvent(TextInputControl textInput, int maxLength) {

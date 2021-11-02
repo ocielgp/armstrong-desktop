@@ -26,7 +26,7 @@ public class Fingerprint_Capture_Box {
         this.labelFingerprintCounter = labelFingerprintCounter;
         this.buttonStartCapture = buttonStartCapture;
         this.buttonRestartCapture = buttonRestartCapture;
-        Input.createVisibleProperty(this.boxFingerprintPane, true);
+        Input.createVisibleEvent(this.boxFingerprintPane, true);
 
         this.buttonStartCapture.setOnAction(actionEvent -> captureEvent());
         this.buttonRestartCapture.setOnAction(actionEvent -> this.restartCaptureEvent());
