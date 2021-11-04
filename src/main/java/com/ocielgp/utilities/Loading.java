@@ -29,10 +29,12 @@ public class Loading {
         Scene scene = new Scene(boxSpinner);
         scene.setFill(Color.TRANSPARENT);
         stage.setScene(scene);
-        stage.initModality(Modality.NONE);
-        stage.initOwner(Application.STAGE_PRIMARY);
         stage.showingProperty().addListener(((observableValue, oldValue, newValue) -> {
             if (newValue) {
+                Platform.runLater(() -> {
+                    stage.setX(Screen.getPrimary().getVisualBounds().getWidth() / 2 - stage.getWidth() / 2);
+                    stage.setY(Screen.getPrimary().getVisualBounds().getHeight() / 2 - stage.getHeight() / 2);
+                });
                 Application.DisableDashboard();
             } else {
                 Application.EnableDashboard();
@@ -40,17 +42,28 @@ public class Loading {
         }));
     }
 
+    public static void create() {
+        stage.initModality(Modality.NONE);
+        stage.initOwner(Application.STAGE_PRIMARY);
+    }
+
     public static void show() {
         if (!stage.isShowing()) {
-            Platform.runLater(() -> {
-                stage.show();
-                stage.setX(Screen.getPrimary().getVisualBounds().getWidth() / 2 - stage.getWidth() / 2);
-                stage.setY(Screen.getPrimary().getVisualBounds().getHeight() / 2 - stage.getHeight() / 2);
-            });
+            Platform.runLater(stage::show);
         }
     }
 
-    public static void close() {
+    synchronized public static void close() {
+        if (Application.isAnimationFinished && Application.isChildLoaded) {
+            Application.isAnimationFinished = false;
+            Application.isChildLoaded = false;
+            Platform.runLater(stage::close);
+        }
+    }
+
+    synchronized public static void closeNow() {
+        Application.isAnimationFinished = false;
+        Application.isChildLoaded = false;
         Platform.runLater(stage::close);
     }
 }

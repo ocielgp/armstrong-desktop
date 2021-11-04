@@ -6,9 +6,8 @@
 <?import javafx.scene.layout.*?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 <?import java.lang.*?>
-<ScrollPane fx:id="scrollPane" fitToHeight="true" fitToWidth="true" maxWidth="412.0" styleClass="day-theme"
-            stylesheets="@../../../styles.css" xmlns="http://javafx.com/javafx/15.0.1"
-            xmlns:fx="http://javafx.com/fxml/1">
+<ScrollPane fx:id="scrollPane" fitToHeight="true" fitToWidth="true" maxWidth="412.0"
+            xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1">
     <content>
         <VBox fx:id="boxRoot" maxWidth="412.0" styleClass="form">
             <HBox alignment="CENTER">

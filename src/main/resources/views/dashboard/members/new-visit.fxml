@@ -7,9 +7,9 @@
 <?import javafx.scene.layout.*?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 <?import java.lang.String?>
-<VBox fx:id="boxVisit" maxWidth="500.0" prefWidth="500.0"
-      style="-fx-background-color: -fx-color-background; -fx-border-color: -fx-color-border;" styleClass="day-theme"
-      stylesheets="@../../../styles.css" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<VBox fx:id="boxRoot" maxWidth="500.0" prefWidth="500.0"
+      style="-fx-background-color: -fx-color-background; -fx-border-color: -fx-color-border;"
+      xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1">
     <children>
         <AnchorPane style="-fx-background-color: -fx-color-background;" styleClass="success-style">
             <VBox.margin>
@@ -17,13 +17,9 @@
             </VBox.margin>
             <children>
                 <Label alignment="CENTER" styleClass="bold" text="NUEVA VISITA" AnchorPane.bottomAnchor="-1.0"
-                       AnchorPane.leftAnchor="-1.0" AnchorPane.rightAnchor="-1.0" AnchorPane.topAnchor="-1.0">
-                    <graphic>
-                        <FontIcon iconLiteral="gmi-local-play"/>
-                    </graphic>
-                </Label>
-                <HBox layoutX="456.0" layoutY="14.0" AnchorPane.bottomAnchor="-1.0" AnchorPane.rightAnchor="-1.0"
-                      AnchorPane.topAnchor="-1.0">
+                       AnchorPane.leftAnchor="-1.0" AnchorPane.rightAnchor="-1.0" AnchorPane.topAnchor="-1.0"/>
+                <HBox layoutX="456.0" layoutY="14.0" style="-fx-cursor: hand;" AnchorPane.bottomAnchor="-1.0"
+                      AnchorPane.rightAnchor="-1.0" AnchorPane.topAnchor="-1.0">
                     <children>
                         <FontIcon fx:id="fontIconClose" iconLiteral="gmi-close" iconSize="30"/>
                     </children>

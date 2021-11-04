@@ -18,7 +18,7 @@ public class Model_Membership {
     private final IntegerProperty idMembership = new SimpleIntegerProperty();
     private final ObjectProperty<BigDecimal> price = new SimpleObjectProperty<>();
     private final StringProperty name = new SimpleStringProperty();
-    private final ObjectProperty<Short> type = new SimpleObjectProperty<>();
+    private final BooleanProperty monthly = new SimpleBooleanProperty();
     private final ObjectProperty<LocalDateTime> dateTime = new SimpleObjectProperty<>();
     private final IntegerProperty idAdmin = new SimpleIntegerProperty();
 
@@ -58,16 +58,16 @@ public class Model_Membership {
         this.name.set(name);
     }
 
-    public Short getType() {
-        return type.get();
+    public boolean isMonthly() {
+        return monthly.get();
     }
 
-    public ObjectProperty<Short> typeProperty() {
-        return type;
+    public BooleanProperty monthlyProperty() {
+        return monthly;
     }
 
-    public void setType(Short type) {
-        this.type.set(type);
+    public void setMonthly(boolean monthly) {
+        this.monthly.set(monthly);
     }
 
     public LocalDateTime getDateTime() {
@@ -96,7 +96,7 @@ public class Model_Membership {
 
     @Override
     public String toString() {
-        if (getType() == 1) {
+        if (isMonthly()) {
             return "[MEN][$" + getPrice() + "]: " + getName();
         } else {
             return "[VIS][$" + getPrice() + "]: " + getName();

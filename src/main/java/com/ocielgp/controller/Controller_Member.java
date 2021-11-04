@@ -19,6 +19,7 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.image.ImageView;
@@ -144,10 +145,10 @@ public class Controller_Member implements Initializable {
     private PhotoHandler photoHandler;
     private Model_Member modelMember = null;
     private Model_Member modelAdmin = null;
-    private final Controller_Members controllerMembers;
+    private final Pagination pagination;
 
-    public Controller_Member(Controller_Members controllerMembers) {
-        this.controllerMembers = controllerMembers;
+    public Controller_Member(Pagination pagination) {
+        this.pagination = pagination;
     }
 
     private void configureForm() {
@@ -194,7 +195,11 @@ public class Controller_Member implements Initializable {
         Fingerprint_Controller.setFingerprintBox(this.boxFingerprint, this.fp_boxFingerprint, this.fp_labelFingerprintCounter, this.fp_buttonCapture, this.fp_buttonRestartCapture);
 
         // membership
-        JDBC_Membership.ReadMemberships(Model_Membership.MONTHLY).thenAccept(model_memberships -> this.ms_comboBoxMemberships.setItems(model_memberships));
+        JDBC_Membership.ReadMemberships(Model_Membership.MONTHLY).thenAccept(model_memberships -> {
+            this.ms_comboBoxMemberships.setItems(model_memberships);
+            Application.isChildLoaded = true;
+            Loading.close();
+        });
         Input.createVisibleEvent(this.ms_boxEndDate, false);
         Input.createVisibleEvent(this.ms_boxMonths, false);
         this.ms_comboBoxMemberships.valueProperty().addListener((observable, oldValue, newValue) -> {
@@ -232,7 +237,7 @@ public class Controller_Member implements Initializable {
         });
         this.pym_labelPrice.textProperty().bind(Bindings.concat("$ ", membershipPrice.asString(), " MXN"));
         this.pym_fieldPaidOut.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (Validator.moneyValidator(new InputDetails(this.pym_fieldPaidOut, this.pym_fieldPaidOut.getText()), false)) {
+            if (Validator.moneyValidator(this.pym_fieldPaidOut, false)) {
                 this.pym_fieldOwe.setText(this.membershipPrice.get().subtract(new BigDecimal(newValue)).toString());
             } else {
                 this.pym_fieldOwe.setText(this.membershipPrice.get().toString());
@@ -247,12 +252,12 @@ public class Controller_Member implements Initializable {
         this.buttonAction.setOnAction(actionEvent -> createMember());
         this.buttonClear.setOnAction((actionEvent) -> {
             eventClearForm(false);
-            this.controllerMembers.unselectTable();
+            this.pagination.unselectTable();
         });
     }
 
-    public Controller_Member(Controller_Members controllerMembers, int idMember, String style) {
-        this.controllerMembers = controllerMembers;
+    public Controller_Member(Pagination pagination, int idMember, String style) {
+        this.pagination = pagination;
         getMemberData(idMember, style);
     }
 
@@ -352,7 +357,7 @@ public class Controller_Member implements Initializable {
 
             FadeInRight fadeInRightScrollPane = new FadeInRight(this.scrollPane);
             fadeInRightScrollPane.setOnFinished(actionEvent -> {
-                Loading.close();
+                Loading.closeNow();
                 this.formChangeListener.setListen(true);
             });
             fadeInRightScrollPane.play();
@@ -397,10 +402,7 @@ public class Controller_Member implements Initializable {
                 this.modelAdmin = null;
                 this.scrollPane.setVvalue(0d);
                 FadeInRight fadeInRightScrollPane = new FadeInRight(this.scrollPane);
-                fadeInRightScrollPane.setOnFinished(actionEvent -> {
-                    Loading.close();
-                    this.formChangeListener.setListen(true);
-                });
+
                 fadeInRightScrollPane.play();
             }
         });
@@ -408,36 +410,35 @@ public class Controller_Member implements Initializable {
 
     private void createMember() {
         CompletableFuture.runAsync(() -> {
-            Loading.show();
-            new FadeOutRight(this.scrollPane).play();
-            ArrayList<InputDetails> nodesRequired = new ArrayList<>();
+            System.out.println("va");
+            System.out.println("fue");
+            ArrayList<Node> nodesRequired = new ArrayList<>();
             // personal information
-            nodesRequired.add(new InputDetails(this.pi_fieldName, this.pi_fieldName.getText()));
-            nodesRequired.add(new InputDetails(this.pi_fieldLastName, this.pi_fieldLastName.getText()));
-            nodesRequired.add(new InputDetails(this.pi_comboBoxGender, String.valueOf(this.pi_comboBoxGender.getSelectionModel().getSelectedIndex())));
-            nodesRequired.add(new InputDetails(Application.getCurrentGymNode(), String.valueOf(Application.getCurrentGymNode().getSelectionModel().getSelectedIndex())));
+            nodesRequired.add(this.pi_fieldName);
+            nodesRequired.add(this.pi_fieldLastName);
+            nodesRequired.add(this.pi_comboBoxGender);
+            nodesRequired.add(Application.getCurrentGymNode());
 
             // membership
-            nodesRequired.add(new InputDetails(this.ms_comboBoxMemberships, String.valueOf(this.ms_comboBoxMemberships.getSelectionModel().getSelectedIndex())));
+            nodesRequired.add(this.ms_comboBoxMemberships);
 
             // payment
             if (!pym_togglePayment.isSelected()) {
-                nodesRequired.add(new InputDetails(this.pym_fieldPaidOut, this.pym_fieldPaidOut.getText()));
+                nodesRequired.add(this.pym_fieldPaidOut);
             }
 
-            Boolean formValid = Validator.emptyValidator(nodesRequired.listIterator());
+            boolean formValid = Validator.emptyValidator(nodesRequired.toArray(new Node[]{}));
             if (formValid) { // text validator
                 nodesRequired.clear();
-                nodesRequired.add(new InputDetails(this.pi_fieldName, this.pi_fieldName.getText()));
-                nodesRequired.add(new InputDetails(this.pi_fieldLastName, this.pi_fieldLastName.getText()));
-                formValid = Validator.textValidator(nodesRequired.listIterator());
+                nodesRequired.add(this.pi_fieldName);
+                nodesRequired.add(this.pi_fieldLastName);
+                formValid = Validator.textValidator(nodesRequired.toArray(new Node[]{}));
 
                 if (formValid) { // money validator
                     nodesRequired.clear();
                     if (!this.pym_togglePayment.isSelected()) {
-                        nodesRequired.add(new InputDetails(this.pym_fieldPaidOut, this.pym_fieldPaidOut.getText()));
+                        formValid = Validator.moneyValidator(this.pym_fieldPaidOut, true);
                     }
-                    formValid = Validator.moneyValidator(nodesRequired.listIterator());
                 }
 
                 if (formValid) { // form 100% valid
@@ -478,6 +479,7 @@ public class Controller_Member implements Initializable {
                     }
 
                     if (formValid) { // insert into database
+                        Loading.show();
                         try {
                             if (this.formChangeListener.isListen()) { // update changes
                                 boolean isOk = true;
@@ -532,7 +534,7 @@ public class Controller_Member implements Initializable {
                                 }
                             }
 
-                            this.controllerMembers.refreshTable();
+                            this.pagination.restartTable();
                             eventClearForm(false);
                         } catch (Exception exception) {
                             Notifications.CatchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], exception.getMessage(), exception);

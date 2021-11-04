@@ -130,7 +130,6 @@
     -fx-opacity: 0.6;
 }
 
-
 .combo-box-popup .list-view .list-cell:filled:selected, .combo-box-popup .list-view .list-cell:filled:selected:hover {
     -fx-background-color: -fx-color-text;
     -fx-text-fill: -fx-color-background;

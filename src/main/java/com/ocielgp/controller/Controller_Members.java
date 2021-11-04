@@ -7,6 +7,7 @@ import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXCheckBox;
 import com.jfoenix.controls.JFXRadioButton;
 import com.jfoenix.controls.JFXTextField;
+import com.ocielgp.app.Application;
 import com.ocielgp.app.UserPreferences;
 import com.ocielgp.controller.dashboard.Controller_Membership;
 import com.ocielgp.dao.JDBC_Member_Fingerprint;
@@ -14,6 +15,7 @@ import com.ocielgp.models.Model_Member;
 import com.ocielgp.utilities.Loader;
 import com.ocielgp.utilities.Loading;
 import com.ocielgp.utilities.Pagination;
+import com.ocielgp.utilities.Styles;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -38,7 +40,7 @@ public class Controller_Members implements Initializable {
     @FXML
     private VBox memberPane;
     @FXML
-    private FlowPane boxActionButtons;
+    private FlowPane boxButtons;
 
     @FXML
     private JFXTextField fieldSearch;
@@ -87,56 +89,88 @@ public class Controller_Members implements Initializable {
     // Attributes
     private Pagination pagination;
 
+    private void createTabButton(String icon, String tabName, String tabResource, Object controller, boolean transition, String... styles) {
+        Platform.runLater(() -> {
+            JFXButton button = new JFXButton(tabName);
+            button.getStyleClass().addAll(styles);
+            button.setGraphic(new FontIcon(icon));
+            if (transition) {
+                button.setOnAction(actionEvent -> {
+                    changeTab(
+                            Loader.Load(
+                                    tabResource,
+                                    "Controller_Members",
+                                    true,
+                                    controller
+                            ));
+                });
+            } else {
+                button.setOnAction(actionEvent -> {
+                    Loader.Load(
+                            tabResource,
+                            "Controller_Members",
+                            true,
+                            controller
+                    );
+                });
+            }
+            this.boxButtons.getChildren().add(button);
+        });
+    }
+
     private void changeTab(Node node) {
         Platform.runLater(() -> {
+            Loading.show();
             FadeOutRight fadeOutRight = new FadeOutRight(this.memberPane);
             fadeOutRight.setOnFinished(actionEvent -> {
                 this.memberPane.getChildren().setAll(node);
-                new FadeInRight(this.memberPane).play();
+                FadeInRight fadeInRight = new FadeInRight(this.memberPane);
+                fadeInRight.setOnFinished(actionEvent1 -> {
+                    Application.isAnimationFinished = true;
+                    Loading.close();
+                });
+                fadeInRight.play();
             });
             fadeOutRight.play();
         });
     }
 
     private void createButtons() {
-//        Node memberFXML = Loader.Load(
-//                "member.fxml",
-//                "Members",
-//                true,
-//                controllerMember
-//        );
-        JFXButton buttonNewVisit = new JFXButton("Nueva visita");
-        buttonNewVisit.getStyleClass().addAll("btn-colorful", "success-style");
-        buttonNewVisit.setGraphic(new FontIcon("gmi-local-play"));
-        buttonNewVisit.setOnAction(actionEvent -> Loader.Load(
-                "new-visit.fxml",
-                "Controller_Members",
-                true,
-                new Controller_Dashboard_Visit()
-        ));
-        this.boxActionButtons.getChildren().add(buttonNewVisit);
-
-        JFXButton buttonMemberships = new JFXButton("MEMBRESÍAS");
-        buttonMemberships.getStyleClass().addAll("btn-colorful", "warn-style");
-        buttonMemberships.setGraphic(new FontIcon("gmi-calendar-today"));
-        buttonMemberships.setOnAction(actionEvent -> {
-            changeTab(
-                    Loader.Load(
-                            "memberships.fxml",
-                            "Controller_Members",
-                            true,
-                            new Controller_Membership()
-                    )
-            );
-        });
-        this.boxActionButtons.getChildren().add(buttonMemberships);
-
+        try {
+            Platform.runLater(() -> {
+                createTabButton("gmi-group-add",
+                        "Socio nuevo",
+                        "member.fxml",
+                        new Controller_Member(this.pagination),
+                        true,
+                        "btn-colorful", Styles.SUCCESS
+                );
+                createTabButton("gmi-local-play",
+                        "Nueva visita",
+                        "new-visit.fxml",
+                        new Controller_Dashboard_Visit(),
+                        false,
+                        "btn-colorful", Styles.SUCCESS
+                );
+                createTabButton("gmi-calendar-today",
+                        "Membresias",
+                        "memberships.fxml",
+                        new Controller_Membership(),
+                        true,
+                        "btn-colorful", Styles.WARN
+                );
+            });
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
     }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        createButtons();
         JDBC_Member_Fingerprint.SCANNING = false;
+
+        this.pagination = new Pagination(this.fieldSearch, this.buttonSearch, this.labelTotalRows, this.tableViewMembers, this.fieldRowsPerPage, this.labelPreviousPage, this.labelCurrentPage, this.labelTotalPages, this.labelNextPage, Pagination.Sources.MEMBERS);
+        createButtons();
 
         this.tableColumnId.setSortable(false);
         this.tableColumnName.setSortable(false);
@@ -147,7 +181,7 @@ public class Controller_Members implements Initializable {
         this.tableColumnLastName.setCellValueFactory(new PropertyValueFactory<>("lastName"));
         this.tableColumnEndDate.setCellValueFactory(new PropertyValueFactory<>("endDate"));
 
-        Controller_Member controllerMember = new Controller_Member(this);
+        Controller_Member controllerMember = new Controller_Member(pagination);
         Node memberFXML = Loader.Load(
                 "member.fxml",
                 "Members",
@@ -158,13 +192,17 @@ public class Controller_Members implements Initializable {
         this.tableViewMembers.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
                 Loading.show();
-                CompletableFuture.runAsync(() -> controllerMember.getMemberData(newValue.getIdMember(), newValue.getStyle()));
+                if (this.memberPane.getChildren().get(0) == memberFXML) {
+                    CompletableFuture.runAsync(() -> controllerMember.getMemberData(newValue.getIdMember(), newValue.getStyle()));
+                } else {
+                    CompletableFuture.runAsync(() -> controllerMember.getMemberData(newValue.getIdMember(), newValue.getStyle()));
+                    changeTab(memberFXML);
+                }
             }
         });
         this.memberPane.getChildren().setAll(memberFXML);
 
         // filters
-        this.pagination = new Pagination(this.fieldSearch, this.buttonSearch, this.labelTotalRows, this.tableViewMembers, this.fieldRowsPerPage, this.labelPreviousPage, this.labelCurrentPage, this.labelTotalPages, this.labelNextPage, Pagination.Sources.MEMBERS);
         this.checkBoxAllGyms.setSelected(UserPreferences.getPreferenceBool("FILTER_MEMBER_ALL_GYMS"));
         this.checkBoxOnlyActiveMembers.setSelected(UserPreferences.getPreferenceBool("FILTER_MEMBER_ACTIVE_MEMBERS"));
         this.checkBoxOnlyDebtors.setSelected(UserPreferences.getPreferenceBool("FILTER_MEMBER_DEBTORS"));
@@ -186,12 +224,8 @@ public class Controller_Members implements Initializable {
 
         Platform.runLater(() -> {
             new FadeIn(this.boxMembersPane).play();
-            refreshTable();
+            this.pagination.restartTable();
         });
-    }
-
-    public void refreshTable() {
-        this.pagination.restartTable();
     }
 
     public void unselectTable() {

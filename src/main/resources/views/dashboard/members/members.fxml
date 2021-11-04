@@ -4,7 +4,7 @@
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import org.kordamp.ikonli.javafx.*?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 <?import java.lang.*?>
 <GridPane fx:id="boxMembersPane" style="-fx-background-color: -fx-color-background;"
           xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1"
@@ -17,37 +17,10 @@
         <RowConstraints vgrow="SOMETIMES"/>
     </rowConstraints>
     <VBox alignment="TOP_CENTER">
-        <FlowPane fx:id="boxActionButtons" alignment="CENTER" columnHalignment="CENTER" hgap="10.0" vgap="10.0">
+        <FlowPane fx:id="boxButtons" alignment="CENTER" columnHalignment="CENTER" hgap="10.0" vgap="10.0">
             <VBox.margin>
                 <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
             </VBox.margin>
-            <JFXButton text="Consultas">
-                <graphic>
-                    <FontIcon iconLiteral="gmi-group"/>
-                </graphic>
-                <styleClass>
-                    <String fx:value="btn-colorful"/>
-                    <String fx:value="default-style"/>
-            </styleClass>
-            </JFXButton>
-            <JFXButton text="Socio nuevo">
-                <graphic>
-                    <FontIcon iconLiteral="gmi-person-add" />
-                </graphic>
-                <styleClass>
-                    <String fx:value="btn-colorful" />
-                    <String fx:value="success-style" />
-                </styleClass>
-            </JFXButton>
-            <JFXButton text="Planes">
-                <graphic>
-                    <FontIcon iconLiteral="gmi-date-range" />
-                </graphic>
-                <styleClass>
-                    <String fx:value="btn-colorful" />
-                    <String fx:value="warn-style" />
-                </styleClass>
-            </JFXButton>
         </FlowPane>
         <VBox alignment="CENTER">
             <VBox alignment="CENTER" maxWidth="500.0" spacing="10.0">

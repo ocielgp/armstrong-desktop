@@ -6,7 +6,10 @@ import com.jfoenix.controls.JFXPasswordField;
 import com.jfoenix.controls.JFXTextField;
 import com.ocielgp.app.Application;
 import com.ocielgp.dao.JDBC_Admins;
-import com.ocielgp.utilities.*;
+import com.ocielgp.utilities.FileLoader;
+import com.ocielgp.utilities.Loader;
+import com.ocielgp.utilities.Notifications;
+import com.ocielgp.utilities.Validator;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -18,7 +21,6 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.ResourceBundle;
 import java.util.concurrent.CompletableFuture;
 
@@ -42,10 +44,7 @@ public class Controller_Login implements Initializable {
         this.imageUser.setImage(FileLoader.getDefaultImage());
 
         this.buttonLogin.setOnAction(actionEvent -> {
-            ArrayList<InputDetails> inputs = new ArrayList<>();
-            inputs.add(new InputDetails(this.fieldUsername, this.fieldUsername.getText()));
-            inputs.add(new InputDetails(this.fieldPassword, this.fieldPassword.getText()));
-            if (Validator.emptyValidator(inputs.listIterator())) {
+            if (Validator.emptyValidator(this.fieldUsername, this.fieldPassword)) {
                 this.boxLoginPane.setDisable(true);
                 CompletableFuture.runAsync(() -> {
                     Boolean answer = JDBC_Admins.ReadLogin(this.fieldUsername.getText(), this.fieldPassword.getText());
@@ -81,9 +80,6 @@ public class Controller_Login implements Initializable {
                     }
                 });
             }
-
-            // clear memory
-            inputs = null;
         });
 
         this.fieldUsername.setOnKeyPressed(this.eventHandlerLogin());

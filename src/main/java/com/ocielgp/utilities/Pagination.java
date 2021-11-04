@@ -76,7 +76,7 @@ public class Pagination {
     }
 
     private void updateRowsPerPage() {
-        if (Validator.numberValidator(new InputDetails(this.fieldRowsPerPage, this.fieldRowsPerPage.getText()), false, true)) {
+        if (Validator.numberValidator(this.fieldRowsPerPage, true)) {
             int newRowsPerPage = Integer.parseInt(this.fieldRowsPerPage.getText());
             if (newRowsPerPage > 0) {
                 this.rows = Integer.parseInt(this.fieldRowsPerPage.getText());
@@ -116,6 +116,9 @@ public class Pagination {
         };
     }
 
+    public void unselectTable() {
+        this.tableView.getSelectionModel().select(-1);
+    }
 
     public void restartTable() {
         this.page.set(1);
@@ -158,6 +161,7 @@ public class Pagination {
                 });
                 this.tableView.setItems(queryRows.getData());
                 this.labelCurrentPage.setText(this.page.toString());
+                Loading.closeNow();
             } else {
                 this.restartCounters();
             }

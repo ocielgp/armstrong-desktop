@@ -45,7 +45,7 @@
                         </HBox>
                         <HBox spacing="5.0">
                             <children>
-                                <Label styleClass="bold" text="Último pago"/>
+                                <Label styleClass="bold" text="Pago"/>
                                 <Label fx:id="qv_labelLastPayment" text="N / A"/>
                             </children>
                         </HBox>

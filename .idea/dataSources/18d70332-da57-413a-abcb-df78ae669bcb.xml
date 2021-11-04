@@ -1376,7 +1376,7 @@ idMember</ColNames>
       <DataType>varchar(60)|0s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="374" parent="292" name="type">
+    <column id="374" parent="292" name="monthly">
       <Position>4</Position>
       <DataType>tinyint|0s</DataType>
       <NotNull>1</NotNull>
@@ -1414,13 +1414,13 @@ idMember</ColNames>
       <RefColNames>idMember</RefColNames>
     </foreign-key>
     <trigger id="381" parent="292" name="MEMBERSHIPS_AFTER_INSERT">
-      <SourceTextLength>962</SourceTextLength>
+      <SourceTextLength>968</SourceTextLength>
       <Definer>root@localhost</Definer>
       <Turn>after-row</Turn>
       <Events>I</Events>
     </trigger>
     <trigger id="382" parent="292" name="MEMBERSHIPS_BEFORE_UPDATE">
-      <SourceTextLength>944</SourceTextLength>
+      <SourceTextLength>950</SourceTextLength>
       <Definer>root@localhost</Definer>
       <Turn>before-row</Turn>
       <Events>U</Events>
@@ -1446,7 +1446,7 @@ idMember</ColNames>
       <DataType>varchar(60)|0s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="387" parent="293" name="type">
+    <column id="387" parent="293" name="monthly">
       <Position>5</Position>
       <DataType>tinyint|0s</DataType>
       <NotNull>1</NotNull>

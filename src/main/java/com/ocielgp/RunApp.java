@@ -5,6 +5,7 @@ import com.ocielgp.controller.Controller_App;
 import com.ocielgp.models.Model_Admin;
 import com.ocielgp.utilities.FileLoader;
 import com.ocielgp.utilities.Loader;
+import com.ocielgp.utilities.Loading;
 import javafx.application.Platform;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -75,10 +76,16 @@ public class RunApp extends javafx.application.Application {
         Application.setModelAdmin(modelAdmin);
 
         Node loginFXML = Loader.Load(
-                "dashboard.fxml",
+                "login.fxml",
                 "Login",
                 true
         );
         appView.setCenter(loginFXML);
+
+        staticHandlers();
+    }
+
+    private void staticHandlers() {
+        Loading.create();
     }
 }

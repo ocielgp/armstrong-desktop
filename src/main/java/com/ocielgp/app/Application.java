@@ -18,6 +18,8 @@ public class Application {
     public static Stage STAGE_SECONDARY;
     public static Stage STAGE_POPUP;
     public static boolean isSecureMode = false;
+    public static boolean isAnimationFinished = false;
+    public static boolean isChildLoaded = false;
 
     static {
         Locale.setDefault(

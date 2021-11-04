@@ -1,13 +1,13 @@
 package com.ocielgp.controller;
 
-import animatefx.animation.FadeIn;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
 import com.ocielgp.app.Application;
+import com.ocielgp.app.UserPreferences;
 import com.ocielgp.dao.JDBC_Membership;
 import com.ocielgp.dao.JDBC_Payment_Visit;
 import com.ocielgp.models.Model_Membership;
-import com.ocielgp.utilities.InputDetails;
+import com.ocielgp.utilities.Loading;
 import com.ocielgp.utilities.Notifications;
 import com.ocielgp.utilities.Validator;
 import javafx.application.Platform;
@@ -29,7 +29,7 @@ import java.util.ResourceBundle;
 public class Controller_Dashboard_Visit implements Initializable {
 
     @FXML
-    private VBox boxVisit;
+    private VBox boxRoot;
     @FXML
     private FontIcon fontIconClose;
     @FXML
@@ -40,14 +40,6 @@ public class Controller_Dashboard_Visit implements Initializable {
     private final Stage stage = new Stage(StageStyle.TRANSPARENT);
 
     public Controller_Dashboard_Visit() {
-        System.out.println("constructor");
-    }
-
-    private void configStage() {
-        Scene scene = new Scene(this.boxVisit);
-        scene.getStylesheets().add("styles.css");
-        scene.setFill(Color.TRANSPARENT);
-        this.stage.setScene(scene);
         this.stage.showingProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue) {
                 this.stage.setX(
@@ -56,7 +48,6 @@ public class Controller_Dashboard_Visit implements Initializable {
                 this.stage.setY(
                         Screen.getPrimary().getVisualBounds().getHeight() / 2 - stage.getHeight() / 2
                 );
-                new FadeIn(this.boxVisit).play();
                 this.stage.toFront();
             }
         });
@@ -67,31 +58,44 @@ public class Controller_Dashboard_Visit implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        configStage();
+        Scene scene = new Scene(this.boxRoot);
+        scene.getStylesheets().add("styles.css");
+        scene.setFill(Color.TRANSPARENT);
+        this.boxRoot.getStyleClass().add(UserPreferences.getPreferenceString("THEME"));
+        this.stage.setScene(scene);
         this.comboBoxVisitors.itemsProperty().addListener((observableValue, oldValue, newValue) -> {
             Platform.runLater(() -> this.comboBoxVisitors.show());
         });
-        JDBC_Membership.ReadMemberships(Model_Membership.VISIT).thenAccept(model_visits -> this.comboBoxVisitors.setItems(model_visits));
+        JDBC_Membership.ReadMemberships(Model_Membership.VISIT).thenAccept(model_visits -> {
+            this.comboBoxVisitors.setItems(model_visits);
+            Platform.runLater(() -> this.comboBoxVisitors.requestFocus());
+        });
         this.fontIconClose.setOnMouseClicked(mouseEvent -> closeStage());
 
-        this.boxVisit.setOnKeyPressed(keyEvent -> {
+        this.boxRoot.setOnKeyPressed(keyEvent -> {
             if (keyEvent.getCode() == KeyCode.ESCAPE) {
                 closeStage();
             }
         });
 
         this.buttonRegister.setOnAction(actionEvent -> {
-            if (Validator.emptyValidator(new InputDetails(this.comboBoxVisitors, String.valueOf(this.comboBoxVisitors.getSelectionModel().getSelectedIndex())))) {
-                this.boxVisit.setDisable(true);
+            if (Validator.emptyValidator(this.comboBoxVisitors)) {
+                this.boxRoot.setDisable(true);
                 JDBC_Payment_Visit.CreatePaymentVisit(this.comboBoxVisitors.getSelectionModel().getSelectedItem());
                 Notifications.Success("Visita", "Visita de $" + this.comboBoxVisitors.getSelectionModel().getSelectedItem().getPrice() + " registrada");
                 closeStage();
             }
         });
-        Platform.runLater(this.stage::showAndWait);
+        Platform.runLater(() -> {
+            Application.isAnimationFinished = true;
+            Application.isChildLoaded = true;
+            Loading.close();
+            this.stage.showAndWait();
+        });
     }
 
     private void closeStage() {
+        Application.STAGE_PRIMARY = null;
         Platform.runLater(this.stage::close);
     }
 }

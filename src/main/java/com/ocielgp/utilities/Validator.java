@@ -6,143 +6,117 @@ import com.jfoenix.controls.JFXDatePicker;
 import com.jfoenix.controls.JFXPasswordField;
 import com.jfoenix.controls.JFXTextField;
 import javafx.scene.Node;
+import javafx.scene.control.TextField;
 import javafx.scene.paint.Color;
 
-import java.util.ListIterator;
+import java.math.BigDecimal;
 
 public class Validator {
-    public static boolean emptyValidator(InputDetails input) {
-        if (input.getMetadata().replace(" ", "").length() == 0 || input.getMetadata().equals("-1")) {
-            shakeInput(input.getNode());
-            Notifications.Danger("Error", "Los campos en rojo no pueden estar vacios.");
-            return false;
+    private static String getMetadataFromNode(Node node) {
+        if (node.getClass() == JFXTextField.class || node.getClass() == JFXPasswordField.class) {
+            return ((TextField) node).getText();
+        } else if (node.getClass() == JFXComboBox.class) {
+            return String.valueOf(((JFXComboBox<?>) node).getSelectionModel().getSelectedIndex());
         } else {
-            return true;
+            return "";
         }
     }
 
-    public static boolean emptyValidator(ListIterator<InputDetails> inputs) {
-        int inputsInvalid = 0;
-        while (inputs.hasNext()) {
-            InputDetails input = inputs.next();
-            if (input.getMetadata().replace(" ", "").length() == 0 || input.getMetadata().equals("-1")) {
-                inputsInvalid++;
-                shakeInput(input.getNode());
+    public static boolean emptyValidator(Node... nodes) {
+        boolean formValid = true;
+        for (Node node : nodes) {
+            String metadata = getMetadataFromNode(node);
+            if (metadata.replace(" ", "").length() == 0 || metadata.equals("-1")) {
+                if (formValid) formValid = false;
+                shakeInput(node);
             }
         }
-        if (inputsInvalid == 0) {
-            return true;
-        } else {
-            Notifications.Danger("Error", "Los campos en rojo no pueden estar vacios.");
-            return false;
+        if (!formValid) {
+            Notifications.Danger("Error", "Los campos en rojo no pueden estar vacios");
         }
+        return formValid;
     }
 
-    public static boolean textValidator(ListIterator<InputDetails> inputs) {
+    public static boolean textValidator(Node... nodes) {
         String regex = "[a-zA-ZáÁéÉíÍóÓúÚñÑ ]+";
-        int inputsInvalid = 0;
-        while (inputs.hasNext()) {
-            InputDetails inputDetails = inputs.next();
-            if (!inputDetails.getMetadata().matches(regex)) {
-                inputsInvalid++;
-                shakeInput(inputDetails.getNode());
+        boolean formValid = true;
+        for (Node node : nodes) {
+            String metadata = getMetadataFromNode(node);
+            if (!metadata.matches(regex)) {
+                if (formValid) formValid = false;
+                shakeInput(node);
             }
         }
-        if (inputsInvalid == 0) {
-            return true;
-        } else {
-            Notifications.Danger("Error", "Los campos en rojo deben ser solo texto.");
-            return false;
+        if (!formValid) {
+            Notifications.Danger("Error", "Los campos en rojo deben ser solo texto");
         }
+        return formValid;
     }
 
-    public static boolean numberValidator(InputDetails input, boolean notify, boolean focus) {
+    public static boolean numberValidator(Node node, boolean requestFocus) {
         String regex = "[0-9]+";
-        int inputsInvalid = 0;
-        if (!input.getMetadata().replace(" ", "").matches(regex)) {
-            shakeInput(input.getNode());
-            inputsInvalid++;
+        String metadata = getMetadataFromNode(node);
+        boolean formValid = true;
+        if (!metadata.replace(" ", "").matches(regex)) {
+            if (formValid) formValid = false;
+            shakeInput(node);
         }
-        if (inputsInvalid == 0) {
-            return true;
-        } else {
-            if (notify) {
-                Notifications.Danger("Error", "Los campos en rojo deben ser solo numéros.");
-            }
-            if (focus) {
-                input.getNode().requestFocus();
-            }
-            return false;
+        if (!formValid && requestFocus) {
+            node.requestFocus();
         }
+        return formValid;
     }
 
-    public static boolean numberValidator(ListIterator<InputDetails> inputs) {
+    public static boolean phoneValidator(Node node) {
         String regex = "[0-9]+";
-        int inputsInvalid = 0;
-        while (inputs.hasNext()) {
-            InputDetails input = inputs.next();
-            if (!input.getMetadata().replace(" ", "").matches(regex)) {
-                shakeInput(input.getNode());
-                inputsInvalid++;
-            }
-        }
-        if (inputsInvalid == 0) {
-            return true;
-        } else {
-            Notifications.Danger("Error", "Los campos en rojo deben ser solo numéros.");
-            return false;
-        }
-    }
-
-    public static boolean phoneValidator(InputDetails phoneInput) {
-        String regex = "[0-9]+";
-        String phone = phoneInput.getMetadata().replace(" ", "");
+        String phone = getMetadataFromNode(node).replace(" ", "");
         if (phone.matches(regex)) {
             if (phone.length() != 10) {
-                shakeInput(phoneInput.getNode());
-                Notifications.Danger("Error", "El teléfono debe tener 10 numéros.");
+                shakeInput(node);
+                Notifications.Danger("Error", "El teléfono debe tener 10 numéros");
                 return false;
             }
             return true;
         } else {
-            shakeInput(phoneInput.getNode());
-            Notifications.Danger("Error", "El teléfono debe tener solo numéros.");
+            shakeInput(node);
+            Notifications.Danger("Error", "El teléfono debe tener solo numéros");
             return false;
         }
     }
 
-    public static boolean emailValidator(InputDetails emailInput) {
+    public static boolean emailValidator(Node node) {
         String regex = "(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)])";
-        String phone = Input.spaceRemover(emailInput.getMetadata()).toLowerCase();
-        if (phone.matches(regex)) {
+        String email = Input.spaceRemover(getMetadataFromNode(node)).toLowerCase();
+        if (email.matches(regex)) {
             return true;
         } else {
-            shakeInput(emailInput.getNode());
-            Notifications.Danger("Error", "El correo no es válido.");
+            shakeInput(node);
+            Notifications.Danger("Error", "El correo no es válido");
             return false;
         }
     }
 
-    public static boolean moneyValidator(InputDetails input, boolean notify) {
+    public static boolean moneyValidator(Node node, boolean notify) {
         try {
-            Double.parseDouble(input.getMetadata());
+            new BigDecimal(getMetadataFromNode(node));
             return true;
         } catch (NumberFormatException ignored) {
-            if (!input.getMetadata().isEmpty()) {
-                shakeInput(input.getNode());
-            }
+//            if (!node.getMetadata().isEmpty()) {
+//                shakeInput(node.getNode());
+//            }
         }
         if (notify) {
-            Notifications.Danger("Error", "Cantidad no válida.");
+            Notifications.Danger("Error", "Cantidad no válida");
+            shakeInput(node);
         }
         return false;
     }
 
 
-    public static boolean moneyValidator(ListIterator<InputDetails> inputs) {
+    /*public static boolean moneyValidator(Node... nodes) {
         int inputsInvalid = 0;
-        while (inputs.hasNext()) {
-            InputDetails input = inputs.next();
+        while (nodes.hasNext()) {
+            InputMetadata input = nodes.next();
             try {
                 Double.parseDouble(input.getMetadata());
             } catch (NumberFormatException ignored) {
@@ -153,10 +127,10 @@ public class Validator {
         if (inputsInvalid == 0) {
             return true;
         } else {
-            Notifications.Danger("Error", "Los campos en rojo deben tener solo numéros.");
+            Notifications.Danger("Error", "Los campos en rojo deben tener solo numéros");
             return false;
         }
-    }
+    }*/
 
     public static void shakeInput(Node... inputs) {
         for (Node input : inputs) {
