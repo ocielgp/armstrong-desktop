@@ -13,26 +13,21 @@ import java.util.TimeZone;
 public class Application {
     public static Controller_App controllerApp;
     public static Controller_Dashboard controllerDashboard;
-    private static Model_Admin modelAdmin;
     public static Stage STAGE_PRIMARY;
     public static Stage STAGE_SECONDARY;
     public static Stage STAGE_POPUP;
     public static boolean isSecureMode = false;
-    public static boolean isAnimationFinished = false;
-    public static boolean isChildLoaded = false;
+    private static Model_Admin modelAdmin;
+    private static JFXComboBox<Model_Gym> comboBoxGyms;
 
     static {
-        Locale.setDefault(
-                new Locale(
-                        UserPreferences.getPreferenceString("LANGUAGE"),
-                        UserPreferences.getPreferenceString("COUNTRY")
-                )
-        );
-        TimeZone.setDefault(
-                TimeZone.getTimeZone(
-                        UserPreferences.getPreferenceString("TIMEZONE")
-                )
-        );
+        Locale.setDefault(new Locale(
+                UserPreferences.getPreferenceString("LANGUAGE"),
+                UserPreferences.getPreferenceString("COUNTRY")
+        ));
+        TimeZone.setDefault(TimeZone.getTimeZone(
+                UserPreferences.getPreferenceString("TIMEZONE")
+        ));
     }
 
     public static void RequestFocus() {
@@ -45,8 +40,9 @@ public class Application {
         }
     }
 
-    public static void setAppController(Controller_App controllerApp) {
+    public static void setAppController(Controller_App controllerApp, JFXComboBox<Model_Gym> comboBoxGymsNode) {
         Application.controllerApp = controllerApp;
+        comboBoxGyms = comboBoxGymsNode;
     }
 
     public static Model_Admin getModelAdmin() {
@@ -60,11 +56,11 @@ public class Application {
     /* Content methods */
 
     public static JFXComboBox<Model_Gym> getCurrentGymNode() {
-        return controllerApp.getGymNode();
+        return comboBoxGyms;
     }
 
     public static Model_Gym getCurrentGym() {
-        return controllerApp.getGym();
+        return comboBoxGyms.getValue();
     }
 
     public static Controller_Dashboard getDashboardController() {
@@ -81,13 +77,13 @@ public class Application {
 
     public static void EnableDashboard() {
         if (controllerDashboard != null) {
-            controllerDashboard.eventEnableDashboard();
+            Router.enableDashboard();
         }
     }
 
     public static void DisableDashboard() {
         if (controllerDashboard != null) {
-            controllerDashboard.eventDisableDashboard();
+            Router.disableDashboard();
         }
     }
 }

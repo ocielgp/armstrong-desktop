@@ -1,7 +1,6 @@
 package com.ocielgp.controller;
 
 import animatefx.animation.FadeIn;
-import animatefx.animation.FadeInUp;
 import com.ocielgp.app.Application;
 import com.ocielgp.app.Router;
 import com.ocielgp.app.UserPreferences;
@@ -29,7 +28,7 @@ public class Controller_Dashboard implements Initializable {
     @FXML
     private GridPane boxDashboard;
     @FXML
-    private ScrollPane scrollPaneContent;
+    private ScrollPane appDashboard;
 
     @FXML
     private ImageView imageViewLogo;
@@ -80,10 +79,10 @@ public class Controller_Dashboard implements Initializable {
         HashMap<HBox, Pair<String, String>> routes = new HashMap<>();
         routes.put(navSummary, new Pair<>(Router.SUMMARY, "Resumen"));
         routes.put(navMembers, new Pair<>(Router.MEMBERS, "Socios"));
-        Router.initRouter(
+        Router.InitRouter(
                 Router.MEMBERS, // TODO: change to summary route
                 labelSection,
-                scrollPaneContent,
+                appDashboard,
                 routes
         );
         /* End Routing */
@@ -91,9 +90,9 @@ public class Controller_Dashboard implements Initializable {
         // Fingerprint_Controller
         Fingerprint_Controller.initializeUI(this.fontIconFingerprint, this.labelFingerprintStatus);
 
-        this.navSecureMode.setOnMouseClicked(mouseEvent -> eventSecureMode());
+        this.navSecureMode.setOnMouseClicked(mouseEvent -> secureMode());
 
-        Platform.runLater(() -> new FadeInUp(Application.getCurrentGymNode()).play());
+        Platform.runLater(() -> Application.getCurrentGymNode().setDisable(false));
     }
 
     public void showUserInfo(String style, byte[] photo, Integer idMember, String name, String gym, String membership) {
@@ -115,14 +114,13 @@ public class Controller_Dashboard implements Initializable {
         });
     }
 
-    // events
-    private void eventSecureMode() {
+    private void secureMode() {
         Popup popup = new Popup();
         if (Application.isSecureMode) {
             popup.password();
             if (popup.showAndWait()) {
-                eventEnableDashboard();
-                this.scrollPaneContent.setEffect(null);
+                Application.EnableDashboard();
+                this.appDashboard.setEffect(null);
                 Application.isSecureMode = false;
             }
         } else {
@@ -132,21 +130,10 @@ public class Controller_Dashboard implements Initializable {
                     "Bloquea la interfaz pero el sistema sigue funcionando"
             );
             if (popup.showAndWait()) {
-                eventDisableDashboard();
-                this.scrollPaneContent.setEffect(new GaussianBlur());
+                Application.DisableDashboard();
+                this.appDashboard.setEffect(new GaussianBlur());
                 Application.isSecureMode = true;
             }
         }
     }
-
-    public void eventEnableDashboard() {
-        Router.isRouterAvailable = true;
-        this.scrollPaneContent.setDisable(false);
-    }
-
-    public void eventDisableDashboard() {
-        Router.isRouterAvailable = false;
-        this.scrollPaneContent.setDisable(true);
-    }
-
 }

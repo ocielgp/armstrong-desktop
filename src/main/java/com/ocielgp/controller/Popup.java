@@ -7,7 +7,7 @@ import com.jfoenix.controls.JFXPasswordField;
 import com.ocielgp.app.Application;
 import com.ocielgp.app.UserPreferences;
 import com.ocielgp.utilities.Hash;
-import com.ocielgp.utilities.Input;
+import com.ocielgp.utilities.InputProperties;
 import com.ocielgp.utilities.Loader;
 import com.ocielgp.utilities.Styles;
 import javafx.application.Platform;
@@ -129,7 +129,7 @@ public class Popup implements Initializable {
             this.boxButtons.getChildren().add(buttonSecondary);
 
             if (this.popupType.equals(POPUP_CONFIRM)) {
-                Input.createVisibleEvent(this.boxPassword, false);
+                InputProperties.createVisibleEvent(this.boxPassword, false);
                 buttonPrimary.setOnAction(actionEvent -> eventConfirm());
                 Platform.runLater(buttonPrimary::requestFocus);
             } else if (this.popupType.equals(POPUP_PASSWORD)) {

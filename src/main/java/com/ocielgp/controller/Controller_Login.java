@@ -6,18 +6,12 @@ import com.jfoenix.controls.JFXPasswordField;
 import com.jfoenix.controls.JFXTextField;
 import com.ocielgp.app.Application;
 import com.ocielgp.dao.JDBC_Admins;
-import com.ocielgp.utilities.FileLoader;
-import com.ocielgp.utilities.Loader;
-import com.ocielgp.utilities.Notifications;
-import com.ocielgp.utilities.Validator;
+import com.ocielgp.utilities.*;
 import javafx.application.Platform;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 
 import java.net.URL;
@@ -26,7 +20,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class Controller_Login implements Initializable {
     @FXML
-    private HBox boxLoginPane;
+    private HBox boxRoot;
     @FXML
     private ImageView imageUser;
     @FXML
@@ -36,68 +30,64 @@ public class Controller_Login implements Initializable {
     @FXML
     private JFXButton buttonLogin;
 
-    // Attributes
+    // attributes
     private byte attempts = 0;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         this.imageUser.setImage(FileLoader.getDefaultImage());
+        InputProperties.createEventEnter(this.buttonLogin, this.fieldUsername, this.fieldPassword);
+        this.buttonLogin.setOnAction(actionEvent -> auth());
 
-        this.buttonLogin.setOnAction(actionEvent -> {
-            if (Validator.emptyValidator(this.fieldUsername, this.fieldPassword)) {
-                this.boxLoginPane.setDisable(true);
-                CompletableFuture.runAsync(() -> {
-                    Boolean answer = JDBC_Admins.ReadLogin(this.fieldUsername.getText(), this.fieldPassword.getText());
-                    if (answer == null) {
-                        Platform.runLater(() -> new Flash(this.boxLoginPane).play());
-                        Notifications.Warn("Bloqueado", "Esta cuenta se encuentra bloqueada.");
-                    } else if (answer) {
-                        Node dashboardFXML = Loader.Load(
-                                "dashboard.fxml",
-                                "Login",
-                                false
-                        );
-                        Platform.runLater(() -> {
-                            FadeOutDown fadeOutDown = new FadeOutDown(this.boxLoginPane);
-                            fadeOutDown.setOnFinished((action) -> {
-                                Application.controllerApp.borderPaneApp.setCenter(dashboardFXML);
-                                new FadeIn(Application.controllerApp.borderPaneApp.getCenter()).play();
-                            });
-                            fadeOutDown.play();
-                        });
-                    } else {
-                        this.attempts++;
-                        if (attempts == 3) {
-                            Notifications.Danger("Intentos excedidos", "Si no recuerdas la contraseña, contacte con el encargado");
-                            Platform.runLater(() -> new Flash(this.boxLoginPane).play());
-                        } else {
-                            Notifications.Danger("Error", "Usuario / Contraseña incorrectos", 2);
-                            Platform.runLater(() -> {
-                                new Shake(this.boxLoginPane).play();
-                                this.boxLoginPane.setDisable(false);
-                            });
-                        }
-                    }
-                });
-            }
-        });
-
-        this.fieldUsername.setOnKeyPressed(this.eventHandlerLogin());
-        this.fieldPassword.setOnKeyPressed(this.eventHandlerLogin());
         Platform.runLater(() -> {
-            new FadeInUp(this.boxLoginPane).play();
+            new FadeInUp(this.boxRoot).play();
+            this.fieldUsername.requestFocus();
             this.fieldUsername.setText("Ociel");
             this.fieldPassword.setText("dos");
-            this.fieldUsername.requestFocus();
         });
     }
 
-    // Event handlers
-    private EventHandler<KeyEvent> eventHandlerLogin() {
-        return keyEvent -> {
-            if (keyEvent.getCode() == KeyCode.ENTER) {
-                this.buttonLogin.fire();
-            }
-        };
+    private void auth() {
+        if (Validator.emptyValidator(this.fieldUsername, this.fieldPassword)) {
+            this.boxRoot.setDisable(true);
+            CompletableFuture.runAsync(() -> {
+                Loading.show();
+                System.out.println("good");
+                Boolean isValidUser = JDBC_Admins.ReadLogin(this.fieldUsername.getText(), this.fieldPassword.getText());
+                if (isValidUser == null) {
+                    Platform.runLater(() -> new Flash(this.boxRoot).play());
+                    Notifications.Warn("Bloqueado", "Esta cuenta se encuentra bloqueada");
+                    Loading.closeNow();
+                } else if (isValidUser) {
+                    Node dashboardFXML = Loader.Load(
+                            "dashboard.fxml",
+                            "Login",
+                            true
+                    );
+                    Platform.runLater(() -> {
+                        FadeOutDown fadeOutDown = new FadeOutDown(this.boxRoot);
+                        fadeOutDown.setOnFinished((action) -> {
+                            Application.controllerApp.borderPaneRoot.setCenter(dashboardFXML);
+                            new FadeIn(Application.controllerApp.borderPaneRoot.getCenter()).play();
+                            Loading.isAnimationFinished.set(true);
+                        });
+                        fadeOutDown.play();
+                    });
+                } else {
+                    this.attempts++;
+                    if (attempts == 3) {
+                        Notifications.Danger("Intentos excedidos", "Si no recuerdas la contraseña, contacte con el encargado");
+                        Platform.runLater(() -> new Flash(this.boxRoot).play());
+                    } else {
+                        Notifications.Danger("Error", "Usuario / Contraseña incorrectos", 2);
+                        Platform.runLater(() -> {
+                            new Shake(this.boxRoot).play();
+                            this.boxRoot.setDisable(false);
+                        });
+                    }
+                    Loading.closeNow();
+                }
+            });
+        }
     }
 }

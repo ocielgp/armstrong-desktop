@@ -22,7 +22,7 @@ public class JDBC_Payment_Visit {
             ps.setInt(4, modelMembership.getIdMembership()); // idMembership
             ps.executeUpdate();
         } catch (SQLException sqlException) {
-            Notifications.CatchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
+            Notifications.CatchException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
         } finally {
             DataServer.closeConnection(con);
         }

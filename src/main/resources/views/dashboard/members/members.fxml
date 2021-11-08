@@ -6,9 +6,8 @@
 <?import javafx.scene.layout.*?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 <?import java.lang.*?>
-<GridPane fx:id="boxMembersPane" style="-fx-background-color: -fx-color-background;"
-          xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1"
-          fx:controller="com.ocielgp.controller.Controller_Members">
+<GridPane fx:id="boxRoot" style="-fx-background-color: -fx-color-background;" xmlns="http://javafx.com/javafx/15.0.1"
+          xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ocielgp.controller.Controller_Members">
     <columnConstraints>
         <ColumnConstraints hgrow="SOMETIMES" prefWidth="700.0"/>
         <ColumnConstraints maxWidth="412.0" minWidth="412.0"/>
@@ -140,6 +139,6 @@
             <Insets left="10.0" right="10.0" />
         </GridPane.margin>
     </VBox>
-    <VBox fx:id="memberPane" style="-fx-border-color: -fx-color-border; -fx-border-width: 0 0 0 1px;"
+    <VBox fx:id="boxRightTab" style="-fx-border-color: -fx-color-border; -fx-border-width: 0 0 0 1px;"
           GridPane.columnIndex="1"/>
 </GridPane>

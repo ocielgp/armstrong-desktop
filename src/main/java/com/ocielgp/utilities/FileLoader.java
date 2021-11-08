@@ -29,12 +29,12 @@ public class FileLoader {
                     image = new Image(file);
                     file.close();
                 } catch (Exception exception) {
-                    Notifications.CatchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], exception.getMessage(), exception);
+                    Notifications.CatchException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], exception.getMessage(), exception);
                 }
                 return image;
             }).get();
         } catch (InterruptedException | ExecutionException exception) {
-            Notifications.CatchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], exception.getMessage(), exception);
+            Notifications.CatchException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], exception.getMessage(), exception);
         }
         return null;
     }
@@ -47,12 +47,12 @@ public class FileLoader {
                 try {
                     imgBytes.close();
                 } catch (IOException ioException) {
-                    Notifications.CatchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], ioException.getMessage(), ioException);
+                    Notifications.CatchException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], ioException.getMessage(), ioException);
                 }
                 return image;
             }).get();
         } catch (InterruptedException | ExecutionException exception) {
-            Notifications.CatchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], exception.getMessage(), exception);
+            Notifications.CatchException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], exception.getMessage(), exception);
         }
         return null;
     }

@@ -117,7 +117,7 @@ public class Pagination {
     }
 
     public void unselectTable() {
-        this.tableView.getSelectionModel().select(-1);
+        this.tableView.getSelectionModel().select(null);
     }
 
     public void restartTable() {
@@ -161,7 +161,6 @@ public class Pagination {
                 });
                 this.tableView.setItems(queryRows.getData());
                 this.labelCurrentPage.setText(this.page.toString());
-                Loading.closeNow();
             } else {
                 this.restartCounters();
             }

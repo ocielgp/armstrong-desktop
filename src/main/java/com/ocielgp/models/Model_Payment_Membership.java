@@ -1,31 +1,29 @@
 package com.ocielgp.models;
 
-import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
 import java.time.LocalDateTime;
 
 public class Model_Payment_Membership extends Model_Membership {
-    private final IntegerProperty idPaymentMembership = new SimpleIntegerProperty();
+    private final ObjectProperty<Integer> idPaymentMembership = new SimpleObjectProperty<>();
     private final ObjectProperty<Short> months = new SimpleObjectProperty<>();
     private final ObjectProperty<LocalDateTime> startDateTime = new SimpleObjectProperty<>();
     private final ObjectProperty<LocalDateTime> endDateTime = new SimpleObjectProperty<>();
     private final ObjectProperty<Short> idGym = new SimpleObjectProperty<>();
-    private final IntegerProperty idAdmin = new SimpleIntegerProperty();
-    private final IntegerProperty idMember = new SimpleIntegerProperty();
-    private final IntegerProperty idMembership = new SimpleIntegerProperty();
+    private final ObjectProperty<Integer> idAdmin = new SimpleObjectProperty<>();
+    private final ObjectProperty<Integer> idMember = new SimpleObjectProperty<>();
+    private final ObjectProperty<Integer> idMembership = new SimpleObjectProperty<>();
 
-    public int getIdPaymentMembership() {
+    public Integer getIdPaymentMembership() {
         return idPaymentMembership.get();
     }
 
-    public IntegerProperty idPaymentMembershipProperty() {
+    public ObjectProperty<Integer> idPaymentMembershipProperty() {
         return idPaymentMembership;
     }
 
-    public void setIdPaymentMembership(int idPaymentMembership) {
+    public void setIdPaymentMembership(Integer idPaymentMembership) {
         this.idPaymentMembership.set(idPaymentMembership);
     }
 
@@ -77,41 +75,41 @@ public class Model_Payment_Membership extends Model_Membership {
         this.idGym.set(idGym);
     }
 
-    public int getIdAdmin() {
+    public Integer getIdAdmin() {
         return idAdmin.get();
     }
 
-    public IntegerProperty idAdminProperty() {
+    public ObjectProperty<Integer> idAdminProperty() {
         return idAdmin;
     }
 
-    public void setIdAdmin(int idAdmin) {
+    public void setIdAdmin(Integer idAdmin) {
         this.idAdmin.set(idAdmin);
     }
 
-    public int getIdMember() {
+    public Integer getIdMember() {
         return idMember.get();
     }
 
-    public IntegerProperty idMemberProperty() {
+    public ObjectProperty<Integer> idMemberProperty() {
         return idMember;
     }
 
-    public void setIdMember(int idMember) {
+    public void setIdMember(Integer idMember) {
         this.idMember.set(idMember);
     }
 
     @Override
-    public int getIdMembership() {
+    public Integer getIdMembership() {
         return idMembership.get();
     }
 
     @Override
-    public IntegerProperty idMembershipProperty() {
+    public ObjectProperty<Integer> idMembershipProperty() {
         return idMembership;
     }
 
-    public void setIdMembership(int idMembership) {
+    public void setIdMembership(Integer idMembership) {
         this.idMembership.set(idMembership);
     }
 }

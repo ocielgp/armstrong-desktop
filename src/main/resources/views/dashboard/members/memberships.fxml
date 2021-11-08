@@ -14,7 +14,7 @@
                 <VBox.margin>
                     <Insets/>
                 </VBox.margin>
-                <Label style="-fx-text-fill: -fx-color-text;" text="MEMBRESÍAS"/>
+                <Label style="-fx-text-fill: -fx-color-text;" text="Membresías"/>
                 <styleClass>
                     <String fx:value="default-style"/>
                     <String fx:value="form-header"/>
@@ -49,7 +49,7 @@
                     <children>
                         <HBox alignment="CENTER">
                             <children>
-                                <Label styleClass="bold" text="HISTÓRICO">
+                                <Label styleClass="bold" text="Histórico">
                                     <graphic>
                                         <FontIcon iconLiteral="gmi-description"/>
                                     </graphic>
@@ -58,7 +58,7 @@
                         </HBox>
                         <HBox spacing="5.0">
                             <children>
-                                <Label styleClass="bold" text="Modificado"/>
+                                <Label styleClass="bold" text="Mod."/>
                                 <Label fx:id="labelModified" text="Label"/>
                             </children>
                         </HBox>
@@ -74,7 +74,7 @@
                     <children>
                         <HBox alignment="CENTER">
                             <children>
-                                <Label styleClass="bold" text="MEMBRESÍA">
+                                <Label styleClass="bold" text="Membresía">
                                     <graphic>
                                         <FontIcon iconLiteral="gmi-calendar-today"/>
                                     </graphic>

@@ -96,7 +96,7 @@ public class Fingerprint_Capture implements ActionListener {
                                         )
                                 );
                             } catch (UareUException uareUException) {
-                                Notifications.CatchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], uareUException.getMessage(), uareUException);
+                                Notifications.CatchException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], uareUException.getMessage(), uareUException);
                             }
                         }
                         System.out.println("[Data]: " + evt.capture_result.image.getData());
@@ -152,7 +152,7 @@ public class Fingerprint_Capture implements ActionListener {
                                         Notifications.Danger("Lector de huellas", "Las huellas son diferentes, vuelve a intentar", 2);
                                     }
                                 } catch (UareUException uareUException) {
-                                    Notifications.CatchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], uareUException.getMessage(), uareUException);
+                                    Notifications.CatchException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], uareUException.getMessage(), uareUException);
                                 }
 
                                 // discard FMDs
@@ -170,7 +170,7 @@ public class Fingerprint_Capture implements ActionListener {
                         }
                     });
                 } catch (UareUException uareUException) {
-                    Notifications.CatchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], uareUException.getMessage(), uareUException);
+                    Notifications.CatchException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], uareUException.getMessage(), uareUException);
                 }
             } else if (Reader.CaptureQuality.CANCELED == evt.capture_result.quality) {
                 // capture or streaming was canceled, just quit
@@ -180,7 +180,7 @@ public class Fingerprint_Capture implements ActionListener {
             }
         } else if (evt.exception != null) {
             // exception during capture
-            Notifications.CatchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], evt.exception.getMessage(), evt.exception);
+            Notifications.CatchException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], evt.exception.getMessage(), evt.exception);
             Fingerprint_Controller.setStatusCode(0); // fingerprint Off
         } else if (null != evt.reader_status) {
             // reader failure
@@ -193,7 +193,7 @@ public class Fingerprint_Capture implements ActionListener {
         try {
             reader.Open(Reader.Priority.COOPERATIVE);
         } catch (UareUException uareUException) {
-            Notifications.CatchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], uareUException.getMessage(), uareUException);
+            Notifications.CatchException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], uareUException.getMessage(), uareUException);
         }
         StartCaptureThread();
     }

@@ -21,6 +21,7 @@ import javafx.stage.StageStyle;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.net.URL;
+import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.ResourceBundle;
 import java.util.Timer;
@@ -69,7 +70,7 @@ public class Notifications {
     private static FadeInRight fadeInRightNotification;
     private static final double DEFAULT_SECONDS = 3;
 
-    static {
+    public static void start() {
         stage.initOwner(Application.STAGE_PRIMARY);
         stage.initModality(Modality.NONE);
         stage.setAlwaysOnTop(true);
@@ -99,7 +100,7 @@ public class Notifications {
                                 fadeInRightNotification = null;
                             });
                         }
-                        HideNotification();
+                        HiddenNotification();
                     } else if (mouseEvent.getButton() == MouseButton.SECONDARY) {
                         if (fadeInRightNotification != null) {
                             Platform.runLater(() -> {
@@ -108,7 +109,7 @@ public class Notifications {
                                 fadeInRightNotification = null;
                             });
                         }
-                        ClearNotifications();
+                        ClearAllNotifications();
                     }
                 }
             });
@@ -126,7 +127,7 @@ public class Notifications {
             timer.schedule(new TimerTask() {
                 @Override
                 public void run() {
-                    HideNotification();
+                    HiddenNotification();
                 }
             }, notificationSeconds.getFirst().longValue() * 1000);
             Platform.runLater(() -> {
@@ -144,7 +145,7 @@ public class Notifications {
         });
     }
 
-    synchronized public static void HideNotification() {
+    synchronized public static void HiddenNotification() {
         CompletableFuture.runAsync(() -> {
             Platform.runLater(() -> scene.getRoot().setDisable(true));
             notificationViews.pop();
@@ -161,7 +162,7 @@ public class Notifications {
         });
     }
 
-    private static void ClearNotifications() {
+    private static void ClearAllNotifications() {
         CompletableFuture.runAsync(() -> {
             notificationViews.clear();
             notificationSeconds.clear();
@@ -215,7 +216,7 @@ public class Notifications {
         Notifications.BuildNotification("gmi-close", title, content, DEFAULT_SECONDS, Styles.DANGER);
     }
 
-    public static void CatchError(String className, StackTraceElement exceptionMetaData, String body, Exception exception) {
+    public static void CatchException(String className, StackTraceElement exceptionMetaData, String body, Exception exception) {
         Notifications.BuildNotification(
                 "gmi-sync-problem",
                 className,
@@ -226,15 +227,15 @@ public class Notifications {
         exception.printStackTrace();
     }
 
-    public static void CatchError(String className, StackTraceElement exceptionMetaData, String body, Exception exception, String icon) {
+    public static void CatchSqlException(String className, StackTraceElement exceptionMetaData, SQLException sqlException) {
         Notifications.BuildNotification(
-                icon,
+                "gmi-sync-problem",
                 className,
-                "[" + exceptionMetaData.getMethodName() + " : " + exceptionMetaData.getLineNumber() + " line]\n" + body,
+                "[" + exceptionMetaData.getMethodName() + " : " + exceptionMetaData.getLineNumber() + " line]\n" + "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(),
                 20,
                 Styles.DANGER
         );
-        exception.printStackTrace();
+        sqlException.printStackTrace();
     }
 
 }

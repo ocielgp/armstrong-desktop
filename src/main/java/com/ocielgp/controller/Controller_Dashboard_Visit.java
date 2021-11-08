@@ -87,9 +87,7 @@ public class Controller_Dashboard_Visit implements Initializable {
             }
         });
         Platform.runLater(() -> {
-            Application.isAnimationFinished = true;
-            Application.isChildLoaded = true;
-            Loading.close();
+            Loading.closeNow();
             this.stage.showAndWait();
         });
     }

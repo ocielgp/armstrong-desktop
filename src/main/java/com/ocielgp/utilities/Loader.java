@@ -20,7 +20,7 @@ public class Loader {
                 node.setOpacity(0);
             }
         } catch (IOException ioException) {
-            Notifications.CatchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], ioException.getMessage(), ioException);
+            Notifications.CatchException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], ioException.getMessage(), ioException);
         }
         return node;
     }
@@ -37,7 +37,7 @@ public class Loader {
                 node.setOpacity(0);
             }
         } catch (IOException ioException) {
-            Notifications.CatchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], ioException.getMessage(), ioException);
+            Notifications.CatchException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], ioException.getMessage(), ioException);
         }
         return node;
     }

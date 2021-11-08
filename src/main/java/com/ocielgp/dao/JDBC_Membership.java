@@ -4,6 +4,7 @@ import com.ocielgp.app.Application;
 import com.ocielgp.models.Model_Membership;
 import com.ocielgp.utilities.DateTime;
 import com.ocielgp.utilities.Notifications;
+import com.ocielgp.utilities.ParamBuilder;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -23,7 +24,7 @@ public class JDBC_Membership {
                     Statement.RETURN_GENERATED_KEYS);
             ps.setBigDecimal(1, modelMembership.getPrice()); // price
             ps.setString(2, modelMembership.getName()); // name
-            ps.setBoolean(3, modelMembership.isMonthly()); // monthly
+            ps.setBoolean(3, modelMembership.getMonthly()); // monthly
             ps.setInt(4, Application.getModelAdmin().getIdMember()); // idAdmin
             ps.executeUpdate();
             rs = ps.getGeneratedKeys();
@@ -31,7 +32,7 @@ public class JDBC_Membership {
                 return rs.getInt(1);
             }
         } catch (SQLException sqlException) {
-            Notifications.CatchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
+            Notifications.CatchException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
         } finally {
             DataServer.closeConnection(con);
         }
@@ -75,11 +76,37 @@ public class JDBC_Membership {
                 }
                 con.close();
             } catch (SQLException sqlException) {
-                Notifications.CatchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
+                Notifications.CatchException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
             } finally {
                 DataServer.closeConnection(con);
             }
             return modelMembershipsList;
         });
+    }
+
+    public static boolean UpdateMembership(Model_Membership modelMembership) {
+        ParamBuilder paramBuilder = new ParamBuilder("MEMBERSHIPS", "idMembership", modelMembership.getIdMembership());
+        paramBuilder.addParam("name", modelMembership.getName());
+        paramBuilder.addParam("price", modelMembership.getPrice());
+        paramBuilder.addParam("monthly", modelMembership.getMonthly());
+        return paramBuilder.executeUpdate();
+    }
+
+    public static boolean DeleteMembership(int idMembership) {
+        Connection con = DataServer.getConnection();
+        try {
+            PreparedStatement ps;
+            assert con != null;
+            ps = con.prepareStatement("UPDATE MEMBERSHIPS SET idAdmin = ?, flag = 0 WHERE idMembership = ?");
+            ps.setInt(1, Application.getModelAdmin().getIdMember());
+            ps.setInt(2, idMembership);
+            ps.executeUpdate();
+            return true;
+        } catch (SQLException sqlException) {
+            Notifications.CatchException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
+            return false;
+        } finally {
+            DataServer.closeConnection(con);
+        }
     }
 }

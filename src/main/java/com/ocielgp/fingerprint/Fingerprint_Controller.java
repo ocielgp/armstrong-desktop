@@ -44,11 +44,11 @@ public class Fingerprint_Controller {
                 readerCollection.GetReaders();
                 reader = readerCollection.get(0); // catch exception
 
-                Notifications.Success("gmi-fingerprint", "Lector de Huellas", "Lector de huellas conectado", 2);
+//                Notifications.Success("gmi-fingerprint", "Lector de Huellas", "Lector de huellas conectado", 2);
                 StartCapture();
             } catch (Exception ignored) {
                 Fingerprint_Controller.setStatusCode(0);
-                Notifications.Warn("gmi-fingerprint", "Lector de Huellas", "Lector de huellas no detectado", 2);
+//                Notifications.Warn("gmi-fingerprint", "Lector de Huellas", "Lector de huellas no detectado", 2);
             }
 
             RefreshDashboard();
@@ -184,7 +184,7 @@ public class Fingerprint_Controller {
                             return false;
                         }
                     } catch (UareUException uareUException) {
-                        Notifications.CatchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], uareUException.getMessage(), uareUException);
+                        Notifications.CatchException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], uareUException.getMessage(), uareUException);
                     }
                 }
             }
@@ -218,7 +218,7 @@ public class Fingerprint_Controller {
                 return true;
             }
         } catch (UareUException uareUException) {
-            Notifications.CatchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], uareUException.getMessage(), uareUException);
+            Notifications.CatchException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], uareUException.getMessage(), uareUException);
         }
         return false;
     }
@@ -234,7 +234,7 @@ public class Fingerprint_Controller {
                     return true;
                 }
             } catch (UareUException uareUException) {
-                Notifications.CatchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], uareUException.getMessage(), uareUException);
+                Notifications.CatchException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], uareUException.getMessage(), uareUException);
             }
             return false;
         });

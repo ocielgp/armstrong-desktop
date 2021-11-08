@@ -2,12 +2,11 @@ package com.ocielgp;
 
 import com.ocielgp.app.Application;
 import com.ocielgp.controller.Controller_App;
-import com.ocielgp.models.Model_Admin;
 import com.ocielgp.utilities.FileLoader;
 import com.ocielgp.utilities.Loader;
 import com.ocielgp.utilities.Loading;
+import com.ocielgp.utilities.Notifications;
 import javafx.application.Platform;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
@@ -32,12 +31,11 @@ public class RunApp extends javafx.application.Application {
         Controller_App controllerApp = new Controller_App();
 
         Application.STAGE_PRIMARY = primaryStage;
-        Application.setAppController(controllerApp);
 
         BorderPane appView = (BorderPane) Loader.Load(
                 "app.fxml",
                 "RunApp",
-                false,
+                true,
                 controllerApp
         );
 
@@ -47,11 +45,9 @@ public class RunApp extends javafx.application.Application {
 
         // show app
         primaryStage.focusedProperty().addListener((observable, oldValue, newValue) -> {
-            Platform.runLater(() -> {
-                primaryStage.getIcons().setAll(
-                        (newValue) ? this.appIcon.get("focus") : this.appIcon.get("unfocused")
-                );
-            });
+            Platform.runLater(() -> primaryStage.getIcons().setAll(
+                    (newValue) ? this.appIcon.get("focus") : this.appIcon.get("unfocused")
+            ));
         });
         primaryStage.setTitle("Gym App by Ociel");
         primaryStage.setScene(scene);
@@ -66,26 +62,11 @@ public class RunApp extends javafx.application.Application {
             System.exit(0);
         });
 
-        // TODO: FIX BUG WINDOWS IS BLANK
-        Model_Admin modelAdmin = new Model_Admin();
-        modelAdmin.setPassword("a94cbdca65dd4582c45c2b8dd97aec782baa8fbad32b73b547bf5b0e52ef58f3");
-        modelAdmin.setIdRole(Short.valueOf("1"));
-        modelAdmin.setIdMember(2);
-        modelAdmin.setName("Ociel");
-        modelAdmin.setLastName("Garcia");
-        Application.setModelAdmin(modelAdmin);
-
-        Node loginFXML = Loader.Load(
-                "login.fxml",
-                "Login",
-                true
-        );
-        appView.setCenter(loginFXML);
-
-        staticHandlers();
+        startComponents();
     }
 
-    private void staticHandlers() {
-        Loading.create();
+    private void startComponents() {
+        Notifications.start();
+        Loading.start();
     }
 }

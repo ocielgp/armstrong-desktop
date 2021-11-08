@@ -1,18 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import org.kordamp.ikonli.javafx.*?>
 <?import java.lang.String?>
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.RowConstraints?>
-<?import javafx.scene.layout.VBox?>
-<?import org.kordamp.ikonli.javafx.FontIcon?>
-
 <GridPane fx:id="boxDashboard" prefHeight="768.0" prefWidth="1366.0" styleClass="dashboard" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ocielgp.controller.Controller_Dashboard">
     <columnConstraints>
         <ColumnConstraints hgrow="SOMETIMES" maxWidth="200.0" minWidth="200.0" />
@@ -183,5 +176,6 @@
          <Insets bottom="10.0" top="10.0" />
       </GridPane.margin>
    </HBox>
-    <ScrollPane fx:id="scrollPaneContent" fitToHeight="true" fitToWidth="true" styleClass="content" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+    <ScrollPane fx:id="appDashboard" fitToHeight="true" fitToWidth="true" styleClass="content" GridPane.columnIndex="1"
+                GridPane.rowIndex="1"/>
 </GridPane>

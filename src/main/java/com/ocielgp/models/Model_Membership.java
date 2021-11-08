@@ -1,6 +1,9 @@
 package com.ocielgp.models;
 
-import javafx.beans.property.*;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -15,22 +18,22 @@ public class Model_Membership {
     public static final byte MAX_PRICE = 10;
     public static final byte MAX_NAME = 60;
 
-    private final IntegerProperty idMembership = new SimpleIntegerProperty();
-    private final ObjectProperty<BigDecimal> price = new SimpleObjectProperty<>();
+    private final ObjectProperty<Integer> idMembership = new SimpleObjectProperty<>();
     private final StringProperty name = new SimpleStringProperty();
-    private final BooleanProperty monthly = new SimpleBooleanProperty();
+    private final ObjectProperty<BigDecimal> price = new SimpleObjectProperty<>();
+    private final ObjectProperty<Boolean> monthly = new SimpleObjectProperty<>();
     private final ObjectProperty<LocalDateTime> dateTime = new SimpleObjectProperty<>();
-    private final IntegerProperty idAdmin = new SimpleIntegerProperty();
+    private final ObjectProperty<Integer> idAdmin = new SimpleObjectProperty<>();
 
-    public int getIdMembership() {
+    public Integer getIdMembership() {
         return idMembership.get();
     }
 
-    public IntegerProperty idMembershipProperty() {
+    public ObjectProperty<Integer> idMembershipProperty() {
         return idMembership;
     }
 
-    public void setIdMembership(int idMembership) {
+    public void setIdMembership(Integer idMembership) {
         this.idMembership.set(idMembership);
     }
 
@@ -58,15 +61,15 @@ public class Model_Membership {
         this.name.set(name);
     }
 
-    public boolean isMonthly() {
+    public Boolean getMonthly() {
         return monthly.get();
     }
 
-    public BooleanProperty monthlyProperty() {
+    public ObjectProperty<Boolean> monthlyProperty() {
         return monthly;
     }
 
-    public void setMonthly(boolean monthly) {
+    public void setMonthly(Boolean monthly) {
         this.monthly.set(monthly);
     }
 
@@ -82,21 +85,21 @@ public class Model_Membership {
         this.dateTime.set(dateTime);
     }
 
-    public int getIdAdmin() {
+    public Integer getIdAdmin() {
         return idAdmin.get();
     }
 
-    public IntegerProperty idAdminProperty() {
+    public ObjectProperty<Integer> idAdminProperty() {
         return idAdmin;
     }
 
-    public void setIdAdmin(int idAdmin) {
+    public void setIdAdmin(Integer idAdmin) {
         this.idAdmin.set(idAdmin);
     }
 
     @Override
     public String toString() {
-        if (isMonthly()) {
+        if (getMonthly()) {
             return "[MEN][$" + getPrice() + "]: " + getName();
         } else {
             return "[VIS][$" + getPrice() + "]: " + getName();

@@ -64,7 +64,7 @@ public class PhotoHandler {
                     this.formChangeListener.change("photo", false);
                 }
             } catch (Exception exception) {
-                Notifications.CatchError(
+                Notifications.CatchException(
                         MethodHandles.lookup().lookupClass().getSimpleName(),
                         Thread.currentThread().getStackTrace()[1],
                         exception.getMessage(),

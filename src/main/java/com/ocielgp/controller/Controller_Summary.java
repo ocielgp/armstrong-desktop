@@ -1,7 +1,6 @@
 package com.ocielgp.controller;
 
 import animatefx.animation.FadeIn;
-import com.ocielgp.app.Application;
 import com.ocielgp.utilities.Loading;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -33,8 +32,11 @@ public class Controller_Summary implements Initializable {
 //        charts.getChildren().add(pieChart);
 
         Platform.runLater(() -> {
-            new FadeIn(this.rootPane).play();
-            Loading.close();
+            FadeIn fadeIn = new FadeIn(this.rootPane);
+            fadeIn.setOnFinished(actionEvent -> {
+                Loading.closeNow();
+            });
+            fadeIn.play();
         });
     }
 }

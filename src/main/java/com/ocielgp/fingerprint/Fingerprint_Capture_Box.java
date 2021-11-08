@@ -3,7 +3,7 @@ package com.ocielgp.fingerprint;
 import com.digitalpersona.uareu.Fmd;
 import com.jfoenix.controls.JFXButton;
 import com.ocielgp.dao.JDBC_Member_Fingerprint;
-import com.ocielgp.utilities.Input;
+import com.ocielgp.utilities.InputProperties;
 import javafx.application.Platform;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
@@ -26,7 +26,7 @@ public class Fingerprint_Capture_Box {
         this.labelFingerprintCounter = labelFingerprintCounter;
         this.buttonStartCapture = buttonStartCapture;
         this.buttonRestartCapture = buttonRestartCapture;
-        Input.createVisibleEvent(this.boxFingerprintPane, true);
+        InputProperties.createVisibleEvent(this.boxFingerprintPane, true);
 
         this.buttonStartCapture.setOnAction(actionEvent -> captureEvent());
         this.buttonRestartCapture.setOnAction(actionEvent -> this.restartCaptureEvent());

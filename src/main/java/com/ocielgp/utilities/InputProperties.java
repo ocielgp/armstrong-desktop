@@ -1,18 +1,23 @@
 package com.ocielgp.utilities;
 
 import animatefx.animation.FadeIn;
-import com.jfoenix.controls.JFXComboBox;
-import com.jfoenix.controls.JFXDatePicker;
-import com.jfoenix.controls.JFXPasswordField;
-import com.jfoenix.controls.JFXTextField;
+import com.jfoenix.controls.*;
 import javafx.scene.Node;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextInputControl;
+import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
-public class Input {
+public class InputProperties {
+    public static void createEventEnter(JFXButton buttonTarget, TextField... textFields) {
+        for (int i = 0; i < textFields.length; i++) {
+            textFields[i].setOnKeyPressed(keyEvent -> {
+                if (keyEvent.getCode() == KeyCode.ENTER) {
+                    buttonTarget.fire();
+                }
+            });
+        }
+    }
+
     public static void createVisibleEvent(Node node) {
         node.visibleProperty().addListener((observable, oldValue, newValue) -> {
             node.setVisible(newValue);

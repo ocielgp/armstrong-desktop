@@ -146,13 +146,21 @@ public class Controller_Member implements Initializable {
     private Model_Member modelMember = null;
     private Model_Member modelAdmin = null;
     private final Pagination pagination;
+    private int idMember = -1;
+    private String style;
 
     public Controller_Member(Pagination pagination) {
         this.pagination = pagination;
     }
 
+    public Controller_Member(Pagination pagination, int idMember, String style) {
+        this.pagination = pagination;
+        this.idMember = idMember;
+        this.style = style;
+    }
+
     private void configureForm() {
-        Input.getScrollEvent(this.scrollPane);
+        InputProperties.getScrollEvent(this.scrollPane);
         this.boxMember.heightProperty().addListener((observableValue, oldValue, newValue) -> {
             if (newValue.doubleValue() > oldValue.doubleValue() && oldValue.doubleValue() != 0) {
                 Platform.runLater(() -> this.scrollPane.setVvalue(1d));
@@ -164,19 +172,19 @@ public class Controller_Member implements Initializable {
         });
 
         // set max length
-        Input.createMaxLengthEvent(this.pi_fieldName, Model_Member.nameLength);
-        Input.createMaxLengthEvent(this.pi_fieldLastName, Model_Member.lastNameLength);
-        Input.createMaxLengthEvent(this.pi_fieldNotes, Model_Member.notesLength);
+        InputProperties.createMaxLengthEvent(this.pi_fieldName, Model_Member.nameLength);
+        InputProperties.createMaxLengthEvent(this.pi_fieldLastName, Model_Member.lastNameLength);
+        InputProperties.createMaxLengthEvent(this.pi_fieldNotes, Model_Member.notesLength);
     }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         configureForm();
         createFormChangeListener();
-        Input.createComboBoxListener(this.pi_comboBoxGender, this.ms_comboBoxMemberships);
+        InputProperties.createComboBoxListener(this.pi_comboBoxGender, this.ms_comboBoxMemberships);
 
         // quick view
-        Input.createVisibleEvent(this.boxQuickView, false);
+        InputProperties.createVisibleEvent(this.boxQuickView, false);
 
         // photo section
         this.photoHandler = new PhotoHandler(this.formChangeListener, this.ph_imgMemberPhoto, this.ph_buttonDeletePhoto);
@@ -196,12 +204,14 @@ public class Controller_Member implements Initializable {
 
         // membership
         JDBC_Membership.ReadMemberships(Model_Membership.MONTHLY).thenAccept(model_memberships -> {
+            if (this.idMember == -1) {
+                Loading.isChildLoaded.set(true);
+                this.pagination.unselectTable();
+            }
             this.ms_comboBoxMemberships.setItems(model_memberships);
-            Application.isChildLoaded = true;
-            Loading.close();
         });
-        Input.createVisibleEvent(this.ms_boxEndDate, false);
-        Input.createVisibleEvent(this.ms_boxMonths, false);
+        InputProperties.createVisibleEvent(this.ms_boxEndDate, false);
+        InputProperties.createVisibleEvent(this.ms_boxMonths, false);
         this.ms_comboBoxMemberships.valueProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
                 Platform.runLater(() -> eventUpdatePrice(true));
@@ -214,11 +224,11 @@ public class Controller_Member implements Initializable {
         });
         this.ms_iconSubtractMonth.setOnMouseClicked(mouseEvent -> eventSubtractMonth());
         this.ms_iconAddMonth.setOnMouseClicked(mouseEvent -> eventAddMonth());
-        Input.createVisibleEvent(this.ms_boxButtons, false);
+        InputProperties.createVisibleEvent(this.ms_boxButtons, false);
 
         // payment -> hide
-        Input.createVisibleEvent(this.boxPayment, false);
-        Input.createVisibleEvent(this.pym_boxOwe, false);
+        InputProperties.createVisibleEvent(this.boxPayment, false);
+        InputProperties.createVisibleEvent(this.pym_boxOwe, false);
         this.boxPayment.visibleProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue) {
                 Platform.runLater(() -> this.pym_togglePayment.setSelected(true));
@@ -227,7 +237,7 @@ public class Controller_Member implements Initializable {
         this.pym_togglePayment.selectedProperty().addListener((observableValue, oldValue, newValue) -> {
             Platform.runLater(() -> this.pym_boxOwe.setVisible(!newValue));
             if (newValue) { // hide boxOwe
-                Input.clearInputs(this.pym_fieldPaidOut, this.pym_fieldOwe);
+                InputProperties.clearInputs(this.pym_fieldPaidOut, this.pym_fieldOwe);
             } else { // show boxOwe
                 Platform.runLater(() -> {
                     this.pym_fieldPaidOut.requestFocus();
@@ -245,8 +255,8 @@ public class Controller_Member implements Initializable {
         });
 
         // shortcut
-        Input.createVisibleEvent(this.boxShortcut, false);
-        Input.createVisibleEvent(this.s_buttonPayDebt, false);
+        InputProperties.createVisibleEvent(this.boxShortcut, false);
+        InputProperties.createVisibleEvent(this.s_buttonPayDebt, false);
 
         // end buttons
         this.buttonAction.setOnAction(actionEvent -> createMember());
@@ -254,15 +264,14 @@ public class Controller_Member implements Initializable {
             eventClearForm(false);
             this.pagination.unselectTable();
         });
-    }
 
-    public Controller_Member(Pagination pagination, int idMember, String style) {
-        this.pagination = pagination;
-        getMemberData(idMember, style);
+        if (this.idMember > -1) {
+            getMemberData(this.idMember, this.style);
+        }
     }
 
     public void getMemberData(int idMember, String style) {
-        new FadeOutRight(this.scrollPane).play();
+        Platform.runLater(() -> new FadeOutRight(this.scrollPane).play());
         JDBC_Member.ReadMember(idMember).thenAccept(model_member -> {
             this.modelMember = model_member;
             this.modelMember.setIdMember(idMember);
@@ -326,7 +335,6 @@ public class Controller_Member implements Initializable {
                 this.ms_comboBoxMemberships.getItems().forEach(model_membership -> { // select current membership
                     if (model_membership.getIdMembership() == this.modelMember.getModelPaymentMembership().getIdMembership()) {
                         this.ms_comboBoxMemberships.getSelectionModel().select(model_membership);
-                        this.ms_labelEndDate.setText(DateTime.getDateWithDayName(this.modelMember.getModelPaymentMembership().getEndDateTime()));
                         createMembershipButtons();
                     }
                 });
@@ -349,16 +357,24 @@ public class Controller_Member implements Initializable {
             this.s_buttonPayDebt.setVisible(this.modelMember.getStyle().equals(Styles.CREATIVE));
             this.boxShortcut.setVisible(true);
 
-
             // end buttons
             this.buttonAction.setText("Guardar cambios");
             this.buttonAction.setDisable(true);
             this.buttonClear.setText("Cancelar");
 
+            this.formChangeListener.setListen(true);
+            if (this.modelMember.getModelPaymentMembership() != null)
+                this.ms_labelEndDate.setText(DateTime.getDateWithDayName(this.modelMember.getModelPaymentMembership().getEndDateTime()));
+
             FadeInRight fadeInRightScrollPane = new FadeInRight(this.scrollPane);
             fadeInRightScrollPane.setOnFinished(actionEvent -> {
-                Loading.closeNow();
-                this.formChangeListener.setListen(true);
+                if (this.idMember > -1) {
+                    Loading.isChildLoaded.set(true);
+                    this.idMember = -1;
+                    this.style = null;
+                } else {
+                    Loading.closeNow();
+                }
             });
             fadeInRightScrollPane.play();
         });
@@ -376,7 +392,7 @@ public class Controller_Member implements Initializable {
 
             Fingerprint_Controller.FB_RestartCapture();
 
-            Input.clearInputs(
+            InputProperties.clearInputs(
                     this.pi_fieldName,
                     this.pi_fieldLastName,
                     this.pi_comboBoxGender,
@@ -402,7 +418,7 @@ public class Controller_Member implements Initializable {
                 this.modelAdmin = null;
                 this.scrollPane.setVvalue(0d);
                 FadeInRight fadeInRightScrollPane = new FadeInRight(this.scrollPane);
-
+                fadeInRightScrollPane.setOnFinished(actionEvent -> this.pi_fieldName.requestFocus());
                 fadeInRightScrollPane.play();
             }
         });
@@ -410,8 +426,6 @@ public class Controller_Member implements Initializable {
 
     private void createMember() {
         CompletableFuture.runAsync(() -> {
-            System.out.println("va");
-            System.out.println("fue");
             ArrayList<Node> nodesRequired = new ArrayList<>();
             // personal information
             nodesRequired.add(this.pi_fieldName);
@@ -444,11 +458,11 @@ public class Controller_Member implements Initializable {
                 if (formValid) { // form 100% valid
                     // modelMember
                     Model_Member modelMember = new Model_Member();
-                    modelMember.setName(Input.capitalizeFirstLetterPerWord(this.pi_fieldName.getText()));
-                    modelMember.setLastName(Input.capitalizeFirstLetterPerWord(this.pi_fieldLastName.getText()));
+                    modelMember.setName(InputProperties.capitalizeFirstLetterPerWord(this.pi_fieldName.getText()));
+                    modelMember.setLastName(InputProperties.capitalizeFirstLetterPerWord(this.pi_fieldLastName.getText()));
                     modelMember.setGender(this.pi_comboBoxGender.getSelectionModel().getSelectedItem());
 
-                    modelMember.setNotes(Input.capitalizeFirstLetter(this.pi_fieldNotes.getText()));
+                    modelMember.setNotes(InputProperties.capitalizeFirstLetter(this.pi_fieldNotes.getText()));
                     modelMember.setIdGym(Application.getCurrentGym().getIdGym());
 
                     // modelMembership
@@ -496,7 +510,7 @@ public class Controller_Member implements Initializable {
                                         isOk = JDBC_Debt.CreateDebt(this.modelMember.getIdMember(), modelDebt);
                                     }
                                 }
-                                if (isOk && this.formChangeListener.isChanged("membershipRemove")) {
+                                if (isOk && this.formChangeListener.isChanged("membershipDelete")) {
                                     isOk = JDBC_Payment_Membership.DeletePaymentMembership(this.modelMember.getModelPaymentMembership());
                                 }
                                 if (isOk && this.formChangeListener.isChanged("photo")) {
@@ -534,10 +548,11 @@ public class Controller_Member implements Initializable {
                                 }
                             }
 
+                            Loading.closeNow();
                             this.pagination.restartTable();
                             eventClearForm(false);
                         } catch (Exception exception) {
-                            Notifications.CatchError(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], exception.getMessage(), exception);
+                            Notifications.CatchException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], exception.getMessage(), exception);
                         }
                     }
                 }
@@ -552,7 +567,7 @@ public class Controller_Member implements Initializable {
             buttonChangeMembership.setOnAction(actionEvent -> eventMembershipChange());
             JFXButton buttonRemoveMembership = new JFXButton("Quitar");
             buttonRemoveMembership.getStyleClass().addAll("btn-colorful", "danger-style");
-            buttonRemoveMembership.setOnAction(actionEvent -> eventMembershipRemove());
+            buttonRemoveMembership.setOnAction(actionEvent -> eventMembershipDelete());
             this.ms_boxButtons.getChildren().setAll(buttonChangeMembership, buttonRemoveMembership);
             this.ms_boxButtons.setVisible(true);
         } else {
@@ -587,12 +602,12 @@ public class Controller_Member implements Initializable {
         }
     }
 
-    private void eventMembershipRemove() {
+    private void eventMembershipDelete() {
         Popup popup = new Popup();
         popup.password();
         if (popup.showAndWait()) {
             this.ms_labelEndDate.getStyleClass().add("strikethrough");
-            formChangeListener.change("membershipRemove", false);
+            formChangeListener.change("membershipDelete", false);
             this.ms_boxButtons.setDisable(true);
         }
     }
@@ -621,17 +636,17 @@ public class Controller_Member implements Initializable {
             if (this.modelMember == null || this.modelMember.getModelPaymentMembership() == null) {
                 this.ms_boxMonths.setVisible(true);
                 this.boxPayment.setVisible(true);
-
             }
             if (this.formChangeListener.isListen()) {
-                if (this.modelMember != null && this.modelMember.getModelPaymentMembership() == null) {
-                    this.formChangeListener.change("membershipRenew", false);
-
-                }
-                if (this.formChangeListener.isChanged("membershipRenew") || this.formChangeListener.isChanged("membershipChange") || this.formChangeListener.isChanged("membershipRemove")) {
-                    this.ms_labelEndDate.setText(
-                            DateTime.getEndDate(this.totalMonths)
-                    );
+                if (this.modelMember != null) {
+                    if (this.modelMember.getModelPaymentMembership() == null) {
+                        this.formChangeListener.change("membershipRenew", false);
+                    }
+                    if (this.formChangeListener.isChanged("membershipRenew") || this.formChangeListener.isChanged("membershipChange") || this.formChangeListener.isChanged("membershipDelete")) {
+                        this.ms_labelEndDate.setText(
+                                DateTime.getEndDate(this.totalMonths)
+                        );
+                    }
                 }
             } else {
                 this.ms_labelEndDate.setText(
@@ -645,7 +660,7 @@ public class Controller_Member implements Initializable {
                                 BigDecimal.valueOf(this.totalMonths)
                         )
                 );
-                Input.clearInputs(this.pym_fieldPaidOut);
+                InputProperties.clearInputs(this.pym_fieldPaidOut);
                 this.pym_fieldOwe.setText(this.membershipPrice.get().toString());
             }
         });
@@ -695,7 +710,6 @@ public class Controller_Member implements Initializable {
         });
     }
 
-    // Update listener
     private void createFormChangeListener() {
         this.formChangeListener = new FormChangeListener(this.buttonAction);
         formChangeListener.add("photo");
@@ -706,7 +720,7 @@ public class Controller_Member implements Initializable {
         formChangeListener.add("fingerprint");
         formChangeListener.add("membershipRenew");
         formChangeListener.add("membershipChange");
-        formChangeListener.add("membershipRemove");
+        formChangeListener.add("membershipDelete");
         this.pi_fieldName.setOnKeyTyped(keyEvent -> {
             if (this.formChangeListener.isListen()) {
                 this.formChangeListener.change(
