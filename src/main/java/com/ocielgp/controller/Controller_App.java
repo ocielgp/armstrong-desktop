@@ -35,7 +35,7 @@ public class Controller_App implements Initializable {
 
         this.comboBoxGyms.setDisable(true);
 
-        this.boxTheme.setOnMouseClicked(mouseEvent -> changeTheme());
+        this.boxTheme.setOnMouseClicked(mouseEvent -> eventChangeTheme());
 
         // recover last gym if exists
         readLastGym();
@@ -61,9 +61,10 @@ public class Controller_App implements Initializable {
         });
     }
 
-    private void changeTheme() {
+    private void eventChangeTheme() {
+        System.out.println("change teme");
         String newTheme = (UserPreferences.getPreferenceString("THEME").equals("day-theme")) ? "night-theme" : "day-theme";
-        this.borderPaneRoot.getStyleClass().set(1, newTheme);
+        Platform.runLater(() -> this.borderPaneRoot.getStyleClass().set(1, newTheme));
         UserPreferences.setPreference("THEME", newTheme);
     }
 

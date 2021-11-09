@@ -5,6 +5,7 @@ import com.ocielgp.app.UserPreferences;
 import com.ocielgp.models.Model_Member;
 import com.ocielgp.utilities.DateTime;
 import com.ocielgp.utilities.Notifications;
+import com.ocielgp.utilities.ParamBuilder;
 import com.ocielgp.utilities.Styles;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -28,7 +29,7 @@ public class JDBC_Member {
             ps.setString(3, modelMember.getGender()); // gender
             if (modelMember.getNotes().equals("")) ps.setNull(4, Types.NULL); // notes
             else ps.setString(4, modelMember.getNotes());
-            ps.setInt(5, modelMember.getIdGym()); // idGym
+            ps.setInt(5, Application.getCurrentGym().getIdGym()); // idGym
             ps.executeUpdate();
 
             rs = ps.getGeneratedKeys();
@@ -77,7 +78,7 @@ public class JDBC_Member {
                 PreparedStatement ps;
                 ResultSet rs;
                 assert con != null;
-                ps = con.prepareStatement("SELECT name, lastName, gender, notes, registrationDateTime, access, idGym FROM MEMBERS WHERE idMember = ? ORDER BY idMember DESC");
+                ps = con.prepareStatement("SELECT name, lastName, gender, notes, createdAt, access, idGym FROM MEMBERS WHERE idMember = ? ORDER BY idMember DESC");
                 ps.setInt(1, idMember);
                 rs = ps.executeQuery();
                 if (rs.next()) {
@@ -85,7 +86,7 @@ public class JDBC_Member {
                     modelMember.setLastName(rs.getString("lastName"));
                     modelMember.setGender(rs.getString("gender"));
                     modelMember.setNotes(rs.getString("notes") == null ? "" : rs.getString("notes"));
-                    modelMember.setRegistrationDateTime(DateTime.MySQLToJava(rs.getString("registrationDateTime")));
+                    modelMember.setCreatedAt(DateTime.MySQLToJava(rs.getString("createdAt")));
                     modelMember.setAccess(rs.getBoolean("access"));
                     modelMember.setIdGym(rs.getInt("idGym"));
                     try {
@@ -190,7 +191,7 @@ public class JDBC_Member {
                         LocalDateTime endDateTime = DateTime.MySQLToJava(rs.getString("endDateTime"));
                         modelMember.setEndDate(DateTime.getDateShort(endDateTime));
                         long daysLeft = DateTime.getDaysLeft(endDateTime);
-                        modelMember.setStyle(JDBC_Member.ReadStyle(modelMember.isAccess(), daysLeft, rs.getBoolean("haveDebts")));
+                        modelMember.setStyle(JDBC_Member.ReadStyle(modelMember.getAccess(), daysLeft, rs.getBoolean("haveDebts")));
                     } else {
                         modelMember.setIdMember(rs.getInt("idMember"));
                         modelMember.setName(rs.getString("name"));
@@ -210,112 +211,13 @@ public class JDBC_Member {
         });
     }
 
-    public static boolean UpdateName(int idMember, String newName) {
-        Connection con = DataServer.getConnection();
-        try {
-            PreparedStatement ps;
-            assert con != null;
-            ps = con.prepareStatement("UPDATE MEMBERS SET name = ? WHERE idMember = ?");
-            ps.setString(1, newName);
-            ps.setInt(2, idMember);
-            ps.executeUpdate();
-            return true;
-        } catch (SQLException sqlException) {
-            Notifications.CatchException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
-            return false;
-        } finally {
-            DataServer.closeConnection(con);
-        }
-    }
-
-    public static boolean UpdateLastName(int idMember, String newLastName) {
-        Connection con = DataServer.getConnection();
-        try {
-            PreparedStatement ps;
-            assert con != null;
-            ps = con.prepareStatement("UPDATE MEMBERS SET lastName = ? WHERE idMember = ?");
-            ps.setString(1, newLastName);
-            ps.setInt(2, idMember);
-            ps.executeUpdate();
-            return true;
-        } catch (SQLException sqlException) {
-            Notifications.CatchException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
-            return false;
-        } finally {
-            DataServer.closeConnection(con);
-        }
-    }
-
-    public static boolean UpdateGender(int idMember, String newGender) {
-        Connection con = DataServer.getConnection();
-        try {
-            PreparedStatement ps;
-            assert con != null;
-            ps = con.prepareStatement("UPDATE MEMBERS SET gender = ? WHERE idMember = ?");
-            ps.setString(1, newGender);
-            ps.setInt(2, idMember);
-            ps.executeUpdate();
-            return true;
-        } catch (SQLException sqlException) {
-            Notifications.CatchException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
-            return false;
-        } finally {
-            DataServer.closeConnection(con);
-        }
-    }
-
-    public static void UpdatePhone(int idMember, String newPhone) {
-        CompletableFuture.runAsync(() -> {
-            Connection con = DataServer.getConnection();
-            try {
-                PreparedStatement ps;
-                assert con != null;
-                ps = con.prepareStatement("UPDATE MEMBERS SET phone = ? WHERE idMember = ?");
-                ps.setString(1, newPhone);
-                ps.setInt(2, idMember);
-                ps.executeUpdate();
-            } catch (SQLException sqlException) {
-                Notifications.CatchException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
-            } finally {
-                DataServer.closeConnection(con);
-            }
-        });
-    }
-
-    public static void UpdateEmail(int idMember, String newEmail) {
-        CompletableFuture.runAsync(() -> {
-            Connection con = DataServer.getConnection();
-            try {
-                PreparedStatement ps;
-                assert con != null;
-                ps = con.prepareStatement("UPDATE MEMBERS SET email = ? WHERE idMember = ?");
-                ps.setString(1, newEmail);
-                ps.setInt(2, idMember);
-                ps.executeUpdate();
-            } catch (SQLException sqlException) {
-                Notifications.CatchException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
-            } finally {
-                DataServer.closeConnection(con);
-            }
-        });
-    }
-
-    public static boolean UpdateNotes(int idMember, String newNotes) {
-        Connection con = DataServer.getConnection();
-        try {
-            PreparedStatement ps;
-            assert con != null;
-            ps = con.prepareStatement("UPDATE MEMBERS SET notes = ? WHERE idMember = ?");
-            ps.setString(1, newNotes);
-            ps.setInt(2, idMember);
-            ps.executeUpdate();
-            return true;
-        } catch (SQLException sqlException) {
-            Notifications.CatchException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
-            return false;
-        } finally {
-            DataServer.closeConnection(con);
-        }
+    public static boolean UpdateMember(Model_Member modelMember) {
+        ParamBuilder paramBuilder = new ParamBuilder("MEMBERS", "idMember", modelMember.getIdMember());
+        paramBuilder.addParam("name", modelMember.getName());
+        paramBuilder.addParam("lastName", modelMember.getLastName());
+        paramBuilder.addParam("gender", modelMember.getGender());
+        paramBuilder.addParam("notes", modelMember.getNotes());
+        return paramBuilder.executeUpdate();
     }
 
     public static CompletableFuture<Boolean> UpdateAccess(int idMember, boolean access) {

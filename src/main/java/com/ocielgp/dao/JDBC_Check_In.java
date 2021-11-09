@@ -22,7 +22,7 @@ public class JDBC_Check_In {
                 ResultSet rs;
                 assert con != null;
                 if (isStaff) {
-                    ps = con.prepareStatement("SELECT M.name, M.lastName, MP.photo, SR.name, G.name AS 'gymName' FROM MEMBERS M LEFT JOIN MEMBERS_PHOTOS MP ON M.idMember = MP.idMember JOIN STAFF_MEMBERS SM on M.idMember = SM.idMember JOIN STAFF_ROLE SR on SM.idRole = SR.idRole JOIN GYMS G on M.idGym = G.idGym WHERE M.idMember = ?");
+                    ps = con.prepareStatement("SELECT M.name, M.lastName, MP.photo, A.username, G.name AS 'gymName' FROM MEMBERS M LEFT JOIN MEMBERS_PHOTOS MP ON M.idMember = MP.idMember JOIN ADMINS A on M.idMember = A.idMember JOIN ADMINS_ROLES AR on AR.idRole = A.idRole JOIN GYMS G on M.idGym = G.idGym WHERE M.idMember = ?");
                     ps.setInt(1, idMember);
                     rs = ps.executeQuery();
 
@@ -98,7 +98,7 @@ public class JDBC_Check_In {
                 Loading.close();
             } finally {
                 DataServer.closeConnection(con);
-                JDBC_Member_Fingerprint.SCANNING = false;
+                JDBC_Member_Fingerprint.isReaderAvailable = true;
             }
         });
     }

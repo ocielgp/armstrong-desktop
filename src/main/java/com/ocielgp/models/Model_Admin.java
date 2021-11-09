@@ -1,12 +1,15 @@
 package com.ocielgp.models;
 
-import javafx.beans.property.*;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 
 public class Model_Admin extends Model_Member {
     private final StringProperty username = new SimpleStringProperty();
     private final StringProperty password = new SimpleStringProperty();
-    private final IntegerProperty idMember = new SimpleIntegerProperty();
-    private final IntegerProperty addedByIdMember = new SimpleIntegerProperty();
+    private final ObjectProperty<Integer> idMember = new SimpleObjectProperty<>();
+    private final ObjectProperty<Integer> addedByIdMember = new SimpleObjectProperty<>();
     private final ObjectProperty<Short> idRole = new SimpleObjectProperty<>();
 
     public String getUsername() {
@@ -34,28 +37,28 @@ public class Model_Admin extends Model_Member {
     }
 
     @Override
-    public int getIdMember() {
+    public Integer getIdMember() {
         return idMember.get();
     }
 
     @Override
-    public IntegerProperty idMemberProperty() {
+    public ObjectProperty<Integer> idMemberProperty() {
         return idMember;
     }
 
-    public void setIdMember(int idMember) {
+    public void setIdMember(Integer idMember) {
         this.idMember.set(idMember);
     }
 
-    public int getAddedByIdMember() {
+    public Integer getAddedByIdMember() {
         return addedByIdMember.get();
     }
 
-    public IntegerProperty addedByIdMemberProperty() {
+    public ObjectProperty<Integer> addedByIdMemberProperty() {
         return addedByIdMember;
     }
 
-    public void setAddedByIdMember(int addedByIdMember) {
+    public void setAddedByIdMember(Integer addedByIdMember) {
         this.addedByIdMember.set(addedByIdMember);
     }
 

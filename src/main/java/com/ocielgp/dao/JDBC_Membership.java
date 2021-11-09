@@ -19,20 +19,19 @@ public class JDBC_Membership {
             PreparedStatement ps;
             ResultSet rs;
             assert con != null;
-            ps = con.prepareStatement("INSERT INTO MEMBERSHIPS(price, name, monthly, idAdmin)" +
-                            "VALUE (?, ?, ?, ?)",
+            ps = con.prepareStatement("INSERT INTO MEMBERSHIPS(name, price, monthly, createdBy) VALUE (?, ?, ?, ?)",
                     Statement.RETURN_GENERATED_KEYS);
-            ps.setBigDecimal(1, modelMembership.getPrice()); // price
-            ps.setString(2, modelMembership.getName()); // name
+            ps.setString(1, modelMembership.getName()); // name
+            ps.setBigDecimal(2, modelMembership.getPrice()); // price
             ps.setBoolean(3, modelMembership.getMonthly()); // monthly
             ps.setInt(4, Application.getModelAdmin().getIdMember()); // idAdmin
             ps.executeUpdate();
             rs = ps.getGeneratedKeys();
-            if (rs.next()) { // return new Membership
+            if (rs.next()) { // return new id membership
                 return rs.getInt(1);
             }
         } catch (SQLException sqlException) {
-            Notifications.CatchException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
+            Notifications.CatchSqlException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], sqlException);
         } finally {
             DataServer.closeConnection(con);
         }
@@ -52,7 +51,7 @@ public class JDBC_Membership {
                 PreparedStatement ps;
                 ResultSet rs;
                 assert con != null;
-                String sql = "SELECT idMembership, price, name, monthly, dateTime, idAdmin FROM MEMBERSHIPS WHERE flag = 1";
+                String sql = "SELECT idMembership, name, price, monthly, createdAt, createdBy, updatedAt, updatedBy FROM MEMBERSHIPS WHERE flag = 1";
                 if (monthly == 0 || monthly == 1) {
                     sql += " AND monthly = ?";
                     ps = con.prepareStatement(sql + " ORDER BY monthly, price DESC");
@@ -60,15 +59,16 @@ public class JDBC_Membership {
 
                 } else ps = con.prepareStatement(sql + " ORDER BY monthly DESC, price");
                 rs = ps.executeQuery();
-
                 while (rs.next()) {
                     Model_Membership modelMembership = new Model_Membership();
                     modelMembership.setIdMembership(rs.getInt("idMembership"));
-                    modelMembership.setPrice(rs.getBigDecimal("price"));
                     modelMembership.setName(rs.getString("name"));
+                    modelMembership.setPrice(rs.getBigDecimal("price"));
                     modelMembership.setMonthly(rs.getBoolean("monthly"));
-                    modelMembership.setDateTime(DateTime.MySQLToJava(rs.getString("dateTime")));
-                    modelMembership.setIdAdmin(rs.getInt("idAdmin"));
+                    modelMembership.setCreatedAt(DateTime.MySQLToJava(rs.getString("createdAt")));
+                    modelMembership.setCreatedBy(rs.getInt("createdBy"));
+                    modelMembership.setUpdatedAt(DateTime.MySQLToJava(rs.getString("updatedAt")));
+                    modelMembership.setUpdatedBy(rs.getInt("updatedBy"));
                     modelMembershipsList.add(modelMembership);
                 }
                 if (modelMembershipsList.isEmpty()) {
@@ -93,20 +93,9 @@ public class JDBC_Membership {
     }
 
     public static boolean DeleteMembership(int idMembership) {
-        Connection con = DataServer.getConnection();
-        try {
-            PreparedStatement ps;
-            assert con != null;
-            ps = con.prepareStatement("UPDATE MEMBERSHIPS SET idAdmin = ?, flag = 0 WHERE idMembership = ?");
-            ps.setInt(1, Application.getModelAdmin().getIdMember());
-            ps.setInt(2, idMembership);
-            ps.executeUpdate();
-            return true;
-        } catch (SQLException sqlException) {
-            Notifications.CatchException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
-            return false;
-        } finally {
-            DataServer.closeConnection(con);
-        }
+        ParamBuilder paramBuilder = new ParamBuilder("MEMBERSHIPS", "idMembership", idMembership);
+        paramBuilder.addParam("updatedBy", Application.getModelAdmin().getIdMember());
+        paramBuilder.addParam("flag", 0);
+        return paramBuilder.executeUpdate();
     }
 }

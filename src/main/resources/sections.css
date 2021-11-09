@@ -6,7 +6,7 @@
 }
 
 .dashboard .aside *:disabled {
-    /*-fx-opacity: 1;*/
+    -fx-opacity: 1;
 }
 
 .dashboard .aside .option {
@@ -116,13 +116,14 @@
 }
 
 .form-header {
-    -fx-background-color: -fx-color-text;
+    -fx-background-color: -fx-color-background;
+    -fx-border-width: 1px 1px 0px 1px;
+    -fx-border-color: -fx-color-border;
     -fx-padding: 10px;
-
 }
 
 .form-header .label {
-    -fx-text-fill: -fx-color-background !important;
+    -fx-text-fill: -fx-color-text;
 }
 
 .form-section {

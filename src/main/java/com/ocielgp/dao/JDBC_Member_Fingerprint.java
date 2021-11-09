@@ -19,17 +19,16 @@ import java.util.ListIterator;
 import java.util.concurrent.CompletableFuture;
 
 public class JDBC_Member_Fingerprint {
-    public static boolean SCANNING = false;
+    public static boolean isReaderAvailable = true;
 
     public static boolean CreateFingerprints(int idMember, ListIterator<Fmd> fingerprints) {
         Connection con = DataServer.getConnection();
         try {
             PreparedStatement ps;
-            // remove all previous fingerprints if exists
             assert con != null;
             ps = con.prepareStatement("DELETE FROM MEMBERS_FINGERPRINTS WHERE idMember = ?");
             ps.setInt(1, idMember);
-            ps.executeUpdate();
+            ps.executeUpdate(); // remove all previous fingerprints if exists
 
             while (fingerprints.hasNext()) {
                 ps = con.prepareStatement("INSERT INTO MEMBERS_FINGERPRINTS(fingerprint, idMember) VALUE (?, ?)");
@@ -47,7 +46,7 @@ public class JDBC_Member_Fingerprint {
     }
 
     synchronized public static void ReadFindFingerprint(Fmd fingerprint) {
-        if (!SCANNING) {
+        if (isReaderAvailable) {
             CompletableFuture.runAsync(() -> {
                 Connection con = DataServer.getConnection();
                 try {
@@ -64,10 +63,10 @@ public class JDBC_Member_Fingerprint {
                             return;
                         }
                     }
-                    Notifications.Danger("gmi-fingerprint", "Lector de Huellas", "Huella no encontrada", 1.5);
+                    Notifications.Danger("gmi-fingerprint", "Lector de Huellas", "Huella no encontrada", 2);
                     Loading.close();
                 } catch (SQLException sqlException) {
-                    Notifications.CatchException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
+                    Notifications.CatchSqlException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], sqlException);
                 } finally {
                     DataServer.closeConnection(con);
                 }

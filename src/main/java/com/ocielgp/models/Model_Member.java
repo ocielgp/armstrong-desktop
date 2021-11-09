@@ -1,6 +1,9 @@
 package com.ocielgp.models;
 
-import javafx.beans.property.*;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 
 import java.time.LocalDateTime;
 
@@ -10,14 +13,17 @@ public class Model_Member {
     public static final byte lastNameLength = 30;
     public static final byte notesLength = 80;
 
-    private final IntegerProperty idMember = new SimpleIntegerProperty();
+    private final ObjectProperty<Integer> idMember = new SimpleObjectProperty<>();
     private final StringProperty name = new SimpleStringProperty();
     private final StringProperty lastName = new SimpleStringProperty();
     private final StringProperty gender = new SimpleStringProperty();
     private final StringProperty notes = new SimpleStringProperty();
-    private final ObjectProperty<LocalDateTime> registrationDateTime = new SimpleObjectProperty<>();
-    private final BooleanProperty access = new SimpleBooleanProperty();
-    private final IntegerProperty idGym = new SimpleIntegerProperty();
+    private final ObjectProperty<Boolean> access = new SimpleObjectProperty<>();
+    private final ObjectProperty<Integer> idGym = new SimpleObjectProperty<>();
+    private final ObjectProperty<LocalDateTime> createdAt = new SimpleObjectProperty<>();
+    private final ObjectProperty<Integer> createdBy = new SimpleObjectProperty<>();
+    private final ObjectProperty<LocalDateTime> updatedAt = new SimpleObjectProperty<>();
+    private final ObjectProperty<Integer> updatedBy = new SimpleObjectProperty<>();
 
     private final StringProperty endDate = new SimpleStringProperty();
     private String style;
@@ -35,15 +41,15 @@ public class Model_Member {
     // debts
     private Model_Debt modelDebt;
 
-    public int getIdMember() {
+    public Integer getIdMember() {
         return idMember.get();
     }
 
-    public IntegerProperty idMemberProperty() {
+    public ObjectProperty<Integer> idMemberProperty() {
         return idMember;
     }
 
-    public void setIdMember(int idMember) {
+    public void setIdMember(Integer idMember) {
         this.idMember.set(idMember);
     }
 
@@ -95,40 +101,76 @@ public class Model_Member {
         this.notes.set(notes);
     }
 
-    public LocalDateTime getRegistrationDateTime() {
-        return registrationDateTime.get();
-    }
-
-    public ObjectProperty<LocalDateTime> registrationDateTimeProperty() {
-        return registrationDateTime;
-    }
-
-    public void setRegistrationDateTime(LocalDateTime registrationDateTime) {
-        this.registrationDateTime.set(registrationDateTime);
-    }
-
-    public boolean isAccess() {
+    public Boolean getAccess() {
         return access.get();
     }
 
-    public BooleanProperty accessProperty() {
+    public ObjectProperty<Boolean> accessProperty() {
         return access;
     }
 
-    public void setAccess(boolean access) {
+    public void setAccess(Boolean access) {
         this.access.set(access);
     }
 
-    public int getIdGym() {
+    public Integer getIdGym() {
         return idGym.get();
     }
 
-    public IntegerProperty idGymProperty() {
+    public ObjectProperty<Integer> idGymProperty() {
         return idGym;
     }
 
-    public void setIdGym(int idGym) {
+    public void setIdGym(Integer idGym) {
         this.idGym.set(idGym);
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt.get();
+    }
+
+    public ObjectProperty<LocalDateTime> createdAtProperty() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt.set(createdAt);
+    }
+
+    public Integer getCreatedBy() {
+        return createdBy.get();
+    }
+
+    public ObjectProperty<Integer> createdByProperty() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(Integer createdBy) {
+        this.createdBy.set(createdBy);
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt.get();
+    }
+
+    public ObjectProperty<LocalDateTime> updatedAtProperty() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt.set(updatedAt);
+    }
+
+    public Integer getUpdatedBy() {
+        return updatedBy.get();
+    }
+
+    public ObjectProperty<Integer> updatedByProperty() {
+        return updatedBy;
+    }
+
+    public void setUpdatedBy(Integer updatedBy) {
+        this.updatedBy.set(updatedBy);
     }
 
     public String getEndDate() {
@@ -157,6 +199,14 @@ public class Model_Member {
 
     public void setModelMemberPhoto(Model_Member_Photo modelMemberPhoto) {
         this.modelMemberPhoto = modelMemberPhoto;
+    }
+
+    public Model_Member_Fingerprint getModelMemberFingerprint() {
+        return modelMemberFingerprint;
+    }
+
+    public void setModelMemberFingerprint(Model_Member_Fingerprint modelMemberFingerprint) {
+        this.modelMemberFingerprint = modelMemberFingerprint;
     }
 
     public Model_Gym getModelGym() {

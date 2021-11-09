@@ -22,8 +22,10 @@ public class Model_Membership {
     private final StringProperty name = new SimpleStringProperty();
     private final ObjectProperty<BigDecimal> price = new SimpleObjectProperty<>();
     private final ObjectProperty<Boolean> monthly = new SimpleObjectProperty<>();
-    private final ObjectProperty<LocalDateTime> dateTime = new SimpleObjectProperty<>();
-    private final ObjectProperty<Integer> idAdmin = new SimpleObjectProperty<>();
+    private final ObjectProperty<LocalDateTime> createdAt = new SimpleObjectProperty<>();
+    private final ObjectProperty<Integer> createdBy = new SimpleObjectProperty<>();
+    private final ObjectProperty<LocalDateTime> updatedAt = new SimpleObjectProperty<>();
+    private final ObjectProperty<Integer> updatedBy = new SimpleObjectProperty<>();
 
     public Integer getIdMembership() {
         return idMembership.get();
@@ -35,18 +37,6 @@ public class Model_Membership {
 
     public void setIdMembership(Integer idMembership) {
         this.idMembership.set(idMembership);
-    }
-
-    public BigDecimal getPrice() {
-        return price.get();
-    }
-
-    public ObjectProperty<BigDecimal> priceProperty() {
-        return price;
-    }
-
-    public void setPrice(BigDecimal price) {
-        this.price.set(price);
     }
 
     public String getName() {
@@ -61,6 +51,18 @@ public class Model_Membership {
         this.name.set(name);
     }
 
+    public BigDecimal getPrice() {
+        return price.get();
+    }
+
+    public ObjectProperty<BigDecimal> priceProperty() {
+        return price;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price.set(price);
+    }
+
     public Boolean getMonthly() {
         return monthly.get();
     }
@@ -73,36 +75,60 @@ public class Model_Membership {
         this.monthly.set(monthly);
     }
 
-    public LocalDateTime getDateTime() {
-        return dateTime.get();
+    public LocalDateTime getCreatedAt() {
+        return createdAt.get();
     }
 
-    public ObjectProperty<LocalDateTime> dateTimeProperty() {
-        return dateTime;
+    public ObjectProperty<LocalDateTime> createdAtProperty() {
+        return createdAt;
     }
 
-    public void setDateTime(LocalDateTime dateTime) {
-        this.dateTime.set(dateTime);
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt.set(createdAt);
     }
 
-    public Integer getIdAdmin() {
-        return idAdmin.get();
+    public Integer getCreatedBy() {
+        return createdBy.get();
     }
 
-    public ObjectProperty<Integer> idAdminProperty() {
-        return idAdmin;
+    public ObjectProperty<Integer> createdByProperty() {
+        return createdBy;
     }
 
-    public void setIdAdmin(Integer idAdmin) {
-        this.idAdmin.set(idAdmin);
+    public void setCreatedBy(Integer createdBy) {
+        this.createdBy.set(createdBy);
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt.get();
+    }
+
+    public ObjectProperty<LocalDateTime> updatedAtProperty() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt.set(updatedAt);
+    }
+
+    public Integer getUpdatedBy() {
+        return updatedBy.get();
+    }
+
+    public ObjectProperty<Integer> updatedByProperty() {
+        return updatedBy;
+    }
+
+    public void setUpdatedBy(Integer updatedBy) {
+        this.updatedBy.set(updatedBy);
     }
 
     @Override
     public String toString() {
         if (getMonthly()) {
-            return "[MEN][$" + getPrice() + "]: " + getName();
+            return "[M][$" + getPrice() + "]: " + getName();
         } else {
-            return "[VIS][$" + getPrice() + "]: " + getName();
+            return "[D][$" + getPrice() + "]: " + getName();
         }
     }
 }

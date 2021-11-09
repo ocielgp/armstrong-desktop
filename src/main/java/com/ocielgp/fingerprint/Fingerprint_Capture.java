@@ -74,8 +74,7 @@ public class Fingerprint_Capture implements ActionListener {
     }
 
     public void actionPerformed(ActionEvent e) {
-        System.out.println("captura");
-        if (!JDBC_Member_Fingerprint.SCANNING) {
+        if (JDBC_Member_Fingerprint.isReaderAvailable) {
             if (e.getActionCommand().equals(Fingerprint_Capture_Thread.ACT_CAPTURE)) {
                 // event from capture thread
                 Fingerprint_Capture_Thread.CaptureEvent evt = (Fingerprint_Capture_Thread.CaptureEvent) e;

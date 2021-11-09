@@ -36,7 +36,9 @@ public class Controller_Membership implements Initializable {
     @FXML
     private VBox boxHistorical;
     @FXML
-    private Label labelModified;
+    private Label labelHistorical;
+    @FXML
+    private Label labelDateTime;
     @FXML
     private Label labelAdmin;
 
@@ -48,6 +50,8 @@ public class Controller_Membership implements Initializable {
     private JFXTextField fieldPrice;
     @FXML
     private JFXToggleButton toggleMonthly;
+    @FXML
+    private HBox boxButtonDelete;
     @FXML
     private JFXButton buttonDelete;
 
@@ -74,7 +78,7 @@ public class Controller_Membership implements Initializable {
         InputProperties.createVisibleAnimation(this.boxMemberships, false);
         InputProperties.createVisibleAnimation(this.boxHistorical, false);
         InputProperties.createVisibleAnimation(this.boxMembershipDetail, false);
-        InputProperties.createVisibleAnimation(this.buttonDelete, false);
+        InputProperties.createVisibleAnimation(this.boxButtonDelete, false);
         InputProperties.createVisibleAnimation(this.boxEndButtons, false);
 
         // properties binding
@@ -86,22 +90,26 @@ public class Controller_Membership implements Initializable {
         });
     }
 
-
-    @Override
-    public void initialize(URL url, ResourceBundle resourceBundle) {
-        configureForm();
-
+    private void configureData() {
         JDBC_Membership.ReadMemberships(Model_Membership.ALL).thenAccept(model_memberships -> {
             if (model_memberships.isEmpty()) this.buttonEdit.setDisable(true);
             else this.comboBoxMemberships.setItems(model_memberships);
             Loading.isChildLoaded.set(true);
         });
+    }
+
+
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+        configureForm();
+        configureData();
 
         // event handlers
         this.buttonCreate.setOnAction(actionEvent -> eventCreate());
         this.buttonEdit.setOnAction(actionEvent -> eventEdit());
 
         this.buttonDelete.setDisable(true);
+        this.buttonDelete.setOnAction(actionEvent -> eventDelete());
 
         // end buttons
         this.buttonSave.setOnAction(actionEvent -> eventSave());
@@ -109,8 +117,18 @@ public class Controller_Membership implements Initializable {
     }
 
     private void fillMembershipData(Model_Membership modelMembership) {
-        JDBC_Member.ReadMember(modelMembership.getIdAdmin()).thenAccept(model_member -> Platform.runLater(() -> {
-            this.labelModified.setText(DateTime.getDateWithDayName(modelMembership.getDateTime()));
+        int idMember;
+        if (modelMembership.getUpdatedBy() == 0) {
+            Platform.runLater(() -> this.labelHistorical.setText("Creado"));
+            idMember = modelMembership.getCreatedBy();
+        } else {
+            Platform.runLater(() -> this.labelHistorical.setText("Modificado"));
+            idMember = modelMembership.getUpdatedBy();
+        }
+        JDBC_Member.ReadMember(idMember).thenAccept(model_member -> Platform.runLater(() -> {
+            this.labelDateTime.setText(DateTime.getDateWithDayName(
+                    (modelMembership.getUpdatedBy() == 0) ? modelMembership.getCreatedAt() : modelMembership.getUpdatedAt()
+            ));
             this.labelAdmin.setText(model_member.getName() + " " + model_member.getLastName());
             this.boxHistorical.setVisible(true);
 
@@ -138,7 +156,7 @@ public class Controller_Membership implements Initializable {
         this.fieldPrice.setText("");
         this.toggleMonthly.setSelected(true);
 
-        this.buttonDelete.setVisible(false);
+        this.boxButtonDelete.setVisible(false);
         this.buttonSave.setDisable(false);
         this.boxEndButtons.setVisible(false);
 
@@ -153,9 +171,11 @@ public class Controller_Membership implements Initializable {
 
         this.boxEndButtons.setVisible(true);
         this.buttonSave.setText("Crear");
+        this.fieldName.requestFocus();
     }
 
     private void createMembership() {
+        Loading.show();
         Model_Membership modelMembership = new Model_Membership();
         modelMembership.setName(this.fieldName.getText());
         modelMembership.setPrice(new BigDecimal(this.fieldPrice.getText()));
@@ -164,6 +184,8 @@ public class Controller_Membership implements Initializable {
         if (idMembership > 0) {
             Notifications.Success("Membresía", "La membresía ha sido creada");
             clearForm(true);
+            configureData();
+            Loading.closeNow();
         }
     }
 
@@ -171,7 +193,7 @@ public class Controller_Membership implements Initializable {
         clearForm(false);
         this.boxMemberships.setVisible(true);
         this.boxMemberships.requestFocus();
-        this.buttonDelete.setVisible(true);
+        this.boxButtonDelete.setVisible(true);
         this.buttonSave.setText("Guardar");
     }
 
@@ -201,9 +223,9 @@ public class Controller_Membership implements Initializable {
             if (this.formChangeListener.isChanged("membershipDelete")) {
                 boolean isOk = JDBC_Membership.DeleteMembership(this.modelMembership.getIdMembership());
                 if (isOk) {
-                    Loading.closeNow();
                     clearForm(true);
                     Notifications.Warn("Membresías", "Membresía eliminada");
+                    Loading.closeNow();
                 }
             } else {
                 if (this.formChangeListener.isChanged("name")) {
@@ -217,14 +239,12 @@ public class Controller_Membership implements Initializable {
                 }
                 boolean isOk = JDBC_Membership.UpdateMembership(newModelMembership);
                 if (isOk) {
-                    JDBC_Membership.ReadMemberships(Model_Membership.ALL).thenAccept(model_memberships -> {
-                        Platform.runLater(() -> {
-                            Platform.runLater(() -> this.comboBoxMemberships.setItems(model_memberships));
-                            Loading.closeNow();
-                            clearForm(true);
-                        });
-                        Notifications.Success("Membresía", "Nuevos cambios aplicados");
+                    Platform.runLater(() -> {
+                        configureData();
+                        clearForm(true);
+                        Loading.closeNow();
                     });
+                    Notifications.Success("Membresía", "Nuevos cambios aplicados");
                 }
             }
         }

@@ -225,6 +225,19 @@ public class Notifications {
                 Styles.DANGER
         );
         exception.printStackTrace();
+        Loading.closeNow();
+    }
+
+    public static void CatchException(String className, StackTraceElement exceptionMetaData, Exception exception) {
+        Notifications.BuildNotification(
+                "gmi-sync-problem",
+                className,
+                "[" + exceptionMetaData.getMethodName() + " : " + exceptionMetaData.getLineNumber() + " line]\n" + exception.getMessage(),
+                20,
+                Styles.DANGER
+        );
+        exception.printStackTrace();
+        Loading.closeNow();
     }
 
     public static void CatchSqlException(String className, StackTraceElement exceptionMetaData, SQLException sqlException) {
@@ -236,6 +249,7 @@ public class Notifications {
                 Styles.DANGER
         );
         sqlException.printStackTrace();
+        Loading.closeNow();
     }
 
 }

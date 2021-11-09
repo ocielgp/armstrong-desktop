@@ -8,10 +8,10 @@ import java.util.concurrent.CompletableFuture;
 public class FormChangeListener {
     private final HashMap<String, Boolean> formListeners = new HashMap<>();
     private boolean isListen = false;
-    private final JFXButton buttonChange;
+    private final JFXButton buttonAction;
 
     public FormChangeListener(JFXButton buttonUpdater) {
-        this.buttonChange = buttonUpdater;
+        this.buttonAction = buttonUpdater;
     }
 
     public boolean isListen() {
@@ -19,39 +19,42 @@ public class FormChangeListener {
     }
 
     public void setListen(boolean listen) {
-        CompletableFuture.runAsync(() -> {
-            this.isListen = listen;
-            if (!listen) {
-                restartValues();
-            }
-        });
-    }
-
-    private void restartValues() {
-        CompletableFuture.runAsync(() -> this.formListeners.replaceAll((key, value) -> value = true));
+        if (this.isListen != listen) {
+            CompletableFuture.runAsync(() -> {
+                this.isListen = listen;
+                if (!listen) {
+                    restartValues();
+                }
+            });
+        }
     }
 
     public void add(String codeName) {
         CompletableFuture.runAsync(() -> this.formListeners.put(codeName, true));
     }
 
-    public void change(String codeName, boolean value) {
+    synchronized public void change(String codeName, boolean value) {
         CompletableFuture.runAsync(() -> {
             this.formListeners.replace(codeName, value);
             System.out.println("[" + codeName + "]: - " + value);
 
-            boolean flag = false;
-            for (Boolean aBoolean : this.formListeners.values()) {
-                if (!aBoolean) {
-                    flag = true;
+            boolean newChanges = false;
+            for (Boolean flag : this.formListeners.values()) {
+                if (!flag) {
+                    newChanges = true;
                     break;
                 }
             }
-            this.buttonChange.setDisable(!flag);
+            this.buttonAction.setDisable(!newChanges);
         });
     }
 
     public boolean isChanged(String codeName) {
+        System.out.println(codeName);
         return !this.formListeners.get(codeName);
+    }
+
+    private void restartValues() {
+        CompletableFuture.runAsync(() -> this.formListeners.replaceAll((key, value) -> value = true));
     }
 }

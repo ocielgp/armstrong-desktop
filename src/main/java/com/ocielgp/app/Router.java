@@ -84,13 +84,15 @@ public class Router {
         }
     }
 
-    public static void enableDashboard() {
+    public static void EnableDashboard() {
         Router.isRouterAvailable = true;
         Router.appDashboard.setDisable(false);
+        Application.controllerApp.borderPaneRoot.getBottom().setDisable(false);
     }
 
-    public static void disableDashboard() {
+    public static void DisableDashboard() {
         Router.isRouterAvailable = false;
         Router.appDashboard.setDisable(true);
+        Application.controllerApp.borderPaneRoot.getBottom().setDisable(true);
     }
 }

@@ -38,10 +38,12 @@ public class InputProperties {
         node.setVisible(visible);
         node.setManaged(visible);
         node.visibleProperty().addListener((observable, oldValue, newValue) -> {
-            node.setVisible(newValue);
-            node.setManaged(newValue);
-            if (newValue) {
-                new FadeIn(node).play();
+            if (newValue != oldValue) {
+                node.setVisible(newValue);
+                node.setManaged(newValue);
+                if (newValue) {
+                    new FadeIn(node).play();
+                }
             }
         });
     }
@@ -74,7 +76,7 @@ public class InputProperties {
         scrollPane.getContent().setOnScroll(scrollEvent -> {
             double deltaY = scrollEvent.getDeltaY() * SPEED_SCROLL;
             double scrollPosition = scrollPane.getVvalue() - deltaY;
-            if (scrollPosition >= 0 && scrollPosition <= 1) {
+            if (scrollPosition > 0 && scrollPosition < 1) {
                 scrollPane.setVvalue(scrollPane.getVvalue() - deltaY);
             }
         });

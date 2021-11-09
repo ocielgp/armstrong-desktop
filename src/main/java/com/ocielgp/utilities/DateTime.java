@@ -14,6 +14,7 @@ public class DateTime {
     private static final String DATE_SHORT = "dd/MM/yyyy";
 
     public static LocalDateTime MySQLToJava(String dateTime) {
+        if (dateTime == null) return null;
         return LocalDateTime.parse(
                 dateTime,
                 DateTimeFormatter.ofPattern(DATETIME_MYSQL)
@@ -33,6 +34,7 @@ public class DateTime {
     }
 
     public static String getDateWithDayName(LocalDateTime localDateTime) {
+        if (localDateTime == null) return null;
         return localDateTime.format(DateTimeFormatter.ofPattern(DATE_WITH_DAY_NAME, Locale.getDefault()));
     }
 

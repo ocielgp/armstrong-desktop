@@ -9,7 +9,6 @@ import com.jfoenix.controls.JFXRadioButton;
 import com.jfoenix.controls.JFXTextField;
 import com.ocielgp.app.UserPreferences;
 import com.ocielgp.controller.dashboard.Controller_Membership;
-import com.ocielgp.dao.JDBC_Member_Fingerprint;
 import com.ocielgp.models.Model_Member;
 import com.ocielgp.utilities.Loader;
 import com.ocielgp.utilities.Loading;
@@ -18,7 +17,6 @@ import com.ocielgp.utilities.Styles;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -93,20 +91,13 @@ public class Controller_Members implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        JDBC_Member_Fingerprint.SCANNING = false;
+//        JDBC_Member_Fingerprint.isReaderAvailable = true;
 
         this.pagination = new Pagination(this.fieldSearch, this.buttonSearch, this.labelTotalRows, this.tableViewMembers, this.fieldRowsPerPage, this.labelPreviousPage, this.labelCurrentPage, this.labelTotalPages, this.labelNextPage, Pagination.Sources.MEMBERS);
         this.controllerMember = new Controller_Member(this.pagination);
         createButtons();
         createFilters();
         bindTable();
-
-        Node memberFXML = Loader.Load(
-                "member.fxml",
-                "Members",
-                true,
-                this.controllerMember
-        );
 
         this.tableViewMembers.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
@@ -119,7 +110,6 @@ public class Controller_Members implements Initializable {
                 }
             }
         });
-        this.boxRightTab.getChildren().setAll(memberFXML);
 
         Platform.runLater(() -> {
             FadeIn fadeIn = new FadeIn(this.boxRoot);
@@ -152,6 +142,10 @@ public class Controller_Members implements Initializable {
                     true,
                     "btn-colorful", Styles.WARN
             );
+            Platform.runLater(() -> {
+//                Loading.isChildLoaded.set(true);
+                ((JFXButton) this.boxButtons.getChildren().get(0)).fire(); // add member button
+            });
         });
     }
 

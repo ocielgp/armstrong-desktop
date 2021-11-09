@@ -8,6 +8,7 @@
 <?import javafx.scene.layout.*?>
 <?import org.kordamp.ikonli.javafx.*?>
 <?import java.lang.*?>
+<?import java.net.URL?>
 <ScrollPane fx:id="scrollPane" fitToHeight="true" fitToWidth="true" maxWidth="412.0"
             xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1">
     <content>
@@ -16,21 +17,24 @@
                 <VBox.margin>
                     <Insets/>
                 </VBox.margin>
-                <Label fx:id="t_labelTitle" style="-fx-text-fill: -fx-color-text;" text="Socio nuevo"/>
+                <Label fx:id="t_labelTitle" text="Socio nuevo"/>
+                <padding>
+                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                </padding>
                 <styleClass>
-                    <String fx:value="default-style"/>
                     <String fx:value="form-header"/>
+                    <String fx:value="default-style"/>
                 </styleClass>
             </HBox>
             <VBox>
                 <VBox.margin>
                     <Insets/>
                 </VBox.margin>
-                <VBox fx:id="boxQuickView" styleClass="form-section">
+                <VBox fx:id="boxHistorical" styleClass="form-section">
                     <children>
                         <HBox alignment="CENTER">
                             <children>
-                                <Label alignment="CENTER" styleClass="bold" text="HISTÓRICO">
+                                <Label alignment="CENTER" styleClass="bold" text="Histórico">
                                     <graphic>
                                         <FontIcon iconLiteral="gmi-description"/>
                                     </graphic>
@@ -40,25 +44,25 @@
                         <HBox spacing="5.0">
                             <children>
                                 <Label styleClass="bold" text="Registro"/>
-                                <Label fx:id="qv_labelRegistrationDate" text="date"/>
+                                <Label fx:id="h_labelCreatedAt" text="date"/>
                             </children>
                         </HBox>
                         <HBox spacing="5.0">
                             <children>
                                 <Label styleClass="bold" text="Pago"/>
-                                <Label fx:id="qv_labelLastPayment" text="N / A"/>
+                                <Label fx:id="h_labelLastPayment" text="N / A"/>
                             </children>
                         </HBox>
                         <HBox spacing="5.0">
                             <children>
                                 <Label styleClass="bold" text="Gimnasio"/>
-                                <Label fx:id="qv_labelGym" text="gymName"/>
+                                <Label fx:id="h_labelGym" text="gymName"/>
                             </children>
                         </HBox>
                         <VBox alignment="CENTER">
                             <children>
                                 <Label styleClass="bold" text="Atendido por"/>
-                                <Label fx:id="qv_labelAdmin" text="N / A" textAlignment="CENTER" wrapText="true"/>
+                                <Label fx:id="h_labelAdmin" text="N / A" textAlignment="CENTER" wrapText="true"/>
                             </children>
                         </VBox>
                     </children>
@@ -67,7 +71,7 @@
                     <children>
                         <HBox alignment="CENTER">
                             <children>
-                                <Label styleClass="bold" text="INFORMACIÓN PERSONAL">
+                                <Label styleClass="bold" text="Información personal">
                                     <graphic>
                                         <FontIcon iconLiteral="gmi-person"/>
                                     </graphic>
@@ -120,7 +124,7 @@
                     <children>
                         <HBox>
                             <children>
-                                <Label styleClass="bold" text="LECTOR DE HUELLAS">
+                                <Label styleClass="bold" text="Lector de Huellas">
                                     <graphic>
                                         <FontIcon iconLiteral="gmi-fingerprint"/>
                                     </graphic>
@@ -165,7 +169,7 @@
                     <children>
                         <HBox alignment="CENTER" VBox.vgrow="ALWAYS">
                             <children>
-                                <Label alignment="CENTER" styleClass="bold" text="MEMBRESÍA">
+                                <Label alignment="CENTER" styleClass="bold" text="Membresía">
                                     <graphic>
                                         <FontIcon iconLiteral="gmi-event"/>
                                     </graphic>
@@ -327,12 +331,16 @@
                     </JFXButton>
                     <JFXButton fx:id="buttonClear" text="Limpiar">
                         <styleClass>
-                            <String fx:value="btn-colorful" />
-                            <String fx:value="danger-style" />
+                            <String fx:value="btn-colorful"/>
+                            <String fx:value="danger-style"/>
                         </styleClass>
                     </JFXButton>
                 </HBox>
             </VBox>
         </VBox>
     </content>
+    <stylesheets>
+        <URL value="@../../../styles.css"/>
+        <URL value="@../../../sections.css"/>
+    </stylesheets>
 </ScrollPane>

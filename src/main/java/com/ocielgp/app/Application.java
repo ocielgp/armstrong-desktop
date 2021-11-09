@@ -77,13 +77,13 @@ public class Application {
 
     public static void EnableDashboard() {
         if (controllerDashboard != null) {
-            Router.enableDashboard();
+            Router.EnableDashboard();
         }
     }
 
     public static void DisableDashboard() {
         if (controllerDashboard != null) {
-            Router.disableDashboard();
+            Router.DisableDashboard();
         }
     }
 }
