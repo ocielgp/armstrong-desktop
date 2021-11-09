@@ -8,6 +8,7 @@ import com.ocielgp.utilities.Notifications;
 
 import java.lang.invoke.MethodHandles;
 import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.concurrent.CompletableFuture;
 
 public class JDBC_Payment_Membership {
@@ -17,15 +18,19 @@ public class JDBC_Payment_Membership {
             PreparedStatement ps;
             ResultSet rs;
             assert con != null;
-            ps = con.prepareStatement("INSERT INTO PAYMENTS_MEMBERSHIPS(months, price, idGym, idAdmin, idMember, idMembership)" +
-                            "VALUE (?, ?, ?, ?, ?, ?)",
+            LocalDateTime now = LocalDateTime.now();
+            ps = con.prepareStatement("INSERT INTO PAYMENTS_MEMBERSHIPS(months, price, startDateTime, endDateTime, idGym, idAdmin, idMember, idMembership)" +
+                            "VALUE (?, ?, ?, ?, ?, ?, ?, ?)",
                     Statement.RETURN_GENERATED_KEYS);
+            System.out.println("endatetime: " + DateTime.getEndDateToMySQL(now, months));
             ps.setShort(1, months); // months
             ps.setBigDecimal(2, modelMembership.getPrice()); // price
-            ps.setInt(3, Application.getCurrentGym().getIdGym()); // idGym
-            ps.setInt(4, Application.getModelAdmin().getIdMember()); // idAdmin
-            ps.setInt(5, idMember); // idMember
-            ps.setInt(6, modelMembership.getIdMembership()); // idMembership
+            ps.setString(3, DateTime.JavaToMySQLDateTime(now)); // startDateTime
+            ps.setString(4, DateTime.getEndDateToMySQL(now, months)); // endDateTime
+            ps.setInt(5, Application.getCurrentGym().getIdGym()); // idGym
+            ps.setInt(6, Application.getModelAdmin().getIdMember()); // idAdmin
+            ps.setInt(7, idMember); // idMember
+            ps.setInt(8, modelMembership.getIdMembership()); // idMembership
             ps.executeUpdate();
             rs = ps.getGeneratedKeys();
             if (rs.next()) { // return new idPaymentMembership

@@ -54,7 +54,6 @@ public class JDBC_Member {
          * 1-3 DAYS = WARN
          * + 3 DAYS = SUCCESS
          */
-        System.out.println(daysLeft);
         if (haveDebts) {
             return Styles.CREATIVE;
         } else if (!access) {

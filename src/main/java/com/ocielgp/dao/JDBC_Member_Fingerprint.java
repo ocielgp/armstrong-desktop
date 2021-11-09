@@ -59,12 +59,18 @@ public class JDBC_Member_Fingerprint {
 
                     while (rs.next()) {
                         if (Fingerprint_Controller.CompareFingerprints(fingerprint, rs.getBytes("fingerprint"))) {
-                            JDBC_Check_In.CreateCheckIn(rs.getBoolean("idAdmin"), rs.getInt("idMember"), 1);
+                            int idMember = rs.getInt("idMember");
+                            JDBC_Check_In.CreateCheckIn(rs.getInt("idMember"), 1);
+                            if (rs.getBoolean("idAdmin")) {
+                                JDBC_Check_In.showAdminInfo(idMember);
+                            } else {
+                                JDBC_Check_In.showMemberInfo(idMember);
+                            }
                             return;
                         }
                     }
                     Notifications.Danger("gmi-fingerprint", "Lector de Huellas", "Huella no encontrada", 2);
-                    Loading.close();
+                    Loading.closeNow();
                 } catch (SQLException sqlException) {
                     Notifications.CatchSqlException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], sqlException);
                 } finally {

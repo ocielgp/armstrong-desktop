@@ -42,7 +42,17 @@ public class DateTime {
         return localDateTime.format(DateTimeFormatter.ofPattern(DATE_SHORT, Locale.getDefault()));
     }
 
-    public static String getEndDate(long months) {
+    public static LocalDateTime getEndDate(LocalDateTime localDateTime, long months) {
+        return localDateTime.plusMonths(months);
+    }
+
+    public static String getEndDateToMySQL(LocalDateTime localDateTime, long months) {
+        return JavaToMySQLDateTime(
+                localDateTime.plusMonths(months)
+        );
+    }
+
+    public static String getEndDateWithDayName(long months) {
         return getDateWithDayName(
                 LocalDateTime.now().plusMonths(months)
         );

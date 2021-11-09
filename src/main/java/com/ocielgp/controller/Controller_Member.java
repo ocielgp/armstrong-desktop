@@ -336,7 +336,7 @@ public class Controller_Member implements Initializable {
             // personal information
             this.pi_fieldName.setText(this.modelMember.getName());
             this.pi_fieldLastName.setText(this.modelMember.getLastName());
-            this.pi_comboBoxGender.getSelectionModel().select(this.modelMember.getGender());
+            this.pi_comboBoxGender.setValue(this.modelMember.getGender());
             this.pi_fieldNotes.setText(this.modelMember.getNotes());
 
             // membership
@@ -350,7 +350,7 @@ public class Controller_Member implements Initializable {
                 this.ms_comboBoxMemberships.setDisable(true);
                 this.ms_comboBoxMemberships.getItems().forEach(model_membership -> { // select current membership
                     if (model_membership.getIdMembership() == this.modelMember.getModelPaymentMembership().getIdMembership()) {
-                        this.ms_comboBoxMemberships.getSelectionModel().select(model_membership);
+                        this.ms_comboBoxMemberships.setValue(model_membership);
                         createMembershipButtons();
                     }
                 });
@@ -369,7 +369,7 @@ public class Controller_Member implements Initializable {
                 this.s_buttonAccess.setText("Desbloquear acceso");
                 this.s_buttonOpenDoor.setDisable(true);
             }
-            this.s_buttonAccess.setOnAction(actionEvent -> eventAccess());
+            this.s_buttonOpenDoor.setOnAction(actionEvent -> CompletableFuture.runAsync(() -> JDBC_Check_In.checkInSystem(this.modelMember.getIdMember())));
             this.s_buttonPayDebt.setVisible(this.modelMember.getStyle().equals(Styles.CREATIVE));
             this.boxShortcut.setVisible(true);
 
@@ -496,7 +496,8 @@ public class Controller_Member implements Initializable {
     }
 
     private Model_Membership prepareMembership() {
-        Model_Membership modelMembership = this.ms_comboBoxMemberships.getValue();
+        Model_Membership modelMembership = new Model_Membership();
+        modelMembership.setIdMembership(this.ms_comboBoxMemberships.getValue().getIdMembership());
         modelMembership.setPrice(this.membershipPrice.get());
         return modelMembership;
     }
@@ -543,9 +544,9 @@ public class Controller_Member implements Initializable {
             if (modelDebt.getAmount() != 0 && idNewMembership > 0) {
                 JDBC_Debt.CreateDebt(idMember, modelDebt);
             }
+            Fingerprint_Controller.FB_RestartCapture();
             Notifications.Success("Nuevo socio", "[ID: " + idMember + " ] " + modelMember.getName() + " ha sido registrado");
         }
-
     }
 
     private void saveChanges(Model_Membership modelMembership, Model_Debt modelDebt) {
@@ -682,19 +683,19 @@ public class Controller_Member implements Initializable {
                     }
                     if (this.formChangeListener.isChanged("membershipRenew") || this.formChangeListener.isChanged("membershipChange") || this.formChangeListener.isChanged("membershipDelete")) {
                         this.ms_labelEndDate.setText(
-                                DateTime.getEndDate(this.totalMonths)
+                                DateTime.getEndDateWithDayName(this.totalMonths)
                         );
                     }
                 }
             } else {
                 this.ms_labelEndDate.setText(
-                        DateTime.getEndDate(this.totalMonths)
+                        DateTime.getEndDateWithDayName(this.totalMonths)
                 );
             }
             this.ms_labelMonth.setText(this.totalMonths + ((this.totalMonths == 1) ? " MES" : " MESES"));
             if (this.boxPayment.isVisible()) {
                 this.membershipPrice.set(
-                        this.ms_comboBoxMemberships.getSelectionModel().getSelectedItem().getPrice().multiply(
+                        this.ms_comboBoxMemberships.getValue().getPrice().multiply(
                                 BigDecimal.valueOf(this.totalMonths)
                         )
                 );
@@ -779,7 +780,7 @@ public class Controller_Member implements Initializable {
             if (this.formChangeListener.isListen()) {
                 this.formChangeListener.change(
                         "gender",
-                        Validator.compare(this.pi_comboBoxGender.getSelectionModel().getSelectedItem(), this.modelMember.getGender())
+                        Validator.compare(this.pi_comboBoxGender.getValue(), this.modelMember.getGender())
                 );
             }
         });

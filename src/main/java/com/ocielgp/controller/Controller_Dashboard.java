@@ -95,17 +95,10 @@ public class Controller_Dashboard implements Initializable {
         Platform.runLater(() -> Application.getCurrentGymNode().setDisable(false));
     }
 
-    public void showUserInfo(String style, byte[] photo, Integer idMember, String name, String gym, String membership) {
-        Image loadImage;
-        if (photo == null) {
-            loadImage = FileLoader.getDefaultImage();
-        } else {
-            loadImage = FileLoader.loadImage(photo);
-        }
-
+    public void showUserInfo(String style, Image photo, Integer idMember, String name, String gym, String membership) {
         Platform.runLater(() -> {
             this.ci_box.getStyleClass().setAll(UserPreferences.getPreferenceString("THEME"), style);
-            this.ci_imgPhoto.setImage(loadImage);
+            this.ci_imgPhoto.setImage(photo);
             this.ci_labelId.setText(idMember.toString());
             this.ci_labelName.setText(name);
             this.ci_labelGym.setText(gym);

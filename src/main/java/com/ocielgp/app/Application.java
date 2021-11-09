@@ -5,6 +5,7 @@ import com.ocielgp.controller.Controller_App;
 import com.ocielgp.controller.Controller_Dashboard;
 import com.ocielgp.models.Model_Admin;
 import com.ocielgp.models.Model_Gym;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 import java.util.Locale;
@@ -71,7 +72,7 @@ public class Application {
         Application.controllerDashboard = controllerDashboard;
     }
 
-    public static void showUserInfo(String style, byte[] photo, int idMember, String name, String gym, String membership) {
+    public static void showUserInfo(String style, Image photo, int idMember, String name, String gym, String membership) {
         controllerDashboard.showUserInfo(style, photo, idMember, name, gym, membership);
     }
 

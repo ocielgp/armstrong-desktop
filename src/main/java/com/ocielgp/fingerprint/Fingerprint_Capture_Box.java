@@ -90,13 +90,16 @@ public class Fingerprint_Capture_Box {
     }
 
     public void restartCaptureEvent() {
-        this.boxFingerprintPane.requestFocus();
-        Fingerprint_Controller.BackgroundReader();
-        this.buttonRestartCapture.setText("Iniciar captura");
-        this.buttonRestartCapture.setDisable(true);
-        this.clearFingerprintPane();
-        this.labelFingerprintCounter.setText("0");
-        this.arrayFingerprints.clear();
+        Platform.runLater(() -> {
+            this.boxFingerprintPane.requestFocus();
+            Fingerprint_Controller.BackgroundReader();
+            this.buttonStartCapture.setText("Iniciar captura");
+            this.buttonRestartCapture.setText("Reiniciar huellas");
+            this.buttonRestartCapture.setDisable(true);
+            this.clearFingerprintPane();
+            this.labelFingerprintCounter.setText("0");
+            this.arrayFingerprints.clear();
+        });
     }
 
 }

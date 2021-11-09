@@ -72,6 +72,8 @@ public class Fingerprint_Controller {
                 fingerprintStatusProperty.set(Fingerprint_Controller.getStatusDescription());
             }
 
+            System.out.println("fingerprintxbox " + fingerprintBox);
+
             if (fingerprintBox != null) {
                 if (fingerprintStatusCode == 0) { // disconnected
                     fingerprintBox.hide();

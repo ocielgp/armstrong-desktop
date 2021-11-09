@@ -53,7 +53,7 @@ public class Controller_App implements Initializable {
 
         Platform.runLater(() -> {
             Node loginView = Loader.Load(
-                    "dashboard.fxml",
+                    "login.fxml",
                     "Controller_App",
                     true
             );
@@ -62,7 +62,6 @@ public class Controller_App implements Initializable {
     }
 
     private void eventChangeTheme() {
-        System.out.println("change teme");
         String newTheme = (UserPreferences.getPreferenceString("THEME").equals("day-theme")) ? "night-theme" : "day-theme";
         Platform.runLater(() -> this.borderPaneRoot.getStyleClass().set(1, newTheme));
         UserPreferences.setPreference("THEME", newTheme);

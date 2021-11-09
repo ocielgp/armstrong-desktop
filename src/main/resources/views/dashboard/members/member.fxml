@@ -8,7 +8,6 @@
 <?import javafx.scene.layout.*?>
 <?import org.kordamp.ikonli.javafx.*?>
 <?import java.lang.*?>
-<?import java.net.URL?>
 <ScrollPane fx:id="scrollPane" fitToHeight="true" fitToWidth="true" maxWidth="412.0"
             xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1">
     <content>
@@ -339,8 +338,4 @@
             </VBox>
         </VBox>
     </content>
-    <stylesheets>
-        <URL value="@../../../styles.css"/>
-        <URL value="@../../../sections.css"/>
-    </stylesheets>
 </ScrollPane>
