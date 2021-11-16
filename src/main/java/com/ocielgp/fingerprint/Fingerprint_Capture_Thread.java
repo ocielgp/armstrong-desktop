@@ -62,12 +62,12 @@ public class Fingerprint_Capture_Thread extends Thread {
 
     private void Capture() {
         try {
-            // Wait for reader to become ready
+            // wait for reader to become ready
             boolean bReady = false;
             while (!bReady && !bCancel) {
                 Reader.Status rs = reader.GetStatus();
                 if (Reader.ReaderStatus.BUSY == rs.status) {
-                    // If busy, wait a bit
+                    // if busy, wait a bit
                     try {
                         Thread.sleep(100);
                     } catch (InterruptedException e) {
@@ -75,11 +75,11 @@ public class Fingerprint_Capture_Thread extends Thread {
                         break;
                     }
                 } else if (Reader.ReaderStatus.READY == rs.status || Reader.ReaderStatus.NEED_CALIBRATION == rs.status) {
-                    // Ready for capture
+                    // ready for capture
                     bReady = true;
                     break;
                 } else {
-                    // Reader failure
+                    // reader failure
                     NotifyListener(null, rs, null);
                     break;
                 }
@@ -93,7 +93,7 @@ public class Fingerprint_Capture_Thread extends Thread {
 
 
             if (bReady) {
-                // Fingerprint_Capture
+                // fingerprint_Capture
                 Reader.CaptureResult cr = reader.Capture(format, proc, 500, -1);
                 NotifyListener(cr, null, null);
             }
@@ -104,12 +104,12 @@ public class Fingerprint_Capture_Thread extends Thread {
 
     private void Stream() {
         try {
-            // Wait for reader to become ready
+            // wait for reader to become ready
             boolean bReady = false;
             while (!bReady && !bCancel) {
                 Reader.Status rs = reader.GetStatus();
                 if (Reader.ReaderStatus.BUSY == rs.status) {
-                    // If busy, wait a bit
+                    // if busy, wait a bit
                     try {
                         Thread.sleep(100);
                     } catch (InterruptedException e) {
@@ -117,27 +117,27 @@ public class Fingerprint_Capture_Thread extends Thread {
                         break;
                     }
                 } else if (Reader.ReaderStatus.READY == rs.status || Reader.ReaderStatus.NEED_CALIBRATION == rs.status) {
-                    // Ready for capture
+                    // ready for capture
                     bReady = true;
                     break;
                 } else {
-                    // Reader failure
+                    // reader failure
                     NotifyListener(null, rs, null);
                     break;
                 }
             }
 
             if (bReady) {
-                // Start streaming
+                // start streaming
                 reader.StartStreaming();
 
-                // Get images
+                // get images
                 while (!bCancel) {
                     Reader.CaptureResult cr = reader.GetStreamImage(format, proc, 500);
                     NotifyListener(cr, null, null);
                 }
 
-                // Stop streaming
+                // stop streaming
                 reader.StopStreaming();
             }
         } catch (UareUException e) {
@@ -154,12 +154,12 @@ public class Fingerprint_Capture_Thread extends Thread {
     private void NotifyListener(Reader.CaptureResult cr, Reader.Status st, UareUException ex) {
         final CaptureEvent evt = new CaptureEvent(this, Fingerprint_Capture_Thread.ACT_CAPTURE, cr, st, ex);
 
-        // Store last capture event
+        // store last capture event
         last_capture = evt;
 
-        if (null == listener) return;
+        if (listener == null) return;
 
-        // Invoke listener on EDT thread
+        // invoke listener on EDT thread
         Platform.runLater(() -> listener.actionPerformed(evt));
     }
 

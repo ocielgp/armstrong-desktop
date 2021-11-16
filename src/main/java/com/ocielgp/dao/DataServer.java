@@ -11,8 +11,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 public class DataServer {
     private static final HikariConfig hikariConfig;
@@ -24,12 +22,12 @@ public class DataServer {
     private static final String database;
 
     static {
-        int source = UserPreferences.getPreferenceInt("DB_SOURCE");
-        database = UserPreferences.getPreferenceString("DB_NAME");
-        host = UserPreferences.getPreferenceString("DB_HOST_" + source);
-        port = UserPreferences.getPreferenceString("DB_PORT_" + source);
-        user = UserPreferences.getPreferenceString("DB_USER_" + source);
-        password = UserPreferences.getPreferenceString("DB_PASSWORD_" + source);
+        int source = UserPreferences.GetPreferenceInt("DB_SOURCE");
+        database = UserPreferences.GetPreferenceString("DB_NAME");
+        host = UserPreferences.GetPreferenceString("DB_HOST_" + source);
+        port = UserPreferences.GetPreferenceString("DB_PORT_" + source);
+        user = UserPreferences.GetPreferenceString("DB_USER_" + source);
+        password = UserPreferences.GetPreferenceString("DB_PASSWORD_" + source);
 
         hikariConfig = new HikariConfig();
         hikariConfig.setJdbcUrl("jdbc:mysql://" + host + ":" + port + "/" + database);
@@ -58,51 +56,44 @@ public class DataServer {
         );
     }
 
-    synchronized public static Connection getConnection() {
-        System.out.println("getConnection()");
+    synchronized public static Connection GetConnection() {
         try {
-            return CompletableFuture.supplyAsync(() -> {
-                try {
-                    return hikariDataSource.getConnection();
-                } catch (SQLException sqlException) {
-                    // reconnecting
-                    System.out.println("[DataServer]: Reconectando a " + host + "...");
-                    hikariDataSource = new HikariDataSource(hikariConfig);
-                    try {
-                        Connection connection = hikariDataSource.getConnection();
-                        System.out.println("[DataServer]: Conectado a " + host);
-                        return connection;
-                    } catch (SQLException sqlException1) {
-                        Notifications.CatchException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
-                        System.out.println("[DataServer]: Desconectado");
-                    }
-                }
-                return null;
-            }).get();
-        } catch (InterruptedException | ExecutionException exception) {
-            Notifications.CatchException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], exception.getMessage(), exception);
+            System.out.println("getConnection()");
+            return hikariDataSource.getConnection();
+        } catch (SQLException ignored) {
+            // reconnecting
+            System.out.println("[DataServer]: Reconectando a " + host + "...");
+            hikariDataSource = new HikariDataSource(hikariConfig);
+            try {
+                Connection connection = hikariDataSource.getConnection();
+                System.out.println("[DataServer]: Conectado a " + host);
+                return connection;
+            } catch (SQLException sqlException) {
+                Notifications.CatchSqlException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], sqlException);
+                System.out.println("[DataServer]: Desconectado");
+            }
         }
         return null;
     }
 
-    synchronized public static void closeConnection(Connection connection) {
+    synchronized public static void CloseConnection(Connection connection) {
         try {
             if (connection != null && !connection.isClosed()) {
                 connection.close();
             }
         } catch (SQLException sqlException) {
-            Notifications.CatchException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
+            Notifications.CatchSqlException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], sqlException);
         }
     }
 
-    public static int countRows(PreparedStatement ps) {
+    public static int CountRows(PreparedStatement ps) {
         try {
             ResultSet rs = ps.executeQuery();
             if (rs.last()) {
                 return rs.getRow();
             }
         } catch (SQLException sqlException) {
-            Notifications.CatchException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
+            Notifications.CatchSqlException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], sqlException);
         }
         return 0;
     }

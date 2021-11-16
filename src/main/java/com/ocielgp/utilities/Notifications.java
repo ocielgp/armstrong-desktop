@@ -53,7 +53,7 @@ class NotificationView implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        this.gridPaneNotification.getStyleClass().addAll(UserPreferences.getPreferenceString("THEME"), style);
+        this.gridPaneNotification.getStyleClass().addAll(UserPreferences.GetPreferenceString("THEME"), style);
         this.fontIcon.setIconLiteral(icon);
         this.labelTitle.textProperty().bind(title);
         this.labelContent.textProperty().bind(content);
@@ -70,11 +70,11 @@ public class Notifications {
     private static FadeInRight fadeInRightNotification;
     private static final double DEFAULT_SECONDS = 3;
 
-    public static void start() {
+    public static void Start() {
         stage.initOwner(Application.STAGE_PRIMARY);
         stage.initModality(Modality.NONE);
         stage.setAlwaysOnTop(true);
-        stage.showingProperty().addListener((observable, oldValue, newValue) -> {
+        stage.focusedProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue) {
                 Application.RequestFocus();
             }
@@ -116,12 +116,12 @@ public class Notifications {
             notificationViews.add(notificationView);
             notificationSeconds.add(seconds);
             if (notificationViews.size() == 1 && !stage.isShowing()) {
-                showNotification();
+                ShowNotification();
             }
         });
     }
 
-    synchronized private static void showNotification() {
+    synchronized private static void ShowNotification() {
         CompletableFuture.runAsync(() -> {
             GridPane notificationView = notificationViews.getFirst();
             timer.schedule(new TimerTask() {
@@ -155,7 +155,7 @@ public class Notifications {
                 Platform.runLater(stage::close);
 
                 if (!notificationViews.isEmpty()) {
-                    showNotification();
+                    ShowNotification();
                 }
             });
             Platform.runLater(fadeOutRightNotification::play);
@@ -214,18 +214,6 @@ public class Notifications {
 
     public static void Danger(String title, String content) {
         Notifications.BuildNotification("gmi-close", title, content, DEFAULT_SECONDS, Styles.DANGER);
-    }
-
-    public static void CatchException(String className, StackTraceElement exceptionMetaData, String body, Exception exception) {
-        Notifications.BuildNotification(
-                "gmi-sync-problem",
-                className,
-                "[" + exceptionMetaData.getMethodName() + " : " + exceptionMetaData.getLineNumber() + " line]\n" + body,
-                20,
-                Styles.DANGER
-        );
-        exception.printStackTrace();
-        Loading.closeNow();
     }
 
     public static void CatchException(String className, StackTraceElement exceptionMetaData, Exception exception) {

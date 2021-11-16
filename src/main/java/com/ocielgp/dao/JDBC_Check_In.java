@@ -13,32 +13,33 @@ import java.time.LocalDateTime;
 import java.util.concurrent.CompletableFuture;
 
 public class JDBC_Check_In {
-    synchronized public static void CreateCheckIn(int idMember, int openedBy) {
-        CompletableFuture.runAsync(() -> {
-            Connection con = DataServer.getConnection();
+    synchronized public static CompletableFuture<Boolean> CreateCheckIn(int idMember, int openedBy) {
+        return CompletableFuture.supplyAsync(() -> {
+            Connection con = DataServer.GetConnection();
             try {
                 PreparedStatement ps;
                 assert con != null;
-                ps = con.prepareStatement("INSERT INTO CHECK_IN(dateTime, idMember, idGym, openedBy) VALUE (NOW(), ?, ?, ?)");
+                ps = con.prepareStatement("INSERT INTO CHECK_IN(idMember, idGym, openedBy) VALUE (?, ?, ?)");
                 ps.setInt(1, idMember); // idMember
-                ps.setInt(2, Application.getCurrentGym().getIdGym()); // idGym
+                ps.setInt(2, Application.GetCurrentGym().getIdGym()); // idGym
                 ps.setInt(3, openedBy); // openedBy
                 ps.executeUpdate();
-                System.out.println("Libre");
+                return true;
             } catch (SQLException sqlException) {
                 if (sqlException.getErrorCode() != 1062) { // ignore duplicate rows
                     Notifications.CatchSqlException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], sqlException);
                 }
             } finally {
-                DataServer.closeConnection(con);
+                DataServer.CloseConnection(con);
                 JDBC_Member_Fingerprint.isReaderAvailable = true;
             }
+            return false;
         });
     }
 
-    public static void checkInSystem(int idMember) {
+    public static void CheckInByAdmin(int idMember) {
         Loading.show();
-        Connection con = DataServer.getConnection();
+        Connection con = DataServer.GetConnection();
         try {
             PreparedStatement ps;
             ResultSet rs;
@@ -47,20 +48,20 @@ public class JDBC_Check_In {
             ps.setInt(1, idMember);
             rs = ps.executeQuery();
 
-            JDBC_Check_In.CreateCheckIn(idMember, Application.getModelAdmin().getIdMember());
             if (rs.next()) {
-                if (rs.getBoolean("idAdmin")) showAdminInfo(idMember);
-                else showMemberInfo(idMember);
+                if (rs.getBoolean("idAdmin"))
+                    JDBC_Check_In.ShowAdminInfo(idMember, Application.GetModelAdmin().getIdMember());
+                else JDBC_Check_In.ShowMemberInfo(idMember, Application.GetModelAdmin().getIdMember());
             }
         } catch (SQLException sqlException) {
             Notifications.CatchSqlException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], sqlException);
         } finally {
-            DataServer.closeConnection(con);
+            DataServer.CloseConnection(con);
         }
     }
 
-    public static void showMemberInfo(int idMember) {
-        Connection con = DataServer.getConnection();
+    public static void ShowMemberInfo(int idMember, int openedBy) {
+        Connection con = DataServer.GetConnection();
         try {
             PreparedStatement ps;
             ResultSet rs;
@@ -82,12 +83,21 @@ public class JDBC_Check_In {
                     boolean haveDebts = rs.getBoolean("haveDebts");
                     String months = rs.getString("months");
 
-                    StringBuilder membershipDescription = new StringBuilder();
-                    membershipDescription.append("(").append(months).append(") ").append(membershipName);
-                    membershipDescription.append(", termina el ").append(DateTime.getDateShort(endDateTime));
-                    membershipDescription.append(" (").append(daysLeft).append((daysLeft == 1 ? "día" : " días")).append(")");
+                    String membershipDescription = "(" + months + ") " + membershipName +
+                            ", termina el " + DateTime.getDateShort(endDateTime) +
+                            " (" + daysLeft + (daysLeft == 1 ? "día" : " días") + ")";
                     JDBC_Gym.ReadGym(rs.getInt("idGymPayment")).thenAccept(model_gyms -> {
-                        Application.showUserInfo(
+                        if (haveDebts) {
+                            Notifications.Danger("Deudor", "El socio tiene adeudos pendientes");
+                        } else if (!access) {
+                            Notifications.Danger("Bloqueado", "El socio no tiene acceso al los gimnasios");
+                        } else {
+                            JDBC_Check_In.CreateCheckIn(idMember, openedBy).thenAccept(isOk -> {
+                                if (isOk)
+                                    Notifications.Success("Entrada", "Entrada de " + name + " registrada", 2);
+                            });
+                        }
+                        Application.ShowUserInfo(
                                 JDBC_Member.ReadStyle(
                                         access,
                                         daysLeft,
@@ -97,11 +107,11 @@ public class JDBC_Check_In {
                                 idMember,
                                 name,
                                 model_gyms.getName(),
-                                membershipDescription.toString()
+                                membershipDescription
                         );
                     });
                 } else { // no payment found
-                    JDBC_Gym.ReadGym(rs.getInt("idGymMember")).thenAccept(model_gyms -> Application.showUserInfo(
+                    JDBC_Gym.ReadGym(rs.getInt("idGymMember")).thenAccept(model_gyms -> Application.ShowUserInfo(
                             Styles.DANGER,
                             photo,
                             idMember,
@@ -114,13 +124,13 @@ public class JDBC_Check_In {
         } catch (SQLException sqlException) {
             Notifications.CatchSqlException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], sqlException);
         } finally {
-            DataServer.closeConnection(con);
+            DataServer.CloseConnection(con);
             Loading.closeNow();
         }
     }
 
-    public static void showAdminInfo(int idMember) {
-        Connection con = DataServer.getConnection();
+    public static void ShowAdminInfo(int idMember, int openedBy) {
+        Connection con = DataServer.GetConnection();
         try {
             PreparedStatement ps;
             ResultSet rs;
@@ -135,19 +145,24 @@ public class JDBC_Check_In {
             String gym = rs.getString("gymName");
 
             if (rs.next()) {
-                Application.showUserInfo(
-                        Styles.EPIC,
-                        photo,
-                        idMember,
-                        name,
-                        gym,
-                        "Empleado"
-                );
+                JDBC_Check_In.CreateCheckIn(idMember, openedBy).thenAccept(isOk -> {
+                    if (isOk) {
+                        Application.ShowUserInfo(
+                                Styles.EPIC,
+                                photo,
+                                idMember,
+                                name,
+                                gym,
+                                "Empleado"
+                        );
+                        Notifications.Success("Entrada", "Entrada de " + name + " registrada", 2);
+                    }
+                });
             }
         } catch (SQLException sqlException) {
             Notifications.CatchSqlException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], sqlException);
         } finally {
-            DataServer.closeConnection(con);
+            DataServer.CloseConnection(con);
             Loading.closeNow();
         }
     }

@@ -106,7 +106,7 @@ public class Popup implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        this.boxPopup.getStyleClass().addAll(UserPreferences.getPreferenceString("THEME"));
+        this.boxPopup.getStyleClass().addAll(UserPreferences.GetPreferenceString("THEME"));
         this.boxTitle.getStyleClass().add(this.style);
         this.labelTitle.textProperty().bind(new SimpleStringProperty(title));
         this.labelContent.textProperty().bind(new SimpleStringProperty(body));
@@ -122,14 +122,16 @@ public class Popup implements Initializable {
         this.fontIconClose.setOnMouseClicked(mouseEvent -> this.eventCancel());
 
         this.boxButtons.getChildren().setAll(buttonPrimary);
-        if (!this.popupType.equals(POPUP_ALERT)) {
+        InputProperties.createVisibleEvent(this.boxPassword, false);
+        if (this.popupType.equals(POPUP_ALERT)) {
+            buttonPrimary.setOnAction(actionEvent -> eventConfirm());
+        } else {
             JFXButton buttonSecondary = new JFXButton("Cancelar");
             buttonSecondary.getStyleClass().addAll("btn-secondary");
             buttonSecondary.setOnAction(actionEvent -> this.eventCancel());
             this.boxButtons.getChildren().add(buttonSecondary);
 
             if (this.popupType.equals(POPUP_CONFIRM)) {
-                InputProperties.createVisibleEvent(this.boxPassword, false);
                 buttonPrimary.setOnAction(actionEvent -> eventConfirm());
                 Platform.runLater(buttonPrimary::requestFocus);
             } else if (this.popupType.equals(POPUP_PASSWORD)) {
@@ -140,6 +142,7 @@ public class Popup implements Initializable {
     }
 
     private void popupPassword() {
+        this.boxPassword.setVisible(true);
         this.fieldPassword.setOnKeyPressed(keyEvent -> {
             if (keyEvent.getCode() == KeyCode.ENTER) eventPassword();
         });
@@ -157,7 +160,7 @@ public class Popup implements Initializable {
     }
 
     private void eventPassword() { // compare input password to admin stored password
-        if (Hash.generateHash(this.fieldPassword.getText()).equals(Application.getModelAdmin().getPassword())) {
+        if (Hash.generateHash(this.fieldPassword.getText()).equals(Application.GetModelAdmin().getPassword())) {
             this.boolAnswer = true;
             closeStage();
         } else {

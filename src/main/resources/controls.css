@@ -219,7 +219,6 @@
 }
 
 .table-label {
-    /* TODO: CHANGE NAME */
     -fx-background-color: -fx-color-background;
     -fx-text-fill: -fx-color-text;
     -fx-border-color: -fx-color-border;

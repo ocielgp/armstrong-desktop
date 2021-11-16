@@ -14,7 +14,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class JDBC_Membership {
     public static int CreateMembership(Model_Membership modelMembership) {
-        Connection con = DataServer.getConnection();
+        Connection con = DataServer.GetConnection();
         try {
             PreparedStatement ps;
             ResultSet rs;
@@ -24,7 +24,7 @@ public class JDBC_Membership {
             ps.setString(1, modelMembership.getName()); // name
             ps.setBigDecimal(2, modelMembership.getPrice()); // price
             ps.setBoolean(3, modelMembership.getMonthly()); // monthly
-            ps.setInt(4, Application.getModelAdmin().getIdMember()); // idAdmin
+            ps.setInt(4, Application.GetModelAdmin().getIdMember()); // idAdmin
             ps.executeUpdate();
             rs = ps.getGeneratedKeys();
             if (rs.next()) { // return new id membership
@@ -33,7 +33,7 @@ public class JDBC_Membership {
         } catch (SQLException sqlException) {
             Notifications.CatchSqlException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], sqlException);
         } finally {
-            DataServer.closeConnection(con);
+            DataServer.CloseConnection(con);
         }
         return 0;
     }
@@ -45,7 +45,7 @@ public class JDBC_Membership {
      */
     public static CompletableFuture<ObservableList<Model_Membership>> ReadMemberships(byte monthly) {
         return CompletableFuture.supplyAsync(() -> {
-            Connection con = DataServer.getConnection();
+            Connection con = DataServer.GetConnection();
             ObservableList<Model_Membership> modelMembershipsList = FXCollections.observableArrayList();
             try {
                 PreparedStatement ps;
@@ -54,7 +54,7 @@ public class JDBC_Membership {
                 String sql = "SELECT idMembership, name, price, monthly, createdAt, createdBy, updatedAt, updatedBy FROM MEMBERSHIPS WHERE flag = 1";
                 if (monthly == 0 || monthly == 1) {
                     sql += " AND monthly = ?";
-                    ps = con.prepareStatement(sql + " ORDER BY monthly, price DESC");
+                    ps = con.prepareStatement(sql + " ORDER BY monthly, price");
                     ps.setByte(1, monthly);
 
                 } else ps = con.prepareStatement(sql + " ORDER BY monthly DESC, price");
@@ -76,9 +76,9 @@ public class JDBC_Membership {
                 }
                 con.close();
             } catch (SQLException sqlException) {
-                Notifications.CatchException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
+                Notifications.CatchSqlException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], sqlException);
             } finally {
-                DataServer.closeConnection(con);
+                DataServer.CloseConnection(con);
             }
             return modelMembershipsList;
         });
@@ -88,13 +88,12 @@ public class JDBC_Membership {
         ParamBuilder paramBuilder = new ParamBuilder("MEMBERSHIPS", "idMembership", modelMembership.getIdMembership());
         paramBuilder.addParam("name", modelMembership.getName());
         paramBuilder.addParam("price", modelMembership.getPrice());
-        paramBuilder.addParam("monthly", modelMembership.getMonthly());
         return paramBuilder.executeUpdate();
     }
 
     public static boolean DeleteMembership(int idMembership) {
         ParamBuilder paramBuilder = new ParamBuilder("MEMBERSHIPS", "idMembership", idMembership);
-        paramBuilder.addParam("updatedBy", Application.getModelAdmin().getIdMember());
+        paramBuilder.addParam("updatedBy", Application.GetModelAdmin().getIdMember());
         paramBuilder.addParam("flag", 0);
         return paramBuilder.executeUpdate();
     }

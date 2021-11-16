@@ -8,11 +8,11 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.concurrent.CompletableFuture;
 
 public class JDBC_Member_Photo {
     public static void CreatePhoto(int idMember, byte[] photoBytes) {
-        Connection con = DataServer.getConnection();
+        if (photoBytes == null) return;
+        Connection con = DataServer.GetConnection();
         try {
             PreparedStatement ps;
             assert con != null;
@@ -21,39 +21,37 @@ public class JDBC_Member_Photo {
             ps.setInt(2, idMember); // idMember
             ps.executeUpdate();
         } catch (SQLException sqlException) {
-            Notifications.CatchException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
+            Notifications.CatchSqlException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], sqlException);
         } finally {
-            DataServer.closeConnection(con);
+            DataServer.CloseConnection(con);
         }
     }
 
-    public static CompletableFuture<Model_Member_Photo> ReadPhoto(int idMember) {
-        return CompletableFuture.supplyAsync(() -> {
-            Connection con = DataServer.getConnection();
-            Model_Member_Photo modelMemberPhoto = null;
-            try {
-                PreparedStatement ps;
-                ResultSet rs;
-                assert con != null;
-                ps = con.prepareStatement("SELECT idPhoto, photo FROM MEMBERS_PHOTOS WHERE idMember = ? ORDER BY idMember DESC");
-                ps.setInt(1, idMember); // photo
-                rs = ps.executeQuery();
-                if (rs.next()) {
-                    modelMemberPhoto = new Model_Member_Photo();
-                    modelMemberPhoto.setPhoto(rs.getBytes("photo"));
-                    return modelMemberPhoto;
-                }
-            } catch (SQLException sqlException) {
-                Notifications.CatchException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
-            } finally {
-                DataServer.closeConnection(con);
+    public static Model_Member_Photo ReadPhoto(int idMember) {
+        Connection con = DataServer.GetConnection();
+        Model_Member_Photo modelMemberPhoto = null;
+        try {
+            PreparedStatement ps;
+            ResultSet rs;
+            assert con != null;
+            ps = con.prepareStatement("SELECT idPhoto, photo FROM MEMBERS_PHOTOS WHERE idMember = ? ORDER BY idMember DESC");
+            ps.setInt(1, idMember); // photo
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                modelMemberPhoto = new Model_Member_Photo();
+                modelMemberPhoto.setPhoto(rs.getBytes("photo"));
+                return modelMemberPhoto;
             }
-            return modelMemberPhoto;
-        });
+        } catch (SQLException sqlException) {
+            Notifications.CatchSqlException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], sqlException);
+        } finally {
+            DataServer.CloseConnection(con);
+        }
+        return modelMemberPhoto;
     }
 
     public static boolean UpdatePhoto(int idMember, byte[] photoBytes) {
-        Connection con = DataServer.getConnection();
+        Connection con = DataServer.GetConnection();
         try {
             PreparedStatement ps;
             assert con != null;
@@ -63,10 +61,10 @@ public class JDBC_Member_Photo {
             ps.executeUpdate();
             return true;
         } catch (SQLException sqlException) {
-            Notifications.CatchException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
+            Notifications.CatchSqlException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], sqlException);
             return false;
         } finally {
-            DataServer.closeConnection(con);
+            DataServer.CloseConnection(con);
         }
     }
 }

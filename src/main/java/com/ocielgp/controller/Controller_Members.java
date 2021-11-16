@@ -7,6 +7,7 @@ import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXCheckBox;
 import com.jfoenix.controls.JFXRadioButton;
 import com.jfoenix.controls.JFXTextField;
+import com.ocielgp.app.Router;
 import com.ocielgp.app.UserPreferences;
 import com.ocielgp.controller.dashboard.Controller_Membership;
 import com.ocielgp.models.Model_Member;
@@ -39,6 +40,7 @@ public class Controller_Members implements Initializable {
     @FXML
     private FlowPane boxButtons;
 
+    // table
     @FXML
     private JFXTextField fieldSearch;
     @FXML
@@ -58,13 +60,13 @@ public class Controller_Members implements Initializable {
     @FXML
     private JFXTextField fieldRowsPerPage;
     @FXML
-    private Label labelPreviousPage;
+    private FontIcon iconPreviousPage;
     @FXML
     private Label labelCurrentPage;
     @FXML
     private Label labelTotalPages;
     @FXML
-    private Label labelNextPage;
+    private FontIcon iconNextPage;
 
     // filters
     @FXML
@@ -86,14 +88,12 @@ public class Controller_Members implements Initializable {
 
     // attributes
     private Pagination pagination;
-    public static boolean isMemberTab = true;
+    public boolean isMemberTab = true;
     private Controller_Member controllerMember;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-//        JDBC_Member_Fingerprint.isReaderAvailable = true;
-
-        this.pagination = new Pagination(this.fieldSearch, this.buttonSearch, this.labelTotalRows, this.tableViewMembers, this.fieldRowsPerPage, this.labelPreviousPage, this.labelCurrentPage, this.labelTotalPages, this.labelNextPage, Pagination.Sources.MEMBERS);
+        this.pagination = new Pagination(Pagination.Tables.MEMBERS, this.fieldSearch, this.buttonSearch, this.labelTotalRows, this.tableViewMembers, this.fieldRowsPerPage, this.iconPreviousPage, this.labelCurrentPage, this.labelTotalPages, this.iconNextPage);
         this.controllerMember = new Controller_Member(this.pagination);
         createButtons();
         createFilters();
@@ -103,10 +103,10 @@ public class Controller_Members implements Initializable {
             if (newValue != null) {
                 if (isMemberTab) {
                     Loading.show();
-                    CompletableFuture.runAsync(() -> controllerMember.getMemberData(newValue.getIdMember(), newValue.getStyle()));
+                    CompletableFuture.runAsync(() -> this.controllerMember.getMemberData(newValue.getIdMember(), newValue.getStyle()));
                 } else {
                     this.controllerMember = new Controller_Member(this.pagination, newValue.getIdMember(), newValue.getStyle());
-                    ((JFXButton) this.boxButtons.getChildren().get(0)).fire(); // add member button
+                    changeTab("member.fxml", this.controllerMember);
                 }
             }
         });
@@ -115,7 +115,8 @@ public class Controller_Members implements Initializable {
             FadeIn fadeIn = new FadeIn(this.boxRoot);
             fadeIn.setOnFinished(actionEvent -> this.fieldSearch.requestFocus());
             fadeIn.play();
-            this.pagination.restartTable();
+            this.pagination.refillTable(1);
+            changeTab("member.fxml", this.controllerMember); // initial tab
         });
     }
 
@@ -142,10 +143,6 @@ public class Controller_Members implements Initializable {
                     true,
                     "btn-colorful", Styles.WARN
             );
-            Platform.runLater(() -> {
-//                Loading.isChildLoaded.set(true);
-                ((JFXButton) this.boxButtons.getChildren().get(0)).fire(); // add member button
-            });
         });
     }
 
@@ -168,40 +165,51 @@ public class Controller_Members implements Initializable {
             isMemberTab = true;
         } else {
             isMemberTab = false;
-            this.pagination.unselectTable();
+            this.pagination.clearSelection();
         }
         Loading.show();
-        FadeOutRight fadeOutRight = new FadeOutRight(this.boxRightTab);
-        fadeOutRight.setOnFinished(actionEvent -> {
-            this.boxRightTab.getChildren().setAll(
-                    Loader.Load(tabResource, "Controller_Members", true, (tabResource.equals("member.fxml")) ? this.controllerMember : controller)
-            );
+        if (this.boxRightTab.getChildren().size() > 0) {
+            FadeOutRight fadeOutRight = new FadeOutRight(this.boxRightTab);
+            fadeOutRight.setOnFinished(actionEvent -> {
+                getNode(tabResource, controller);
+                FadeInRight fadeInRight = new FadeInRight(this.boxRightTab);
+                fadeInRight.setOnFinished(actionEvent1 -> Loading.isAnimationFinished.set(true));
+                fadeInRight.play();
+            });
+            fadeOutRight.play();
+        } else {
+            getNode(tabResource, controller);
             FadeInRight fadeInRight = new FadeInRight(this.boxRightTab);
             fadeInRight.setOnFinished(actionEvent1 -> Loading.isAnimationFinished.set(true));
             fadeInRight.play();
-        });
-        fadeOutRight.play();
+        }
+    }
+
+    private void getNode(String tabResource, Object controller) {
+        this.boxRightTab.getChildren().setAll(
+                Loader.Load(tabResource, "Controller_Members", true, (tabResource.equals("member.fxml")) ? this.controllerMember : controller)
+        );
     }
 
     private void createFilters() {
-        this.checkBoxAllGyms.setSelected(UserPreferences.getPreferenceBool("FILTER_MEMBER_ALL_GYMS"));
-        this.checkBoxOnlyActiveMembers.setSelected(UserPreferences.getPreferenceBool("FILTER_MEMBER_ACTIVE_MEMBERS"));
-        this.checkBoxOnlyDebtors.setSelected(UserPreferences.getPreferenceBool("FILTER_MEMBER_DEBTORS"));
+        this.checkBoxAllGyms.setSelected(UserPreferences.GetPreferenceBool("FILTER_MEMBER_ALL_GYMS"));
+        this.checkBoxOnlyActiveMembers.setSelected(UserPreferences.GetPreferenceBool("FILTER_MEMBER_ACTIVE_MEMBERS"));
+        this.checkBoxOnlyDebtors.setSelected(UserPreferences.GetPreferenceBool("FILTER_MEMBER_DEBTORS"));
 
-        this.checkBoxAllGyms.selectedProperty().addListener(UserPreferences.listenerSaver("FILTER_MEMBER_ALL_GYMS", pagination));
-        this.checkBoxOnlyActiveMembers.selectedProperty().addListener(UserPreferences.listenerSaver("FILTER_MEMBER_ACTIVE_MEMBERS", pagination));
-        this.checkBoxOnlyDebtors.selectedProperty().addListener(UserPreferences.listenerSaver("FILTER_MEMBER_DEBTORS", pagination));
+        this.checkBoxAllGyms.selectedProperty().addListener(UserPreferences.ListenerSaver("FILTER_MEMBER_ALL_GYMS", pagination));
+        this.checkBoxOnlyActiveMembers.selectedProperty().addListener(UserPreferences.ListenerSaver("FILTER_MEMBER_ACTIVE_MEMBERS", pagination));
+        this.checkBoxOnlyDebtors.selectedProperty().addListener(UserPreferences.ListenerSaver("FILTER_MEMBER_DEBTORS", pagination));
 
         ToggleGroup toggleGender = new ToggleGroup();
         this.radioButtonGender0.setToggleGroup(toggleGender);
         this.radioButtonGender1.setToggleGroup(toggleGender);
         this.radioButtonGender2.setToggleGroup(toggleGender);
-        UserPreferences.createSelectedToggleProperty(toggleGender, "radioButtonGender", "FILTER_MEMBER_GENDERS", pagination);
+        UserPreferences.CreateSelectedToggleProperty(toggleGender, "radioButtonGender", "FILTER_MEMBER_GENDERS", pagination);
 
         ToggleGroup toggleOrderBy = new ToggleGroup();
         this.radioButtonOrderBy0.setToggleGroup(toggleOrderBy);
         this.radioButtonOrderBy1.setToggleGroup(toggleOrderBy);
-        UserPreferences.createSelectedToggleProperty(toggleOrderBy, "radioButtonOrderBy", "FILTER_MEMBER_ORDER_BY", pagination);
+        UserPreferences.CreateSelectedToggleProperty(toggleOrderBy, "radioButtonOrderBy", "FILTER_MEMBER_ORDER_BY", pagination);
     }
 
     private void bindTable() {

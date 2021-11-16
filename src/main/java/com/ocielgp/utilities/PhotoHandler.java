@@ -17,82 +17,71 @@ import java.nio.file.Files;
 
 public class PhotoHandler {
     private final FormChangeListener formChangeListener;
-    private final ImageView imageViewPhoto;
+    private final ImageView imageView;
     private byte[] bytes;
     private final JFXButton buttonDeletePhoto;
 
-    public PhotoHandler(FormChangeListener formChangeListener, ImageView imageViewPhoto, JFXButton buttonDeletePhoto) {
+    public PhotoHandler(FormChangeListener formChangeListener, ImageView imageView, JFXButton buttonDeletePhoto) {
         this.formChangeListener = formChangeListener;
-        this.imageViewPhoto = imageViewPhoto;
+        this.imageView = imageView;
         this.buttonDeletePhoto = buttonDeletePhoto;
 
-        imageViewPhoto.setOnMouseClicked(mouseEvent -> browseImage());
-        imageViewPhoto.setOnKeyPressed(keyEvent -> {
+        imageView.setOnMouseClicked(mouseEvent -> browseImage());
+        imageView.setOnKeyPressed(keyEvent -> {
             if (keyEvent.getCode() == KeyCode.SPACE || keyEvent.getCode() == KeyCode.ENTER) {
                 browseImage();
             }
         });
-        buttonDeletePhoto.addEventFilter(ActionEvent.ACTION, actionEvent -> deleteImage());
+        buttonDeletePhoto.addEventFilter(ActionEvent.ACTION, actionEvent -> removeImage());
 
-        this.imageViewPhoto.setStyle("-fx-cursor: hand");
-        this.imageViewPhoto.setImage(FileLoader.getDefaultImage());
+        this.imageView.setImage(FileLoader.getDefaultImage());
     }
 
 
     private void browseImage() {
-        if (Fingerprint_Controller.getStatusCode() != 0) {
-            Fingerprint_Controller.FB_StopReader();
-        }
+        // stop fingerprint to don't crash the app
+        if (Fingerprint_Controller.IsConnected()) Fingerprint_Controller.StopCapture();
         FileChooser fileChooser = new FileChooser();
-        FileChooser.ExtensionFilter extensionFilter = new FileChooser.ExtensionFilter("Imágenes", "*.png", "*.jpg", "*.jpeg");
-        fileChooser.getExtensionFilters().add(extensionFilter);
+        fileChooser.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter("Imágenes", "*.png", "*.jpg", "*.jpeg")
+        );
 
-        // TODO: OPEN LAST LOCATION
-        File folder = UserPreferences.getFolderPath();
-        if (folder != null) {
-            fileChooser.setInitialDirectory(folder);
+        File lastSavedFolder = UserPreferences.GetFolderPath();
+        if (lastSavedFolder != null) { // open last directory if exists
+            fileChooser.setInitialDirectory(lastSavedFolder);
         }
 
         File file = fileChooser.showOpenDialog(Application.STAGE_PRIMARY);
         if (file != null) {
-            UserPreferences.setFolderPath(file);
-            this.imageViewPhoto.setImage(new Image(file.toURI().toString()));
+            UserPreferences.SetFolderPath(file); // save last directory
+            this.imageView.setImage(new Image(file.toURI().toString()));
             this.buttonDeletePhoto.setDisable(false);
             try {
                 this.bytes = Files.readAllBytes(file.toPath());
-                if (this.formChangeListener.isListen()) {
-                    this.formChangeListener.change("photo", false);
-                }
+                if (this.formChangeListener.isListen()) this.formChangeListener.change("photo", false);
             } catch (Exception exception) {
-                Notifications.CatchException(
-                        MethodHandles.lookup().lookupClass().getSimpleName(),
-                        Thread.currentThread().getStackTrace()[1],
-                        exception.getMessage(),
-                        exception
-                );
+                Notifications.CatchException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], exception);
             }
         }
 
-        if (Fingerprint_Controller.getStatusCode() != 0) {
-            Fingerprint_Controller.StartCapture();
-        }
+        if (Fingerprint_Controller.IsConnected()) Fingerprint_Controller.BackgroundReader();
     }
 
-    private void deleteImage() {
-        this.imageViewPhoto.setImage(FileLoader.getDefaultImage());
+    private void removeImage() {
+        this.imageView.requestFocus();
+        this.imageView.setImage(FileLoader.getDefaultImage());
         this.buttonDeletePhoto.setDisable(true);
         this.bytes = null;
-        this.imageViewPhoto.requestFocus();
         formChangeListener.change("photo", false);
     }
 
     public void setPhoto(byte[] bytes) {
         if (bytes != null) {
+            this.imageView.setImage(FileLoader.loadImage(bytes));
             this.bytes = bytes;
-            this.imageViewPhoto.setImage(FileLoader.loadImage(bytes));
             this.buttonDeletePhoto.setDisable(false);
         } else {
-            this.imageViewPhoto.setImage(FileLoader.getDefaultImage());
+            this.imageView.setImage(FileLoader.getDefaultImage());
             this.buttonDeletePhoto.setDisable(true);
         }
     }
@@ -101,8 +90,8 @@ public class PhotoHandler {
         return this.bytes;
     }
 
-    public void resetHandler() {
-        this.imageViewPhoto.setImage(FileLoader.getDefaultImage());
+    public void restartPane() {
+        this.imageView.setImage(FileLoader.getDefaultImage());
         this.bytes = null;
         this.buttonDeletePhoto.setDisable(true);
     }

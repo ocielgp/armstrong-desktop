@@ -1,17 +1,18 @@
 package com.ocielgp.models;
 
+import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 
 public class Model_Member_Fingerprint {
-    private final SimpleIntegerProperty idFingerprint = new SimpleIntegerProperty();
+    private final IntegerProperty idFingerprint = new SimpleIntegerProperty();
     private byte[] fingerprint;
-    private final SimpleIntegerProperty idMember = new SimpleIntegerProperty();
+    private final IntegerProperty idMember = new SimpleIntegerProperty();
 
     public int getIdFingerprint() {
         return idFingerprint.get();
     }
 
-    public SimpleIntegerProperty idFingerprintProperty() {
+    public IntegerProperty idFingerprintProperty() {
         return idFingerprint;
     }
 
@@ -31,7 +32,7 @@ public class Model_Member_Fingerprint {
         return idMember.get();
     }
 
-    public SimpleIntegerProperty idMemberProperty() {
+    public IntegerProperty idMemberProperty() {
         return idMember;
     }
 

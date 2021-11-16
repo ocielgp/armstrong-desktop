@@ -61,7 +61,7 @@ public class Controller_Dashboard_Visit implements Initializable {
         Scene scene = new Scene(this.boxRoot);
         scene.getStylesheets().add("styles.css");
         scene.setFill(Color.TRANSPARENT);
-        this.boxRoot.getStyleClass().add(UserPreferences.getPreferenceString("THEME"));
+        this.boxRoot.getStyleClass().add(UserPreferences.GetPreferenceString("THEME"));
         this.stage.setScene(scene);
         this.comboBoxVisitors.itemsProperty().addListener((observableValue, oldValue, newValue) -> {
             Platform.runLater(() -> this.comboBoxVisitors.show());
@@ -81,8 +81,10 @@ public class Controller_Dashboard_Visit implements Initializable {
         this.buttonRegister.setOnAction(actionEvent -> {
             if (Validator.emptyValidator(this.comboBoxVisitors)) {
                 this.boxRoot.setDisable(true);
-                JDBC_Payment_Visit.CreatePaymentVisit(this.comboBoxVisitors.getSelectionModel().getSelectedItem());
-                Notifications.Success("Visita", "Visita de $" + this.comboBoxVisitors.getSelectionModel().getSelectedItem().getPrice() + " registrada");
+                boolean isOk = JDBC_Payment_Visit.CreatePaymentVisit(this.comboBoxVisitors.getSelectionModel().getSelectedItem());
+                if (isOk) {
+                    Notifications.Success("Visita", "Visita de $" + this.comboBoxVisitors.getSelectionModel().getSelectedItem().getPrice() + " registrada");
+                }
                 closeStage();
             }
         });

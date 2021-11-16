@@ -2,77 +2,59 @@ package com.ocielgp.utilities;
 
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
-import com.ocielgp.app.Application;
 import com.ocielgp.app.UserPreferences;
 import com.ocielgp.dao.JDBC_Member;
 import com.ocielgp.models.Model_Member;
 import javafx.application.Platform;
-import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseEvent;
+import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Pagination {
-    private final Sources source;
 
-    public enum Sources {
+    public enum Tables {
         MEMBERS
     }
 
     private final JFXTextField fieldSearch;
-    private final Label labelTotalRows;
     private final TableView tableView;
+    private final Label labelTotalRows;
     private final JFXTextField fieldRowsPerPage;
     private final Label labelCurrentPage;
     private final Label labelTotalPages;
+
+    // attributes
     private final AtomicInteger page = new AtomicInteger();
     private Integer rows;
+    private final Tables tables;
 
-    public Pagination(JFXTextField fieldSearch, JFXButton buttonSearch, Label labelTotalRows, TableView tableView, JFXTextField fieldRegistersPerPage, Label labelPreviusPage, Label labelCurrentPage, Label labelTotalPages, Label labelNextPage, Sources source) {
+    public Pagination(Tables tables, JFXTextField fieldSearch, JFXButton buttonSearch, Label labelTotalRows, TableView tableView, JFXTextField fieldRowsPerPage, FontIcon iconPreviousPage, Label labelCurrentPage, Label labelTotalPages, FontIcon iconNextPage) {
+        this.tables = tables;
         this.fieldSearch = fieldSearch;
         this.labelTotalRows = labelTotalRows;
         this.tableView = tableView;
-        this.fieldRowsPerPage = fieldRegistersPerPage;
+        this.fieldRowsPerPage = fieldRowsPerPage;
         this.labelCurrentPage = labelCurrentPage;
         this.labelTotalPages = labelTotalPages;
-        this.source = source;
 
-        this.fieldSearch.setOnKeyPressed((keyEvent -> {
-            if (keyEvent.getCode() == KeyCode.ENTER) {
-                this.restartTable();
-            }
-        }));
-        buttonSearch.setOnAction(actionEvent -> this.restartTable());
+        InputProperties.createEventEnter(buttonSearch, this.fieldSearch);
+        buttonSearch.setOnAction(actionEvent -> this.refillTable(1));
 
         this.fieldRowsPerPage.setOnKeyPressed(keyEvent -> {
             if (keyEvent.getCode().equals(KeyCode.ENTER)) {
-                this.updateRowsPerPage();
+                updateRowsPerPage();
             }
         });
-        labelPreviusPage.setOnMouseClicked(this.previousPage());
-        labelNextPage.setOnMouseClicked(this.nextPage());
-        this.rows = UserPreferences.getPreferenceInt("PAGINATION_MAX_ROWS");
-
-        // Listener on ComboBox GymModel
-        EventHandler<ActionEvent> gymChange = actionEvent -> {
-            if (!UserPreferences.getPreferenceBool("FILTER_MEMBER_ALL_GYMS")) {
-                this.restartTable();
-            }
-        };
-        Application.getCurrentGymNode().removeEventHandler(ActionEvent.ACTION, gymChange);
-        Application.getCurrentGymNode().addEventHandler(ActionEvent.ACTION, gymChange);
-
-        this.fieldSearch.sceneProperty().addListener((observable, oldScene, newScene) -> {
-            if (oldScene != null) {
-                Application.getCurrentGymNode().removeEventHandler(ActionEvent.ACTION, gymChange);
-            }
-        });
+        iconPreviousPage.setOnMouseClicked(eventPreviousPage());
+        iconNextPage.setOnMouseClicked(eventNextPage());
+        this.rows = UserPreferences.GetPreferenceInt("PAGINATION_MAX_ROWS");
     }
 
     private void updateRowsPerPage() {
@@ -80,62 +62,40 @@ public class Pagination {
             int newRowsPerPage = Integer.parseInt(this.fieldRowsPerPage.getText());
             if (newRowsPerPage > 0) {
                 this.rows = Integer.parseInt(this.fieldRowsPerPage.getText());
-                UserPreferences.setPreference("PAGINATION_MAX_ROWS", Integer.parseInt(this.fieldRowsPerPage.getText()));
-                this.restartTable();
+                UserPreferences.SetPreference("PAGINATION_MAX_ROWS", Integer.parseInt(this.fieldRowsPerPage.getText()));
+                refillTable(1);
             } else {
-                Notifications.Danger("Error", "Cantidad de registros no válida.", 2);
+                Notifications.Danger("Error", "Cantidad de registros no válida", 2);
                 Validator.shakeInput(this.fieldRowsPerPage);
             }
         }
     }
 
-
-    public EventHandler<MouseEvent> previousPage() {
-        return mouseEvent -> {
-            CompletableFuture.runAsync(() -> {
-                if ((this.page.get() - 1) > 0) {
-                    CompletableFuture.runAsync(() -> {
-                        this.page.set(this.page.get() - 1);
-                        this.fillTable();
-                    });
-                }
-            });
-        };
-    }
-
-    public EventHandler<MouseEvent> nextPage() {
-        return mouseEvent -> {
-            CompletableFuture.runAsync(() -> {
-                if ((page.get() + 1) <= Integer.parseInt(this.labelTotalPages.getText())) {
-                    CompletableFuture.runAsync(() -> {
-                        this.page.set(this.page.get() + 1);
-                        this.fillTable();
-                    });
-                }
-            });
-        };
-    }
-
-    public void unselectTable() {
-        this.tableView.getSelectionModel().select(null);
-    }
-
-    public void restartTable() {
-        this.page.set(1);
-        this.fillTable();
-    }
-
-    public void fillTable() {
-        Platform.runLater(() -> this.fieldRowsPerPage.setText(this.rows.toString()));
-
-        switch (source) {
-            case MEMBERS: {
-                CompletableFuture.runAsync(this::loadMembers);
+    public EventHandler<MouseEvent> eventPreviousPage() {
+        return mouseEvent -> CompletableFuture.runAsync(() -> {
+            if ((this.page.get() - 1) > 0) {
+                CompletableFuture.runAsync(() -> refillTable(this.page.get() - 1));
             }
+        });
+    }
+
+    public EventHandler<MouseEvent> eventNextPage() {
+        return mouseEvent -> CompletableFuture.runAsync(() -> {
+            if ((page.get() + 1) <= Integer.parseInt(this.labelTotalPages.getText())) {
+                CompletableFuture.runAsync(() -> refillTable(this.page.get() + 1));
+            }
+        });
+    }
+
+    public void refillTable(int page) {
+        this.page.set(page);
+        Platform.runLater(() -> this.fieldRowsPerPage.setText(this.rows.toString()));
+        if (tables == Tables.MEMBERS) {
+            CompletableFuture.runAsync(this::refillMembers);
         }
     }
 
-    private void loadMembers() {
+    private void refillMembers() {
         JDBC_Member.ReadMembers(this.rows, this.page, this.fieldSearch.getText()).thenAccept(queryRows -> Platform.runLater(() -> {
             if (queryRows.getData().size() > 0) {
                 this.labelTotalPages.setText(queryRows.getPages().toString());
@@ -162,16 +122,19 @@ public class Pagination {
                 this.tableView.setItems(queryRows.getData());
                 this.labelCurrentPage.setText(this.page.toString());
             } else {
-                this.restartCounters();
+                initialStateCounters();
             }
-
             this.tableView.setDisable(false);
         }));
     }
 
-    public void restartCounters() {
+    public void clearSelection() {
+        this.tableView.getSelectionModel().clearSelection();
+    }
+
+    public void initialStateCounters() {
         Platform.runLater(() -> {
-            this.tableView.setItems(null);
+            this.tableView.getItems().clear();
             this.labelTotalRows.setText("0");
             this.labelCurrentPage.setText("0");
             this.labelTotalPages.setText("0");

@@ -19,7 +19,7 @@ public class ParamBuilder {
     public ParamBuilder(String table, String whereColumn, Object whereValue) {
         this.sqlBuilder = new StringBuilder("UPDATE ").append(table).append(" SET ");
         this.where = new Pair<>(whereColumn, whereValue);
-        addParam("updatedBy", Application.getModelAdmin().getIdMember());
+        addParam("updatedBy", Application.GetModelAdmin().getIdMember());
     }
 
     public void addParam(String tableColumn, Object param) {
@@ -36,7 +36,7 @@ public class ParamBuilder {
     public boolean executeUpdate() {
         if (this.queryParams.size() == 1) return true;
         if (this.queryParams.size() > 1) { // skip updated by
-            Connection con = DataServer.getConnection();
+            Connection con = DataServer.GetConnection();
             try {
                 this.sqlBuilder.append(" WHERE ").append(this.where.getKey()).append(" = ?");
                 assert con != null;
@@ -56,7 +56,7 @@ public class ParamBuilder {
                 Notifications.CatchSqlException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], sqlException);
                 return true;
             } finally {
-                DataServer.closeConnection(con);
+                DataServer.CloseConnection(con);
             }
         }
         return false;

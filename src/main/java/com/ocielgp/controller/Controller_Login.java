@@ -40,10 +40,13 @@ public class Controller_Login implements Initializable {
         this.buttonLogin.setOnAction(actionEvent -> auth());
 
         Platform.runLater(() -> {
-            new FadeInUp(this.boxRoot).play();
-            this.fieldUsername.requestFocus();
-            this.fieldUsername.setText("Ociel");
-            this.fieldPassword.setText("dos");
+            FadeInUp fadeInUp = new FadeInUp(this.boxRoot);
+            fadeInUp.setOnFinished(actionEvent -> {
+                this.fieldUsername.setText("Ociel");
+                this.fieldPassword.setText("dos");
+                this.fieldUsername.requestFocus();
+            });
+            fadeInUp.play();
         });
     }
 
@@ -52,7 +55,6 @@ public class Controller_Login implements Initializable {
             this.boxRoot.setDisable(true);
             CompletableFuture.runAsync(() -> {
                 Loading.show();
-                System.out.println("good");
                 Boolean isValidUser = JDBC_Admins.ReadLogin(this.fieldUsername.getText(), this.fieldPassword.getText());
                 if (isValidUser == null) {
                     Platform.runLater(() -> new Flash(this.boxRoot).play());

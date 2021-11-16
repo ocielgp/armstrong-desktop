@@ -65,45 +65,45 @@ public class UserPreferences {
         });
     }
 
-    public static void setPreference(String preference, String value) {
+    public static void SetPreference(String preference, String value) {
         PREFERENCES.put(preference, value);
     }
 
-    public static void setPreference(String preference, int value) {
+    public static void SetPreference(String preference, int value) {
         PREFERENCES.putInt(preference, value);
     }
 
-    public static void setPreference(String preference, boolean value) {
+    public static void SetPreference(String preference, boolean value) {
         PREFERENCES.putBoolean(preference, value);
     }
 
-    public static String getPreferenceString(String preference) {
+    public static String GetPreferenceString(String preference) {
         return PREFERENCES.get(preference, (String) DEFAULT_PREFERENCES.get(preference));
     }
 
-    public static int getPreferenceInt(String preference) {
+    public static int GetPreferenceInt(String preference) {
         return PREFERENCES.getInt(preference, (int) DEFAULT_PREFERENCES.get(preference));
     }
 
-    public static boolean getPreferenceBool(String preference) {
+    public static boolean GetPreferenceBool(String preference) {
         return PREFERENCES.getBoolean(preference, (boolean) DEFAULT_PREFERENCES.get(preference));
     }
 
-    public static void setFolderPath(File file) {
+    public static void SetFolderPath(File file) {
         File parentFile = file.getParentFile();
         if (parentFile != null && file.exists() && parentFile.isDirectory()) {
             PREFERENCES.put("FOLDER_PATH", parentFile.toString());
         }
     }
 
-    public static File getFolderPath() {
+    public static File GetFolderPath() {
         String path = PREFERENCES.get("FOLDER_PATH", DEFAULT_PREFERENCES.get("FOLDER_PATH").toString());
         File folder = new File(path);
         return (folder.exists() && folder.isDirectory()) ? folder : null;
     }
 
-    public static void createSelectedToggleProperty(ToggleGroup toggle, String radioButtonPrefix, String preference, Pagination pagination) {
-        int selectPreviousState = getPreferenceInt(preference);
+    public static void CreateSelectedToggleProperty(ToggleGroup toggle, String radioButtonPrefix, String preference, Pagination pagination) {
+        int selectPreviousState = GetPreferenceInt(preference);
         for (byte i = 0; i < toggle.getToggles().size(); i++) {
             if (((JFXRadioButton) toggle.getToggles().get(i)).getId().equals(radioButtonPrefix + selectPreviousState)) {
                 toggle.getToggles().get(i).setSelected(true);
@@ -112,16 +112,16 @@ public class UserPreferences {
         toggle.selectedToggleProperty().addListener((observableValue, oldValue, newValue) -> {
             if (oldValue != null && oldValue != newValue) {
                 JFXRadioButton selected = (JFXRadioButton) newValue;
-                setPreference(preference, String.valueOf(selected.getId().charAt(selected.getId().length() - 1)));
-                pagination.restartTable();
+                SetPreference(preference, String.valueOf(selected.getId().charAt(selected.getId().length() - 1)));
+                pagination.refillTable(1);
             }
         });
     }
 
-    public static ChangeListener<Object> listenerSaver(String preference, Pagination pagination) {
+    public static ChangeListener<Object> ListenerSaver(String preference, Pagination pagination) {
         return (observableValue, oldValue, newValue) -> {
-            setPreference(preference, Boolean.parseBoolean(newValue.toString()));
-            pagination.restartTable();
+            SetPreference(preference, Boolean.parseBoolean(newValue.toString()));
+            pagination.refillTable(1);
         };
     }
 

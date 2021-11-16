@@ -11,6 +11,7 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.HBox;
 import javafx.util.Pair;
 
+import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicReference;
@@ -47,7 +48,6 @@ public class Router {
                     Platform.runLater(() -> {
                         Loading.show();
                         Router.appDashboard.setContent(initialView);
-                        Loading.isAnimationFinished.set(true);
                     });
                     navBox.setDisable(true);
                 }
@@ -78,7 +78,6 @@ public class Router {
                     appDashboard.setContent(page);
                     InputProperties.getScrollEvent(appDashboard);
                     Fingerprint_Controller.BackgroundReader();
-                    Loading.isAnimationFinished.set(true);
                 });
             });
         }
@@ -86,13 +85,13 @@ public class Router {
 
     public static void EnableDashboard() {
         Router.isRouterAvailable = true;
-        Router.appDashboard.setDisable(false);
+        if (Router.appDashboard != null) Router.appDashboard.setDisable(false);
         Application.controllerApp.borderPaneRoot.getBottom().setDisable(false);
     }
 
     public static void DisableDashboard() {
         Router.isRouterAvailable = false;
-        Router.appDashboard.setDisable(true);
+        if (Router.appDashboard != null) Router.appDashboard.setDisable(true);
         Application.controllerApp.borderPaneRoot.getBottom().setDisable(true);
     }
 }

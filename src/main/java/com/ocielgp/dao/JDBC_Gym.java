@@ -15,7 +15,7 @@ import java.util.concurrent.CompletableFuture;
 public class JDBC_Gym {
     public static CompletableFuture<Model_Gym> ReadGym(int idGym) {
         return CompletableFuture.supplyAsync(() -> {
-            Connection con = DataServer.getConnection();
+            Connection con = DataServer.GetConnection();
             Model_Gym modelGym = null;
             try {
                 PreparedStatement ps;
@@ -31,9 +31,9 @@ public class JDBC_Gym {
                     modelGym.setAddress(rs.getString("address"));
                 }
             } catch (SQLException sqlException) {
-                Notifications.CatchException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
+                Notifications.CatchSqlException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], sqlException);
             } finally {
-                DataServer.closeConnection(con);
+                DataServer.CloseConnection(con);
             }
             return modelGym;
         });
@@ -41,7 +41,7 @@ public class JDBC_Gym {
 
     public static CompletableFuture<ObservableList<Model_Gym>> ReadGyms() {
         return CompletableFuture.supplyAsync(() -> {
-            Connection con = DataServer.getConnection();
+            Connection con = DataServer.GetConnection();
             ObservableList<Model_Gym> modelGymsList = FXCollections.observableArrayList();
             try {
                 PreparedStatement ps;
@@ -60,9 +60,9 @@ public class JDBC_Gym {
                     Notifications.Warn("Gimnasios", "No hay gimnasios registrados", 5);
                 }
             } catch (SQLException sqlException) {
-                Notifications.CatchException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
+                Notifications.CatchSqlException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], sqlException);
             } finally {
-                DataServer.closeConnection(con);
+                DataServer.CloseConnection(con);
             }
             return modelGymsList;
         });

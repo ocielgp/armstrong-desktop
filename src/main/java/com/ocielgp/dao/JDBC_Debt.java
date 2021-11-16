@@ -17,7 +17,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class JDBC_Debt {
     public static boolean CreateDebt(int idMember, Model_Debt modelDebt) {
-        Connection con = DataServer.getConnection();
+        Connection con = DataServer.GetConnection();
         try {
             PreparedStatement ps;
             assert con != null;
@@ -26,22 +26,22 @@ public class JDBC_Debt {
             ps.setBigDecimal(2, modelDebt.getPaidOut()); // paidOut
             ps.setInt(3, modelDebt.getAmount()); // amount
             ps.setString(4, modelDebt.getDescription()); // description
-            ps.setInt(5, Application.getModelAdmin().getIdMember()); // idAdmin
+            ps.setInt(5, Application.GetModelAdmin().getIdMember()); // idAdmin
             ps.setInt(6, idMember); // idMember
             ps.setBoolean(7, modelDebt.isMembership()); // idMember
             ps.executeUpdate();
             return true;
         } catch (SQLException sqlException) {
-            Notifications.CatchException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
+            Notifications.CatchSqlException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], sqlException);
             return false;
         } finally {
-            DataServer.closeConnection(con);
+            DataServer.CloseConnection(con);
         }
     }
 
     public static CompletableFuture<List<Model_Debt>> ReadDebts(int idMember) {
         return CompletableFuture.supplyAsync(() -> {
-            Connection con = DataServer.getConnection();
+            Connection con = DataServer.GetConnection();
             List<Model_Debt> debtList = new ArrayList<>();
             try {
                 PreparedStatement ps;
@@ -61,9 +61,9 @@ public class JDBC_Debt {
                 }
                 con.close();
             } catch (SQLException sqlException) {
-                Notifications.CatchException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
+                Notifications.CatchSqlException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], sqlException);
             } finally {
-                DataServer.closeConnection(con);
+                DataServer.CloseConnection(con);
             }
             return debtList;
         });
@@ -71,7 +71,7 @@ public class JDBC_Debt {
 
     public static CompletableFuture<BigDecimal> ReadTotalOwe(int idMember) {
         return CompletableFuture.supplyAsync(() -> {
-            Connection con = DataServer.getConnection();
+            Connection con = DataServer.GetConnection();
             try {
                 PreparedStatement ps;
                 ResultSet rs;
@@ -83,9 +83,9 @@ public class JDBC_Debt {
                     return rs.getBigDecimal("totalOwe");
                 }
             } catch (SQLException sqlException) {
-                Notifications.CatchException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
+                Notifications.CatchSqlException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], sqlException);
             } finally {
-                DataServer.closeConnection(con);
+                DataServer.CloseConnection(con);
             }
             return new BigDecimal("0.0");
         });

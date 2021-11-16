@@ -2,6 +2,7 @@ package com.ocielgp.utilities;
 
 import com.jfoenix.controls.JFXSpinner;
 import com.ocielgp.app.Application;
+import com.ocielgp.app.Router;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -21,14 +22,10 @@ public class Loading {
     public static BooleanProperty isAnimationFinished = new SimpleBooleanProperty(false);
     public static BooleanProperty isChildLoaded = new SimpleBooleanProperty(false);
 
-    public static void start() {
+    public static void Start() {
         Platform.runLater(() -> {
-            isAnimationFinished.addListener((observableValue, oldValue, newValue) -> {
-                Loading.close();
-            });
-            isChildLoaded.addListener((observableValue, oldValue, newValue) -> {
-                Loading.close();
-            });
+            isAnimationFinished.addListener((observableValue, oldValue, newValue) -> Loading.close());
+            isChildLoaded.addListener((observableValue, oldValue, newValue) -> Loading.close());
 
             buildSpinner();
 
@@ -40,11 +37,11 @@ public class Loading {
                         stage.setX(Screen.getPrimary().getVisualBounds().getWidth() / 2 - stage.getWidth() / 2);
                         stage.setY(Screen.getPrimary().getVisualBounds().getHeight() / 2 - stage.getHeight() / 2);
                     });
-                    Application.DisableDashboard();
+                    Router.DisableDashboard();
                 } else {
+                    Router.EnableDashboard();
                     Loading.isAnimationFinished.set(false);
                     Loading.isChildLoaded.set(false);
-                    Application.EnableDashboard();
                 }
             }));
         });
@@ -60,7 +57,6 @@ public class Loading {
 
     public static void close() {
         Platform.runLater(() -> {
-//            System.out.println("animation: " + Loading.isAnimationFinished.get() + " child: " + Loading.isChildLoaded.get());
             if (stage.isShowing() && Loading.isAnimationFinished.get() && Loading.isChildLoaded.get()) {
                 stage.close();
             }

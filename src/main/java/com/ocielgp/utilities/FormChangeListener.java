@@ -30,7 +30,7 @@ public class FormChangeListener {
     }
 
     public void add(String codeName) {
-        CompletableFuture.runAsync(() -> this.formListeners.put(codeName, true));
+        this.formListeners.put(codeName, true);
     }
 
     synchronized public void change(String codeName, boolean value) {
@@ -50,7 +50,6 @@ public class FormChangeListener {
     }
 
     public boolean isChanged(String codeName) {
-        System.out.println(codeName);
         return !this.formListeners.get(codeName);
     }
 

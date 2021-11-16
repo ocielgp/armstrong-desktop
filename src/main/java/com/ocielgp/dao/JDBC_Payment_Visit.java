@@ -10,22 +10,24 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 public class JDBC_Payment_Visit {
-    public static void CreatePaymentVisit(Model_Membership modelMembership) {
-        Connection con = DataServer.getConnection();
+    public static boolean CreatePaymentVisit(Model_Membership modelMembership) {
+        Connection con = DataServer.GetConnection();
         try {
             PreparedStatement ps;
             assert con != null;
-            ps = con.prepareStatement("INSERT INTO PAYMENTS_VISITS(price, idGym, idAdmin, idMembership) VALUE (?, ?, ?, ?)");
+            ps = con.prepareStatement("INSERT INTO PAYMENTS_VISITS(price, idGym, idMembership, createdBy) VALUE (?, ?, ?, ?)");
             ps.setBigDecimal(1, modelMembership.getPrice()); // price
-            ps.setInt(2, Application.getCurrentGym().getIdGym()); // idGym
-            ps.setInt(3, Application.getModelAdmin().getIdMember()); // idAdmin
-            ps.setInt(4, modelMembership.getIdMembership()); // idMembership
+            ps.setInt(2, Application.GetCurrentGym().getIdGym()); // idGym
+            ps.setInt(3, modelMembership.getIdMembership()); // idMembership
+            ps.setInt(4, Application.GetModelAdmin().getIdMember()); // idAdmin
             ps.executeUpdate();
+            return true;
         } catch (SQLException sqlException) {
-            Notifications.CatchException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
+            Notifications.CatchException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], sqlException);
         } finally {
-            DataServer.closeConnection(con);
+            DataServer.CloseConnection(con);
         }
+        return false;
     }
 
 //    public static CompletableFuture<ArrayList<Model_Visit>> ReadPaymentsVisits() {

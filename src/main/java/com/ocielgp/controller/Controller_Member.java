@@ -8,7 +8,7 @@ import com.jfoenix.controls.JFXTextField;
 import com.jfoenix.controls.JFXToggleButton;
 import com.ocielgp.app.Application;
 import com.ocielgp.dao.*;
-import com.ocielgp.fingerprint.Fingerprint_Controller;
+import com.ocielgp.fingerprint.Fingerprint_Capture_Box;
 import com.ocielgp.models.Model_Debt;
 import com.ocielgp.models.Model_Member;
 import com.ocielgp.models.Model_Membership;
@@ -138,14 +138,15 @@ public class Controller_Member implements Initializable {
 
     // attributes
     private FormChangeListener formChangeListener;
-    private short totalMonths = 1;
-    private final ObjectProperty<BigDecimal> membershipPrice = new SimpleObjectProperty<>(new BigDecimal(0));
-    private PhotoHandler photoHandler;
-    private Model_Member modelMember = null;
-    private Model_Member modelAdmin = null;
-    private final Pagination pagination;
     private int idMember = -1;
     private String style;
+    private Model_Member modelMember = null;
+    private Model_Member modelAdmin = null;
+    private PhotoHandler photoHandler;
+    private Fingerprint_Capture_Box fingerprintCaptureBox;
+    private final Pagination pagination;
+    private short totalMonths = 1;
+    private final ObjectProperty<BigDecimal> membershipPrice = new SimpleObjectProperty<>(new BigDecimal(0));
 
     public Controller_Member(Pagination pagination) {
         this.pagination = pagination;
@@ -246,7 +247,7 @@ public class Controller_Member implements Initializable {
         JDBC_Membership.ReadMemberships(Model_Membership.MONTHLY).thenAccept(model_memberships -> {
             if (this.idMember == -1) {
                 Loading.isChildLoaded.set(true);
-                this.pagination.unselectTable();
+                this.pagination.clearSelection();
             }
             this.ms_comboBoxMemberships.setItems(model_memberships);
         });
@@ -262,7 +263,7 @@ public class Controller_Member implements Initializable {
         this.photoHandler = new PhotoHandler(this.formChangeListener, this.ph_imgMemberPhoto, this.ph_buttonDeletePhoto);
 
         // fingerprint
-        Fingerprint_Controller.setFingerprintBox(this.boxFingerprint, this.fp_boxFingerprint, this.fp_labelFingerprintCounter, this.fp_buttonCapture, this.fp_buttonRestartCapture);
+        this.fingerprintCaptureBox = new Fingerprint_Capture_Box(this.boxFingerprint, this.fp_boxFingerprint, this.fp_labelFingerprintCounter, this.fp_buttonCapture, this.fp_buttonRestartCapture);
 
         // membership
         this.ms_iconSubtractMonth.setOnMouseClicked(mouseEvent -> eventSubtractMonth());
@@ -278,7 +279,7 @@ public class Controller_Member implements Initializable {
         this.buttonAction.setOnAction(actionEvent -> validateAndUpdateMember());
         this.buttonClear.setOnAction((actionEvent) -> {
             eventClearForm(false);
-            this.pagination.unselectTable();
+            this.pagination.clearSelection();
         });
 
         if (this.idMember > -1) {
@@ -293,7 +294,7 @@ public class Controller_Member implements Initializable {
             this.modelMember.setIdMember(idMember);
             this.modelMember.setStyle(style);
 
-            Fingerprint_Controller.loadFingerprints(idMember);
+            this.fingerprintCaptureBox.getFingerprints(this.idMember);
             JDBC_Payment_Membership.ReadLastPayment(idMember)
                     .thenAccept(model_payments_memberships -> {
                         this.modelMember.setModelPaymentMembership(model_payments_memberships);
@@ -304,7 +305,7 @@ public class Controller_Member implements Initializable {
                                         eventClearForm(true);
                                     });
                         } else {
-                            JDBC_Member.ReadMember(model_payments_memberships.getIdAdmin()).thenAccept(model_admin -> JDBC_Gym.ReadGym(model_payments_memberships.getIdGym())
+                            JDBC_Member.ReadMember(model_payments_memberships.getCreatedBy()).thenAccept(model_admin -> JDBC_Gym.ReadGym(model_payments_memberships.getIdGym())
                                     .thenAccept(model_gym -> {
                                         this.modelMember.setModelGym(model_gym);
                                         this.modelAdmin = model_admin;
@@ -369,11 +370,18 @@ public class Controller_Member implements Initializable {
                 this.s_buttonAccess.setText("Desbloquear acceso");
                 this.s_buttonOpenDoor.setDisable(true);
             }
-            this.s_buttonOpenDoor.setOnAction(actionEvent -> CompletableFuture.runAsync(() -> JDBC_Check_In.checkInSystem(this.modelMember.getIdMember())));
-            this.s_buttonPayDebt.setVisible(this.modelMember.getStyle().equals(Styles.CREATIVE));
+            this.s_buttonOpenDoor.setOnAction(actionEvent -> CompletableFuture.runAsync(() -> JDBC_Check_In.CheckInByAdmin(this.modelMember.getIdMember())));
+            if (this.modelMember.getStyle().equals(Styles.CREATIVE)) {
+                this.s_buttonPayDebt.setVisible(true);
+                this.ms_boxButtons.setVisible(false);
+            }
             this.boxShortcut.setVisible(true);
 
             // end buttons
+//            this.s_buttonOpenDoor.setOnAction(actionEvent -> );
+            this.s_buttonAccess.setOnAction(actionEvent -> changeAccess());
+//            this.s_buttonPayDebt.setOnAction(actionEvent -> debt());
+
             this.buttonAction.setText("Guardar cambios");
             this.buttonAction.setDisable(true);
             this.buttonClear.setText("Cancelar");
@@ -404,9 +412,9 @@ public class Controller_Member implements Initializable {
 
             this.boxHistorical.setVisible(false);
 
-            this.photoHandler.resetHandler();
+            this.photoHandler.restartPane();
 
-            Fingerprint_Controller.FB_RestartCapture();
+            this.fingerprintCaptureBox.initialStatePane(true);
 
             InputProperties.clearInputs(
                     this.pi_fieldName,
@@ -446,7 +454,7 @@ public class Controller_Member implements Initializable {
         nodesRequired.add(this.pi_fieldName);
         nodesRequired.add(this.pi_fieldLastName);
         nodesRequired.add(this.pi_comboBoxGender);
-        nodesRequired.add(Application.getCurrentGymNode());
+        nodesRequired.add(Application.GetCurrentGymNode());
 
         // membership
         nodesRequired.add(this.ms_comboBoxMemberships);
@@ -484,7 +492,7 @@ public class Controller_Member implements Initializable {
                         Loading.show();
                         if (this.formChangeListener.isListen()) saveChanges(modelMembership, modelDebt);
                         else createMember(modelMembership, modelDebt);
-                        this.pagination.restartTable();
+                        this.pagination.refillTable(1);
                         eventClearForm(false);
                         Loading.closeNow();
                     }
@@ -504,7 +512,6 @@ public class Controller_Member implements Initializable {
 
     private Model_Debt prepareDebt() {
         final Model_Debt modelDebt = new Model_Debt();
-        System.out.println(this.boxPayment.isVisible());
         if (this.boxPayment.isVisible()) {
             if (!this.pym_togglePayment.isSelected()) { // have debt
                 BigDecimal paidOut = new BigDecimal(this.pym_fieldPaidOut.getText());
@@ -539,12 +546,11 @@ public class Controller_Member implements Initializable {
         int idMember = JDBC_Member.CreateMember(modelMember);
         if (idMember > 0) {
             JDBC_Member_Photo.CreatePhoto(idMember, photoHandler.getPhoto());
-            JDBC_Member_Fingerprint.CreateFingerprints(idMember, Fingerprint_Controller.getFingerprints());
+            JDBC_Member_Fingerprint.CreateFingerprints(idMember, fingerprintCaptureBox.getFingerprintsListIterator());
             int idNewMembership = JDBC_Payment_Membership.CreatePaymentMembership(idMember, modelMembership, this.totalMonths);
             if (modelDebt.getAmount() != 0 && idNewMembership > 0) {
                 JDBC_Debt.CreateDebt(idMember, modelDebt);
             }
-            Fingerprint_Controller.FB_RestartCapture();
             Notifications.Success("Nuevo socio", "[ID: " + idMember + " ] " + modelMember.getName() + " ha sido registrado");
         }
     }
@@ -590,7 +596,7 @@ public class Controller_Member implements Initializable {
         isOk = JDBC_Member.UpdateMember(modelMember);
 
         if (isOk && this.formChangeListener.isChanged("fingerprint")) {
-            isOk = JDBC_Member_Fingerprint.CreateFingerprints(this.modelMember.getIdMember(), Objects.requireNonNull(Fingerprint_Controller.getFingerprints()));
+            isOk = JDBC_Member_Fingerprint.CreateFingerprints(this.modelMember.getIdMember(), Objects.requireNonNull(fingerprintCaptureBox.getFingerprintsListIterator()));
         }
 
         if (isOk) {
@@ -705,7 +711,7 @@ public class Controller_Member implements Initializable {
         });
     }
 
-    private void eventAccess() { // TODO: REFRESH TABLE AFTER CHANGE
+    private void changeAccess() { // TODO: REFRESH TABLE AFTER CHANGE
         Popup popup = new Popup();
         Platform.runLater(() -> {
             String style = this.s_buttonAccess.getStyleClass().get(3);
@@ -725,6 +731,7 @@ public class Controller_Member implements Initializable {
                                 this.s_buttonAccess.setText("Desbloquear acceso");
                                 Notifications.Danger("Acceso bloqueado", this.modelMember.getName() + " ha perdido el acceso a los gimnasios");
                                 this.scrollPane.requestFocus();
+                                this.pagination.refillTable(1);
                             });
                         }
                     });
@@ -743,6 +750,7 @@ public class Controller_Member implements Initializable {
                         this.s_buttonAccess.setText("Bloquear acceso");
                         Notifications.Success("Acceso desbloqueado", this.modelMember.getName() + " puede entrar a los gimnasios nuevamente");
                         this.scrollPane.requestFocus();
+                        this.pagination.refillTable(1);
                     }));
                 }
             }

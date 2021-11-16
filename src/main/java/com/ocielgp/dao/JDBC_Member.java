@@ -18,7 +18,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class JDBC_Member {
     public static int CreateMember(Model_Member modelMember) {
-        Connection con = DataServer.getConnection();
+        Connection con = DataServer.GetConnection();
         try {
             PreparedStatement ps;
             ResultSet rs;
@@ -29,7 +29,7 @@ public class JDBC_Member {
             ps.setString(3, modelMember.getGender()); // gender
             if (modelMember.getNotes().equals("")) ps.setNull(4, Types.NULL); // notes
             else ps.setString(4, modelMember.getNotes());
-            ps.setInt(5, Application.getCurrentGym().getIdGym()); // idGym
+            ps.setInt(5, Application.GetCurrentGym().getIdGym()); // idGym
             ps.executeUpdate();
 
             rs = ps.getGeneratedKeys();
@@ -37,9 +37,9 @@ public class JDBC_Member {
                 return rs.getInt(1);
             }
         } catch (SQLException sqlException) {
-            Notifications.CatchException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
+            Notifications.CatchSqlException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], sqlException);
         } finally {
-            DataServer.closeConnection(con);
+            DataServer.CloseConnection(con);
         }
         return 0;
     }
@@ -71,7 +71,7 @@ public class JDBC_Member {
 
     public static CompletableFuture<Model_Member> ReadMember(int idMember) {
         return CompletableFuture.supplyAsync(() -> {
-            Connection con = DataServer.getConnection();
+            Connection con = DataServer.GetConnection();
             Model_Member modelMember = new Model_Member();
             try {
                 PreparedStatement ps;
@@ -88,16 +88,13 @@ public class JDBC_Member {
                     modelMember.setCreatedAt(DateTime.MySQLToJava(rs.getString("createdAt")));
                     modelMember.setAccess(rs.getBoolean("access"));
                     modelMember.setIdGym(rs.getInt("idGym"));
-                    try {
-                        JDBC_Member_Photo.ReadPhoto(idMember).thenAccept(modelMember::setModelMemberPhoto).get();
-                    } catch (Exception exception) {
-                        Notifications.CatchException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], exception.getMessage(), exception);
-                    }
+
+                    modelMember.setModelMemberPhoto(JDBC_Member_Photo.ReadPhoto(idMember));
                 }
             } catch (SQLException sqlException) {
-                Notifications.CatchException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
+                Notifications.CatchSqlException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], sqlException);
             } finally {
-                DataServer.closeConnection(con);
+                DataServer.CloseConnection(con);
             }
             return modelMember;
         });
@@ -105,7 +102,7 @@ public class JDBC_Member {
 
     public static CompletableFuture<QueryRows> ReadMembers(int maxRows, AtomicInteger page, String query) {
         return CompletableFuture.supplyAsync(() -> {
-            Connection con = DataServer.getConnection();
+            Connection con = DataServer.GetConnection();
             try {
                 PreparedStatement statementLimited, statement;
                 ResultSet rs;
@@ -123,24 +120,24 @@ public class JDBC_Member {
                 }
 
                 // filters
-                if (!UserPreferences.getPreferenceBool("FILTER_MEMBER_ALL_GYMS")) {
-                    sqlQuery += "AND PM.idGym = " + Application.getCurrentGym().getIdGym() + " ";
+                if (!UserPreferences.GetPreferenceBool("FILTER_MEMBER_ALL_GYMS")) {
+                    sqlQuery += "AND PM.idGym = " + Application.GetCurrentGym().getIdGym() + " ";
                 }
-                if (UserPreferences.getPreferenceBool("FILTER_MEMBER_ACTIVE_MEMBERS")) {
-                    sqlQuery += "AND PM.endDateTime >= CURRENT_DATE ";
+                if (UserPreferences.GetPreferenceBool("FILTER_MEMBER_ACTIVE_MEMBERS")) {
+                    sqlQuery += "AND M.access = 1 AND PM.endDateTime >= CURRENT_DATE ";
                 }
-                if (UserPreferences.getPreferenceBool("FILTER_MEMBER_DEBTORS")) {
+                if (UserPreferences.GetPreferenceBool("FILTER_MEMBER_DEBTORS")) {
                     sqlQuery += "AND M.idMember IN (SELECT DISTINCT D.idMember FROM DEBTS D WHERE D.debtStatus = 1 AND D.flag = 1) ";
                 }
 
-                int genderFilter = UserPreferences.getPreferenceInt("FILTER_MEMBER_GENDERS");
+                int genderFilter = UserPreferences.GetPreferenceInt("FILTER_MEMBER_GENDERS");
                 if (genderFilter == 1) {
                     sqlQuery += "AND M.gender = 'Hombre' ";
                 } else if (genderFilter == 2) {
                     sqlQuery += "AND M.gender = 'Mujer' ";
                 }
 
-                if (UserPreferences.getPreferenceInt("FILTER_MEMBER_ORDER_BY") == 0) {
+                if (UserPreferences.GetPreferenceInt("FILTER_MEMBER_ORDER_BY") == 0) {
                     sqlQuery += "ORDER BY M.idMember DESC ";
                 } else { // 1
                     sqlQuery += "ORDER BY M.idMember ";
@@ -175,7 +172,7 @@ public class JDBC_Member {
                     }
                 }
 
-                int totalRows = DataServer.countRows(statement);
+                int totalRows = DataServer.CountRows(statement);
                 int totalPages = (int) Math.ceil((double) totalRows / maxRows);
                 rs = statementLimited.executeQuery();
                 ObservableList<Model_Member> members = FXCollections.observableArrayList();
@@ -202,9 +199,9 @@ public class JDBC_Member {
                 }
                 return new QueryRows(members, totalRows, totalPages);
             } catch (SQLException sqlException) {
-                Notifications.CatchException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
+                Notifications.CatchSqlException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], sqlException);
             } finally {
-                DataServer.closeConnection(con);
+                DataServer.CloseConnection(con);
             }
             return null;
         });
@@ -221,7 +218,7 @@ public class JDBC_Member {
 
     public static CompletableFuture<Boolean> UpdateAccess(int idMember, boolean access) {
         return CompletableFuture.supplyAsync(() -> {
-            Connection con = DataServer.getConnection();
+            Connection con = DataServer.GetConnection();
             try {
                 PreparedStatement ps;
                 assert con != null;
@@ -231,9 +228,9 @@ public class JDBC_Member {
                 ps.executeUpdate();
                 return true;
             } catch (SQLException sqlException) {
-                Notifications.CatchException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
+                Notifications.CatchSqlException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], sqlException);
             } finally {
-                DataServer.closeConnection(con);
+                DataServer.CloseConnection(con);
             }
             return false;
         });

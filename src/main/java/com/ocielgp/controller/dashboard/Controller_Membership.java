@@ -78,6 +78,7 @@ public class Controller_Membership implements Initializable {
         InputProperties.createVisibleAnimation(this.boxMemberships, false);
         InputProperties.createVisibleAnimation(this.boxHistorical, false);
         InputProperties.createVisibleAnimation(this.boxMembershipDetail, false);
+        InputProperties.createVisibleAnimation(this.toggleMonthly, false);
         InputProperties.createVisibleAnimation(this.boxButtonDelete, false);
         InputProperties.createVisibleAnimation(this.boxEndButtons, false);
 
@@ -134,7 +135,6 @@ public class Controller_Membership implements Initializable {
 
             this.fieldName.setText(modelMembership.getName());
             this.fieldPrice.setText(modelMembership.getPrice().toString());
-            this.toggleMonthly.setSelected((modelMembership.getMonthly()));
             this.boxMembershipDetail.setVisible(true);
 
             this.formChangeListener.setListen(true);
@@ -155,6 +155,7 @@ public class Controller_Membership implements Initializable {
         this.fieldName.setText("");
         this.fieldPrice.setText("");
         this.toggleMonthly.setSelected(true);
+        this.toggleMonthly.setVisible(false);
 
         this.boxButtonDelete.setVisible(false);
         this.buttonSave.setDisable(false);
@@ -168,6 +169,7 @@ public class Controller_Membership implements Initializable {
     private void eventCreate() {
         clearForm(false);
         this.boxMembershipDetail.setVisible(true);
+        this.toggleMonthly.setVisible(true);
 
         this.boxEndButtons.setVisible(true);
         this.buttonSave.setText("Crear");
@@ -234,9 +236,6 @@ public class Controller_Membership implements Initializable {
                 if (this.formChangeListener.isChanged("price")) {
                     newModelMembership.setPrice(new BigDecimal(this.fieldPrice.getText()));
                 }
-                if (this.formChangeListener.isChanged("monthly")) {
-                    newModelMembership.setMonthly(this.toggleMonthly.isSelected());
-                }
                 boolean isOk = JDBC_Membership.UpdateMembership(newModelMembership);
                 if (isOk) {
                     Platform.runLater(() -> {
@@ -254,7 +253,6 @@ public class Controller_Membership implements Initializable {
         this.formChangeListener = new FormChangeListener(this.buttonSave);
         this.formChangeListener.add("name");
         this.formChangeListener.add("price");
-        this.formChangeListener.add("monthly");
         this.formChangeListener.add("membershipDelete");
         this.fieldName.setOnKeyTyped(keyEvent -> {
             if (this.formChangeListener.isListen()) {
@@ -269,14 +267,6 @@ public class Controller_Membership implements Initializable {
                 this.formChangeListener.change(
                         "price",
                         Validator.compare(this.fieldPrice.getText(), this.modelMembership.getPrice().toString())
-                );
-            }
-        });
-        this.toggleMonthly.setOnAction(keyEvent -> {
-            if (this.formChangeListener.isListen()) {
-                this.formChangeListener.change(
-                        "monthly",
-                        Validator.compare(String.valueOf(this.toggleMonthly.isSelected()), String.valueOf(this.modelMembership.getMonthly()))
                 );
             }
         });

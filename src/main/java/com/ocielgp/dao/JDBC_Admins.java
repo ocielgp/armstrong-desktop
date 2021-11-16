@@ -13,7 +13,7 @@ import java.sql.SQLException;
 
 public class JDBC_Admins {
     public static Boolean ReadLogin(String username, String password) {
-        Connection con = DataServer.getConnection();
+        Connection con = DataServer.GetConnection();
         try {
             PreparedStatement ps;
             ResultSet rs;
@@ -36,14 +36,14 @@ public class JDBC_Admins {
                     modelAdmin.setName(rs.getString("name"));
                     modelAdmin.setLastName(rs.getString("lastName"));
 
-                    Application.setModelAdmin(modelAdmin);
+                    Application.SetModelAdmin(modelAdmin);
                     return true;
                 }
             }
         } catch (SQLException sqlException) {
-            Notifications.CatchException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], "[" + sqlException.getErrorCode() + "]: " + sqlException.getMessage(), sqlException);
+            Notifications.CatchSqlException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], sqlException);
         } finally {
-            DataServer.closeConnection(con);
+            DataServer.CloseConnection(con);
         }
         return false;
     }
