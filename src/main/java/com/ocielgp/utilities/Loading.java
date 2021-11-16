@@ -1,88 +1,89 @@
 package com.ocielgp.utilities;
 
-import animatefx.animation.*;
-import com.ocielgp.controller.AppController;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
+import com.jfoenix.controls.JFXSpinner;
+import com.ocielgp.app.Application;
+import com.ocielgp.app.Router;
+import javafx.application.Platform;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
+import javafx.scene.layout.Background;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.stage.Modality;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import org.kordamp.ikonli.javafx.FontIcon;
 
 public class Loading {
-    private static final Stage stage;
-    private static final Scene scene;
-    private static final VBox box;
-    private static final FontIcon fontIcon;
-    private static ZoomIn zoomIn;
-    private static final Tada tada;
-    private static final double iconSize = 100;
+    private static final Stage stage = new Stage(StageStyle.TRANSPARENT);
+    private static final int spinnerSize = 100;
+    public static BooleanProperty isAnimationFinished = new SimpleBooleanProperty(false);
+    public static BooleanProperty isChildLoaded = new SimpleBooleanProperty(false);
 
+    public static void Start() {
+        Platform.runLater(() -> {
+            isAnimationFinished.addListener((observableValue, oldValue, newValue) -> Loading.close());
+            isChildLoaded.addListener((observableValue, oldValue, newValue) -> Loading.close());
 
-    static {
-        stage = new Stage();
-        stage.initStyle(StageStyle.TRANSPARENT);
+            buildSpinner();
 
-        fontIcon = new FontIcon("gmi-cloud-circle");
-        fontIcon.setIconSize((int) iconSize);
-        tada = new Tada(fontIcon);
-        box = new VBox(fontIcon);
-        box.setStyle("-fx-background-color: transparent");
-        box.getStyleClass().add(AppController.themeType);
-        box.setOpacity(0); // Hide
-
-        scene = new Scene(box);
-        scene.getStylesheets().add("colors.css");
-        scene.setFill(Color.TRANSPARENT);
-        stage.setScene(scene);
-
-        stage.setX(
-                (Screen.getPrimary().getBounds().getWidth() / 2) - (iconSize / 2)
-        );
-        stage.setY(
-                (Screen.getPrimary().getBounds().getHeight() / 2) - (iconSize / 2)
-        );
-        stage.setAlwaysOnTop(true);
+            stage.initModality(Modality.NONE);
+            stage.initOwner(Application.STAGE_PRIMARY);
+            stage.showingProperty().addListener(((observableValue, oldValue, newValue) -> {
+                if (newValue) {
+                    Platform.runLater(() -> {
+                        stage.setX(Screen.getPrimary().getVisualBounds().getWidth() / 2 - stage.getWidth() / 2);
+                        stage.setY(Screen.getPrimary().getVisualBounds().getHeight() / 2 - stage.getHeight() / 2);
+                    });
+                    Router.DisableDashboard();
+                } else {
+                    Router.EnableDashboard();
+                    Loading.isAnimationFinished.set(false);
+                    Loading.isChildLoaded.set(false);
+                }
+            }));
+        });
     }
 
-    public static void startLoad() {
-        if (zoomIn == null) {
-            box.getStyleClass().set(1, AppController.themeType);
-            stage.show();
-
-            zoomIn = new ZoomIn(box);
-            zoomIn.setOnFinished(actionEvent -> {
-                tada.setCycleCount(AnimationFX.INDEFINITE);
-                tada.play();
-            });
-            zoomIn.play();
-        }
+    public static void show() {
+        Platform.runLater(() -> {
+            if (!stage.isShowing()) {
+                stage.show();
+            }
+        });
     }
 
-    public static void stopLoad() {
-        if (zoomIn != null) {
-            tada.stop();
-            ZoomOut zoomOut = new ZoomOut(box);
-            zoomOut.setOnFinished(actionEvent -> stage.hide());
-            zoomIn = null;
-            zoomOut.play();
-        }
+    public static void close() {
+        Platform.runLater(() -> {
+            if (stage.isShowing() && Loading.isAnimationFinished.get() && Loading.isChildLoaded.get()) {
+                stage.close();
+            }
+        });
     }
 
-    public static void stopLoad(AnimationFX animationFX) {
-        if (zoomIn != null) {
-            tada.stop();
-            ZoomOut zoomOut = new ZoomOut(box);
-            zoomOut.setOnFinished(actionEvent -> {
-                stage.hide();
-                animationFX.play();
-            });
-            zoomIn = null;
-            zoomOut.play();
-        }
+    public static void closeNow() {
+        Platform.runLater(() -> {
+            if (stage.isShowing()) {
+                stage.close();
+            }
+        });
     }
 
+    private static void buildSpinner() {
+        Platform.runLater(() -> {
+            JFXSpinner spinner = new JFXSpinner();
+            spinner.setPrefWidth(spinnerSize);
+            spinner.setPrefHeight(spinnerSize);
+            VBox boxSpinner = new VBox(spinner);
+            boxSpinner.setPadding(new Insets(5, 5, 5, 5));
+            boxSpinner.setBackground(Background.EMPTY);
+
+            Scene scene = new Scene(boxSpinner);
+            scene.setFill(Color.TRANSPARENT);
+
+            stage.setScene(scene);
+        });
+    }
 }

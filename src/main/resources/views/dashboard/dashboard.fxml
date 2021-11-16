@@ -1,106 +1,187 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.String?>
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.*?>
-<?import org.kordamp.ikonli.javafx.*?>
-<?import java.lang.*?>
-<GridPane fx:id="rootPane" styleClass="dashboard" xmlns="http://javafx.com/javafx/15.0.1"
-          xmlns:fx="http://javafx.com/fxml/1">
-   <columnConstraints>
-      <ColumnConstraints hgrow="SOMETIMES" percentWidth="20.0"/>
-      <ColumnConstraints hgrow="SOMETIMES" percentWidth="80.0"/>
-   </columnConstraints>
-   <rowConstraints>
-      <RowConstraints fillHeight="false" maxHeight="100.0" minHeight="100.0" prefHeight="100.0"/>
-      <RowConstraints vgrow="SOMETIMES"/>
-   </rowConstraints>
-   <HBox alignment="CENTER">
-      <styleClass>
-         <String fx:value="aside"/>
-         <String fx:value="aside-top"/>
-      </styleClass>
-      <ImageView fx:id="logo" fitHeight="75.0" pickOnBounds="true" preserveRatio="true">
-         <HBox.margin>
-            <Insets bottom="10.0" top="10.0"/>
-         </HBox.margin>
-         <Image url="@../../img.jpg"/>
-      </ImageView>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<GridPane fx:id="boxRoot" prefHeight="768.0" prefWidth="1366.0" styleClass="dashboard" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ocielgp.controller.Controller_Dashboard">
+    <columnConstraints>
+        <ColumnConstraints hgrow="SOMETIMES" maxWidth="200.0" minWidth="200.0" />
+        <ColumnConstraints hgrow="SOMETIMES" />
+    </columnConstraints>
+    <rowConstraints>
+        <RowConstraints fillHeight="false" maxHeight="100.0" minHeight="100.0" prefHeight="100.0" />
+        <RowConstraints vgrow="SOMETIMES" />
+    </rowConstraints>
+    <HBox alignment="CENTER" style="-fx-border-color: -fx-color-border; -fx-border-width: 0px 1px 1px 0px;" styleClass="aside">
+        <ImageView fx:id="imageViewLogo" fitHeight="75.0" fitWidth="75.0" pickOnBounds="true" preserveRatio="true">
+            <HBox.margin>
+                <Insets />
+            </HBox.margin>
+            <Image url="@../../img.jpg" />
+        </ImageView>
+        <GridPane.margin>
+            <Insets />
+        </GridPane.margin>
+        <padding>
+            <Insets bottom="13.0" left="13.0" right="13.0" top="13.0" />
+      </padding>
    </HBox>
-   <VBox styleClass="aside" GridPane.rowIndex="1">
+   <VBox style="-fx-border-color: -fx-color-border; -fx-border-width: 0px 1px 0px 0px;" styleClass="aside" GridPane.rowIndex="1">
       <VBox>
-         <HBox fx:id="navSummary">
-            <styleClass>
-               <String fx:value="option"/>
-               <String fx:value="selected"/>
-            </styleClass>
+         <HBox fx:id="navSummary" styleClass="option">
             <Label text="Resumen">
                <graphic>
-                  <FontIcon iconLiteral="gmi-insert-chart"/>
+                  <FontIcon iconLiteral="gmi-insert-chart" />
                </graphic>
             </Label>
          </HBox>
          <HBox fx:id="navMembers" styleClass="option">
             <Label text="Socios">
                <graphic>
-                  <FontIcon iconLiteral="gmi-assignment-ind"/>
+                  <FontIcon iconLiteral="gmi-assignment-ind" />
                </graphic>
             </Label>
          </HBox>
          <HBox styleClass="option">
             <Label text="Estados">
                <graphic>
-                  <FontIcon iconLiteral="gmi-monetization-on"/>
+                  <FontIcon iconLiteral="gmi-monetization-on" />
                </graphic>
             </Label>
          </HBox>
          <HBox styleClass="option">
             <Label text="Gerencia">
                <graphic>
-                  <FontIcon iconLiteral="gmi-work"/>
+                  <FontIcon iconLiteral="gmi-work" />
                </graphic>
             </Label>
+         </HBox>
+         <HBox fx:id="navSecureMode" style="-fx-background-color: -fx-color-background;">
+            <children>
+               <Label text="Modo seguro">
+                  <graphic>
+                      <FontIcon iconLiteral="gmi-security" />
+                  </graphic>
+               </Label>
+            </children>
+             <styleClass>
+                 <String fx:value="option" />
+                 <String fx:value="success-style" />
+             </styleClass>
          </HBox>
       </VBox>
       <VBox alignment="BOTTOM_CENTER" styleClass="fingerprint" VBox.vgrow="ALWAYS">
-         <HBox alignment="CENTER" styleClass="title">
-            <Label styleClass="title" text="LECTOR" wrapText="true"/>
-         </HBox>
-         <HBox alignment="CENTER">
-            <Label>
-               <graphic>
-                  <FontIcon fx:id="fingerprintIcon" iconLiteral="gmi-fingerprint">
-                     <styleClass>
-                        <String fx:value="icon"/>
-                        <String fx:value="off"/>
-                     </styleClass>
-                  </FontIcon>
-               </graphic>
-            </Label>
-         </HBox>
-         <HBox alignment="CENTER">
-            <Label fx:id="fingerprintStatus" styleClass="status" text="DESCONECTADO"/>
-         </HBox>
+         <Label style="-fx-font: 2.5em  &quot;Roboto Bold&quot;;" styleClass="title" text="LECTOR" wrapText="true" />
+         <Label>
+            <graphic>
+                <FontIcon fx:id="fontIconFingerprint" iconLiteral="gmi-fingerprint" iconSize="50">
+                    <styleClass>
+                        <String fx:value="icon" />
+                        <String fx:value="off" />
+                    </styleClass>
+                </FontIcon>
+            </graphic>
+         </Label>
+          <Label fx:id="labelFingerprintStatus" style="-fx-font: 2em &quot;Roboto Thin&quot;;;" text="DESCONECTADO" />
       </VBox>
+      <GridPane.margin>
+         <Insets />
+      </GridPane.margin>
    </VBox>
-   <HBox alignment="CENTER_LEFT" styleClass="top-bar" GridPane.columnIndex="1">
-      <HBox alignment="CENTER" styleClass="section">
-         <Label fx:id="section" styleClass="section" text="Resumen"/>
-      </HBox>
-      <HBox alignment="CENTER_RIGHT" styleClass="user" HBox.hgrow="SOMETIMES">
+   <HBox alignment="CENTER" spacing="10.0" style="-fx-border-color: -fx-color-border; -fx-border-width: 0px 0px 1px 0px;" styleClass="top-bar" GridPane.columnIndex="1">
+      <HBox alignment="CENTER_LEFT" minWidth="150.0" styleClass="section">
+          <Label fx:id="labelSection" styleClass="section" text="Socios">
+              <HBox.margin>
+                  <Insets />
+              </HBox.margin>
+          </Label>
          <HBox.margin>
-            <Insets right="20.0"/>
+            <Insets />
          </HBox.margin>
-         <ImageView fx:id="userImage" fitHeight="75.0" fitWidth="100.0" pickOnBounds="true" preserveRatio="true">
-            <HBox.margin>
-               <Insets right="10.0"/>
-            </HBox.margin>
-         </ImageView>
-         <Label fx:id="nombres" text="Ociel"/>
+         <padding>
+            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+         </padding>
       </HBox>
+       <HBox fx:id="ci_box" spacing="5.0" style="-fx-border-radius: 5px; -fx-background-radius: 5px;" styleClass="default-style" HBox.hgrow="ALWAYS">
+           <children>
+               <VBox alignment="CENTER">
+                   <children>
+                       <ImageView fx:id="ci_imgPhoto" fitHeight="70.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                               <Image url="@../../img/no-user-image.png" />
+                           </image>
+                           <VBox.margin>
+                               <Insets left="5.0" right="5.0" />
+                           </VBox.margin>
+                       </ImageView>
+               </children>
+            </VBox>
+            <VBox alignment="CENTER" minWidth="100.0">
+               <children>
+                  <Label styleClass="bold" text="ID" />
+                   <Label fx:id="ci_labelId" text="N / A" />
+               </children>
+               <padding>
+                  <Insets left="10.0" right="10.0" />
+               </padding>
+            </VBox>
+            <VBox>
+               <children>
+                  <HBox spacing="5.0">
+                     <children>
+                        <Label styleClass="bold" text="Nombre" />
+                         <Label fx:id="ci_labelName" text="N / A" />
+                     </children>
+                  </HBox>
+                  <HBox spacing="5.0">
+                     <children>
+                        <Label styleClass="bold" text="Gimnasio" />
+                         <Label fx:id="ci_labelGym" text="N / A" />
+                     </children>
+                  </HBox>
+                  <HBox spacing="5.0" VBox.vgrow="SOMETIMES">
+                     <children>
+                        <Label styleClass="bold" text="Membresia" />
+                         <Label fx:id="ci_labelMembership" text="N / A" />
+                     </children>
+                  </HBox>
+               </children>
+            </VBox>
+         </children>
+         <HBox.margin>
+            <Insets bottom="9.0" left="9.0" right="9.0" top="9.0" />
+         </HBox.margin>
+         <padding>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+         </padding>
+      </HBox>
+      <HBox alignment="CENTER_RIGHT" spacing="5.0" styleClass="user">
+         <HBox.margin>
+            <Insets bottom="9.0" left="9.0" right="9.0" top="9.0" />
+         </HBox.margin>
+          <ImageView fx:id="imageViewUser" fitHeight="75.0" fitWidth="75.0" pickOnBounds="true" preserveRatio="true">
+              <HBox.margin>
+                  <Insets />
+              </HBox.margin>
+              <image>
+                  <Image url="@../../img/no-user-image.png" />
+              </image>
+          </ImageView>
+          <Label fx:id="labelStaffName" text="Ociel" />
+      </HBox>
+      <GridPane.margin>
+         <Insets bottom="10.0" top="10.0" />
+      </GridPane.margin>
    </HBox>
-   <ScrollPane fx:id="content" fitToHeight="true" fitToWidth="true" styleClass="content" GridPane.columnIndex="1"
-               GridPane.rowIndex="1"/>
+    <ScrollPane fx:id="body" fitToHeight="true" fitToWidth="true" styleClass="content" GridPane.columnIndex="1" GridPane.rowIndex="1" />
 </GridPane>

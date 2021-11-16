@@ -2,31 +2,28 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.RowConstraints?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.*?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
-
-<GridPane fx:id="container" alignment="CENTER" minWidth="400.0" prefWidth="400.0" styleClass="notification-container" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
-  <columnConstraints>
-    <ColumnConstraints halignment="CENTER" minWidth="10.0" prefWidth="100.0" />
-    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-  </columnConstraints>
-  <rowConstraints>
-    <RowConstraints vgrow="SOMETIMES" />
-  </rowConstraints>
-   <children>
-      <Label styleClass="notification-icon-container">
-         <graphic>
-            <FontIcon fx:id="icon" iconLiteral="gmi-brightness-6" />
-         </graphic>
-      </Label>
-      <VBox alignment="CENTER_LEFT" GridPane.columnIndex="1">
-         <children>
-            <Label fx:id="title" styleClass="title" text="Title" wrapText="true" />
-            <Label fx:id="content" styleClass="content" text="Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum" wrapText="true" />
-         </children>
+<GridPane fx:id="gridPaneNotification" alignment="CENTER" minWidth="400.0" prefWidth="400.0"
+          style="-fx-background-color: -fx-color-background; -fx-cursor: hand; -fx-background-radius: 5px; -fx-border-radius: 5px;"
+          xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1">
+    <columnConstraints>
+        <ColumnConstraints halignment="CENTER" minWidth="10.0" prefWidth="100.0"/>
+        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+    </columnConstraints>
+    <rowConstraints>
+        <RowConstraints vgrow="SOMETIMES"/>
+    </rowConstraints>
+    <children>
+        <FontIcon fx:id="fontIcon" iconLiteral="gmi-brightness-6" iconSize="60"/>
+        <VBox alignment="CENTER_LEFT" GridPane.columnIndex="1">
+            <children>
+                <Label fx:id="labelTitle" style="-fx-text-fill: -fx-color-text; -fx-font: 20px &quot;Roboto Bold&quot;;"
+                       text="Title" wrapText="true"/>
+                <Label fx:id="labelContent" style="-fx-text-fill: -fx-color-text; -fx-font: 14px &quot;Roboto&quot;;"
+                       text="Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum"
+                       wrapText="true"/>
+            </children>
       </VBox>
    </children>
    <padding>

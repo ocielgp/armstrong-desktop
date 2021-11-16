@@ -1,6 +1,7 @@
 module app {
-    requires javafx.controls;
+    requires javafx.swing;
     requires javafx.fxml;
+    requires javafx.controls;
     requires javafx.graphics;
     requires javafx.web;
 
@@ -10,18 +11,21 @@ module app {
     requires com.jfoenix;
 
     requires java.sql;
-    requires mysql.connector.java;
+    requires com.zaxxer.hikari;
 
     requires java.desktop;
-    requires javafx.swing;
+    requires java.prefs;
 
     exports com.digitalpersona.uareu;
     exports animatefx.animation;
     exports animatefx.util;
 
-    opens com.ocielgp.utilities;
-    opens com.ocielgp.controller;
-    opens com.ocielgp.database;
-    opens com.ocielgp.model;
     opens com.ocielgp;
+    opens com.ocielgp.app;
+    opens com.ocielgp.dao;
+    opens com.ocielgp.fingerprint;
+    opens com.ocielgp.controller;
+    opens com.ocielgp.controller.dashboard;
+    opens com.ocielgp.models;
+    opens com.ocielgp.utilities;
 }

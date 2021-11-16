@@ -1,17 +1,29 @@
-* .label, .jfx-text-field, .jfx-password-field, .jfx-button {
+* .label, .jfx-text-field, .jfx-password-field, .jfx-button, .jfx-combo-box, .jfx-date-picker .text-field {
     -fx-font: 2em "Roboto";
+}
+
+.jfx-toggle-button, .jfx-check-box, .jfx-radio-button {
+    -fx-font: 1.5em "Roboto";
 }
 
 .label {
     -fx-text-fill: -fx-color-text;
 }
 
-.bold {
-    -fx-font: 2em "Roboto Bold";
+.regular {
+    -fx-font: 2em "Roboto";
 }
 
 .thin {
     -fx-font: 2em "Roboto Thin";
+}
+
+.bold {
+    -fx-font: 2em "Roboto Bold";
+}
+
+.strikethrough .text {
+    -fx-strikethrough: true;
 }
 
 .jfx-text-field, .jfx-password-field {
@@ -22,9 +34,11 @@
 }
 
 .jfx-button {
+    -fx-background-insets: 0;
     -fx-background-radius: 5px;
     -fx-border-radius: 5px;
     -fx-icon-color: #fff;
+    /*-jfx-disable-visual-focus: true;*/
 }
 
 .jfx-button, .button {
@@ -33,9 +47,18 @@
 
 .btn-primary {
     -fx-font: 20px "Roboto Bold";
-    -fx-border-color: -fx-color-text;
     -fx-background-color: -fx-color-text;
     -fx-text-fill: -fx-color-background;
+    -fx-border-color: -fx-color-text;
+}
+
+.ikonli-icon {
+    -fx-cursor: hand;
+    -fx-icon-color: -fx-color-background;
+}
+
+.ikonli-icon:hover, .ikonli-icon:focused {
+    -fx-opacity: 0.5;
 }
 
 .btn-primary .ikonli-font-icon {
@@ -48,23 +71,50 @@
 
 .btn-secondary {
     -fx-font: 20px "Roboto";
-    -fx-border-color: -fx-color-text;
     -fx-background-color: -fx-color-background;
     -fx-text-fill: -fx-color-text;
+    -fx-border-color: -fx-color-text;
 }
 
 .btn-secondary .jfx-rippler {
     -jfx-rippler-fill: -fx-color-text;
 }
 
+.btn-colorful {
+    -fx-font: 20px "Roboto";
+    -fx-background-color: -fx-color-background;
+    -fx-text-fill: -fx-color-text;
+    -fx-border-color: -fx-color-border;
+}
+
+.btn-colorful .jfx-rippler {
+    -jfx-rippler-fill: -fx-color-text;
+}
+
+.jfx-check-box {
+    -fx-text-fill: -fx-color-text;
+    -jfx-checked-color: -fx-color-text;
+    -jfx-unchecked-color: -fx-color-text;
+}
+
+.jfx-check-box .mark {
+    -fx-border-color: -fx-color-background;
+}
+
+.jfx-radio-button {
+    -fx-icon-color: red;
+    -fx-text-fill: -fx-color-text;
+    -jfx-selected-color: -fx-color-text;
+    -jfx-unselected-color: -fx-color-text;
+}
+
 .jfx-toggle-button {
     -fx-text-fill: -fx-color-text;
-    -fx-font: 1.5em "Roboto";
     -jfx-toggle-color: -fx-color-text;
 }
 
 .jfx-combo-box {
-    -fx-font: 2em "Roboto Thin";
+    -fx-prompt-text-fill: -fx-color-unfocus;
     -jfx-unfocus-color: -fx-color-unfocus;
     -jfx-focus-color: -fx-color-text;
 }
@@ -75,7 +125,14 @@
 }
 
 .jfx-combo-box .cell:hover {
-    -fx-opacity: 0.8;
+    -fx-background-color: -fx-color-text;
+    -fx-text-fill: -fx-color-background;
+    -fx-opacity: 0.6;
+}
+
+.combo-box-popup .list-view .list-cell:filled:selected, .combo-box-popup .list-view .list-cell:filled:selected:hover {
+    -fx-background-color: -fx-color-text;
+    -fx-text-fill: -fx-color-background;
 }
 
 .jfx-date-picker {
@@ -87,7 +144,6 @@
 }
 
 .jfx-date-picker .text-field {
-    -fx-font: 2em "Roboto Thin";
     -fx-alignment: center;
 }
 
@@ -95,19 +151,129 @@
     -fx-background-color: #333;
 }
 
-.jfx-date-picker .date-cell {
-    -fx-text-fill: #333;
+.jfx-date-picker .date-cell:selected, .jfx-date-picker .date-cell:focused, .jfx-date-picker .date-cell:hover, .jfx-date-picker .today:focused {
+    -fx-text-fill: #00B4D8;
+    -fx-font-weight: bold;
 }
 
 .jfx-date-picker .today {
-    -fx-font-weight: bold;
+    -fx-text-fill: #333;
+}
+
+.scroll-pane {
+    -fx-background-insets: 0;
+    -fx-background-color: transparent;
 }
 
 .scroll-pane > .viewport {
     -fx-background-color: transparent;
 }
 
-.scroll-pane, .table-view {
+.scroll-bar:horizontal .track,
+.scroll-bar:vertical .track {
     -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-background-radius: 0.0em;
+    -fx-border-radius: 2.0em;
+}
+
+
+.scroll-bar:horizontal .increment-button,
+.scroll-bar:horizontal .decrement-button {
+    -fx-background-color: transparent;
+    -fx-background-radius: 0.0em;
+    -fx-padding: 0.0 0.0 10.0 0.0;
+}
+
+.scroll-bar:vertical .increment-button,
+.scroll-bar:vertical .decrement-button {
+    -fx-background-color: transparent;
+    -fx-background-radius: 0.0em;
+    -fx-padding: 0.0 10.0 0.0 0.0;
+}
+
+.scroll-bar .increment-arrow,
+.scroll-bar .decrement-arrow {
+    -fx-shape: " ";
+    -fx-padding: 0.15em 0.0;
+}
+
+.scroll-bar:vertical .increment-arrow,
+.scroll-bar:vertical .decrement-arrow {
+    -fx-shape: " ";
+    -fx-padding: 0.0 0.15em;
+}
+
+.scroll-bar:horizontal .thumb,
+.scroll-bar:vertical .thumb {
+    -fx-background-color: derive(black, 90.0%);
+    -fx-background-insets: 2.0, 0.0, 0.0;
+    -fx-background-radius: 2.0em;
+}
+
+.scroll-bar:horizontal .thumb:hover,
+.scroll-bar:vertical .thumb:hover {
+    -fx-background-color: derive(#4D4C4F, 10.0%);
+    -fx-background-insets: 2.0, 0.0, 0.0;
+    -fx-background-radius: 2.0em;
+}
+
+.table-label {
+    -fx-background-color: -fx-color-background;
+    -fx-text-fill: -fx-color-text;
+    -fx-border-color: -fx-color-border;
+    -fx-background-radius: 5px;
+    -fx-border-radius: 5px;
+    -fx-padding: 2px 2px 2px 2px;
+    /*-fx-opacity: 0.5;*/
+}
+
+.table-view {
+    -fx-background-color: transparent;
+    -fx-border-width: 0px;
+}
+
+.table-view .column-header {
+    -fx-background-color: -fx-color-text;
+    -fx-border-width: 1px 1px 0 0;
+    -fx-border-color: -fx-color-border;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: -fx-color-background;
+}
+
+.table-view .table-cell {
+    -fx-padding: 5px;
+    -fx-border-width: 1px 1px 0 0;
+    -fx-border-color: -fx-color-border;
+}
+
+.table-row-cell {
+    -fx-font: 14px "Roboto";
+}
+
+.table-row-cell:selected .table-cell {
+    -fx-background-color: #2D2B36 !important;
+    -fx-text-fill: #fff !important;
+    -fx-font: 14px "Roboto Bold";
+}
+
+.table-row-cell:empty {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+.table-row-cell:empty .table-cell {
     -fx-border-width: 0;
 }
+
+/*.table-view .table-row-cell:odd .table-cell {*/
+/*    -fx-background-color: #E5E5E5;*/
+/*    -fx-text-fill: #333;*/
+/*}*/
+
+/*.table-view .table-row-cell:even .table-cell {*/
+/*    -fx-background-color: #FFF;*/
+/*    -fx-text-fill: #333;*/
+/*}*/

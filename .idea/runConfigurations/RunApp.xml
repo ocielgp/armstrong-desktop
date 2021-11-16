@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="RunApp" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="com.ocielgp.RunApp" />
+    <module name="gym" />
+    <option name="VM_PARAMETERS" value="--add-opens java.base/java.lang.reflect=com.jfoenix --add-exports javafx.base/com.sun.javafx.event=com.jfoenix --add-exports javafx.base/com.sun.javafx.binding=com.jfoenix --add-exports javafx.graphics/com.sun.javafx.stage=com.jfoenix --add-exports javafx.graphics/com.sun.javafx.scene=com.jfoenix --add-exports javafx.controls/com.sun.javafx.scene.control.behavior=com.jfoenix" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
