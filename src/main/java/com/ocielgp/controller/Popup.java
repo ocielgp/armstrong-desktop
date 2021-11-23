@@ -146,18 +146,17 @@ public class Popup implements Initializable {
             this.boxButtons.getChildren().add(buttonSecondary);
 
             switch (this.popupType) {
-                case POPUP_CONFIRM -> {
+                case POPUP_CONFIRM:
                     buttonPrimary.setOnAction(actionEvent -> eventConfirm());
                     Platform.runLater(buttonPrimary::requestFocus);
-                }
-                case POPUP_DEBT -> {
+                    break;
+                case POPUP_DEBT:
                     popupDebt();
                     buttonPrimary.setOnAction(actionEvent -> eventDebt());
-                }
-                case POPUP_PASSWORD -> {
+                    break;
+                case POPUP_PASSWORD:
                     popupPassword();
                     buttonPrimary.setOnAction(actionEvent -> eventPassword());
-                }
             }
         }
     }
