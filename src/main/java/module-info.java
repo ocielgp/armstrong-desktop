@@ -25,7 +25,9 @@ module app {
     opens com.ocielgp.dao;
     opens com.ocielgp.fingerprint;
     opens com.ocielgp.controller;
-    opens com.ocielgp.controller.dashboard;
     opens com.ocielgp.models;
     opens com.ocielgp.utilities;
+    opens com.ocielgp.controller.summary;
+    opens com.ocielgp.controller.members;
+    opens com.ocielgp.controller.admins;
 }

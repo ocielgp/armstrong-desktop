@@ -2,6 +2,7 @@
 
 <?import com.jfoenix.controls.JFXButton?>
 <?import com.jfoenix.controls.JFXPasswordField?>
+<?import com.jfoenix.controls.JFXTextField?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.*?>
@@ -32,12 +33,18 @@
       </AnchorPane>
       <VBox spacing="20.0">
          <children>
-            <Label fx:id="labelContent" text="labelContent" wrapText="true" />
+            <Label fx:id="labelContent" text="labelContent" wrapText="true"/>
             <AnchorPane fx:id="boxPassword">
                <children>
                   <JFXPasswordField fx:id="fieldPassword" alignment="CENTER" AnchorPane.bottomAnchor="-1.0"
                                     AnchorPane.leftAnchor="25.0" AnchorPane.rightAnchor="25.0"
                                     AnchorPane.topAnchor="-1.0"/>
+               </children>
+            </AnchorPane>
+            <AnchorPane fx:id="boxField">
+               <children>
+                  <JFXTextField fx:id="fieldText" alignment="CENTER" AnchorPane.bottomAnchor="-1.0"
+                                AnchorPane.leftAnchor="25.0" AnchorPane.rightAnchor="25.0" AnchorPane.topAnchor="-1.0"/>
                </children>
             </AnchorPane>
          </children>

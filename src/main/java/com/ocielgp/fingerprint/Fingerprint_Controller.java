@@ -34,9 +34,11 @@ public class Fingerprint_Controller {
     private static final EventHandler<MouseEvent> fingerprintEvent = mouseEvent -> Fingerprint_Controller.Scanner();
 
     public static void Start(FontIcon fontIconFingerprint, Label labelStatus) {
-        Fingerprint_Controller.fingerprintIcon = fontIconFingerprint;
-        labelStatus.textProperty().bind(Fingerprint_Controller.fingerprintStatusProperty);
-        Fingerprint_Controller.Scanner();
+        if (Fingerprint_Controller.fingerprintIcon == null) {
+            Fingerprint_Controller.fingerprintIcon = fontIconFingerprint;
+            labelStatus.textProperty().bind(Fingerprint_Controller.fingerprintStatusProperty);
+            Fingerprint_Controller.Scanner();
+        }
     }
 
     public static void setFingerprintCaptureBox(Fingerprint_Capture_Box fingerprintCaptureBox) {
@@ -57,11 +59,11 @@ public class Fingerprint_Controller {
                 ReaderCollection readerCollection = UareUGlobal.GetReaderCollection();
                 readerCollection.GetReaders();
                 Fingerprint_Controller.reader = readerCollection.get(0); // catch exception
-                Notifications.Success("gmi-fingerprint", "Lector de Huellas", "Lector de huellas conectado", 2);
+                Platform.runLater(() -> Notifications.Success("gmi-fingerprint", "Lector de Huellas", "Lector de huellas conectado", 2));
                 BackgroundReader();
             } catch (Exception ignored) {
                 Fingerprint_Controller.setStatusCode(0);
-                Notifications.Warn("gmi-fingerprint", "Lector de Huellas", "Lector de huellas no detectado", 2);
+                Platform.runLater(() -> Notifications.Warn("gmi-fingerprint", "Lector de Huellas", "Lector de huellas no detectado", 2));
             }
         });
     }
@@ -87,7 +89,7 @@ public class Fingerprint_Controller {
     }
 
     public static void BackgroundReader() {
-        if (!Fingerprint_Controller.IsReading()) {
+        if (Fingerprint_Controller.IsConnected() && !Fingerprint_Controller.IsReading()) {
             if (Fingerprint_Controller.fingerprintCaptureThread != null) {
                 StopCapture();
             }
@@ -107,7 +109,7 @@ public class Fingerprint_Controller {
     }
 
     public static void RefreshDashboard() {
-        System.out.println("RefreshDashboard()");
+//        System.out.println("RefreshDashboard()");
         if (Fingerprint_Controller.IsConnected()) {
             if (Fingerprint_Controller.fingerprintIcon != null) {
                 Fingerprint_Controller.fingerprintIcon.removeEventFilter(MouseEvent.MOUSE_CLICKED, Fingerprint_Controller.fingerprintEvent);

@@ -40,6 +40,7 @@ public class FileLoader {
     }
 
     public static Image loadImage(byte[] bytes) {
+        if (bytes == null) return getDefaultImage();
         try {
             return CompletableFuture.supplyAsync(() -> {
                 ByteArrayInputStream imgBytes = new ByteArrayInputStream(bytes);

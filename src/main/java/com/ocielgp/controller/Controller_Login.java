@@ -1,11 +1,14 @@
 package com.ocielgp.controller;
 
-import animatefx.animation.*;
+import animatefx.animation.FadeIn;
+import animatefx.animation.FadeOutDown;
+import animatefx.animation.Flash;
+import animatefx.animation.Shake;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXPasswordField;
 import com.jfoenix.controls.JFXTextField;
 import com.ocielgp.app.Application;
-import com.ocielgp.dao.JDBC_Admins;
+import com.ocielgp.dao.JDBC_Admin;
 import com.ocielgp.utilities.*;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -16,7 +19,6 @@ import javafx.scene.layout.HBox;
 
 import java.net.URL;
 import java.util.ResourceBundle;
-import java.util.concurrent.CompletableFuture;
 
 public class Controller_Login implements Initializable {
     @FXML
@@ -40,27 +42,22 @@ public class Controller_Login implements Initializable {
         this.buttonLogin.setOnAction(actionEvent -> auth());
 
         Platform.runLater(() -> {
-            FadeInUp fadeInUp = new FadeInUp(this.boxRoot);
-            fadeInUp.setOnFinished(actionEvent -> {
-                this.fieldUsername.setText("Ociel");
-                this.fieldPassword.setText("dos");
-                this.fieldUsername.requestFocus();
-            });
-            fadeInUp.play();
+//            this.fieldUsername.setText("ocielgp");
+//            this.fieldPassword.setText("fsociety");
+            this.fieldUsername.requestFocus();
         });
     }
 
     private void auth() {
         if (Validator.emptyValidator(this.fieldUsername, this.fieldPassword)) {
             this.boxRoot.setDisable(true);
-            CompletableFuture.runAsync(() -> {
-                Loading.show();
-                Boolean isValidUser = JDBC_Admins.ReadLogin(this.fieldUsername.getText(), this.fieldPassword.getText());
+            Loading.show();
+            JDBC_Admin.ReadLogin(this.fieldUsername.getText(), this.fieldPassword.getText()).thenAccept(isValidUser -> {
                 if (isValidUser == null) {
                     Platform.runLater(() -> new Flash(this.boxRoot).play());
                     Notifications.Warn("Bloqueado", "Esta cuenta se encuentra bloqueada");
                     Loading.closeNow();
-                } else if (isValidUser) {
+                } else if ((Boolean) isValidUser) {
                     Node dashboardFXML = Loader.Load(
                             "dashboard.fxml",
                             "Login",

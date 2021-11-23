@@ -4,12 +4,12 @@ import animatefx.animation.FadeIn;
 import animatefx.animation.Shake;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXPasswordField;
+import com.jfoenix.controls.JFXTextField;
 import com.ocielgp.app.Application;
 import com.ocielgp.app.UserPreferences;
-import com.ocielgp.utilities.Hash;
-import com.ocielgp.utilities.InputProperties;
-import com.ocielgp.utilities.Loader;
-import com.ocielgp.utilities.Styles;
+import com.ocielgp.dao.JDBC_Debt;
+import com.ocielgp.models.Model_Debt;
+import com.ocielgp.utilities.*;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
@@ -27,12 +27,14 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import org.kordamp.ikonli.javafx.FontIcon;
 
+import java.math.BigDecimal;
 import java.net.URL;
 import java.util.ResourceBundle;
 
 public class Popup implements Initializable {
     private static final String POPUP_ALERT = "ALERT";
     private static final String POPUP_CONFIRM = "CONFIRM";
+    private static final String POPUP_DEBT = "DEBT";
     private static final String POPUP_PASSWORD = "PASSWORD";
 
     @FXML
@@ -50,6 +52,10 @@ public class Popup implements Initializable {
     @FXML
     private JFXPasswordField fieldPassword;
     @FXML
+    private AnchorPane boxField;
+    @FXML
+    private JFXTextField fieldText;
+    @FXML
     private HBox boxButtons;
 
     // attributes
@@ -58,8 +64,10 @@ public class Popup implements Initializable {
     private String body;
     private String popupType;
 
+
     private final Stage stage = new Stage(StageStyle.TRANSPARENT);
     private boolean boolAnswer = false;
+    private Model_Debt modelDebt;
 
     public Popup() {
         this.stage.showingProperty().addListener((observable, oldValue, newValue) -> {
@@ -100,6 +108,11 @@ public class Popup implements Initializable {
         createPopup(style, title, content, POPUP_CONFIRM);
     }
 
+    public void debt(int idMember) {
+        this.modelDebt = JDBC_Debt.ReadDebt(idMember);
+        createPopup(Styles.CREATIVE, "Abonar mensualidad", "Adeudo: " + this.modelDebt.getOwe().toString(), POPUP_DEBT);
+    }
+
     public void password() {
         createPopup(Styles.WARN, "Contraseña", "Esta acción necesita tu contraseña", POPUP_PASSWORD);
     }
@@ -123,6 +136,7 @@ public class Popup implements Initializable {
 
         this.boxButtons.getChildren().setAll(buttonPrimary);
         InputProperties.createVisibleEvent(this.boxPassword, false);
+        InputProperties.createVisibleEvent(this.boxField, false);
         if (this.popupType.equals(POPUP_ALERT)) {
             buttonPrimary.setOnAction(actionEvent -> eventConfirm());
         } else {
@@ -131,14 +145,28 @@ public class Popup implements Initializable {
             buttonSecondary.setOnAction(actionEvent -> this.eventCancel());
             this.boxButtons.getChildren().add(buttonSecondary);
 
-            if (this.popupType.equals(POPUP_CONFIRM)) {
-                buttonPrimary.setOnAction(actionEvent -> eventConfirm());
-                Platform.runLater(buttonPrimary::requestFocus);
-            } else if (this.popupType.equals(POPUP_PASSWORD)) {
-                popupPassword();
-                buttonPrimary.setOnAction(actionEvent -> eventPassword());
+            switch (this.popupType) {
+                case POPUP_CONFIRM:
+                    buttonPrimary.setOnAction(actionEvent -> eventConfirm());
+                    Platform.runLater(buttonPrimary::requestFocus);
+                    break;
+                case POPUP_DEBT:
+                    popupDebt();
+                    buttonPrimary.setOnAction(actionEvent -> eventDebt());
+                    break;
+                case POPUP_PASSWORD:
+                    popupPassword();
+                    buttonPrimary.setOnAction(actionEvent -> eventPassword());
             }
         }
+    }
+
+    private void popupDebt() {
+        this.boxField.setVisible(true);
+        this.fieldText.setOnKeyPressed(keyEvent -> {
+            if (keyEvent.getCode() == KeyCode.ENTER) eventDebt();
+        });
+        Platform.runLater(this.fieldText::requestFocus);
     }
 
     private void popupPassword() {
@@ -157,6 +185,27 @@ public class Popup implements Initializable {
     private void eventConfirm() {
         this.boolAnswer = true;
         closeStage();
+    }
+
+    private void eventDebt() {
+        if (Validator.moneyValidator(this.fieldText, true)) {
+            BigDecimal paidOut = new BigDecimal(this.fieldText.getText());
+            BigDecimal newOwe = this.modelDebt.getOwe().subtract(paidOut);
+            if (newOwe.compareTo(BigDecimal.ZERO) >= 0) {
+                this.modelDebt.setOwe(newOwe);
+                this.modelDebt.setPaidOut(paidOut);
+                this.boolAnswer = JDBC_Debt.UpdateDebt(this.modelDebt);
+
+                if (newOwe.compareTo(BigDecimal.ZERO) == 0) {
+                    Notifications.BuildNotification("gmi-payment", "Deuda", "Deuda liquidada", 3, Styles.SUCCESS);
+                } else {
+                    Notifications.BuildNotification("gmi-payment", "Deuda", "Deuda pendiente de $ " + newOwe, 3, Styles.CREATIVE);
+                }
+                closeStage();
+            } else {
+                new Shake(this.fieldText).play();
+            }
+        }
     }
 
     private void eventPassword() { // compare input password to admin stored password

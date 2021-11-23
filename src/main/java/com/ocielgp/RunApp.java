@@ -49,7 +49,7 @@ public class RunApp extends javafx.application.Application {
                     (newValue) ? this.appIcon.get("focus") : this.appIcon.get("unfocused")
             ));
         });
-        primaryStage.setTitle("Gym App by Ociel");
+        primaryStage.setTitle("Armstrong");
         primaryStage.setScene(scene);
 //        primaryStage.setAlwaysOnTop(true);
 //        primaryStage.setMaximized(true);

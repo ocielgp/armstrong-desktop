@@ -58,7 +58,7 @@ public class DataServer {
 
     synchronized public static Connection GetConnection() {
         try {
-            System.out.println("getConnection()");
+//            System.out.println("getConnection()");
             return hikariDataSource.getConnection();
         } catch (SQLException ignored) {
             // reconnecting

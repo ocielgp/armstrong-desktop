@@ -18,17 +18,17 @@ public class ParamBuilder {
 
     public ParamBuilder(String table, String whereColumn, Object whereValue) {
         this.sqlBuilder = new StringBuilder("UPDATE ").append(table).append(" SET ");
-        this.where = new Pair<>(whereColumn, whereValue);
         addParam("updatedBy", Application.GetModelAdmin().getIdMember());
+        this.where = new Pair<>(whereColumn, whereValue);
     }
 
-    public void addParam(String tableColumn, Object param) {
-        if (param != null) {
-            this.queryParams.put(this.queryParams.size() + 1, param);
+    public void addParam(String column, Object value) {
+        if (value != null) {
+            this.queryParams.put(this.queryParams.size() + 1, value);
             if (this.queryParams.size() > 1) {
-                this.sqlBuilder.append(", ").append(tableColumn).append(" = ?");
+                this.sqlBuilder.append(", ").append(column).append(" = ?");
             } else {
-                this.sqlBuilder.append(tableColumn).append(" = ?");
+                this.sqlBuilder.append(column).append(" = ?");
             }
         }
     }
@@ -40,7 +40,7 @@ public class ParamBuilder {
             try {
                 this.sqlBuilder.append(" WHERE ").append(this.where.getKey()).append(" = ?");
                 assert con != null;
-                System.out.println("sql: " + this.sqlBuilder);
+//                System.out.println("paramBuilder: " + this.sqlBuilder);
                 PreparedStatement preparedStatement = con.prepareStatement(this.sqlBuilder.toString());
                 this.queryParams.forEach((position, param) -> {
                     try {
@@ -54,11 +54,11 @@ public class ParamBuilder {
                 return true;
             } catch (SQLException sqlException) {
                 Notifications.CatchSqlException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], sqlException);
-                return true;
+                return false;
             } finally {
                 DataServer.CloseConnection(con);
             }
         }
-        return false;
+        return true;
     }
 }

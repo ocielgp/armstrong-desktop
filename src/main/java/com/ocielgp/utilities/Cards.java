@@ -7,6 +7,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.text.TextAlignment;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 public class Cards {
@@ -15,6 +16,8 @@ public class Cards {
         title.getStyleClass().add("title");
         Label description = new Label(descriptionText);
         description.getStyleClass().add("description");
+        description.setWrapText(true);
+        description.setTextAlignment(TextAlignment.CENTER);
         VBox info = new VBox(title, description);
 
         HBox icon = new HBox(new FontIcon(iconCode));
@@ -24,12 +27,13 @@ public class Cards {
 
         HBox card = new HBox(info, icon);
         card.getStyleClass().add("card");
+        card.setOpacity(0);
         return card;
     }
 
-    public static HBox createCard(String iconCode, String titleText, String descriptionText, Color leftColor, Color rightColor) {
+    public static HBox createCard(String iconCode, String titleText, String descriptionText, String hexFontColor, Color leftColor, Color rightColor) {
         HBox card = createCard(iconCode, titleText, descriptionText);
-        card.setStyle("-fx-background-color: linear-gradient(to right, rgba(" + leftColor.getRed() * 255 + "," + leftColor.getGreen() * 255 + "," + leftColor.getBlue() * 255 + "," + leftColor.getOpacity() * 255 + ") 0%, rgb(" + rightColor.getRed() * 255 + "," + rightColor.getGreen() * 255 + "," + rightColor.getBlue() * 255 + "," + rightColor.getOpacity() * 255 + ") 100%);");
+        card.setStyle("-fx-color-text: " + hexFontColor + "; -fx-background-color: linear-gradient(to right, rgba(" + leftColor.getRed() * 255 + "," + leftColor.getGreen() * 255 + "," + leftColor.getBlue() * 255 + "," + leftColor.getOpacity() * 255 + ") 0%, rgb(" + rightColor.getRed() * 255 + "," + rightColor.getGreen() * 255 + "," + rightColor.getBlue() * 255 + "," + rightColor.getOpacity() * 255 + ") 100%);");
         return card;
     }
 }

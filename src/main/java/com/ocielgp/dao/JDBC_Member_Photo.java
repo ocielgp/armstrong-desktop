@@ -29,7 +29,7 @@ public class JDBC_Member_Photo {
 
     public static Model_Member_Photo ReadPhoto(int idMember) {
         Connection con = DataServer.GetConnection();
-        Model_Member_Photo modelMemberPhoto = null;
+        Model_Member_Photo modelMemberPhoto = new Model_Member_Photo();
         try {
             PreparedStatement ps;
             ResultSet rs;
@@ -38,9 +38,7 @@ public class JDBC_Member_Photo {
             ps.setInt(1, idMember); // photo
             rs = ps.executeQuery();
             if (rs.next()) {
-                modelMemberPhoto = new Model_Member_Photo();
                 modelMemberPhoto.setPhoto(rs.getBytes("photo"));
-                return modelMemberPhoto;
             }
         } catch (SQLException sqlException) {
             Notifications.CatchSqlException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], sqlException);
@@ -54,11 +52,19 @@ public class JDBC_Member_Photo {
         Connection con = DataServer.GetConnection();
         try {
             PreparedStatement ps;
+            ResultSet rs;
             assert con != null;
-            ps = con.prepareStatement("UPDATE MEMBERS_PHOTOS SET photo = ? WHERE idMember = ?");
-            ps.setBytes(1, photoBytes);
-            ps.setInt(2, idMember);
-            ps.executeUpdate();
+            ps = con.prepareStatement("SELECT idPhoto FROM MEMBERS_PHOTOS WHERE idMember = ?");
+            ps.setInt(1, idMember);
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                ps = con.prepareStatement("UPDATE MEMBERS_PHOTOS SET photo = ? WHERE idMember = ?");
+                ps.setBytes(1, photoBytes);
+                ps.setInt(2, idMember);
+                ps.executeUpdate();
+            } else {
+                JDBC_Member_Photo.CreatePhoto(idMember, photoBytes);
+            }
             return true;
         } catch (SQLException sqlException) {
             Notifications.CatchSqlException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], sqlException);

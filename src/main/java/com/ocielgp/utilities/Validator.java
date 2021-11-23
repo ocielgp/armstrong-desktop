@@ -97,19 +97,19 @@ public class Validator {
     }
 
     public static boolean moneyValidator(Node node, boolean notify) {
+        boolean isOk = false;
         try {
-            new BigDecimal(getMetadataFromNode(node));
-            return true;
+            isOk = new BigDecimal(getMetadataFromNode(node)).compareTo(BigDecimal.ZERO) >= 0;
         } catch (NumberFormatException ignored) {
 //            if (!node.getMetadata().isEmpty()) {
 //                shakeInput(node.getNode());
 //            }
         }
-        if (notify) {
+        if (!isOk && notify) {
             Notifications.Danger("Error", "Cantidad no válida");
             shakeInput(node);
         }
-        return false;
+        return isOk;
     }
 
 

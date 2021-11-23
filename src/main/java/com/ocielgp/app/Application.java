@@ -13,7 +13,7 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 public class Application {
-    public static final String version = "1.0 Beta";
+    public static final String version = "1.0";
     public static Controller_App controllerApp;
     public static Controller_Dashboard controllerDashboard;
     public static Stage STAGE_PRIMARY;
@@ -52,11 +52,23 @@ public class Application {
 
     public static void RequestFocus() {
         if (Application.STAGE_POPUP != null && Application.STAGE_POPUP.getScene() != null) {
-            Platform.runLater(() -> Application.STAGE_POPUP.requestFocus());
+            Platform.runLater(() -> {
+                if (Application.STAGE_POPUP != null) {
+                    Application.STAGE_POPUP.requestFocus();
+                }
+            });
         } else if (Application.STAGE_SECONDARY != null && Application.STAGE_SECONDARY.getScene() != null) {
-            Platform.runLater(() -> Application.STAGE_SECONDARY.requestFocus());
+            Platform.runLater(() -> {
+                if (Application.STAGE_SECONDARY != null) {
+                    Application.STAGE_SECONDARY.requestFocus();
+                }
+            });
         } else if (Application.STAGE_PRIMARY != null && Application.STAGE_PRIMARY.getScene() != null) {
-            Platform.runLater(() -> Application.STAGE_PRIMARY.requestFocus());
+            Platform.runLater(() -> {
+                if (Application.STAGE_PRIMARY != null) {
+                    Application.STAGE_PRIMARY.requestFocus();
+                }
+            });
         }
     }
 

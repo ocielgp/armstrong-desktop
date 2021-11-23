@@ -60,6 +60,16 @@ public class InputProperties {
         });
     }
 
+    public static void autoShow(ComboBoxBase<?>... comboBox) {
+        for (ComboBoxBase<?> box : comboBox) {
+            box.focusedProperty().addListener((observable, oldValue, newValue) -> {
+                if (newValue && !box.isShowing()) {
+                    box.show();
+                }
+            });
+        }
+    }
+
     public static void createComboBoxListener(ComboBox<?>... comboBox) {
         for (ComboBox<?> box : comboBox) {
             box.focusedProperty().addListener((observable, oldValue, newValue) -> {

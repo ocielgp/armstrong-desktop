@@ -4,6 +4,7 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.Locale;
 
 public class DateTime {
@@ -66,6 +67,6 @@ public class DateTime {
     }
 
     public static long getDaysLeft(LocalDateTime localDateTime) {
-        return Duration.between(LocalDateTime.now(), localDateTime).toDays();
+        return ChronoUnit.DAYS.between(LocalDate.now(), localDateTime.toLocalDate());
     }
 }

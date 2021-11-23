@@ -56,6 +56,7 @@ public class Loading {
     }
 
     public static void close() {
+//        System.out.println("close, isAnimationfinished: "+Loading.isAnimationFinished.get()+" childLoaded: "+isChildLoaded);
         Platform.runLater(() -> {
             if (stage.isShowing() && Loading.isAnimationFinished.get() && Loading.isChildLoaded.get()) {
                 stage.close();

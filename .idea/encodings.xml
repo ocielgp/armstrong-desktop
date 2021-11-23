@@ -7,7 +7,8 @@
     <file url="file://$PROJECT_DIR$/src/main/resources/img" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/resources/utilities" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/resources/views" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/src/main/resources/views/dashboard" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/src/main/resources/views/dashboard/members" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/views/admins" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/views/members" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/views/summary" charset="UTF-8" />
   </component>
 </project>
