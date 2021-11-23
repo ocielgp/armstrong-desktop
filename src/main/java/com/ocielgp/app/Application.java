@@ -52,11 +52,23 @@ public class Application {
 
     public static void RequestFocus() {
         if (Application.STAGE_POPUP != null && Application.STAGE_POPUP.getScene() != null) {
-            Platform.runLater(() -> Application.STAGE_POPUP.requestFocus());
+            Platform.runLater(() -> {
+                if (Application.STAGE_POPUP != null) {
+                    Application.STAGE_POPUP.requestFocus();
+                }
+            });
         } else if (Application.STAGE_SECONDARY != null && Application.STAGE_SECONDARY.getScene() != null) {
-            Platform.runLater(() -> Application.STAGE_SECONDARY.requestFocus());
+            Platform.runLater(() -> {
+                if (Application.STAGE_SECONDARY != null) {
+                    Application.STAGE_SECONDARY.requestFocus();
+                }
+            });
         } else if (Application.STAGE_PRIMARY != null && Application.STAGE_PRIMARY.getScene() != null) {
-            Platform.runLater(() -> Application.STAGE_PRIMARY.requestFocus());
+            Platform.runLater(() -> {
+                if (Application.STAGE_PRIMARY != null) {
+                    Application.STAGE_PRIMARY.requestFocus();
+                }
+            });
         }
     }
 

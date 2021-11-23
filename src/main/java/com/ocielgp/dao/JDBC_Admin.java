@@ -47,7 +47,7 @@ public class JDBC_Admin {
                 PreparedStatement ps;
                 ResultSet rs;
                 String hash = Hash.generateHash(password);
-                System.out.println("hash " + hash);
+//                System.out.println("hash " + hash);
 
                 assert con != null;
                 ps = con.prepareStatement("SELECT A.idAdmin, M.access FROM ADMINS A JOIN MEMBERS M ON A.idAdmin = M.idMember WHERE (A.flag = 1 AND M.flag = 1) AND (BINARY username = ? AND BINARY password = ?)");

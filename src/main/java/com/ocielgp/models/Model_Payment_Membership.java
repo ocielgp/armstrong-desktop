@@ -12,6 +12,7 @@ public class Model_Payment_Membership extends Model_Membership {
     private final ObjectProperty<BigDecimal> price = new SimpleObjectProperty<>();
     private final ObjectProperty<LocalDateTime> startDateTime = new SimpleObjectProperty<>();
     private final ObjectProperty<LocalDateTime> endDateTime = new SimpleObjectProperty<>();
+    private final ObjectProperty<Boolean> firstMembership = new SimpleObjectProperty<>();
     private final ObjectProperty<Short> idGym = new SimpleObjectProperty<>();
     private final ObjectProperty<Integer> idMember = new SimpleObjectProperty<>();
     private final ObjectProperty<Integer> idMembership = new SimpleObjectProperty<>();
@@ -80,6 +81,18 @@ public class Model_Payment_Membership extends Model_Membership {
 
     public void setEndDateTime(LocalDateTime endDateTime) {
         this.endDateTime.set(endDateTime);
+    }
+
+    public Boolean getFirstMembership() {
+        return firstMembership.get();
+    }
+
+    public ObjectProperty<Boolean> firstMembershipProperty() {
+        return firstMembership;
+    }
+
+    public void setFirstMembership(Boolean firstMembership) {
+        this.firstMembership.set(firstMembership);
     }
 
     public Short getIdGym() {

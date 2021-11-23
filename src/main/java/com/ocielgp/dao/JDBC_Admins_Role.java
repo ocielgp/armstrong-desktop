@@ -46,7 +46,8 @@ public class JDBC_Admins_Role {
                 PreparedStatement ps;
                 ResultSet rs;
                 assert con != null;
-                ps = con.prepareStatement("SELECT idRole, name, createdAt, createdBy, updatedAt, updatedBy FROM ADMINS_ROLES WHERE flag = 1");
+                ps = con.prepareStatement("SELECT idRole, name, createdAt, createdBy, updatedAt, updatedBy FROM ADMINS_ROLES WHERE flag = 1 AND idRole > ?");
+                ps.setShort(1, Application.GetModelAdmin().getIdRole());
                 rs = ps.executeQuery();
                 while (rs.next()) {
                     Model_Admin_Role modelAdminsRole = new Model_Admin_Role();

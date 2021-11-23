@@ -13,24 +13,25 @@ import java.time.LocalDateTime;
 import java.util.concurrent.CompletableFuture;
 
 public class JDBC_Payment_Membership {
-    public static int CreatePaymentMembership(int idMember, Model_Membership modelMembership, short months) {
+    public static int CreatePaymentMembership(int idMember, Model_Membership modelMembership, short months, boolean isFirstMembership) {
         Connection con = DataServer.GetConnection();
         try {
             PreparedStatement ps;
             ResultSet rs;
             assert con != null;
             LocalDateTime now = LocalDateTime.now();
-            ps = con.prepareStatement("INSERT INTO PAYMENTS_MEMBERSHIPS(months, price, startDateTime, endDateTime, idGym, createdBy, idMember, idMembership)" +
-                            "VALUE (?, ?, ?, ?, ?, ?, ?, ?)",
+            ps = con.prepareStatement("INSERT INTO PAYMENTS_MEMBERSHIPS(months, price, startDateTime, endDateTime, firstMembership, idGym, createdBy, idMember, idMembership)" +
+                            "VALUE (?, ?, ?, ?,?, ?, ?, ?, ?)",
                     Statement.RETURN_GENERATED_KEYS);
             ps.setShort(1, months); // months
             ps.setBigDecimal(2, modelMembership.getPrice()); // price
             ps.setString(3, DateTime.JavaToMySQLDateTime(now)); // startDateTime
             ps.setString(4, DateTime.getEndDateToMySQL(now, months)); // endDateTime
-            ps.setInt(5, Application.GetCurrentGym().getIdGym()); // idGym
-            ps.setInt(6, Application.GetModelAdmin().getIdMember()); // idAdmin
-            ps.setInt(7, idMember); // idMember
-            ps.setInt(8, modelMembership.getIdMembership()); // idMembership
+            ps.setBoolean(5, isFirstMembership); // firstMembership
+            ps.setInt(6, Application.GetCurrentGym().getIdGym()); // idGym
+            ps.setInt(7, Application.GetModelAdmin().getIdMember()); // idAdmin
+            ps.setInt(8, idMember); // idMember
+            ps.setInt(9, modelMembership.getIdMembership()); // idMembership
             ps.executeUpdate();
             rs = ps.getGeneratedKeys();
             if (rs.next()) { // return new idPaymentMembership
@@ -52,7 +53,7 @@ public class JDBC_Payment_Membership {
                 PreparedStatement ps;
                 ResultSet rs;
                 assert con != null;
-                ps = con.prepareStatement("SELECT idPaymentMembership, months, price, startDateTime, endDateTime, idGym, idMembership, createdAt, createdBy, updatedAt, updatedBy FROM PAYMENTS_MEMBERSHIPS WHERE flag = 1 AND idMember = ? ORDER BY createdAt DESC LIMIT 1");
+                ps = con.prepareStatement("SELECT idPaymentMembership, months, price, startDateTime, endDateTime, firstMembership, idGym, idMembership, createdAt, createdBy, updatedAt, updatedBy FROM PAYMENTS_MEMBERSHIPS WHERE flag = 1 AND idMember = ? ORDER BY createdAt DESC LIMIT 1");
                 ps.setInt(1, idMember);
                 rs = ps.executeQuery();
                 if (rs.next()) {
@@ -62,6 +63,7 @@ public class JDBC_Payment_Membership {
                     modelPaymentMembership.setPrice(rs.getBigDecimal("price"));
                     modelPaymentMembership.setStartDateTime(DateTime.MySQLToJava(rs.getString("startDateTime")));
                     modelPaymentMembership.setEndDateTime(DateTime.MySQLToJava(rs.getString("endDateTime")));
+                    modelPaymentMembership.setFirstMembership(rs.getBoolean("firstMembership"));
                     modelPaymentMembership.setIdGym(rs.getShort("idGym"));
                     modelPaymentMembership.setIdMembership(rs.getInt("idMembership"));
                     modelPaymentMembership.setCreatedAt(DateTime.MySQLToJava(rs.getString("createdAt")));
@@ -89,6 +91,7 @@ public class JDBC_Payment_Membership {
             paramBuilder.addParam("price", modelMembership.getPrice());
             paramBuilder.addParam("startDateTime", DateTime.JavaToMySQLDateTime(now));
             paramBuilder.addParam("endDateTime", DateTime.getEndDateToMySQL(now, modelPaymentMembership.getMonths()));
+            paramBuilder.addParam("firstMembership", modelPaymentMembership.getFirstMembership());
             paramBuilder.addParam("idGym", Application.GetCurrentGym().getIdGym());
             paramBuilder.addParam("idMembership", modelMembership.getIdMembership());
             isOk = paramBuilder.executeUpdate();

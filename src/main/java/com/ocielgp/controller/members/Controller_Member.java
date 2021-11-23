@@ -371,6 +371,7 @@ public class Controller_Member implements Initializable {
                 this.s_buttonAccess.setText("Desbloquear acceso");
                 this.s_buttonOpenDoor.setDisable(true);
             }
+            this.s_buttonOpenDoor.setDisable(this.modelMember.getStyle().equals(Styles.DANGER));
             this.s_buttonOpenDoor.setOnAction(actionEvent -> {
                 this.s_buttonOpenDoor.setDisable(true);
                 CompletableFuture.runAsync(() -> JDBC_Check_In.CheckInByAdmin(this.modelMember.getIdMember()));
@@ -384,10 +385,6 @@ public class Controller_Member implements Initializable {
             if (!this.modelMember.getAccess()) {
                 this.ms_boxButtons.setVisible(false);
             }
-            this.boxShortcut.setVisible(true);
-
-            // end buttons
-//            this.s_buttonOpenDoor.setOnAction(actionEvent -> );
             this.s_buttonAccess.setOnAction(actionEvent -> changeAccess());
             this.s_buttonPayDebt.setOnAction(actionEvent -> {
                 Popup popup = new Popup();
@@ -397,7 +394,9 @@ public class Controller_Member implements Initializable {
                     this.pagination.refillTable(1);
                 }
             });
+            this.boxShortcut.setVisible(true);
 
+            // end buttons
             this.buttonAction.setText("Guardar cambios");
             this.buttonAction.setDisable(true);
             this.buttonClear.setText("Cancelar");
@@ -562,7 +561,7 @@ public class Controller_Member implements Initializable {
         if (idMember > 0) {
             JDBC_Member_Photo.CreatePhoto(idMember, photoHandler.getPhoto());
             JDBC_Member_Fingerprint.CreateFingerprints(idMember, fingerprintCaptureBox.getFingerprintsListIterator());
-            int idNewMembership = JDBC_Payment_Membership.CreatePaymentMembership(idMember, modelMembership, this.totalMonths);
+            int idNewMembership = JDBC_Payment_Membership.CreatePaymentMembership(idMember, modelMembership, this.totalMonths, true);
             if (modelDebt.getOwe() != null && idNewMembership > 0) {
                 JDBC_Debt.CreateDebt(idMember, modelDebt);
             }
@@ -576,13 +575,14 @@ public class Controller_Member implements Initializable {
 
         boolean isOk = true;
         if (this.formChangeListener.isChanged("membershipRenew")) {
-            int newIdMembership = JDBC_Payment_Membership.CreatePaymentMembership(this.modelMember.getIdMember(), modelMembership, this.totalMonths);
+            int newIdMembership = JDBC_Payment_Membership.CreatePaymentMembership(this.modelMember.getIdMember(), modelMembership, this.totalMonths, false);
             isOk = newIdMembership > 0;
             if (modelDebt.getOwe() != null && newIdMembership > 0) {
                 isOk = JDBC_Debt.CreateDebt(this.modelMember.getIdMember(), modelDebt);
             }
         }
         if (isOk && this.formChangeListener.isChanged("membershipChange")) {
+            System.out.println("months: " + this.totalMonths);
             this.modelMember.getModelPaymentMembership().setMonths(this.totalMonths);
             isOk = JDBC_Payment_Membership.UpdatePaymentMembership(modelMembership, this.modelMember.getModelPaymentMembership());
             if (modelDebt.getOwe() != null) {

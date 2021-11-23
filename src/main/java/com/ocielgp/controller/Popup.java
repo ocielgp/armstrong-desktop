@@ -192,7 +192,7 @@ public class Popup implements Initializable {
         if (Validator.moneyValidator(this.fieldText, true)) {
             BigDecimal paidOut = new BigDecimal(this.fieldText.getText());
             BigDecimal newOwe = this.modelDebt.getOwe().subtract(paidOut);
-            if (paidOut.compareTo(BigDecimal.ZERO) >= 0) {
+            if (newOwe.compareTo(BigDecimal.ZERO) >= 0) {
                 this.modelDebt.setOwe(newOwe);
                 this.modelDebt.setPaidOut(paidOut);
                 this.boolAnswer = JDBC_Debt.UpdateDebt(this.modelDebt);

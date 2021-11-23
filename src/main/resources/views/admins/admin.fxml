@@ -140,9 +140,9 @@
                         </VBox>
                         <VBox>
                             <children>
-                                <Label styleClass="form-input" text="Apellidos *">
+                                <Label styleClass="form-input" text="Apellidos">
                                     <graphic>
-                                        <FontIcon iconLiteral="gmi-create" />
+                                        <FontIcon iconLiteral="gmi-create"/>
                                     </graphic>
                                 </Label>
                                 <JFXTextField fx:id="pi_fieldLastName" />

@@ -66,7 +66,7 @@ public class JDBC_Check_In {
             PreparedStatement ps;
             ResultSet rs;
             assert con != null;
-            ps = con.prepareStatement("SELECT MP.photo, M.name, M.lastName, M.access, MS.name AS 'membershipName', M.idGym AS 'idGymMember', PM.months, PM.endDateTime, PM.idGym AS 'idGymPayment', (SELECT COUNT(idDebt) > 0 FROM DEBTS WHERE idMember = M.idMember AND debtStatus = 1 AND flag = 1 ORDER BY M.createdAt DESC) AS 'haveDebts' FROM MEMBERS M LEFT JOIN MEMBERS_PHOTOS MP ON M.idMember = MP.idMember LEFT JOIN PAYMENTS_MEMBERSHIPS PM ON PM.idPaymentMembership = (SELECT idPaymentMembership FROM PAYMENTS_MEMBERSHIPS WHERE idMember = M.idMember AND flag = 1 ORDER BY PM.startDateTime DESC LIMIT 1) LEFT JOIN MEMBERSHIPS MS ON PM.idMembership = MS.idMembership WHERE M.idMember = ? AND M.flag = 1");
+            ps = con.prepareStatement("SELECT MP.photo, M.name, M.lastName, M.access, MS.name AS 'membershipName', M.idGym AS 'idGymMember', PM.price AS 'payment', PM.months, PM.endDateTime, PM.idGym AS 'idGymPayment', (SELECT COUNT(idDebt) > 0 FROM DEBTS WHERE idMember = M.idMember AND debtStatus = 1 AND flag = 1 ORDER BY M.createdAt DESC) AS 'haveDebts' FROM MEMBERS M LEFT JOIN MEMBERS_PHOTOS MP ON M.idMember = MP.idMember LEFT JOIN PAYMENTS_MEMBERSHIPS PM ON PM.idPaymentMembership = (SELECT idPaymentMembership FROM PAYMENTS_MEMBERSHIPS WHERE idMember = M.idMember AND flag = 1 ORDER BY startDateTime DESC LIMIT 1) LEFT JOIN MEMBERSHIPS MS ON PM.idMembership = MS.idMembership WHERE M.idMember = ? AND M.flag = 1");
             ps.setInt(1, idMember);
             rs = ps.executeQuery();
 
@@ -81,28 +81,30 @@ public class JDBC_Check_In {
                     LocalDateTime endDateTime = DateTime.MySQLToJava(rs.getString("endDateTime"));
                     long daysLeft = DateTime.getDaysLeft(endDateTime);
                     boolean haveDebts = rs.getBoolean("haveDebts");
+                    String price = rs.getString("payment");
                     String months = rs.getString("months");
 
-                    String membershipDescription = "(" + months + ") " + membershipName +
+                    String membershipDescription = "(" + months + "x" + price + ") " + membershipName +
                             ", termina el " + DateTime.getDateShort(endDateTime) +
                             " (" + daysLeft + (daysLeft == 1 ? "día" : " días") + ")";
                     JDBC_Gym.ReadGym(rs.getInt("idGymPayment")).thenAccept(model_gyms -> {
+                        String style = JDBC_Member.ReadStyle(
+                                access,
+                                daysLeft,
+                                haveDebts
+                        );
                         if (haveDebts) {
                             Notifications.Danger("Deudor", "El socio tiene adeudos pendientes");
                         } else if (!access) {
                             Notifications.Danger("Bloqueado", "El socio no tiene acceso al los gimnasios");
-                        } else {
+                        } else if (style.equals(Styles.SUCCESS) || style.equals(Styles.WARN)) {
                             JDBC_Check_In.CreateCheckIn(idMember, openedBy).thenAccept(isOk -> {
                                 if (isOk)
                                     Notifications.Success("Entrada", "Entrada de " + name + " registrada", 2);
                             });
                         }
                         Application.ShowUserInfo(
-                                JDBC_Member.ReadStyle(
-                                        access,
-                                        daysLeft,
-                                        haveDebts
-                                ),
+                                style,
                                 photo,
                                 idMember,
                                 name,
@@ -142,7 +144,7 @@ public class JDBC_Check_In {
             if (rs.next()) {
                 byte[] photoBytes = rs.getBytes("photo");
                 Image photo = (photoBytes == null) ? FileLoader.getDefaultImage() : FileLoader.loadImage(photoBytes);
-                String name = rs.getString("name") + " " + rs.getString("lastName");
+                String name = rs.getString("name");
                 String gym = rs.getString("gymName");
                 String roleName = rs.getString("roleName");
 

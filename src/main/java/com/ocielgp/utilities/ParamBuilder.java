@@ -40,7 +40,7 @@ public class ParamBuilder {
             try {
                 this.sqlBuilder.append(" WHERE ").append(this.where.getKey()).append(" = ?");
                 assert con != null;
-                System.out.println("paramBuilder: " + this.sqlBuilder);
+//                System.out.println("paramBuilder: " + this.sqlBuilder);
                 PreparedStatement preparedStatement = con.prepareStatement(this.sqlBuilder.toString());
                 this.queryParams.forEach((position, param) -> {
                     try {

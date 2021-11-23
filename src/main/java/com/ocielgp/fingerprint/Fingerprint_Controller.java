@@ -34,9 +34,11 @@ public class Fingerprint_Controller {
     private static final EventHandler<MouseEvent> fingerprintEvent = mouseEvent -> Fingerprint_Controller.Scanner();
 
     public static void Start(FontIcon fontIconFingerprint, Label labelStatus) {
-        Fingerprint_Controller.fingerprintIcon = fontIconFingerprint;
-        labelStatus.textProperty().bind(Fingerprint_Controller.fingerprintStatusProperty);
-        Fingerprint_Controller.Scanner();
+        if (Fingerprint_Controller.fingerprintIcon == null) {
+            Fingerprint_Controller.fingerprintIcon = fontIconFingerprint;
+            labelStatus.textProperty().bind(Fingerprint_Controller.fingerprintStatusProperty);
+            Fingerprint_Controller.Scanner();
+        }
     }
 
     public static void setFingerprintCaptureBox(Fingerprint_Capture_Box fingerprintCaptureBox) {
@@ -107,7 +109,7 @@ public class Fingerprint_Controller {
     }
 
     public static void RefreshDashboard() {
-        System.out.println("RefreshDashboard()");
+//        System.out.println("RefreshDashboard()");
         if (Fingerprint_Controller.IsConnected()) {
             if (Fingerprint_Controller.fingerprintIcon != null) {
                 Fingerprint_Controller.fingerprintIcon.removeEventFilter(MouseEvent.MOUSE_CLICKED, Fingerprint_Controller.fingerprintEvent);

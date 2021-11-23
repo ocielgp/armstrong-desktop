@@ -88,7 +88,6 @@ public class Controller_Admins implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         this.pagination = new Pagination(Pagination.Tables.ADMINS, this.fieldSearch, this.buttonSearch, this.labelTotalRows, this.tableViewAdmins, this.fieldRowsPerPage, this.iconPreviousPage, this.labelCurrentPage, this.labelTotalPages, this.iconNextPage);
-        System.out.println("controller");
         this.controllerAdmin = new Controller_Admin(this.pagination);
         createButtons();
         createFilters();

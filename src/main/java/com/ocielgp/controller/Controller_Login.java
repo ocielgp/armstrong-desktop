@@ -43,7 +43,7 @@ public class Controller_Login implements Initializable {
 
         Platform.runLater(() -> {
 //            this.fieldUsername.setText("ocielgp");
-//            this.fieldPassword.setText("tres");
+//            this.fieldPassword.setText("fsociety");
             this.fieldUsername.requestFocus();
         });
     }

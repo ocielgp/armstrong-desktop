@@ -20,7 +20,6 @@
             <HBox.margin>
                 <Insets/>
             </HBox.margin>
-            <Image url="@../../img.jpg"/>
         </ImageView>
         <GridPane.margin>
             <Insets />
@@ -42,13 +41,6 @@
             <Label text="Socios">
                <graphic>
                   <FontIcon iconLiteral="gmi-assignment-ind" />
-               </graphic>
-            </Label>
-         </HBox>
-         <HBox styleClass="option">
-            <Label text="Estados">
-               <graphic>
-                  <FontIcon iconLiteral="gmi-monetization-on" />
                </graphic>
             </Label>
          </HBox>

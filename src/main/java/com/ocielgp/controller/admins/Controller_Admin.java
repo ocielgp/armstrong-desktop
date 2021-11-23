@@ -1,6 +1,7 @@
 package com.ocielgp.controller.admins;
 
 import animatefx.animation.FadeInRight;
+import animatefx.animation.FadeInUp;
 import animatefx.animation.FadeOutRight;
 import animatefx.animation.Shake;
 import com.jfoenix.controls.JFXButton;
@@ -349,12 +350,11 @@ public class Controller_Admin implements Initializable {
         ArrayList<Node> nodesRequired = new ArrayList<>();
         // administration
         nodesRequired.add(this.a_fieldUsername);
-        if (this.modelAdmin == null) nodesRequired.add(this.a_fieldPassword);
-        nodesRequired.add(this.a_comboBoxRoles);
+        if (this.modelAdmin != null && this.modelAdmin.getIdAdmin() != 1) nodesRequired.add(this.a_comboBoxRoles);
 
         // personal information
         nodesRequired.add(this.pi_fieldName);
-        if (this.modelAdmin == null) nodesRequired.add(this.pi_fieldLastName);
+        if (!this.pi_fieldLastName.getText().isEmpty()) nodesRequired.add(this.pi_fieldLastName);
         nodesRequired.add(this.pi_comboBoxGender);
         nodesRequired.add(Application.GetCurrentGymNode());
 
@@ -375,8 +375,13 @@ public class Controller_Admin implements Initializable {
                     Model_Admin_Role modelAdminRole = a_comboBoxRoles.getValue();
 
                     Loading.show();
-                    if (this.formChangeListener.isListen()) saveChanges();
-                    else createAdmin();
+                    if (this.formChangeListener.isListen()) {
+                        if (this.modelAdmin.getIdAdmin() == 1 && Application.GetModelAdmin().getIdAdmin().equals(this.modelAdmin.getIdAdmin())) {
+                            saveChanges();
+                        } else if (this.modelAdmin.getIdRole() >= Application.GetModelAdmin().getIdRole()) {
+                            saveChanges();
+                        } else new Shake(this.buttonAction).play();
+                    } else createAdmin();
                     Loading.closeNow();
                 }
             } catch (Exception exception) {
@@ -414,7 +419,6 @@ public class Controller_Admin implements Initializable {
     }
 
     private void saveChanges() {
-        System.out.println("fire");
         if (this.formChangeListener.isChanged("username")) {
             if (!JDBC_Admin.ReadAdminAvailable(this.a_fieldUsername.getText())) {
                 Validator.shakeInput(this.a_fieldUsername);
@@ -439,7 +443,6 @@ public class Controller_Admin implements Initializable {
             modelAdmin.setIdRole(this.a_comboBoxRoles.getValue().getIdRole());
         }
         isOk = JDBC_Admin.UpdateAdmin(modelAdmin);
-        System.out.println("isok: " + isOk);
 
         if (isOk && this.formChangeListener.isChanged("photo")) {
             isOk = JDBC_Member_Photo.UpdatePhoto(this.modelAdmin.getIdAdmin(), this.photoHandler.getPhoto());
@@ -450,7 +453,11 @@ public class Controller_Admin implements Initializable {
             this.modelAdmin.setName(modelMember.getName());
         }
         if (isOk && this.formChangeListener.isChanged("lastName")) {
-            modelMember.setLastName(InputProperties.capitalizeFirstLetterPerWord(this.pi_fieldLastName.getText()));
+            modelMember.setLastName(
+                    (this.pi_fieldLastName.getText().isEmpty())
+                            ? ""
+                            : InputProperties.capitalizeFirstLetterPerWord(this.pi_fieldLastName.getText())
+            );
         }
         if (isOk && this.formChangeListener.isChanged("gender")) {
             modelMember.setGender(this.pi_comboBoxGender.getValue());
@@ -469,13 +476,28 @@ public class Controller_Admin implements Initializable {
 
         if (isOk) {
             Notifications.Success("Nuevos cambios", "[ID:  " + this.modelAdmin.getIdAdmin() + "] " + this.modelAdmin.getName() + " información actualizada");
-            eventClearForm(false);
-            this.pagination.refillTable(1);
+            if (this.modelAdmin.getIdAdmin().equals(Application.GetModelAdmin().getIdAdmin())) {
+                Platform.runLater(() -> {
+                    Application.GetCurrentGymNode().setDisable(true);
+                    Node loginView = Loader.Load(
+                            "login.fxml",
+                            "Controller_App",
+                            false
+                    );
+                    Application.SetModelAdmin(null);
+                    Application.controllerApp.borderPaneRoot.setCenter(loginView);
+                    new FadeInUp(loginView).play();
+                    Loading.closeNow();
+                });
+            } else {
+                eventClearForm(false);
+                this.pagination.refillTable(1);
+            }
         }
     }
 
     private void changeAccess() {
-        if (!this.modelAdmin.getIdAdmin().equals(Application.GetModelAdmin().getIdAdmin())) {
+        if (this.modelAdmin.getIdAdmin() > Application.GetModelAdmin().getIdAdmin() && this.modelAdmin.getIdAdmin() > 1) {
             Popup popup = new Popup();
             Platform.runLater(() -> {
                 boolean isMemberAccess = this.modelAdmin.getAccess();

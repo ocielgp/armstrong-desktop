@@ -5,9 +5,7 @@ import com.jfoenix.controls.JFXComboBox;
 import com.ocielgp.app.Application;
 import com.ocielgp.app.UserPreferences;
 import com.ocielgp.dao.JDBC_Gym;
-import com.ocielgp.models.Model_Admin;
 import com.ocielgp.models.Model_Gym;
-import com.ocielgp.models.Model_Member_Photo;
 import com.ocielgp.utilities.Loader;
 import com.ocielgp.utilities.Styles;
 import javafx.application.Platform;
@@ -35,6 +33,12 @@ public class Controller_App implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         this.borderPaneRoot.getStyleClass().add(UserPreferences.GetPreferenceString("THEME"));
+        this.borderPaneRoot.centerProperty().addListener((observableValue, oldValue, newValue) -> {
+            Platform.runLater(() -> {
+                Application.STAGE_POPUP = null;
+                Application.STAGE_SECONDARY = null;
+            });
+        });
         Application.SetAppController(this, comboBoxGyms);
 
         this.comboBoxGyms.setDisable(true);
@@ -47,14 +51,15 @@ public class Controller_App implements Initializable {
         // recover last gym if exists
         readLastGym();
 
-        Model_Admin modelAdmin = new Model_Admin();
-        modelAdmin.setModelMemberPhoto(new Model_Member_Photo());
-        modelAdmin.setPassword("a94cbdca65dd4582c45c2b8dd97aec782baa8fbad32b73b547bf5b0e52ef58f3");
-        modelAdmin.setIdRole(Short.valueOf("1"));
-        modelAdmin.setIdMember(2);
-        modelAdmin.setName("Ociel");
-        modelAdmin.setLastName("Garcia");
-        Application.SetModelAdmin(modelAdmin);
+        // TODO: REMOVE THIS
+//        Model_Admin modelAdmin = new Model_Admin();
+//        modelAdmin.setModelMemberPhoto(new Model_Member_Photo());
+//        modelAdmin.setPassword("a94cbdca65dd4582c45c2b8dd97aec782baa8fbad32b73b547bf5b0e52ef58f3");
+//        modelAdmin.setIdRole(Short.valueOf("1"));
+//        modelAdmin.setIdMember(1);
+//        modelAdmin.setIdAdmin(1);
+//        modelAdmin.setName("ocielgp");
+//        Application.SetModelAdmin(modelAdmin);
 
         Platform.runLater(() -> {
             Node loginView = Loader.Load(
