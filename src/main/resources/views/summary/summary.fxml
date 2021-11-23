@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.layout.*?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+<VBox fx:id="rootPane" styleClass="summary" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.ocielgp.controller.summary.Controller_Summary">
+   <VBox alignment="CENTER" spacing="5.0" style="-fx-border-color: -fx-color-border; -fx-border-width: 0 0 1 0;">
+      <children>
+         <HBox alignment="CENTER" spacing="5.0">
+            <children>
+               <JFXDatePicker fx:id="startDate" promptText="Fecha inicial"/>
+               <JFXTimePicker fx:id="startTime" promptText="Hora inicial"/>
+            </children>
+         </HBox>
+         <HBox alignment="CENTER" spacing="5.0">
+            <children>
+               <JFXDatePicker fx:id="endDate" promptText="Fecha final"/>
+               <JFXTimePicker fx:id="endTime" promptText="Hora final"/>
+            </children>
+         </HBox>
+         <JFXButton fx:id="buttonSearch" styleClass="btn-primary" text="Buscar">
+            <graphic>
+               <FontIcon iconLiteral="gmi-search"/>
+            </graphic>
+         </JFXButton>
+      </children>
+      <VBox.margin>
+         <Insets/>
+      </VBox.margin>
+      <padding>
+         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+      </padding>
+   </VBox>
+   <FlowPane fx:id="generalCards" hgap="5.0" vgap="5.0">
+      <VBox.margin>
+         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+      </VBox.margin>
+   </FlowPane>
+   <FlowPane fx:id="paymentsCards" hgap="5.0" vgap="5.0">
+      <VBox.margin>
+         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+      </VBox.margin>
+   </FlowPane>
+   <FlowPane fx:id="membershipsCards" hgap="5.0" vgap="5.0">
+      <VBox.margin>
+         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+      </VBox.margin>
+   </FlowPane>
+</VBox>

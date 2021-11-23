@@ -5,6 +5,7 @@ import com.ocielgp.models.Model_Membership;
 import com.ocielgp.models.Model_Payment_Membership;
 import com.ocielgp.utilities.DateTime;
 import com.ocielgp.utilities.Notifications;
+import com.ocielgp.utilities.ParamBuilder;
 
 import java.lang.invoke.MethodHandles;
 import java.sql.*;
@@ -22,7 +23,6 @@ public class JDBC_Payment_Membership {
             ps = con.prepareStatement("INSERT INTO PAYMENTS_MEMBERSHIPS(months, price, startDateTime, endDateTime, idGym, createdBy, idMember, idMembership)" +
                             "VALUE (?, ?, ?, ?, ?, ?, ?, ?)",
                     Statement.RETURN_GENERATED_KEYS);
-            System.out.println("endatetime: " + DateTime.getEndDateToMySQL(now, months));
             ps.setShort(1, months); // months
             ps.setBigDecimal(2, modelMembership.getPrice()); // price
             ps.setString(3, DateTime.JavaToMySQLDateTime(now)); // startDateTime
@@ -80,53 +80,30 @@ public class JDBC_Payment_Membership {
     }
 
     public static boolean UpdatePaymentMembership(Model_Membership modelMembership, Model_Payment_Membership modelPaymentMembership) {
-        Connection con = DataServer.GetConnection();
-        try {
-            PreparedStatement ps;
-            // disable previous debt if exists
-            assert con != null;
-            ps = con.prepareStatement("UPDATE DEBTS SET flag = 0 WHERE DATE(dateTime) = ? AND idMember = ? AND isMembership = 1 ORDER BY dateTime DESC");
-            ps.setString(1, DateTime.JavaToMySQLDate(modelPaymentMembership.getStartDateTime()));
-            ps.setInt(2, modelPaymentMembership.getIdMember());
-            ps.executeUpdate();
-
-            ps = con.prepareStatement("UPDATE PAYMENTS_MEMBERSHIPS SET price = ?, startDateTime = NOW(), idGym = ?, updatedBy = ?, idMembership = ? WHERE idPaymentMembership = ?");
-            ps.setBigDecimal(1, modelMembership.getPrice()); // price
-            ps.setInt(2, Application.GetCurrentGym().getIdGym()); // idGym
-            ps.setInt(3, Application.GetModelAdmin().getIdMember()); // idAdmin
-            ps.setInt(4, modelMembership.getIdMembership()); // idMembership
-            ps.setInt(5, modelPaymentMembership.getIdPaymentMembership());
-            ps.executeUpdate();
-            return true;
-        } catch (SQLException sqlException) {
-            Notifications.CatchException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], sqlException);
-            return false;
-        } finally {
-            DataServer.CloseConnection(con);
+        // disable previous debt if exists
+        boolean isOk = JDBC_Debt.DeleteDebt(modelPaymentMembership.getIdMember());
+        if (isOk) {
+            LocalDateTime now = LocalDateTime.now();
+            ParamBuilder paramBuilder = new ParamBuilder("PAYMENTS_MEMBERSHIPS", "idPaymentMembership", modelPaymentMembership.getIdPaymentMembership());
+            paramBuilder.addParam("months", modelPaymentMembership.getMonths());
+            paramBuilder.addParam("price", modelMembership.getPrice());
+            paramBuilder.addParam("startDateTime", DateTime.JavaToMySQLDateTime(now));
+            paramBuilder.addParam("endDateTime", DateTime.getEndDateToMySQL(now, modelPaymentMembership.getMonths()));
+            paramBuilder.addParam("idGym", Application.GetCurrentGym().getIdGym());
+            paramBuilder.addParam("idMembership", modelMembership.getIdMembership());
+            isOk = paramBuilder.executeUpdate();
         }
+        return isOk;
     }
 
     public static boolean DeletePaymentMembership(Model_Payment_Membership modelPaymentMembership) {
-        Connection con = DataServer.GetConnection();
-        try {
-            PreparedStatement ps;
-            assert con != null;
-            // disable previous debt if exists
-            ps = con.prepareStatement("UPDATE DEBTS SET flag = 0 WHERE DATE(dateTime) = ? AND idMember = ? AND isMembership = 1 ORDER BY dateTime DESC");
-            ps.setString(1, DateTime.JavaToMySQLDate(modelPaymentMembership.getStartDateTime()));
-            ps.setInt(2, modelPaymentMembership.getIdMember());
-            ps.executeUpdate();
-
-            ps = con.prepareStatement("UPDATE PAYMENTS_MEMBERSHIPS SET updatedBy = ?, flag = 0 WHERE idPaymentMembership = ?");
-            ps.setInt(1, Application.GetModelAdmin().getIdMember());
-            ps.setInt(2, modelPaymentMembership.getIdPaymentMembership());
-            ps.executeUpdate();
-            return true;
-        } catch (SQLException sqlException) {
-            Notifications.CatchException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], sqlException);
-            return false;
-        } finally {
-            DataServer.CloseConnection(con);
+        // disable previous debt if exists
+        boolean isOk = JDBC_Debt.DeleteDebt(modelPaymentMembership.getIdMember());
+        if (isOk) {
+            ParamBuilder paramBuilder = new ParamBuilder("PAYMENTS_MEMBERSHIPS", "idPaymentMembership", modelPaymentMembership.getIdPaymentMembership());
+            paramBuilder.addParam("flag", 0);
+            isOk = paramBuilder.executeUpdate();
         }
+        return isOk;
     }
 }

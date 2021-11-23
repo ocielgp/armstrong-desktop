@@ -13,15 +13,12 @@ public class Model_Debt {
     public static final byte MAX_DESCRIPTION = 80;
 
     private final IntegerProperty idDebt = new SimpleIntegerProperty();
-    private final ObjectProperty<LocalDateTime> dateTime = new SimpleObjectProperty<>();
     private final ObjectProperty<BigDecimal> owe = new SimpleObjectProperty<>();
     private final ObjectProperty<BigDecimal> paidOut = new SimpleObjectProperty<>();
-    private final ObjectProperty<Short> amount = new SimpleObjectProperty<>(Short.valueOf("0"));
-    private final StringProperty description = new SimpleStringProperty();
-    private final BooleanProperty isMembership = new SimpleBooleanProperty();
     private final BooleanProperty debtStatus = new SimpleBooleanProperty();
-    private final IntegerProperty idAdmin = new SimpleIntegerProperty();
     private final IntegerProperty idMember = new SimpleIntegerProperty();
+    private final ObjectProperty<LocalDateTime> updatedAt = new SimpleObjectProperty<>();
+    private final IntegerProperty updatedBy = new SimpleIntegerProperty();
 
     public int getIdDebt() {
         return idDebt.get();
@@ -33,18 +30,6 @@ public class Model_Debt {
 
     public void setIdDebt(int idDebt) {
         this.idDebt.set(idDebt);
-    }
-
-    public LocalDateTime getDateTime() {
-        return dateTime.get();
-    }
-
-    public ObjectProperty<LocalDateTime> dateTimeProperty() {
-        return dateTime;
-    }
-
-    public void setDateTime(LocalDateTime dateTime) {
-        this.dateTime.set(dateTime);
     }
 
     public BigDecimal getOwe() {
@@ -71,42 +56,6 @@ public class Model_Debt {
         this.paidOut.set(paidOut);
     }
 
-    public Short getAmount() {
-        return amount.get();
-    }
-
-    public ObjectProperty<Short> amountProperty() {
-        return amount;
-    }
-
-    public void setAmount(Short amount) {
-        this.amount.set(amount);
-    }
-
-    public String getDescription() {
-        return description.get();
-    }
-
-    public StringProperty descriptionProperty() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description.set(description);
-    }
-
-    public boolean isMembership() {
-        return isMembership.get();
-    }
-
-    public BooleanProperty isMembershipProperty() {
-        return isMembership;
-    }
-
-    public void setIsMembership(boolean isMembership) {
-        this.isMembership.set(isMembership);
-    }
-
     public boolean isDebtStatus() {
         return debtStatus.get();
     }
@@ -119,18 +68,6 @@ public class Model_Debt {
         this.debtStatus.set(debtStatus);
     }
 
-    public int getIdAdmin() {
-        return idAdmin.get();
-    }
-
-    public IntegerProperty idAdminProperty() {
-        return idAdmin;
-    }
-
-    public void setIdAdmin(int idAdmin) {
-        this.idAdmin.set(idAdmin);
-    }
-
     public int getIdMember() {
         return idMember.get();
     }
@@ -141,5 +78,29 @@ public class Model_Debt {
 
     public void setIdMember(int idMember) {
         this.idMember.set(idMember);
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt.get();
+    }
+
+    public ObjectProperty<LocalDateTime> updatedAtProperty() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt.set(updatedAt);
+    }
+
+    public int getUpdatedBy() {
+        return updatedBy.get();
+    }
+
+    public IntegerProperty updatedByProperty() {
+        return updatedBy;
+    }
+
+    public void setUpdatedBy(int updatedBy) {
+        this.updatedBy.set(updatedBy);
     }
 }

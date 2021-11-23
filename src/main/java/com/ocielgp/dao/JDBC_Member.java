@@ -107,7 +107,7 @@ public class JDBC_Member {
                 PreparedStatement statementLimited, statement;
                 ResultSet rs;
                 // query initial
-                String sqlQuery = "SELECT M.idMember, M.name, M.lastName, M.access, endDateTime, (SELECT COUNT(idDebt) > 0 FROM DEBTS WHERE idMember = M.idMember AND debtStatus = 1 AND flag = 1 ORDER BY dateTime DESC) AS 'haveDebts', PM.flag AS 'flag' FROM MEMBERS M LEFT JOIN PAYMENTS_MEMBERSHIPS PM ON PM.idPaymentMembership = (SELECT idPaymentMembership FROM PAYMENTS_MEMBERSHIPS WHERE idMember = M.idMember AND flag = 1 ORDER BY startDateTime DESC LIMIT 1) WHERE M.idMember NOT IN (SELECT A.idMember FROM ADMINS A WHERE A.flag = 1) AND M.flag = 1 ";
+                String sqlQuery = "SELECT M.idMember, M.name, M.lastName, M.access, endDateTime, (SELECT COUNT(idDebt) > 0 FROM DEBTS WHERE idMember = M.idMember AND debtStatus = 1 AND flag = 1 ORDER BY updatedAt DESC) AS 'haveDebts', PM.flag AS 'flag', A.username FROM MEMBERS M LEFT JOIN PAYMENTS_MEMBERSHIPS PM ON PM.idPaymentMembership = (SELECT idPaymentMembership FROM PAYMENTS_MEMBERSHIPS WHERE idMember = M.idMember AND flag = 1 ORDER BY startDateTime DESC LIMIT 1) LEFT JOIN ADMINS A ON PM.createdBy = A.idAdmin WHERE M.idMember NOT IN (SELECT A.idAdmin FROM ADMINS A WHERE A.flag = 1) AND M.flag = 1 ";
 
                 // fieldSearchContent
                 if (query.length() > 0) {
@@ -115,7 +115,7 @@ public class JDBC_Member {
                         Integer.parseInt(query);
                         sqlQuery += "AND M.idMember = ? ";
                     } catch (NumberFormatException exception) {
-                        sqlQuery += "AND (M.name LIKE ? OR M.lastName LIKE ?) ";
+                        sqlQuery += "AND (M.name LIKE ? OR M.lastName LIKE ? OR A.username LIKE ?) ";
                     }
                 }
 
@@ -124,7 +124,7 @@ public class JDBC_Member {
                     sqlQuery += "AND PM.idGym = " + Application.GetCurrentGym().getIdGym() + " ";
                 }
                 if (UserPreferences.GetPreferenceBool("FILTER_MEMBER_ACTIVE_MEMBERS")) {
-                    sqlQuery += "AND M.access = 1 AND PM.endDateTime >= CURRENT_DATE ";
+                    sqlQuery += "AND PM.endDateTime >= CURRENT_DATE ";
                 }
                 if (UserPreferences.GetPreferenceBool("FILTER_MEMBER_DEBTORS")) {
                     sqlQuery += "AND M.idMember IN (SELECT DISTINCT D.idMember FROM DEBTS D WHERE D.debtStatus = 1 AND D.flag = 1) ";
@@ -161,14 +161,16 @@ public class JDBC_Member {
                         statementLimited.setInt(3, maxRows); // limit ?,?
 
                         statement.setInt(1, Integer.parseInt(query)); // idMember
-                    } else if (parameters.getParameterCount() == 4) {
+                    } else if (parameters.getParameterCount() == 5) {
                         statementLimited.setString(1, "%" + query + "%"); // name
                         statementLimited.setString(2, "%" + query + "%"); // lastName
-                        statementLimited.setInt(3, maxRegisters - maxRows); // limit ?
-                        statementLimited.setInt(4, maxRows); // limit ?,?
+                        statementLimited.setString(3, "%" + query + "%"); // username
+                        statementLimited.setInt(4, maxRegisters - maxRows); // limit ?
+                        statementLimited.setInt(5, maxRows); // limit ?,?
 
                         statement.setString(1, "%" + query + "%"); // name
                         statement.setString(2, "%" + query + "%"); // lastName
+                        statement.setString(3, "%" + query + "%"); // username
                     }
                 }
 
@@ -213,26 +215,13 @@ public class JDBC_Member {
         paramBuilder.addParam("lastName", modelMember.getLastName());
         paramBuilder.addParam("gender", modelMember.getGender());
         paramBuilder.addParam("notes", modelMember.getNotes());
+        paramBuilder.addParam("access", modelMember.getAccess());
         return paramBuilder.executeUpdate();
     }
 
-    public static CompletableFuture<Boolean> UpdateAccess(int idMember, boolean access) {
-        return CompletableFuture.supplyAsync(() -> {
-            Connection con = DataServer.GetConnection();
-            try {
-                PreparedStatement ps;
-                assert con != null;
-                ps = con.prepareStatement("UPDATE MEMBERS SET access = ? WHERE idMember = ?");
-                ps.setBoolean(1, !access);
-                ps.setInt(2, idMember);
-                ps.executeUpdate();
-                return true;
-            } catch (SQLException sqlException) {
-                Notifications.CatchSqlException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], sqlException);
-            } finally {
-                DataServer.CloseConnection(con);
-            }
-            return false;
-        });
+    public static Boolean UpdateAccess(int idMember, boolean access) {
+        ParamBuilder paramBuilder = new ParamBuilder("MEMBERS", "idMember", idMember);
+        paramBuilder.addParam("access", access);
+        return paramBuilder.executeUpdate();
     }
 }

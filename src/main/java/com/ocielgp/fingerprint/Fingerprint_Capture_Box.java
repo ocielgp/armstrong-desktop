@@ -47,6 +47,9 @@ public class Fingerprint_Capture_Box {
         InputProperties.createVisibleEvent(this.boxFingerprintPane, true);
 
         Fingerprint_Controller.setFingerprintCaptureBox(this);
+        if (!Fingerprint_Controller.IsConnected()) {
+            this.boxFingerprintPane.setVisible(false);
+        }
     }
 
     public void show() {

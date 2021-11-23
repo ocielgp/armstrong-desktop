@@ -75,11 +75,11 @@
 
 .card {
     -fx-background-color: -fx-color-background;
-    -fx-border-color: -fx-color-border;
+    -fx-border-color: -fx-color-background;
     -fx-background-radius: 10px;
     -fx-border-radius: 10px;
     -fx-padding: 10px;
-    -fx-pref-width: 300;
+    -fx-pref-width: 350;
 }
 
 .card .ikonli-font-icon {

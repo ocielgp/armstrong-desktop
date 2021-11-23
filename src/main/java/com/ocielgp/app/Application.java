@@ -13,7 +13,7 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 public class Application {
-    public static final String version = "1.0 Beta";
+    public static final String version = "1.0";
     public static Controller_App controllerApp;
     public static Controller_Dashboard controllerDashboard;
     public static Stage STAGE_PRIMARY;

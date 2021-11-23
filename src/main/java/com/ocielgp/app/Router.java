@@ -11,7 +11,6 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.HBox;
 import javafx.util.Pair;
 
-import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicReference;
@@ -20,6 +19,7 @@ public class Router {
     // routes
     public static final String SUMMARY = "summary.fxml";
     public static final String MEMBERS = "members.fxml";
+    public static final String ADMINS = "admins.fxml";
 
     private static HashMap<HBox, Pair<String, String>> routes = new HashMap<>();
     private static final AtomicReference<HBox> previousNav = new AtomicReference<>();

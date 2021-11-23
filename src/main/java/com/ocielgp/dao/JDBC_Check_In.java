@@ -44,7 +44,7 @@ public class JDBC_Check_In {
             PreparedStatement ps;
             ResultSet rs;
             assert con != null;
-            ps = con.prepareStatement("SELECT M.idMember, A.idMember AS 'idAdmin' FROM MEMBERS M LEFT JOIN ADMINS A on M.idMember = A.idMember WHERE M.idMember = ? ORDER BY M.createdAt");
+            ps = con.prepareStatement("SELECT M.idMember, A.idAdmin AS 'idAdmin' FROM MEMBERS M LEFT JOIN ADMINS A on M.idMember = A.idAdmin WHERE M.idMember = ? ORDER BY M.createdAt");
             ps.setInt(1, idMember);
             rs = ps.executeQuery();
 
@@ -66,7 +66,7 @@ public class JDBC_Check_In {
             PreparedStatement ps;
             ResultSet rs;
             assert con != null;
-            ps = con.prepareStatement("SELECT MP.photo, M.name, M.lastName, M.access, MS.name AS 'membershipName', M.idGym AS 'idGymMember', PM.months, PM.endDateTime, PM.idGym AS 'idGymPayment', (SELECT COUNT(idDebt) > 0 FROM DEBTS WHERE idMember = M.idMember AND debtStatus = 1 AND flag = 1 ORDER BY dateTime DESC) AS 'haveDebts' FROM MEMBERS M LEFT JOIN MEMBERS_PHOTOS MP ON M.idMember = MP.idMember LEFT JOIN PAYMENTS_MEMBERSHIPS PM ON PM.idPaymentMembership = (SELECT idPaymentMembership FROM PAYMENTS_MEMBERSHIPS WHERE idMember = M.idMember AND flag = 1 ORDER BY PM.startDateTime DESC LIMIT 1) LEFT JOIN MEMBERSHIPS MS ON PM.idMembership = MS.idMembership WHERE M.idMember = ? AND M.flag = 1");
+            ps = con.prepareStatement("SELECT MP.photo, M.name, M.lastName, M.access, MS.name AS 'membershipName', M.idGym AS 'idGymMember', PM.months, PM.endDateTime, PM.idGym AS 'idGymPayment', (SELECT COUNT(idDebt) > 0 FROM DEBTS WHERE idMember = M.idMember AND debtStatus = 1 AND flag = 1 ORDER BY M.createdAt DESC) AS 'haveDebts' FROM MEMBERS M LEFT JOIN MEMBERS_PHOTOS MP ON M.idMember = MP.idMember LEFT JOIN PAYMENTS_MEMBERSHIPS PM ON PM.idPaymentMembership = (SELECT idPaymentMembership FROM PAYMENTS_MEMBERSHIPS WHERE idMember = M.idMember AND flag = 1 ORDER BY PM.startDateTime DESC LIMIT 1) LEFT JOIN MEMBERSHIPS MS ON PM.idMembership = MS.idMembership WHERE M.idMember = ? AND M.flag = 1");
             ps.setInt(1, idMember);
             rs = ps.executeQuery();
 
@@ -135,16 +135,17 @@ public class JDBC_Check_In {
             PreparedStatement ps;
             ResultSet rs;
             assert con != null;
-            ps = con.prepareStatement("SELECT M.name, M.lastName, MP.photo, A.username, G.name AS 'gymName' FROM MEMBERS M LEFT JOIN MEMBERS_PHOTOS MP ON M.idMember = MP.idMember JOIN ADMINS A on M.idMember = A.idMember JOIN ADMINS_ROLES AR on AR.idRole = A.idRole JOIN GYMS G on M.idGym = G.idGym WHERE M.idMember = ?");
+            ps = con.prepareStatement("SELECT M.name, M.lastName, MP.photo, AR.name AS 'roleName', G.name AS 'gymName' FROM MEMBERS M LEFT JOIN MEMBERS_PHOTOS MP ON M.idMember = MP.idMember JOIN ADMINS A on M.idMember = A.idAdmin JOIN ADMINS_ROLES AR on AR.idRole = A.idRole JOIN GYMS G on M.idGym = G.idGym WHERE M.idMember = ?");
             ps.setInt(1, idMember);
             rs = ps.executeQuery();
 
-            byte[] photoBytes = rs.getBytes("photo");
-            Image photo = (photoBytes == null) ? FileLoader.getDefaultImage() : FileLoader.loadImage(photoBytes);
-            String name = rs.getString("name") + " " + rs.getString("lastName");
-            String gym = rs.getString("gymName");
-
             if (rs.next()) {
+                byte[] photoBytes = rs.getBytes("photo");
+                Image photo = (photoBytes == null) ? FileLoader.getDefaultImage() : FileLoader.loadImage(photoBytes);
+                String name = rs.getString("name") + " " + rs.getString("lastName");
+                String gym = rs.getString("gymName");
+                String roleName = rs.getString("roleName");
+
                 JDBC_Check_In.CreateCheckIn(idMember, openedBy).thenAccept(isOk -> {
                     if (isOk) {
                         Application.ShowUserInfo(
@@ -153,7 +154,7 @@ public class JDBC_Check_In {
                                 idMember,
                                 name,
                                 gym,
-                                "Empleado"
+                                roleName
                         );
                         Notifications.Success("Entrada", "Entrada de " + name + " registrada", 2);
                     }

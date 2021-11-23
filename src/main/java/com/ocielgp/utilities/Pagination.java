@@ -3,7 +3,9 @@ package com.ocielgp.utilities;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
 import com.ocielgp.app.UserPreferences;
+import com.ocielgp.dao.JDBC_Admin;
 import com.ocielgp.dao.JDBC_Member;
+import com.ocielgp.models.Model_Admin;
 import com.ocielgp.models.Model_Member;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
@@ -20,7 +22,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class Pagination {
 
     public enum Tables {
-        MEMBERS
+        MEMBERS,
+        ADMINS
     }
 
     private final JFXTextField fieldSearch;
@@ -44,7 +47,7 @@ public class Pagination {
         this.labelCurrentPage = labelCurrentPage;
         this.labelTotalPages = labelTotalPages;
 
-        InputProperties.createEventEnter(buttonSearch, this.fieldSearch);
+        if (this.fieldSearch != null) InputProperties.createEventEnter(buttonSearch, this.fieldSearch);
         buttonSearch.setOnAction(actionEvent -> this.refillTable(1));
 
         this.fieldRowsPerPage.setOnKeyPressed(keyEvent -> {
@@ -91,7 +94,9 @@ public class Pagination {
         this.page.set(page);
         Platform.runLater(() -> this.fieldRowsPerPage.setText(this.rows.toString()));
         if (tables == Tables.MEMBERS) {
-            CompletableFuture.runAsync(this::refillMembers);
+            refillMembers();
+        } else if (tables == Tables.ADMINS) {
+            refillAdmins();
         }
     }
 
@@ -106,6 +111,39 @@ public class Pagination {
                         super.updateItem(modelMember, empty);
                         if (modelMember != null) {
                             String style = modelMember.getStyle();
+                            if (getStyleClass().size() == 5) {
+                                getStyleClass().set(4, style); // replace color style
+                            } else {
+                                getStyleClass().addAll("member-cell", style);
+                            }
+                        } else {
+                            if (getStyleClass().size() == 5) {
+                                getStyleClass().remove(4); // remove member-cell
+                                getStyleClass().remove(3); // remove color style
+                            }
+                        }
+                    }
+                });
+                this.tableView.setItems(queryRows.getData());
+                this.labelCurrentPage.setText(this.page.toString());
+            } else {
+                initialStateCounters();
+            }
+            this.tableView.setDisable(false);
+        }));
+    }
+
+    private void refillAdmins() {
+        JDBC_Admin.ReadAdmins(this.rows, this.page, this.fieldSearch.getText()).thenAccept(queryRows -> Platform.runLater(() -> {
+            if (queryRows.getData().size() > 0) {
+                this.labelTotalPages.setText(queryRows.getPages().toString());
+                this.labelTotalRows.setText(queryRows.getRows().toString());
+                this.tableView.setRowFactory(row -> new TableRow<Model_Admin>() {
+                    @Override
+                    public void updateItem(Model_Admin modelAdmin, boolean empty) {
+                        super.updateItem(modelAdmin, empty);
+                        if (modelAdmin != null) {
+                            String style = modelAdmin.getStyle();
                             if (getStyleClass().size() == 5) {
                                 getStyleClass().set(4, style); // replace color style
                             } else {

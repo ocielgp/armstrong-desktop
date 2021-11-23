@@ -74,7 +74,6 @@ public class JDBC_Membership {
                 if (modelMembershipsList.isEmpty()) {
                     Notifications.Danger("Membresías", "No hay membresías registradas");
                 }
-                con.close();
             } catch (SQLException sqlException) {
                 Notifications.CatchSqlException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], sqlException);
             } finally {

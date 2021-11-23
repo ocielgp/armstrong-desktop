@@ -57,11 +57,11 @@ public class Fingerprint_Controller {
                 ReaderCollection readerCollection = UareUGlobal.GetReaderCollection();
                 readerCollection.GetReaders();
                 Fingerprint_Controller.reader = readerCollection.get(0); // catch exception
-                Notifications.Success("gmi-fingerprint", "Lector de Huellas", "Lector de huellas conectado", 2);
+                Platform.runLater(() -> Notifications.Success("gmi-fingerprint", "Lector de Huellas", "Lector de huellas conectado", 2));
                 BackgroundReader();
             } catch (Exception ignored) {
                 Fingerprint_Controller.setStatusCode(0);
-                Notifications.Warn("gmi-fingerprint", "Lector de Huellas", "Lector de huellas no detectado", 2);
+                Platform.runLater(() -> Notifications.Warn("gmi-fingerprint", "Lector de Huellas", "Lector de huellas no detectado", 2));
             }
         });
     }
@@ -87,7 +87,7 @@ public class Fingerprint_Controller {
     }
 
     public static void BackgroundReader() {
-        if (!Fingerprint_Controller.IsReading()) {
+        if (Fingerprint_Controller.IsConnected() && !Fingerprint_Controller.IsReading()) {
             if (Fingerprint_Controller.fingerprintCaptureThread != null) {
                 StopCapture();
             }

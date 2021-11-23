@@ -135,15 +135,24 @@
     -fx-text-fill: -fx-color-background;
 }
 
-.jfx-date-picker {
+.jfx-date-picker, .jfx-time-picker {
     -jfx-default-color: -fx-color-text;
+    /*-fx-control-inner-background: red;*/
 }
 
-.jfx-date-picker .label {
+.jfx-date-picker .label, .jfx-time-picker .label {
     -fx-text-fill: #333;
 }
 
-.jfx-date-picker .text-field {
+.date-picker-popup .time-pane {
+    -fx-background-color: -fx-color-background;
+}
+
+.date-picker-popup .time-pane .label {
+    -fx-text-fill: -fx-color-text;
+}
+
+.jfx-date-picker .text-field, .jfx-time-picker .text-field {
     -fx-alignment: center;
 }
 
