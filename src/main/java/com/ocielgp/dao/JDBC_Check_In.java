@@ -95,9 +95,9 @@ public class JDBC_Check_In {
                                 haveDebts
                         );
                         if (haveDebts) {
-                            Notifications.Danger("Deudor", "El socio tiene adeudos pendientes");
+                            Notifications.Danger("Deudor", "Este socio tiene adeudos pendientes");
                         } else if (!access) {
-                            Notifications.Danger("Bloqueado", "El socio no tiene acceso al los gimnasios");
+                            Notifications.Danger("Bloqueado", "Este socio no tiene acceso al los gimnasios");
                         } else if (style.equals(Styles.SUCCESS) || style.equals(Styles.WARN)) {
                             if (price.equals("0.00")) {
                                 style = Styles.EPIC;
@@ -141,7 +141,7 @@ public class JDBC_Check_In {
             PreparedStatement ps;
             ResultSet rs;
             assert con != null;
-            ps = con.prepareStatement("SELECT M.name, M.lastName, MP.photo, AR.name AS 'roleName', G.name AS 'gymName' FROM MEMBERS M LEFT JOIN MEMBERS_PHOTOS MP ON M.idMember = MP.idMember JOIN ADMINS A on M.idMember = A.idAdmin JOIN ADMINS_ROLES AR on AR.idRole = A.idRole JOIN GYMS G on M.idGym = G.idGym WHERE M.idMember = ?");
+            ps = con.prepareStatement("SELECT M.name, M.lastName, MP.photo, AR.name AS 'roleName', M.access, G.name AS 'gymName' FROM MEMBERS M LEFT JOIN MEMBERS_PHOTOS MP ON M.idMember = MP.idMember JOIN ADMINS A on M.idMember = A.idAdmin JOIN ADMINS_ROLES AR on AR.idRole = A.idRole JOIN GYMS G on M.idGym = G.idGym WHERE M.idMember = ?");
             ps.setInt(1, idMember);
             rs = ps.executeQuery();
 
@@ -149,22 +149,35 @@ public class JDBC_Check_In {
                 byte[] photoBytes = rs.getBytes("photo");
                 Image photo = (photoBytes == null) ? FileLoader.getDefaultImage() : FileLoader.loadImage(photoBytes);
                 String name = rs.getString("name");
+                boolean access = rs.getBoolean("access");
                 String gym = rs.getString("gymName");
                 String roleName = rs.getString("roleName");
 
-                JDBC_Check_In.CreateCheckIn(idMember, openedBy).thenAccept(isOk -> {
-                    if (isOk) {
-                        Application.ShowUserInfo(
-                                Styles.EPIC,
-                                photo,
-                                idMember,
-                                name,
-                                gym,
-                                roleName
-                        );
-                        Notifications.Success("Entrada", "Entrada de " + name + " registrada", 2);
-                    }
-                });
+                if (!access) {
+                    Application.ShowUserInfo(
+                            Styles.DANGER,
+                            photo,
+                            idMember,
+                            name,
+                            gym,
+                            roleName
+                    );
+                    Notifications.Danger("Bloqueado", "Este administrador no tiene acceso al los gimnasios");
+                } else {
+                    JDBC_Check_In.CreateCheckIn(idMember, openedBy).thenAccept(isOk -> {
+                        if (isOk) {
+                            Application.ShowUserInfo(
+                                    Styles.EPIC,
+                                    photo,
+                                    idMember,
+                                    name,
+                                    gym,
+                                    roleName
+                            );
+                            Notifications.Success("Entrada", "Entrada de " + name + " registrada", 2);
+                        }
+                    });
+                }
             }
         } catch (SQLException sqlException) {
             Notifications.CatchSqlException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], sqlException);
