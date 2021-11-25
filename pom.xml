@@ -121,6 +121,9 @@
             <resource>
                 <directory>src/main/resources/views/admins</directory>
             </resource>
+            <resource>
+                <directory>src/main/resources/views/check-in</directory>
+            </resource>
         </resources>
 
         <plugins>

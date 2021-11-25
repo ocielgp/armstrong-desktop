@@ -205,7 +205,6 @@ public class Controller_Admin implements Initializable {
             this.modelAdmin.setIdMember(idMember);
             this.modelAdmin.setStyle(style);
 
-            this.fingerprintCaptureBox.getFingerprints(this.idMember);
             JDBC_Gym.ReadGym(this.modelAdmin.getIdGym())
                     .thenAccept(model_gym -> {
                         this.modelAdmin.setModelGym(model_gym);
@@ -264,6 +263,9 @@ public class Controller_Admin implements Initializable {
             this.pi_fieldLastName.setText(this.modelAdmin.getLastName());
             this.pi_comboBoxGender.setValue(this.modelAdmin.getGender());
             this.pi_fieldNotes.setText(this.modelAdmin.getNotes());
+
+            // fingerprint
+            this.fingerprintCaptureBox.getFingerprints(this.modelAdmin.getIdMember());
 
             // shortcut
             if (this.modelAdmin.getAccess()) {

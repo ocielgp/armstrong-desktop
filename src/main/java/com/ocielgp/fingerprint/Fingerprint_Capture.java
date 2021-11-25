@@ -27,7 +27,7 @@ public class Fingerprint_Capture implements ActionListener {
     public Fingerprint_Capture createBackgroundThread() {
         this.captureThread = new Fingerprint_Capture_Thread(this.reader, false, Fid.Format.ANSI_381_2004, Reader.ImageProcessing.IMG_PROC_DEFAULT);
         startCapture();
-        System.out.println("Background reader");
+        System.out.println("[Fingerprint_Capture][Background]");
         return this;
     }
 
@@ -36,7 +36,7 @@ public class Fingerprint_Capture implements ActionListener {
         startCapture();
         this.fingerprintCaptureBox = fingerprintCaptureBox;
         this.fingerprintsArray = new Fmd[2];
-        System.out.println("View reader");
+        System.out.println("[Fingerprint_Capture][View]");
         return this;
     }
 
@@ -97,11 +97,11 @@ public class Fingerprint_Capture implements ActionListener {
                         bCanceled = true;
                     } else {
                         // bad quality
-                        System.out.println(evt.capture_result.quality);
+                        System.out.println("[Fingerprint_Capture][Bad Quality] " + evt.capture_result.quality);
                     }
                 } else if (evt.exception != null) {
                     // exception during capture
-                    System.out.println("murio 1");
+                    System.out.println("[Fingerprint_Capture][Disconnected]");
                     bCanceled = true;
                     Fingerprint_Controller.setStatusCode(0); // fingerprint off
                     Notifications.Warn("gmi-fingerprint", "Lector de Huellas", "Lector de huellas desconectado", 3);
@@ -166,7 +166,7 @@ public class Fingerprint_Capture implements ActionListener {
                 }
             } else {
                 // bad quality
-                System.out.println("Bad Quality " + evt.capture_result.quality);
+                System.out.println("[Fingerprint_Capture][Bad Quality] " + evt.capture_result.quality);
             }
         } else if (evt.exception != null) {
             // exception during capture
@@ -174,7 +174,7 @@ public class Fingerprint_Capture implements ActionListener {
             Fingerprint_Controller.setStatusCode(0); // fingerprint Off
         } else if (evt.reader_status != null) {
             // reader failure
-            System.out.println("Bad Status " + evt.reader_status);
+            System.out.println("[Fingerprint_Capture][Bad Status] " + evt.reader_status);
         }
 
     }

@@ -65,8 +65,8 @@ public class Fingerprint_Capture_Box {
 
     public void getFingerprints(int idMember) {
         JDBC_Member_Fingerprint.ReadFingerprints(idMember).thenAccept(fingerprints -> Platform.runLater(() -> {
-            this.fingerprintsList = fingerprints.getValue();
             this.totalFingerprintsProperty.set(fingerprints.getKey());
+            this.fingerprintsList = fingerprints.getValue();
             this.buttonRestartCapture.setDisable(!(fingerprints.getKey() > 0));
         }));
     }

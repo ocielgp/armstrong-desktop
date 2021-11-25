@@ -84,4 +84,9 @@ public class Application {
         if (Application.controllerDashboard != null)
             Application.controllerDashboard.showUserInfo(style, photo, idMember, name, gym, membership);
     }
+
+    public static void ShakeUserInfo() {
+        if (Application.controllerDashboard != null)
+            Application.controllerDashboard.shakeUserInfo();
+    }
 }

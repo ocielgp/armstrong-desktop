@@ -19,6 +19,7 @@ public class Router {
     // routes
     public static final String SUMMARY = "summary.fxml";
     public static final String MEMBERS = "members.fxml";
+    public static final String CHECK_IN = "check-in.fxml";
     public static final String ADMINS = "admins.fxml";
 
     private static HashMap<HBox, Pair<String, String>> routes = new HashMap<>();

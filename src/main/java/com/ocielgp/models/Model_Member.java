@@ -19,7 +19,7 @@ public class Model_Member {
     private final StringProperty gender = new SimpleStringProperty();
     private final StringProperty notes = new SimpleStringProperty();
     private final ObjectProperty<Boolean> access = new SimpleObjectProperty<>();
-    private final ObjectProperty<Integer> idGym = new SimpleObjectProperty<>();
+    private final ObjectProperty<Short> idGym = new SimpleObjectProperty<>();
     private final ObjectProperty<LocalDateTime> createdAt = new SimpleObjectProperty<>();
     private final ObjectProperty<Integer> createdBy = new SimpleObjectProperty<>();
     private final ObjectProperty<LocalDateTime> updatedAt = new SimpleObjectProperty<>();
@@ -113,15 +113,15 @@ public class Model_Member {
         this.access.set(access);
     }
 
-    public Integer getIdGym() {
+    public Short getIdGym() {
         return idGym.get();
     }
 
-    public ObjectProperty<Integer> idGymProperty() {
+    public ObjectProperty<Short> idGymProperty() {
         return idGym;
     }
 
-    public void setIdGym(Integer idGym) {
+    public void setIdGym(Short idGym) {
         this.idGym.set(idGym);
     }
 

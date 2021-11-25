@@ -1,28 +1,29 @@
 package com.ocielgp.dao;
 
 import com.ocielgp.app.Application;
+import com.ocielgp.models.Model_Check_In;
 import com.ocielgp.utilities.*;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.scene.image.Image;
 
 import java.lang.invoke.MethodHandles;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class JDBC_Check_In {
-    synchronized public static CompletableFuture<Boolean> CreateCheckIn(int idMember, int openedBy) {
+    synchronized public static CompletableFuture<Boolean> CreateCheckIn(int idMember, int createdBy) {
         return CompletableFuture.supplyAsync(() -> {
             Connection con = DataServer.GetConnection();
             try {
                 PreparedStatement ps;
                 assert con != null;
-                ps = con.prepareStatement("INSERT INTO CHECK_IN(idMember, idGym, openedBy) VALUE (?, ?, ?)");
-                ps.setInt(1, idMember); // idMember
-                ps.setInt(2, Application.GetCurrentGym().getIdGym()); // idGym
-                ps.setInt(3, openedBy); // openedBy
+                ps = con.prepareStatement("INSERT INTO CHECK_IN(createdBy, idMember, idGym) VALUE (?, ?, ?)");
+                ps.setInt(1, createdBy); // createdBy
+                ps.setInt(2, idMember); // idMember
+                ps.setInt(3, Application.GetCurrentGym().getIdGym()); // idGym
                 ps.executeUpdate();
                 return true;
             } catch (SQLException sqlException) {
@@ -44,7 +45,7 @@ public class JDBC_Check_In {
             PreparedStatement ps;
             ResultSet rs;
             assert con != null;
-            ps = con.prepareStatement("SELECT M.idMember, A.idAdmin AS 'idAdmin' FROM MEMBERS M LEFT JOIN ADMINS A on M.idMember = A.idAdmin WHERE M.idMember = ? ORDER BY M.createdAt");
+            ps = con.prepareStatement("SELECT M.idMember, A.idAdmin FROM MEMBERS M LEFT JOIN ADMINS A on M.idMember = A.idAdmin WHERE M.idMember = ? ORDER BY M.createdAt");
             ps.setInt(1, idMember);
             rs = ps.executeQuery();
 
@@ -98,6 +99,9 @@ public class JDBC_Check_In {
                         } else if (!access) {
                             Notifications.Danger("Bloqueado", "El socio no tiene acceso al los gimnasios");
                         } else if (style.equals(Styles.SUCCESS) || style.equals(Styles.WARN)) {
+                            if (price.equals("0.00")) {
+                                style = Styles.EPIC;
+                            }
                             JDBC_Check_In.CreateCheckIn(idMember, openedBy).thenAccept(isOk -> {
                                 if (isOk)
                                     Notifications.Success("Entrada", "Entrada de " + name + " registrada", 2);
@@ -168,5 +172,76 @@ public class JDBC_Check_In {
             DataServer.CloseConnection(con);
             Loading.closeNow();
         }
+    }
+
+    public static CompletableFuture<QueryRows> ReadAllCheckIn(int maxRows, AtomicInteger page, String query, String from, String to) {
+        return CompletableFuture.supplyAsync(() -> {
+            Connection con = DataServer.GetConnection();
+            try {
+                PreparedStatement statementLimited, statement;
+                ResultSet rs;
+                // query initial
+                String sqlQuery = "SELECT CI.createdAt, CONCAT(M.name, ' ', M.lastName) AS 'memberName', A.username, G.name AS 'gymName', CI.createdBy = 1 'openedBySystem' FROM CHECK_IN CI JOIN MEMBERS M ON CI.idMember = M.idMember JOIN ADMINS A ON CI.createdBy = A.idAdmin JOIN GYMS G ON CI.idGym = G.idGym WHERE CI.createdAt BETWEEN ? AND ? ";
+
+                // fieldSearchContent
+                if (query.length() > 0) {
+                    sqlQuery += "AND (CONCAT(M.name, ' ', M.lastName) LIKE ? OR G.name LIKE ? OR A.username LIKE ?) ";
+                }
+
+                assert con != null;
+                statement = con.prepareStatement(sqlQuery, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+                // limit query ( pagination purposes )
+                sqlQuery += "ORDER BY CI.createdAt DESC LIMIT ?,?";
+                statementLimited = con.prepareStatement(sqlQuery, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+
+                ParameterMetaData parameters = statementLimited.getParameterMetaData();
+                int maxRegisters = maxRows * page.get();
+                if (parameters.getParameterCount() == 4) {
+                    statementLimited.setString(1, from);
+                    statementLimited.setString(2, to);
+                    statementLimited.setInt(3, maxRegisters - maxRows); // limit ?
+                    statementLimited.setInt(4, maxRows); // limit ?,?
+
+                    statement.setString(1, from);
+                    statement.setString(2, to);
+                } else {
+                    statementLimited.setString(1, from);
+                    statementLimited.setString(2, to);
+                    statementLimited.setString(3, "%" + query + "%"); // firstName and lastName
+                    statementLimited.setString(4, "%" + query + "%"); // gymName
+                    statementLimited.setString(5, "%" + query + "%"); // username
+                    statementLimited.setInt(6, maxRegisters - maxRows); // limit ?
+                    statementLimited.setInt(7, maxRows); // limit ?,?
+
+                    statement.setString(1, from);
+                    statement.setString(2, to);
+                    statement.setString(3, "%" + query + "%"); // firstName and lastName
+                    statement.setString(4, "%" + query + "%"); // gymName
+                    statement.setString(5, "%" + query + "%"); // username
+                }
+
+                int totalRows = DataServer.CountRows(statement);
+                int totalPages = (int) Math.ceil((double) totalRows / maxRows);
+                rs = statementLimited.executeQuery();
+                ObservableList<Model_Check_In> modelCheckIns = FXCollections.observableArrayList();
+                while (rs.next()) {
+                    Model_Check_In modelCheckIn = new Model_Check_In();
+                    modelCheckIn.setDateTime(DateTime.MySQLToJavaMX(rs.getString("createdAt")));
+                    modelCheckIn.setAdminName(InputProperties.capitalizeFirstLetter(rs.getString("username")));
+                    modelCheckIn.setMemberName(rs.getString("memberName"));
+                    modelCheckIn.setGymName(rs.getString("gymName"));
+                    modelCheckIn.setOpenedBySystem(rs.getBoolean("openedBySystem"));
+
+                    modelCheckIns.add(modelCheckIn);
+                }
+                return new QueryRows(modelCheckIns, totalRows, totalPages);
+            } catch (Exception sqlException) {
+//                Notifications.CatchSqlException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], sqlException);
+                Notifications.CatchException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], sqlException);
+            } finally {
+                DataServer.CloseConnection(con);
+            }
+            return null;
+        });
     }
 }

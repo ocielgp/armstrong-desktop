@@ -29,5 +29,6 @@ module app {
     opens com.ocielgp.utilities;
     opens com.ocielgp.controller.summary;
     opens com.ocielgp.controller.members;
+    opens com.ocielgp.controller.check_in;
     opens com.ocielgp.controller.admins;
 }
