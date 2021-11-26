@@ -77,10 +77,11 @@ public class JDBC_Member {
                 PreparedStatement ps;
                 ResultSet rs;
                 assert con != null;
-                ps = con.prepareStatement("SELECT name, lastName, gender, notes, createdAt, access, idGym FROM MEMBERS WHERE idMember = ? ORDER BY idMember DESC");
+                ps = con.prepareStatement("SELECT idMember, name, lastName, gender, notes, createdAt, access, idGym FROM MEMBERS WHERE idMember = ? ORDER BY idMember DESC");
                 ps.setInt(1, idMember);
                 rs = ps.executeQuery();
                 if (rs.next()) {
+                    modelMember.setIdMember(rs.getInt("idMember"));
                     modelMember.setName(rs.getString("name"));
                     modelMember.setLastName(rs.getString("lastName"));
                     modelMember.setGender(rs.getString("gender"));

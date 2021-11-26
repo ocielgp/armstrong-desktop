@@ -90,11 +90,9 @@ public class JDBC_Member_Fingerprint {
                 PreparedStatement ps;
                 ResultSet rs;
                 assert con != null;
-                System.out.println("idmember: " + idMember);
                 ps = con.prepareStatement("SELECT fingerprint FROM MEMBERS_FINGERPRINTS WHERE idMember = ?");
                 ps.setInt(1, idMember);
                 rs = ps.executeQuery();
-//                if (rs.next()) System.out.println(rs.getBytes("fingerprint"));
 
                 while (rs.next()) {
                     try {

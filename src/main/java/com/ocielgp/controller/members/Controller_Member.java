@@ -654,26 +654,34 @@ public class Controller_Member implements Initializable {
     }
 
     private void eventMembershipChange() {
-        Popup popup = new Popup();
-        popup.password();
-        if (popup.showAndWait()) {
-            Notifications.Default("gmi-event", "Membresía", "Selecciona un nuevo plan");
-            this.ms_boxButtons.setDisable(true);
-            this.ms_comboBoxMemberships.setDisable(false);
-            this.ms_boxMonths.setVisible(true);
-            this.boxPayment.setVisible(true);
-            updateMembershipPrice(true);
-            formChangeListener.change("membershipChange", false);
+        if (this.modelAdmin.getIdMember() == Application.GetModelAdmin().getIdAdmin() || Application.GetModelAdmin().getIdAdmin() == 1) {
+            Popup popup = new Popup();
+            popup.password();
+            if (popup.showAndWait()) {
+                Notifications.Default("gmi-event", "Membresía", "Selecciona un nuevo plan");
+                this.ms_boxButtons.setDisable(true);
+                this.ms_comboBoxMemberships.setDisable(false);
+                this.ms_boxMonths.setVisible(true);
+                this.boxPayment.setVisible(true);
+                updateMembershipPrice(true);
+                formChangeListener.change("membershipChange", false);
+            }
+        } else {
+            Notifications.Danger("Sin permiso", "Solo el que registro al socio puede cambiar la mensualidad");
         }
     }
 
     private void eventMembershipDelete() {
-        Popup popup = new Popup();
-        popup.password();
-        if (popup.showAndWait()) {
-            this.ms_labelEndDate.getStyleClass().add("strikethrough");
-            formChangeListener.change("membershipDelete", false);
-            this.ms_boxButtons.setDisable(true);
+        if (this.modelAdmin.getIdMember() == Application.GetModelAdmin().getIdAdmin() || Application.GetModelAdmin().getIdAdmin() == 1) {
+            Popup popup = new Popup();
+            popup.password();
+            if (popup.showAndWait()) {
+                this.ms_labelEndDate.getStyleClass().add("strikethrough");
+                formChangeListener.change("membershipDelete", false);
+                this.ms_boxButtons.setDisable(true);
+            }
+        } else {
+            Notifications.Danger("Sin permiso", "Solo el que registro al socio puede quitar la mensualidad");
         }
     }
 
