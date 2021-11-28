@@ -14,7 +14,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
-import org.kordamp.ikonli.javafx.FontIcon;
+import javafx.scene.layout.HBox;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -28,17 +28,15 @@ public class Controller_App implements Initializable {
     @FXML
     private Label labelAbout;
     @FXML
-    private FontIcon iconTheme;
+    private HBox boxIcon;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         this.borderPaneRoot.getStyleClass().add(UserPreferences.GetPreferenceString("THEME"));
-        this.borderPaneRoot.centerProperty().addListener((observableValue, oldValue, newValue) -> {
-            Platform.runLater(() -> {
-                Application.STAGE_POPUP = null;
-                Application.STAGE_SECONDARY = null;
-            });
-        });
+        this.borderPaneRoot.centerProperty().addListener((observableValue, oldValue, newValue) -> Platform.runLater(() -> {
+            Application.STAGE_POPUP = null;
+            Application.STAGE_SECONDARY = null;
+        }));
         Application.SetAppController(this, comboBoxGyms);
 
         this.comboBoxGyms.setDisable(true);
@@ -46,10 +44,7 @@ public class Controller_App implements Initializable {
 
         this.labelAbout.setOnMouseClicked(mouseEvent -> about());
 
-        this.iconTheme.setOnMouseClicked(mouseEvent -> eventChangeTheme());
-
-        // recover last gym if exists
-        readLastGym();
+        this.boxIcon.setOnMouseClicked(mouseEvent -> eventChangeTheme());
 
         // TODO: REMOVE THIS
 //        Model_Admin modelAdmin = new Model_Admin();
@@ -68,7 +63,12 @@ public class Controller_App implements Initializable {
                     false
             );
             borderPaneRoot.setCenter(loginView);
-            new FadeInUp(loginView).play();
+            FadeInUp fadeInUp = new FadeInUp(loginView);
+            fadeInUp.setOnFinished(actionEvent -> {
+                // recover last gym if exists
+                readLastGym();
+            });
+            fadeInUp.play();
         });
     }
 
@@ -96,7 +96,7 @@ public class Controller_App implements Initializable {
     private void eventChangeTheme() {
         Platform.runLater(() -> {
             String newTheme = (UserPreferences.GetPreferenceString("THEME").equals("day-theme")) ? "night-theme" : "day-theme";
-            System.out.println(newTheme);
+//            System.out.println(newTheme);
             this.borderPaneRoot.getStyleClass().set(1, newTheme);
             UserPreferences.SetPreference("THEME", newTheme);
         });

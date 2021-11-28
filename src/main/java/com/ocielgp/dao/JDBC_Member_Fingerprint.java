@@ -5,6 +5,7 @@ import com.digitalpersona.uareu.UareUException;
 import com.digitalpersona.uareu.UareUGlobal;
 import com.ocielgp.app.Application;
 import com.ocielgp.app.UserPreferences;
+import com.ocielgp.controller.Controller_Door;
 import com.ocielgp.fingerprint.Fingerprint_Controller;
 import com.ocielgp.utilities.Loading;
 import com.ocielgp.utilities.Notifications;
@@ -48,6 +49,7 @@ public class JDBC_Member_Fingerprint {
 
     synchronized public static void ReadFindFingerprint(Fmd fingerprint) {
         if (isReaderAvailable) {
+            Controller_Door.Busy();
             CompletableFuture.runAsync(() -> {
                 Connection con = DataServer.GetConnection();
                 try {

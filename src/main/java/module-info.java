@@ -20,6 +20,11 @@ module app {
     exports animatefx.animation;
     exports animatefx.util;
 
+    requires com.fazecast.jSerialComm;
+    requires org.slf4j;
+    requires org.slf4j.simple;
+    requires mysql.connector.java;
+
     opens com.ocielgp;
     opens com.ocielgp.app;
     opens com.ocielgp.dao;

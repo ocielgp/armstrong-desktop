@@ -91,7 +91,7 @@ public class Fingerprint_Capture implements ActionListener {
                                 Notifications.CatchException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], uareUException);
                             }
                         }
-                        System.out.println("[Fingerprint_Capture]: data captured");
+                        System.out.println("[Fingerprint_Capture][Captured]");
                     } else if (Reader.CaptureQuality.CANCELED == evt.capture_result.quality) {
                         // capture or streaming was canceled, just quit
                         bCanceled = true;

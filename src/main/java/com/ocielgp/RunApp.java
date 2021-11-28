@@ -2,6 +2,7 @@ package com.ocielgp;
 
 import com.ocielgp.app.Application;
 import com.ocielgp.controller.Controller_App;
+import com.ocielgp.controller.Controller_Door;
 import com.ocielgp.utilities.FileLoader;
 import com.ocielgp.utilities.Loader;
 import com.ocielgp.utilities.Loading;
@@ -44,11 +45,9 @@ public class RunApp extends javafx.application.Application {
         scene.getStylesheets().add("styles.css");
 
         // show app
-        primaryStage.focusedProperty().addListener((observable, oldValue, newValue) -> {
-            Platform.runLater(() -> primaryStage.getIcons().setAll(
-                    (newValue) ? this.appIcon.get("focus") : this.appIcon.get("unfocused")
-            ));
-        });
+        primaryStage.focusedProperty().addListener((observable, oldValue, newValue) -> Platform.runLater(() -> primaryStage.getIcons().setAll(
+                (newValue) ? this.appIcon.get("focus") : this.appIcon.get("unfocused")
+        )));
         primaryStage.setTitle("Armstrong");
         primaryStage.setScene(scene);
 //        primaryStage.setAlwaysOnTop(true);
@@ -68,5 +67,6 @@ public class RunApp extends javafx.application.Application {
     private void startComponents() {
         Notifications.Start();
         Loading.Start();
+        Controller_Door.Start();
     }
 }

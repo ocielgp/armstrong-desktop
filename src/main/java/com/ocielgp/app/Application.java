@@ -3,6 +3,7 @@ package com.ocielgp.app;
 import com.jfoenix.controls.JFXComboBox;
 import com.ocielgp.controller.Controller_App;
 import com.ocielgp.controller.Controller_Dashboard;
+import com.ocielgp.controller.Controller_Door;
 import com.ocielgp.models.Model_Admin;
 import com.ocielgp.models.Model_Gym;
 import javafx.application.Platform;
@@ -86,6 +87,7 @@ public class Application {
     }
 
     public static void ShakeUserInfo() {
+        Controller_Door.Invalid();
         if (Application.controllerDashboard != null)
             Application.controllerDashboard.shakeUserInfo();
     }

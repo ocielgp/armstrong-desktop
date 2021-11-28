@@ -1,6 +1,7 @@
 package com.ocielgp.dao;
 
 import com.ocielgp.app.Application;
+import com.ocielgp.controller.Controller_Door;
 import com.ocielgp.models.Model_Check_In;
 import com.ocielgp.utilities.*;
 import javafx.collections.FXCollections;
@@ -25,6 +26,7 @@ public class JDBC_Check_In {
                 ps.setInt(2, idMember); // idMember
                 ps.setInt(3, Application.GetCurrentGym().getIdGym()); // idGym
                 ps.executeUpdate();
+                Controller_Door.Valid();
                 return true;
             } catch (SQLException sqlException) {
                 if (sqlException.getErrorCode() != 1062) { // ignore duplicate rows
@@ -95,16 +97,19 @@ public class JDBC_Check_In {
                                 haveDebts
                         );
                         if (haveDebts) {
+                            Controller_Door.Invalid();
                             Notifications.Danger("Deudor", "Este socio tiene adeudos pendientes");
                         } else if (!access) {
+                            Controller_Door.Invalid();
                             Notifications.Danger("Bloqueado", "Este socio no tiene acceso al los gimnasios");
                         } else if (style.equals(Styles.SUCCESS) || style.equals(Styles.WARN)) {
                             if (price.equals("0.00")) {
                                 style = Styles.EPIC;
                             }
                             JDBC_Check_In.CreateCheckIn(idMember, openedBy).thenAccept(isOk -> {
-                                if (isOk)
+                                if (isOk) {
                                     Notifications.Success("Entrada", "Entrada de " + name + " registrada", 2);
+                                }
                             });
                         }
                         Application.ShowUserInfo(
@@ -117,14 +122,17 @@ public class JDBC_Check_In {
                         );
                     });
                 } else { // no payment found
-                    JDBC_Gym.ReadGym(rs.getInt("idGymMember")).thenAccept(model_gyms -> Application.ShowUserInfo(
-                            Styles.DANGER,
-                            photo,
-                            idMember,
-                            name,
-                            model_gyms.getName(),
-                            "N / A"
-                    ));
+                    JDBC_Gym.ReadGym(rs.getInt("idGymMember")).thenAccept(model_gyms -> {
+                        Controller_Door.Invalid();
+                        Application.ShowUserInfo(
+                                Styles.DANGER,
+                                photo,
+                                idMember,
+                                name,
+                                model_gyms.getName(),
+                                "N / A"
+                        );
+                    });
                 }
             }
         } catch (SQLException sqlException) {
@@ -154,6 +162,7 @@ public class JDBC_Check_In {
                 String roleName = rs.getString("roleName");
 
                 if (!access) {
+                    Controller_Door.Invalid();
                     Application.ShowUserInfo(
                             Styles.DANGER,
                             photo,
