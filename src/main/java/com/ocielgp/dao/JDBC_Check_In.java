@@ -26,7 +26,6 @@ public class JDBC_Check_In {
                 ps.setInt(2, idMember); // idMember
                 ps.setInt(3, Application.GetCurrentGym().getIdGym()); // idGym
                 ps.executeUpdate();
-                Controller_Door.Valid();
                 return true;
             } catch (SQLException sqlException) {
                 if (sqlException.getErrorCode() != 1062) { // ignore duplicate rows
@@ -97,14 +96,18 @@ public class JDBC_Check_In {
                                 haveDebts
                         );
                         if (haveDebts) {
-                            Controller_Door.Invalid();
                             Notifications.Danger("Deudor", "Este socio tiene adeudos pendientes");
                         } else if (!access) {
-                            Controller_Door.Invalid();
                             Notifications.Danger("Bloqueado", "Este socio no tiene acceso al los gimnasios");
                         } else if (style.equals(Styles.SUCCESS) || style.equals(Styles.WARN)) {
                             if (price.equals("0.00")) {
                                 style = Styles.EPIC;
+                            }
+
+                            if (daysLeft > 3) {
+                                Controller_Door.Access();
+                            } else if (daysLeft >= 0) {
+                                Controller_Door.AccessBlink();
                             }
                             JDBC_Check_In.CreateCheckIn(idMember, openedBy).thenAccept(isOk -> {
                                 if (isOk) {
@@ -123,7 +126,7 @@ public class JDBC_Check_In {
                     });
                 } else { // no payment found
                     JDBC_Gym.ReadGym(rs.getInt("idGymMember")).thenAccept(model_gyms -> {
-                        Controller_Door.Invalid();
+                        Controller_Door.Unknown();
                         Application.ShowUserInfo(
                                 Styles.DANGER,
                                 photo,
@@ -162,7 +165,6 @@ public class JDBC_Check_In {
                 String roleName = rs.getString("roleName");
 
                 if (!access) {
-                    Controller_Door.Invalid();
                     Application.ShowUserInfo(
                             Styles.DANGER,
                             photo,
@@ -175,6 +177,7 @@ public class JDBC_Check_In {
                 } else {
                     JDBC_Check_In.CreateCheckIn(idMember, openedBy).thenAccept(isOk -> {
                         if (isOk) {
+                            Controller_Door.Access();
                             Application.ShowUserInfo(
                                     Styles.EPIC,
                                     photo,

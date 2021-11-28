@@ -667,7 +667,7 @@ public class Controller_Member implements Initializable {
                 formChangeListener.change("membershipChange", false);
             }
         } else {
-            Notifications.Danger("Sin permiso", "Solo el que registro al socio puede cambiar la mensualidad");
+            Notifications.Danger("Sin permiso", "Solo el que registro el pago puede cambiar la mensualidad");
         }
     }
 
@@ -681,7 +681,7 @@ public class Controller_Member implements Initializable {
                 this.ms_boxButtons.setDisable(true);
             }
         } else {
-            Notifications.Danger("Sin permiso", "Solo el que registro al socio puede quitar la mensualidad");
+            Notifications.Danger("Sin permiso", "Solo el que registro el pago puede quitar la mensualidad");
         }
     }
 

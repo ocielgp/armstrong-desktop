@@ -65,8 +65,10 @@ public class RunApp extends javafx.application.Application {
     }
 
     private void startComponents() {
-        Notifications.Start();
-        Loading.Start();
-        Controller_Door.Start();
+        Platform.runLater(() -> {
+            Notifications.Start();
+            Loading.Start();
+            Controller_Door.Start();
+        });
     }
 }

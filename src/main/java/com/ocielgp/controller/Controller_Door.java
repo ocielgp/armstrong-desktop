@@ -31,31 +31,31 @@ public class Controller_Door {
     }
 
     public static void Busy() {
-        if (Controller_Door.serialPort != null) {
-            Controller_Door.serialWrite("BUSY\n");
-        } else {
-            Start();
-        }
+        Controller_Door.serialWrite("BUSY\n");
     }
 
-    public static void Valid() {
-        if (Controller_Door.serialPort != null) {
-            Controller_Door.serialWrite("VALID\n");
-        } else {
-            Start();
-        }
+    public static void Access() {
+        Controller_Door.serialWrite("ACCESS0\n");
     }
 
-    public static void Invalid() {
-        if (Controller_Door.serialPort != null) {
-            Controller_Door.serialWrite("INVALID\n");
-        } else {
-            Start();
-        }
+    public static void AccessBlink() {
+        Controller_Door.serialWrite("ACCESS1\n");
+    }
+
+    public static void Deny() {
+        Controller_Door.serialWrite("DENY\n");
+    }
+
+    public static void Unknown() {
+        Controller_Door.serialWrite("UNKNOWN\n");
     }
 
     private static void serialWrite(String status) {
-        System.out.println("[Arduino][" + status.substring(0, status.length() - 1) + "]");
-        Platform.runLater(() -> Controller_Door.serialPort.writeBytes(status.getBytes(), status.length()));
+        if (Controller_Door.serialPort != null) {
+            System.out.println("[Arduino][" + status.substring(0, status.length() - 1) + "]");
+            Platform.runLater(() -> Controller_Door.serialPort.writeBytes(status.getBytes(), status.length()));
+        } else {
+//            Start();
+        }
     }
 }
