@@ -7,12 +7,10 @@ import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXCheckBox;
 import com.jfoenix.controls.JFXRadioButton;
 import com.jfoenix.controls.JFXTextField;
+import com.ocielgp.app.Application;
 import com.ocielgp.app.UserPreferences;
-import com.ocielgp.models.Model_Member;
-import com.ocielgp.utilities.Loader;
-import com.ocielgp.utilities.Loading;
-import com.ocielgp.utilities.Pagination;
-import com.ocielgp.utilities.Styles;
+import com.ocielgp.models.Model_Admin;
+import com.ocielgp.utilities.*;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -46,15 +44,15 @@ public class Controller_Admins implements Initializable {
     @FXML
     private Label labelTotalRows;
     @FXML
-    private TableView<Model_Member> tableViewAdmins;
+    private TableView<Model_Admin> tableViewAdmins;
     @FXML
-    private TableColumn<Model_Member, Integer> tableColumnId;
+    private TableColumn<Model_Admin, Integer> tableColumnId;
     @FXML
-    private TableColumn<Model_Member, String> tableColumnUsername;
+    private TableColumn<Model_Admin, String> tableColumnUsername;
     @FXML
-    private TableColumn<Model_Member, String> tableColumnName;
+    private TableColumn<Model_Admin, String> tableColumnName;
     @FXML
-    private TableColumn<Model_Member, String> tableColumnRole;
+    private TableColumn<Model_Admin, String> tableColumnRole;
     @FXML
     private JFXTextField fieldRowsPerPage;
     @FXML
@@ -96,8 +94,12 @@ public class Controller_Admins implements Initializable {
         this.tableViewAdmins.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
                 if (isAdminTab) {
-                    Loading.show();
-                    CompletableFuture.runAsync(() -> this.controllerAdmin.getMemberData(newValue.getIdMember(), newValue.getStyle()));
+                    if (newValue.getIdRole() > Application.GetModelAdmin().getIdRole() || Application.GetModelAdmin().getIdMember() == newValue.getIdMember()) {
+                        Loading.show();
+                        CompletableFuture.runAsync(() -> this.controllerAdmin.getMemberData(newValue.getIdMember(), newValue.getStyle()));
+                    } else {
+                        Notifications.Danger("Sin permiso", "Solo puedes editar niveles inferiores");
+                    }
                 } else {
                     this.controllerAdmin = new Controller_Admin(this.pagination, newValue.getIdMember(), newValue.getStyle());
                     changeTab("admin.fxml", this.controllerAdmin);

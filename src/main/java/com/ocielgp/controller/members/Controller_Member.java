@@ -295,7 +295,6 @@ public class Controller_Member implements Initializable {
             this.modelMember.setIdMember(idMember);
             this.modelMember.setStyle(style);
 
-            this.fingerprintCaptureBox.getFingerprints(this.idMember);
             JDBC_Payment_Membership.ReadLastPayment(idMember)
                     .thenAccept(model_payments_memberships -> {
                         this.modelMember.setModelPaymentMembership(model_payments_memberships);
@@ -340,6 +339,9 @@ public class Controller_Member implements Initializable {
             this.pi_fieldLastName.setText(this.modelMember.getLastName());
             this.pi_comboBoxGender.setValue(this.modelMember.getGender());
             this.pi_fieldNotes.setText(this.modelMember.getNotes());
+
+            // fingerprint
+            this.fingerprintCaptureBox.getFingerprints(this.modelMember.getIdMember());
 
             // membership
             if (this.modelMember.getModelPaymentMembership() != null) {
@@ -582,7 +584,6 @@ public class Controller_Member implements Initializable {
             }
         }
         if (isOk && this.formChangeListener.isChanged("membershipChange")) {
-            System.out.println("months: " + this.totalMonths);
             this.modelMember.getModelPaymentMembership().setMonths(this.totalMonths);
             isOk = JDBC_Payment_Membership.UpdatePaymentMembership(modelMembership, this.modelMember.getModelPaymentMembership());
             if (modelDebt.getOwe() != null) {
@@ -653,26 +654,34 @@ public class Controller_Member implements Initializable {
     }
 
     private void eventMembershipChange() {
-        Popup popup = new Popup();
-        popup.password();
-        if (popup.showAndWait()) {
-            Notifications.Default("gmi-event", "Membresía", "Selecciona un nuevo plan");
-            this.ms_boxButtons.setDisable(true);
-            this.ms_comboBoxMemberships.setDisable(false);
-            this.ms_boxMonths.setVisible(true);
-            this.boxPayment.setVisible(true);
-            updateMembershipPrice(true);
-            formChangeListener.change("membershipChange", false);
+        if (this.modelAdmin.getIdMember() == Application.GetModelAdmin().getIdAdmin() || Application.GetModelAdmin().getIdAdmin() == 1) {
+            Popup popup = new Popup();
+            popup.password();
+            if (popup.showAndWait()) {
+                Notifications.Default("gmi-event", "Membresía", "Selecciona un nuevo plan");
+                this.ms_boxButtons.setDisable(true);
+                this.ms_comboBoxMemberships.setDisable(false);
+                this.ms_boxMonths.setVisible(true);
+                this.boxPayment.setVisible(true);
+                updateMembershipPrice(true);
+                formChangeListener.change("membershipChange", false);
+            }
+        } else {
+            Notifications.Danger("Sin permiso", "Solo el que registro el pago puede cambiar la mensualidad");
         }
     }
 
     private void eventMembershipDelete() {
-        Popup popup = new Popup();
-        popup.password();
-        if (popup.showAndWait()) {
-            this.ms_labelEndDate.getStyleClass().add("strikethrough");
-            formChangeListener.change("membershipDelete", false);
-            this.ms_boxButtons.setDisable(true);
+        if (this.modelAdmin.getIdMember() == Application.GetModelAdmin().getIdAdmin() || Application.GetModelAdmin().getIdAdmin() == 1) {
+            Popup popup = new Popup();
+            popup.password();
+            if (popup.showAndWait()) {
+                this.ms_labelEndDate.getStyleClass().add("strikethrough");
+                formChangeListener.change("membershipDelete", false);
+                this.ms_boxButtons.setDisable(true);
+            }
+        } else {
+            Notifications.Danger("Sin permiso", "Solo el que registro el pago puede quitar la mensualidad");
         }
     }
 

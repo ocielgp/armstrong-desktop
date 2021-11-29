@@ -5,6 +5,7 @@ import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXTextField;
 import com.jfoenix.controls.JFXToggleButton;
+import com.ocielgp.app.Application;
 import com.ocielgp.controller.Popup;
 import com.ocielgp.dao.JDBC_Member;
 import com.ocielgp.dao.JDBC_Membership;
@@ -109,7 +110,7 @@ public class Controller_Membership implements Initializable {
         this.buttonCreate.setOnAction(actionEvent -> eventCreate());
         this.buttonEdit.setOnAction(actionEvent -> eventEdit());
 
-        this.buttonDelete.setDisable(true);
+//        this.buttonDelete.setDisable(true);
         this.buttonDelete.setOnAction(actionEvent -> eventDelete());
 
         // end buttons
@@ -179,7 +180,7 @@ public class Controller_Membership implements Initializable {
     private void createMembership() {
         Loading.show();
         Model_Membership modelMembership = new Model_Membership();
-        modelMembership.setName(this.fieldName.getText());
+        modelMembership.setName(InputProperties.capitalizeFirstLetter(this.fieldName.getText()));
         modelMembership.setPrice(new BigDecimal(this.fieldPrice.getText()));
         modelMembership.setMonthly(this.toggleMonthly.isSelected());
         int idMembership = JDBC_Membership.CreateMembership(modelMembership);
@@ -195,7 +196,7 @@ public class Controller_Membership implements Initializable {
         clearForm(false);
         this.boxMemberships.setVisible(true);
         this.boxMemberships.requestFocus();
-        this.boxButtonDelete.setVisible(true);
+        if (Application.GetModelAdmin().getIdAdmin() <= 2) this.boxButtonDelete.setVisible(true);
         this.buttonSave.setText("Guardar");
     }
 
@@ -231,7 +232,7 @@ public class Controller_Membership implements Initializable {
                 }
             } else {
                 if (this.formChangeListener.isChanged("name")) {
-                    newModelMembership.setName(this.fieldName.getText());
+                    newModelMembership.setName(InputProperties.capitalizeFirstLetter(this.fieldName.getText()));
                 }
                 if (this.formChangeListener.isChanged("price")) {
                     newModelMembership.setPrice(new BigDecimal(this.fieldPrice.getText()));

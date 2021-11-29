@@ -77,17 +77,18 @@ public class JDBC_Member {
                 PreparedStatement ps;
                 ResultSet rs;
                 assert con != null;
-                ps = con.prepareStatement("SELECT name, lastName, gender, notes, createdAt, access, idGym FROM MEMBERS WHERE idMember = ? ORDER BY idMember DESC");
+                ps = con.prepareStatement("SELECT idMember, name, lastName, gender, notes, createdAt, access, idGym FROM MEMBERS WHERE idMember = ? ORDER BY idMember DESC");
                 ps.setInt(1, idMember);
                 rs = ps.executeQuery();
                 if (rs.next()) {
+                    modelMember.setIdMember(rs.getInt("idMember"));
                     modelMember.setName(rs.getString("name"));
                     modelMember.setLastName(rs.getString("lastName"));
                     modelMember.setGender(rs.getString("gender"));
                     modelMember.setNotes(rs.getString("notes") == null ? "" : rs.getString("notes"));
                     modelMember.setCreatedAt(DateTime.MySQLToJava(rs.getString("createdAt")));
                     modelMember.setAccess(rs.getBoolean("access"));
-                    modelMember.setIdGym(rs.getInt("idGym"));
+                    modelMember.setIdGym(rs.getShort("idGym"));
 
                     modelMember.setModelMemberPhoto(JDBC_Member_Photo.ReadPhoto(idMember));
                 }
@@ -115,7 +116,7 @@ public class JDBC_Member {
                         Integer.parseInt(query);
                         sqlQuery += "AND M.idMember = ? ";
                     } catch (NumberFormatException exception) {
-                        sqlQuery += "AND (M.name LIKE ? OR M.lastName LIKE ? OR A.username LIKE ?) ";
+                        sqlQuery += "AND (CONCAT(M.name, ' ', M.lastName) LIKE ? OR A.username LIKE ?) ";
                     }
                 }
 
@@ -161,16 +162,14 @@ public class JDBC_Member {
                         statementLimited.setInt(3, maxRows); // limit ?,?
 
                         statement.setInt(1, Integer.parseInt(query)); // idMember
-                    } else if (parameters.getParameterCount() == 5) {
-                        statementLimited.setString(1, "%" + query + "%"); // name
-                        statementLimited.setString(2, "%" + query + "%"); // lastName
-                        statementLimited.setString(3, "%" + query + "%"); // username
-                        statementLimited.setInt(4, maxRegisters - maxRows); // limit ?
-                        statementLimited.setInt(5, maxRows); // limit ?,?
+                    } else if (parameters.getParameterCount() == 4) {
+                        statementLimited.setString(1, "%" + query + "%"); // name and lastName
+                        statementLimited.setString(2, "%" + query + "%"); // username
+                        statementLimited.setInt(3, maxRegisters - maxRows); // limit ?
+                        statementLimited.setInt(4, maxRows); // limit ?,?
 
-                        statement.setString(1, "%" + query + "%"); // name
-                        statement.setString(2, "%" + query + "%"); // lastName
-                        statement.setString(3, "%" + query + "%"); // username
+                        statement.setString(1, "%" + query + "%"); // name and lastName
+                        statement.setString(2, "%" + query + "%"); // username
                     }
                 }
 

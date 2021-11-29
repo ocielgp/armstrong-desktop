@@ -43,14 +43,24 @@ public class DataServer {
         hikariConfig.setKeepaliveTime(30000);
 //        hikariConfig.setMaxLifetime(25000);
         hikariConfig.setConnectionTimeout(25000);
-        hikariConfig.setLeakDetectionThreshold(3000);
-        System.out.println("[DataServer]: Tratando de conectar a " + host + "...");
-        hikariDataSource = new HikariDataSource(hikariConfig);
-        System.out.println("[DataServer]: Conectado a " + host);
+//        hikariConfig.setLeakDetectionThreshold(3000);
+        System.out.println("[DataServer]: Connecting to " + host + "...");
+        try {
+            hikariDataSource = new HikariDataSource(hikariConfig);
+        } catch (Exception exception) {
+            Notifications.BuildNotification(
+                    "gmi-cloud-off",
+                    "Sin conexión",
+                    "Problema al conectar con el servidor\n" + exception.getMessage(),
+                    60,
+                    Styles.DANGER
+            );
+        }
+        System.out.println("[DataServer]: Connected at " + host);
         Notifications.BuildNotification(
                 "gmi-cloud-done",
                 "Conexión establecida",
-                "Conexión con el servidor establecida.",
+                "Conexión con el servidor establecida",
                 3,
                 Styles.EPIC
         );

@@ -70,6 +70,10 @@ public class InputProperties {
         }
     }
 
+    public static String concatDateTime(JFXDatePicker date, JFXTimePicker time) {
+        return date.getValue() + " " + time.getValue();
+    }
+
     public static void createComboBoxListener(ComboBox<?>... comboBox) {
         for (ComboBox<?> box : comboBox) {
             box.focusedProperty().addListener((observable, oldValue, newValue) -> {
