@@ -46,16 +46,6 @@ public class Controller_App implements Initializable {
 
         this.boxIcon.setOnMouseClicked(mouseEvent -> eventChangeTheme());
 
-        // TODO: REMOVE THIS
-//        Model_Admin modelAdmin = new Model_Admin();
-//        modelAdmin.setModelMemberPhoto(new Model_Member_Photo());
-//        modelAdmin.setPassword("a94cbdca65dd4582c45c2b8dd97aec782baa8fbad32b73b547bf5b0e52ef58f3");
-//        modelAdmin.setIdRole(Short.valueOf("1"));
-//        modelAdmin.setIdMember(1);
-//        modelAdmin.setIdAdmin(1);
-//        modelAdmin.setName("ocielgp");
-//        Application.SetModelAdmin(modelAdmin);
-
         Platform.runLater(() -> {
             Node loginView = Loader.Load(
                     "login.fxml",

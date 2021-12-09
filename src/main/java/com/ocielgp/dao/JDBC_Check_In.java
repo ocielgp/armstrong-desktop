@@ -9,6 +9,7 @@ import javafx.collections.ObservableList;
 import javafx.scene.image.Image;
 
 import java.lang.invoke.MethodHandles;
+import java.math.BigDecimal;
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.concurrent.CompletableFuture;
@@ -83,10 +84,10 @@ public class JDBC_Check_In {
                     LocalDateTime endDateTime = DateTime.MySQLToJava(rs.getString("endDateTime"));
                     long daysLeft = DateTime.getDaysLeft(endDateTime);
                     boolean haveDebts = rs.getBoolean("haveDebts");
-                    String price = rs.getString("payment");
-                    String months = rs.getString("months");
+                    BigDecimal price = rs.getBigDecimal("payment");
+                    Short months = rs.getShort("months");
 
-                    String membershipDescription = "(" + months + "x" + price + ") " + membershipName +
+                    String membershipDescription = "(" + months + "x" + price.divide(new BigDecimal(months)) + ") " + membershipName +
                             ", termina el " + DateTime.getDateShort(endDateTime) +
                             " (" + daysLeft + (daysLeft == 1 ? "día" : " días") + ")";
                     JDBC_Gym.ReadGym(rs.getInt("idGymPayment")).thenAccept(model_gyms -> {

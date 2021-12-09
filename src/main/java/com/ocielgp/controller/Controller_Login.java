@@ -42,8 +42,6 @@ public class Controller_Login implements Initializable {
         this.buttonLogin.setOnAction(actionEvent -> auth());
 
         Platform.runLater(() -> {
-            this.fieldUsername.setText("sistema");
-            this.fieldPassword.setText("fsociety");
             this.fieldUsername.requestFocus();
         });
     }
