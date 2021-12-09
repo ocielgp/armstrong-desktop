@@ -257,6 +257,7 @@ public class Controller_Admin implements Initializable {
                     this.a_comboBoxRoles.setValue(model_admin_role);
                 }
             });
+            this.a_comboBoxRoles.setDisable(this.modelAdmin.getIdAdmin() == Application.GetModelAdmin().getIdAdmin());
 
             // personal information
             this.pi_fieldName.setText(this.modelAdmin.getName());
@@ -352,7 +353,7 @@ public class Controller_Admin implements Initializable {
         ArrayList<Node> nodesRequired = new ArrayList<>();
         // administration
         nodesRequired.add(this.a_fieldUsername);
-        if (this.modelAdmin != null && this.modelAdmin.getIdAdmin() != 1) nodesRequired.add(this.a_comboBoxRoles);
+        if (this.modelAdmin != null && this.modelAdmin.getIdAdmin() != Application.GetModelAdmin().getIdAdmin()) nodesRequired.add(this.a_comboBoxRoles);
 
         // personal information
         nodesRequired.add(this.pi_fieldName);
