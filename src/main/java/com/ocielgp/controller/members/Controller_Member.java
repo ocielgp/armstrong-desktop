@@ -727,12 +727,12 @@ public class Controller_Member implements Initializable {
                 );
             }
             this.ms_labelMonth.setText(this.totalMonths + ((this.totalMonths == 1) ? " MES" : " MESES"));
+            this.membershipPrice.set(
+                    this.ms_comboBoxMemberships.getValue().getPrice().multiply(
+                            BigDecimal.valueOf(this.totalMonths)
+                    )
+            );
             if (this.boxPayment.isVisible()) {
-                this.membershipPrice.set(
-                        this.ms_comboBoxMemberships.getValue().getPrice().multiply(
-                                BigDecimal.valueOf(this.totalMonths)
-                        )
-                );
                 InputProperties.clearInputs(this.pym_fieldPaidOut);
                 this.pym_fieldOwe.setText(this.membershipPrice.get().toString());
             }
