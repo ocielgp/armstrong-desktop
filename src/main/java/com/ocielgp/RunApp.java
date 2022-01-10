@@ -51,7 +51,7 @@ public class RunApp extends javafx.application.Application {
         primaryStage.setTitle("Armstrong");
         primaryStage.setScene(scene);
 //        primaryStage.setAlwaysOnTop(true);
-//        primaryStage.setMaximized(true);
+        primaryStage.setMaximized(true);
         primaryStage.show();
 
 

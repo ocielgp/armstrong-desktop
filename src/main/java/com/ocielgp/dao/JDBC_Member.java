@@ -69,6 +69,29 @@ public class JDBC_Member {
         }
     }
 
+    public static CompletableFuture<Integer> ReadIsNewMember(String firstName, String lastName) {
+        return CompletableFuture.supplyAsync(() -> {
+            Connection con = DataServer.GetConnection();
+            try {
+                PreparedStatement ps;
+                ResultSet rs;
+                assert con != null;
+                String fullName = firstName + " " + lastName;
+                ps = con.prepareStatement("SELECT idMember FROM MEMBERS WHERE  (CONCAT(name, ' ', lastName)) LIKE ? AND flag = 1");
+                ps.setString(1, fullName);
+                rs = ps.executeQuery();
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            } catch (SQLException sqlException) {
+                Notifications.CatchSqlException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], sqlException);
+            } finally {
+                DataServer.CloseConnection(con);
+            }
+            return 0;
+        });
+    }
+
     public static CompletableFuture<Model_Member> ReadMember(int idMember) {
         return CompletableFuture.supplyAsync(() -> {
             Connection con = DataServer.GetConnection();

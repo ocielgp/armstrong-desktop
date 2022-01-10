@@ -21,6 +21,8 @@ module app {
     exports animatefx.util;
 
     requires com.fazecast.jSerialComm;
+
+    requires java.net.http;
     requires org.slf4j;
     requires org.slf4j.simple;
     requires mysql.connector.java;

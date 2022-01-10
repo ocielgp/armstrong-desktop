@@ -159,6 +159,23 @@ public class Controller_Member implements Initializable {
         this.style = style;
     }
 
+    private void checkIfMemberExists() {
+        if (!this.pi_fieldName.getText().isEmpty() && !this.pi_fieldLastName.getText().isEmpty()) {
+            JDBC_Member.ReadIsNewMember(
+                    InputProperties.capitalizeFirstLetterPerWord(this.pi_fieldName.getText()),
+                    InputProperties.capitalizeFirstLetterPerWord(this.pi_fieldLastName.getText())
+            ).thenAccept(idMember -> {
+                if (idMember > 0) {
+                    Platform.runLater(() -> {
+                        Popup popup = new Popup();
+                        popup.alert(Styles.DANGER, "Socio encontrado", "Socio con este nombre registrado (ID: " + idMember + ")");
+                        popup.showAndWait();
+                    });
+                }
+            });
+        }
+    }
+
     private void configureForm() {
         InputProperties.getScrollEvent(this.scrollPane);
 
@@ -167,6 +184,14 @@ public class Controller_Member implements Initializable {
         InputProperties.createMaxLengthEvent(this.pi_fieldLastName, Model_Member.lastNameLength);
         InputProperties.createMaxLengthEvent(this.pi_fieldNotes, Model_Member.notesLength);
         InputProperties.createComboBoxListener(this.pi_comboBoxGender, this.ms_comboBoxMemberships);
+
+        this.pi_fieldName.focusedProperty().addListener(((observableValue, oldValue, newValue) -> {
+            if (!newValue) checkIfMemberExists();
+        }));
+
+        this.pi_fieldLastName.focusedProperty().addListener(((observableValue, oldValue, newValue) -> {
+            if (!newValue) checkIfMemberExists();
+        }));
 
         // -> historical
         InputProperties.createVisibleEvent(this.boxHistorical, false);
@@ -654,7 +679,7 @@ public class Controller_Member implements Initializable {
     }
 
     private void eventMembershipChange() {
-        if (this.modelAdmin.getIdMember() == Application.GetModelAdmin().getIdAdmin() || Application.GetModelAdmin().getIdAdmin() == 1) {
+        if (Objects.equals(this.modelAdmin.getIdMember(), Application.GetModelAdmin().getIdAdmin()) || Application.GetModelAdmin().getIdAdmin() == 1) {
             Popup popup = new Popup();
             popup.password();
             if (popup.showAndWait()) {
@@ -672,7 +697,7 @@ public class Controller_Member implements Initializable {
     }
 
     private void eventMembershipDelete() {
-        if (this.modelAdmin.getIdMember() == Application.GetModelAdmin().getIdAdmin() || Application.GetModelAdmin().getIdAdmin() == 1) {
+        if (Objects.equals(this.modelAdmin.getIdMember(), Application.GetModelAdmin().getIdAdmin()) || Application.GetModelAdmin().getIdAdmin() == 1) {
             Popup popup = new Popup();
             popup.password();
             if (popup.showAndWait()) {
