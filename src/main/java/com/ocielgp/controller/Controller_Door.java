@@ -1,61 +1,53 @@
 package com.ocielgp.controller;
 
-import com.fazecast.jSerialComm.SerialPort;
 import com.ocielgp.utilities.Notifications;
 import com.ocielgp.utilities.Styles;
-import javafx.application.Platform;
+
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.util.concurrent.CompletableFuture;
 
 public class Controller_Door {
-    private static SerialPort serialPort;
+    private static final HttpClient httpClient = HttpClient.newHttpClient();
+    private static final String endpoint = "http://localhost:3000";
 
     public static void Start() {
-        for (SerialPort availablePort : SerialPort.getCommPorts()) {
-            if (availablePort.getDescriptivePortName().contains("CH340")) {
-                Controller_Door.serialPort = availablePort;
-                Controller_Door.serialPort.setBaudRate(9600);
-                break;
-            }
-        }
-
-        try {
-            if (Controller_Door.serialPort.openPort()) {
-                System.out.println("[Arduino][Connected]");
+        Controller_Door.createRequest("GREEN").thenAccept(stringHttpResponse -> {
+            if (stringHttpResponse.statusCode() == 200) {
+                System.out.println("[Arduino][Connected][" + stringHttpResponse.statusCode() + "]");
                 Notifications.BuildNotification("gmi-meeting-room", "Puerta", "Puerta conectada", 3, Styles.EPIC);
+            } else {
+                System.out.println("[Arduino][Disconnected][" + stringHttpResponse + "]");
             }
-        } catch (Exception exception) {
-            Notifications.BuildNotification("gmi-no-meeting-room", "Puerta", "La puerta no se ha podido conectar\n" + exception.getMessage(), 10, Styles.DANGER);
-            System.out.println("[Arduino][Disconnected]");
-            Controller_Door.serialPort = null;
-        }
-
+        }).exceptionally(throwable -> {
+            Notifications.BuildNotification("gmi-no-meeting-room", "Puerta", "La puerta no se ha podido conectar", 10, Styles.DANGER);
+            System.out.println("[Arduino][Disconnected][" + throwable.getMessage() + "]");
+            return null;
+        });
     }
 
     public static void Busy() {
-        Controller_Door.serialWrite("BUSY\n");
     }
 
-    public static void Access() {
-        Controller_Door.serialWrite("ACCESS0\n");
+    public static void GREEN() {
+        Controller_Door.createRequest("GREEN");
     }
 
-    public static void AccessBlink() {
-        Controller_Door.serialWrite("ACCESS1\n");
+    public static void YELLOW() {
+        Controller_Door.createRequest("YELLOW");
     }
 
-    public static void Deny() {
-        Controller_Door.serialWrite("DENY\n");
+    public static void RED() {
+        Controller_Door.createRequest("RED");
     }
 
-    public static void Unknown() {
-        Controller_Door.serialWrite("UNKNOWN\n");
-    }
-
-    private static void serialWrite(String status) {
-        if (Controller_Door.serialPort != null) {
-            System.out.println("[Arduino][" + status.substring(0, status.length() - 1) + "]");
-            Platform.runLater(() -> Controller_Door.serialPort.writeBytes(status.getBytes(), status.length()));
-        } else {
-//            Start();
-        }
+    private static CompletableFuture<HttpResponse<String>> createRequest(String status) {
+        HttpRequest request = HttpRequest.newBuilder(URI.create(Controller_Door.endpoint))
+                .headers("Content-Type", "text/plain; charset=UTF-8")
+                .PUT(HttpRequest.BodyPublishers.ofString(status))
+                .build();
+        return httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString());
     }
 }

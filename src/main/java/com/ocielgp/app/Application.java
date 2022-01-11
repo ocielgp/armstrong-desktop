@@ -87,7 +87,7 @@ public class Application {
     }
 
     public static void ShakeUserInfo() {
-        Controller_Door.Unknown();
+        Controller_Door.RED();
         if (Application.controllerDashboard != null)
             Application.controllerDashboard.shakeUserInfo();
     }

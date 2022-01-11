@@ -106,9 +106,9 @@ public class JDBC_Check_In {
                             }
 
                             if (daysLeft > 3) {
-                                Controller_Door.Access();
+                                Controller_Door.GREEN();
                             } else if (daysLeft >= 0) {
-                                Controller_Door.AccessBlink();
+                                Controller_Door.YELLOW();
                             }
                             JDBC_Check_In.CreateCheckIn(idMember, openedBy).thenAccept(isOk -> {
                                 if (isOk) {
@@ -127,7 +127,7 @@ public class JDBC_Check_In {
                     });
                 } else { // no payment found
                     JDBC_Gym.ReadGym(rs.getInt("idGymMember")).thenAccept(model_gyms -> {
-                        Controller_Door.Unknown();
+                        Controller_Door.RED();
                         Application.ShowUserInfo(
                                 Styles.DANGER,
                                 photo,
@@ -178,7 +178,7 @@ public class JDBC_Check_In {
                 } else {
                     JDBC_Check_In.CreateCheckIn(idMember, openedBy).thenAccept(isOk -> {
                         if (isOk) {
-                            Controller_Door.Access();
+                            Controller_Door.GREEN();
                             Application.ShowUserInfo(
                                     Styles.EPIC,
                                     photo,

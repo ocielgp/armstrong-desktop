@@ -84,9 +84,9 @@ public class Controller_App implements Initializable {
     }
 
     private void eventChangeTheme() {
+        Controller_Door.GREEN();
         Platform.runLater(() -> {
             String newTheme = (UserPreferences.GetPreferenceString("THEME").equals("day-theme")) ? "night-theme" : "day-theme";
-//            System.out.println(newTheme);
             this.borderPaneRoot.getStyleClass().set(1, newTheme);
             UserPreferences.SetPreference("THEME", newTheme);
         });
