@@ -3,10 +3,7 @@ package com.ocielgp;
 import com.ocielgp.app.Application;
 import com.ocielgp.controller.Controller_App;
 import com.ocielgp.controller.Controller_Door;
-import com.ocielgp.utilities.FileLoader;
-import com.ocielgp.utilities.Loader;
-import com.ocielgp.utilities.Loading;
-import com.ocielgp.utilities.Notifications;
+import com.ocielgp.utilities.*;
 import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
@@ -14,7 +11,13 @@ import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
+import java.io.File;
+import java.io.IOException;
+import java.lang.invoke.MethodHandles;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.concurrent.CompletableFuture;
 
 public class RunApp extends javafx.application.Application {
     private final HashMap<String, Image> appIcon = new HashMap<>();
@@ -51,7 +54,7 @@ public class RunApp extends javafx.application.Application {
         primaryStage.setTitle("Armstrong");
         primaryStage.setScene(scene);
 //        primaryStage.setAlwaysOnTop(true);
-        primaryStage.setMaximized(true);
+//        primaryStage.setMaximized(true);
         primaryStage.show();
 
 
@@ -65,6 +68,23 @@ public class RunApp extends javafx.application.Application {
     }
 
     private void startComponents() {
+        CompletableFuture.runAsync(() -> {
+            try {
+                File file = new File(Fingerprint_Log.logFileName + ".log");
+                if (file.exists()) {
+                    long lines = Files.lines(Path.of(file.getPath())).count();
+
+                    if (lines >= 1000) {
+                        if (file.delete()) {
+                            Fingerprint_Log.generateLog("Log deleted");
+                        }
+                    }
+                }
+            } catch (IOException exception) {
+                Notifications.CatchException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], exception);
+            }
+        });
+
         Platform.runLater(() -> {
             Notifications.Start();
             Loading.Start();

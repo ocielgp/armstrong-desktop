@@ -7,6 +7,7 @@ import com.ocielgp.app.Application;
 import com.ocielgp.app.UserPreferences;
 import com.ocielgp.controller.Controller_Door;
 import com.ocielgp.fingerprint.Fingerprint_Controller;
+import com.ocielgp.utilities.Fingerprint_Log;
 import com.ocielgp.utilities.Loading;
 import com.ocielgp.utilities.Notifications;
 import javafx.util.Pair;
@@ -48,8 +49,11 @@ public class JDBC_Member_Fingerprint {
     }
 
     synchronized public static void ReadFindFingerprint(Fmd fingerprint) {
+        Fingerprint_Log.generateLog("[Fingerprint]: Captured");
         if (isReaderAvailable) {
-            Controller_Door.Busy();
+            Fingerprint_Log.generateLog("[Fingerprint]: Process started");
+            JDBC_Member_Fingerprint.isReaderAvailable = false;
+            Controller_Door.WHITE();
             CompletableFuture.runAsync(() -> {
                 Connection con = DataServer.GetConnection();
                 try {

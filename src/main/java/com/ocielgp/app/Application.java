@@ -4,8 +4,10 @@ import com.jfoenix.controls.JFXComboBox;
 import com.ocielgp.controller.Controller_App;
 import com.ocielgp.controller.Controller_Dashboard;
 import com.ocielgp.controller.Controller_Door;
+import com.ocielgp.dao.JDBC_Member_Fingerprint;
 import com.ocielgp.models.Model_Admin;
 import com.ocielgp.models.Model_Gym;
+import com.ocielgp.utilities.Fingerprint_Log;
 import javafx.application.Platform;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
@@ -87,6 +89,8 @@ public class Application {
     }
 
     public static void ShakeUserInfo() {
+        Fingerprint_Log.generateLog("[Fingerprint]: Process finalized");
+        JDBC_Member_Fingerprint.isReaderAvailable = true;
         Controller_Door.RED();
         if (Application.controllerDashboard != null)
             Application.controllerDashboard.shakeUserInfo();

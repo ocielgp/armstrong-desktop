@@ -33,6 +33,7 @@ public class JDBC_Check_In {
                     Notifications.CatchSqlException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], sqlException);
                 }
             } finally {
+                Fingerprint_Log.generateLog("[Fingerprint]: Process finalized");
                 DataServer.CloseConnection(con);
                 JDBC_Member_Fingerprint.isReaderAvailable = true;
             }
@@ -85,7 +86,7 @@ public class JDBC_Check_In {
                     long daysLeft = DateTime.getDaysLeft(endDateTime);
                     boolean haveDebts = rs.getBoolean("haveDebts");
                     BigDecimal price = rs.getBigDecimal("payment");
-                    Short months = rs.getShort("months");
+                    short months = rs.getShort("months");
 
                     String membershipDescription = "(" + months + "x" + price.divide(new BigDecimal(months)) + ") " + membershipName +
                             ", termina el " + DateTime.getDateShort(endDateTime) +

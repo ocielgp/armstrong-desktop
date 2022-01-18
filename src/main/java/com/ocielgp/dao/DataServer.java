@@ -47,6 +47,14 @@ public class DataServer {
         System.out.println("[DataServer]: Connecting to " + host + "...");
         try {
             hikariDataSource = new HikariDataSource(hikariConfig);
+            System.out.println("[DataServer]: Connected at " + host);
+            Notifications.BuildNotification(
+                    "gmi-cloud-done",
+                    "Conexión establecida",
+                    "Conexión con el servidor establecida",
+                    3,
+                    Styles.EPIC
+            );
         } catch (Exception exception) {
             Notifications.BuildNotification(
                     "gmi-cloud-off",
@@ -56,14 +64,6 @@ public class DataServer {
                     Styles.DANGER
             );
         }
-        System.out.println("[DataServer]: Connected at " + host);
-        Notifications.BuildNotification(
-                "gmi-cloud-done",
-                "Conexión establecida",
-                "Conexión con el servidor establecida",
-                3,
-                Styles.EPIC
-        );
     }
 
     synchronized public static Connection GetConnection() {

@@ -6,6 +6,7 @@ import com.ocielgp.app.Application;
 import com.ocielgp.app.UserPreferences;
 import com.ocielgp.dao.JDBC_Gym;
 import com.ocielgp.models.Model_Gym;
+import com.ocielgp.utilities.Fingerprint_Log;
 import com.ocielgp.utilities.Loader;
 import com.ocielgp.utilities.Styles;
 import javafx.application.Platform;
@@ -84,7 +85,29 @@ public class Controller_App implements Initializable {
     }
 
     private void eventChangeTheme() {
+        String[] tasks = {
+                "WHITE",
+                "GREEN",
+                "YELLOW",
+                "RED"
+        };
+        int number = (int) (Math.random() * 4) + 1;
         Controller_Door.GREEN();
+        /*System.out.println(number);
+        switch (number) {
+            case 1:
+                Controller_Door.WHITE();
+                break;
+            case 2:
+                Controller_Door.GREEN();
+                break;
+            case 3:
+                Controller_Door.YELLOW();
+                break;
+            case 4:
+                Controller_Door.RED();
+                break;
+        }*/
         Platform.runLater(() -> {
             String newTheme = (UserPreferences.GetPreferenceString("THEME").equals("day-theme")) ? "night-theme" : "day-theme";
             this.borderPaneRoot.getStyleClass().set(1, newTheme);
