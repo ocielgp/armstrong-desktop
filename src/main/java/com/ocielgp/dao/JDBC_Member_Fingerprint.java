@@ -52,7 +52,6 @@ public class JDBC_Member_Fingerprint {
         Fingerprint_Log.generateLog("[Fingerprint]: Captured");
         if (isReaderAvailable) {
             Fingerprint_Log.generateLog("[Fingerprint]: Process started");
-            JDBC_Member_Fingerprint.isReaderAvailable = false;
             Controller_Door.WHITE();
             CompletableFuture.runAsync(() -> {
                 Connection con = DataServer.GetConnection();

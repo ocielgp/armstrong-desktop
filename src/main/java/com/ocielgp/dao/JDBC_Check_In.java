@@ -35,7 +35,6 @@ public class JDBC_Check_In {
             } finally {
                 Fingerprint_Log.generateLog("[Fingerprint]: Process finalized");
                 DataServer.CloseConnection(con);
-                JDBC_Member_Fingerprint.isReaderAvailable = true;
             }
             return false;
         });

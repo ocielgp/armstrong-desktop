@@ -36,14 +36,7 @@ public class DataServer {
         hikariConfig.addDataSourceProperty("cachePrepStmts", "true");
         hikariConfig.addDataSourceProperty("prepStmtCacheSize", "250");
         hikariConfig.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
-        /*hikariConfig.setMinimumIdle(0);
-        hikariConfig.setConnectionTimeout(30000);
-        hikariConfig.setIdleTimeout(35000);
-        hikariConfig.setMaxLifetime(45000);*/
-        hikariConfig.setKeepaliveTime(30000);
-//        hikariConfig.setMaxLifetime(25000);
-        hikariConfig.setConnectionTimeout(25000);
-//        hikariConfig.setLeakDetectionThreshold(3000);
+        hikariConfig.setConnectionTimeout(5000);
         System.out.println("[DataServer]: Connecting to " + host + "...");
         try {
             hikariDataSource = new HikariDataSource(hikariConfig);
@@ -68,18 +61,18 @@ public class DataServer {
 
     synchronized public static Connection GetConnection() {
         try {
-//            System.out.println("getConnection()");
-            return hikariDataSource.getConnection();
-        } catch (SQLException ignored) {
+            Connection connection = hikariDataSource.getConnection();
+            return connection;
+        } catch (Exception ignored) {
             // reconnecting
             System.out.println("[DataServer]: Reconectando a " + host + "...");
-            hikariDataSource = new HikariDataSource(hikariConfig);
             try {
+                hikariDataSource = new HikariDataSource(hikariConfig);
                 Connection connection = hikariDataSource.getConnection();
                 System.out.println("[DataServer]: Conectado a " + host);
                 return connection;
-            } catch (SQLException sqlException) {
-                Notifications.CatchSqlException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], sqlException);
+            } catch (Exception exception) {
+                Notifications.CatchException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], exception);
                 System.out.println("[DataServer]: Desconectado");
             }
         }

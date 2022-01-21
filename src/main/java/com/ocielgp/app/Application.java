@@ -90,7 +90,6 @@ public class Application {
 
     public static void ShakeUserInfo() {
         Fingerprint_Log.generateLog("[Fingerprint]: Process finalized");
-        JDBC_Member_Fingerprint.isReaderAvailable = true;
         Controller_Door.RED();
         if (Application.controllerDashboard != null)
             Application.controllerDashboard.shakeUserInfo();

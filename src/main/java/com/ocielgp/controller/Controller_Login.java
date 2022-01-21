@@ -84,6 +84,9 @@ public class Controller_Login implements Initializable {
                     }
                     Loading.closeNow();
                 }
+            }).exceptionally(throwable -> {
+                this.boxRoot.setDisable(false);
+                return null;
             });
         }
     }
