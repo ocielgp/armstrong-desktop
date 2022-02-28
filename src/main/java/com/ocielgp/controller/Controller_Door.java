@@ -16,16 +16,14 @@ public class Controller_Door {
         GREEN, // led green and door open
         YELLOW, // led yellow and door open
         RED, // led red and door closes
-        CLOSE_DOOR // led turn off and closes door
+        CLOSE // led turn off and closes door
     }
 
     private static final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
     private static final HttpClient httpClient = HttpClient.newHttpClient();
     private static final int WAITING_SECONDS = 4;
     private static ScheduledFuture<?> LAST_TASK;
-    private static final String EDNPOINT = "http://localhost:3000";
-    //    private static final String endpoint = "http://192.168.1.107:80";
-
+    private static final String EDNPOINT = "http://192.168.1.200:80";
 
     public static void Start() {
         Controller_Door.createRequest(Task.EMPTY).thenAccept(stringHttpResponse -> {
@@ -48,7 +46,7 @@ public class Controller_Door {
         }
 
         Controller_Door.LAST_TASK = Controller_Door.executorService.schedule(() -> {
-            Controller_Door.createRequest(Task.CLOSE_DOOR);
+            Controller_Door.createRequest(Task.CLOSE);
         }, seconds, TimeUnit.SECONDS);
     }
 
@@ -72,6 +70,7 @@ public class Controller_Door {
     }
 
     private static CompletableFuture<HttpResponse<String>> createRequest(Task task) {
+//        System.out.println(task);
         HttpRequest request = HttpRequest.newBuilder(URI.create(Controller_Door.EDNPOINT))
                 .headers("Color", task.name())
                 .PUT(HttpRequest.BodyPublishers.noBody())
