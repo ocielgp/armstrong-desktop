@@ -26,7 +26,7 @@ public class Controller_App implements Initializable {
     @FXML
     private JFXComboBox<Model_Gym> comboBoxGyms;
     @FXML
-    private Label labelAbout;
+    private HBox boxAbout;
     @FXML
     private HBox boxIcon;
 
@@ -42,9 +42,7 @@ public class Controller_App implements Initializable {
         this.comboBoxGyms.setDisable(true);
         this.comboBoxGyms.setFocusTraversable(false);
 
-        this.labelAbout.setOnMouseClicked(mouseEvent -> about());
-
-        this.boxIcon.setOnMouseClicked(mouseEvent -> eventChangeTheme());
+        this.boxAbout.setOnMouseClicked(mouseEvent -> about());
 
         Platform.runLater(() -> {
             Node loginView = Loader.Load(
@@ -57,6 +55,8 @@ public class Controller_App implements Initializable {
             fadeInUp.setOnFinished(actionEvent -> {
                 // recover last gym if exists
                 readLastGym();
+
+                this.boxIcon.setOnMouseClicked(mouseEvent -> eventChangeTheme());
             });
             fadeInUp.play();
         });
