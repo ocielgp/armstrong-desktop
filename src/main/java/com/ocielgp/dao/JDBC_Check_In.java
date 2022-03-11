@@ -207,7 +207,7 @@ public class JDBC_Check_In {
                 PreparedStatement statementLimited, statement;
                 ResultSet rs;
                 // query initial
-                String sqlQuery = "SELECT CI.createdAt, CONCAT(M.name, ' ', M.lastName) AS 'memberName', A.username, G.name AS 'gymName', CI.createdBy = 1 'openedBySystem' FROM CHECK_IN CI JOIN MEMBERS M ON CI.idMember = M.idMember JOIN ADMINS A ON CI.createdBy = A.idAdmin JOIN GYMS G ON CI.idGym = G.idGym WHERE CI.createdAt BETWEEN ? AND ? ";
+                String sqlQuery = "SELECT CI.createdAt, CONCAT(M.name, ' ', M.lastName) AS 'memberName', A.username, G.name AS 'gymName', CI.createdBy = 1 'openedBySystem' FROM CHECK_IN CI JOIN MEMBERS M ON CI.idMember = M.idMember JOIN ADMINS A ON CI.createdBy = A.idAdmin JOIN GYMS G ON CI.idGym = G.idGym WHERE M.idMember > 1 AND CI.createdAt BETWEEN ? AND ? ";
 
                 // fieldSearchContent
                 if (query.length() > 0) {

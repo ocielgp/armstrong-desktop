@@ -44,7 +44,7 @@ public class JDBC_Summary {
         return JDBC_Summary.ReadHandler(
                 from,
                 to,
-                "SELECT 'name', COUNT(*) AS 'metadata' FROM CHECK_IN WHERE createdAt BETWEEN ? AND ?"
+                "SELECT 'name', COUNT(*) AS 'metadata' FROM CHECK_IN WHERE idMember > 1 AND createdAt BETWEEN ? AND ?"
         );
     }
 
