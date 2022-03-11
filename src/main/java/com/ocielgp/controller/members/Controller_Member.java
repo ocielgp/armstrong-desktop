@@ -372,7 +372,7 @@ public class Controller_Member implements Initializable {
             if (this.modelMember.getModelPaymentMembership() != null) {
                 this.h_labelAdmin.setText(this.modelAdmin.getName() + " " + this.modelAdmin.getLastName());
                 this.h_labelLastPayment.setText(
-                        DateTime.getDateWithDayName(
+                        DateTime.getDateTime(
                                 this.modelMember.getModelPaymentMembership().getStartDateTime()
                         )
                 );
