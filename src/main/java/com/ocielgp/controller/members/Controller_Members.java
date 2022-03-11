@@ -54,6 +54,8 @@ public class Controller_Members implements Initializable {
     @FXML
     private TableColumn<Model_Member, String> tableColumnLastName;
     @FXML
+    private TableColumn<Model_Member, String> tableColumnPayment;
+    @FXML
     private TableColumn<Model_Member, String> tableColumnEndDate;
     @FXML
     private JFXTextField fieldRowsPerPage;
@@ -218,6 +220,7 @@ public class Controller_Members implements Initializable {
         this.tableColumnId.setCellValueFactory(new PropertyValueFactory<>("idMember"));
         this.tableColumnName.setCellValueFactory(new PropertyValueFactory<>("name"));
         this.tableColumnLastName.setCellValueFactory(new PropertyValueFactory<>("lastName"));
+        this.tableColumnPayment.setCellValueFactory(new PropertyValueFactory<>("payment"));
         this.tableColumnEndDate.setCellValueFactory(new PropertyValueFactory<>("endDate"));
     }
 }

@@ -5,6 +5,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public class Model_Member {
@@ -25,6 +26,7 @@ public class Model_Member {
     private final ObjectProperty<LocalDateTime> updatedAt = new SimpleObjectProperty<>();
     private final ObjectProperty<Integer> updatedBy = new SimpleObjectProperty<>();
 
+    private final ObjectProperty<BigDecimal> payment = new SimpleObjectProperty<>();
     private final StringProperty endDate = new SimpleStringProperty();
     private String style;
 
@@ -171,6 +173,18 @@ public class Model_Member {
 
     public void setUpdatedBy(Integer updatedBy) {
         this.updatedBy.set(updatedBy);
+    }
+
+    public BigDecimal getPayment() {
+        return payment.get();
+    }
+
+    public ObjectProperty<BigDecimal> paymentProperty() {
+        return payment;
+    }
+
+    public void setPayment(BigDecimal payment) {
+        this.payment.set(payment);
     }
 
     public String getEndDate() {
