@@ -36,7 +36,7 @@ public class FormChangeListener {
     synchronized public void change(String codeName, boolean value) {
         CompletableFuture.runAsync(() -> {
             this.formListeners.replace(codeName, value);
-            System.out.println("[" + codeName + "]: - " + value);
+//            System.out.println("[" + codeName + "]: - " + value);
 
             boolean newChanges = false;
             for (Boolean flag : this.formListeners.values()) {

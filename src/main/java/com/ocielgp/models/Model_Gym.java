@@ -1,22 +1,28 @@
 package com.ocielgp.models;
 
-import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+
+import java.time.LocalDateTime;
 
 public class Model_Gym {
-    private final SimpleIntegerProperty idGym = new SimpleIntegerProperty();
-    private final SimpleStringProperty name = new SimpleStringProperty();
-    private final SimpleStringProperty address = new SimpleStringProperty();
+    private final ObjectProperty<Short> idGym = new SimpleObjectProperty<>();
+    private final StringProperty name = new SimpleStringProperty();
+    private final StringProperty address = new SimpleStringProperty();
+    private final ObjectProperty<LocalDateTime> createdAt = new SimpleObjectProperty<>();
+    private final ObjectProperty<Integer> createdBy = new SimpleObjectProperty<>();
 
-    public int getIdGym() {
+    public Short getIdGym() {
         return idGym.get();
     }
 
-    public SimpleIntegerProperty idGymProperty() {
+    public ObjectProperty<Short> idGymProperty() {
         return idGym;
     }
 
-    public void setIdGym(int idGym) {
+    public void setIdGym(Short idGym) {
         this.idGym.set(idGym);
     }
 
@@ -24,7 +30,7 @@ public class Model_Gym {
         return name.get();
     }
 
-    public SimpleStringProperty nameProperty() {
+    public StringProperty nameProperty() {
         return name;
     }
 
@@ -36,12 +42,36 @@ public class Model_Gym {
         return address.get();
     }
 
-    public SimpleStringProperty addressProperty() {
+    public StringProperty addressProperty() {
         return address;
     }
 
     public void setAddress(String address) {
         this.address.set(address);
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt.get();
+    }
+
+    public ObjectProperty<LocalDateTime> createdAtProperty() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt.set(createdAt);
+    }
+
+    public Integer getCreatedBy() {
+        return createdBy.get();
+    }
+
+    public ObjectProperty<Integer> createdByProperty() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(Integer createdBy) {
+        this.createdBy.set(createdBy);
     }
 
     @Override

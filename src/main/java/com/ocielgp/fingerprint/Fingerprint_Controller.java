@@ -34,11 +34,9 @@ public class Fingerprint_Controller {
     private static final EventHandler<MouseEvent> fingerprintEvent = mouseEvent -> Fingerprint_Controller.Scanner();
 
     public static void Start(FontIcon fontIconFingerprint, Label labelStatus) {
-        if (Fingerprint_Controller.fingerprintIcon == null) {
-            Fingerprint_Controller.fingerprintIcon = fontIconFingerprint;
-            labelStatus.textProperty().bind(Fingerprint_Controller.fingerprintStatusProperty);
-            Fingerprint_Controller.Scanner();
-        }
+        Fingerprint_Controller.fingerprintIcon = fontIconFingerprint;
+        labelStatus.textProperty().bind(Fingerprint_Controller.fingerprintStatusProperty);
+        Fingerprint_Controller.Scanner();
     }
 
     public static void setFingerprintCaptureBox(Fingerprint_Capture_Box fingerprintCaptureBox) {
@@ -54,18 +52,28 @@ public class Fingerprint_Controller {
     }
 
     private static void Scanner() {
+        if (Fingerprint_Controller.fingerprintStatusCode != 0)
+            Fingerprint_Controller.setStatusCode(0);
         Platform.runLater(() -> {
             try {
                 ReaderCollection readerCollection = UareUGlobal.GetReaderCollection();
                 readerCollection.GetReaders();
                 Fingerprint_Controller.reader = readerCollection.get(0); // catch exception
                 Platform.runLater(() -> Notifications.Success("gmi-fingerprint", "Lector de Huellas", "Lector de huellas conectado", 2));
-                BackgroundReader();
+                Fingerprint_Controller.FirstConnection();
             } catch (Exception ignored) {
                 Fingerprint_Controller.setStatusCode(0);
                 Platform.runLater(() -> Notifications.Warn("gmi-fingerprint", "Lector de Huellas", "Lector de huellas no detectado", 2));
             }
         });
+    }
+
+    private static void FirstConnection() {
+        if (Fingerprint_Controller.fingerprintCaptureThread != null) {
+            StopCapture();
+        }
+        Fingerprint_Controller.fingerprintCaptureThread = new Fingerprint_Capture(Fingerprint_Controller.reader).createBackgroundThread();
+        Fingerprint_Controller.setStatusCode(1);
     }
 
     public static void setStatusCode(int statusCode) {

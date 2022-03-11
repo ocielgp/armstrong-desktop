@@ -11,25 +11,27 @@
 <BorderPane fx:id="borderPaneRoot" prefWidth="400.0" styleClass="day-theme" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <bottom>
       <AnchorPane style="-fx-border-color: -fx-color-border; -fx-border-width: 1 0 0 0;" BorderPane.alignment="CENTER">
-         <children>
-            <HBox alignment="CENTER" layoutX="9.0" layoutY="9.0" AnchorPane.bottomAnchor="-1.0" AnchorPane.leftAnchor="-1.0" AnchorPane.rightAnchor="-1.0" AnchorPane.topAnchor="-1.0">
-               <children>
-                  <Label fx:id="labelAbout" alignment="CENTER" style="-fx-cursor: hand;" text="Un proyecto de Ociel" />
-               </children>
-            </HBox>
-            <JFXComboBox fx:id="comboBoxGyms" layoutX="9.0" layoutY="10.0" promptText="Gimnnasio" AnchorPane.bottomAnchor="-1.0" AnchorPane.leftAnchor="-1.0" AnchorPane.topAnchor="-1.0" />
-            <HBox alignment="CENTER" layoutX="740.0" layoutY="9.0" style="-fx-background-color: transparent; -fx-background-radius: 20; -fx-border-color: -fx-color-text; -fx-border-radius: 20; -fx-cursor: hand;" AnchorPane.bottomAnchor="-1.0" AnchorPane.rightAnchor="-1.0" AnchorPane.topAnchor="-1.0">
-               <children>
-                  <FontIcon fx:id="iconTheme" iconLiteral="gmi-brightness-6" iconSize="25" />
-               </children>
-               <padding>
-                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-               </padding>
-            </HBox>
-         </children>
          <padding>
             <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
          </padding>
+         <HBox alignment="CENTER" layoutX="9.0" layoutY="9.0" AnchorPane.bottomAnchor="-1.0" AnchorPane.leftAnchor="-1.0" AnchorPane.rightAnchor="-1.0" AnchorPane.topAnchor="-1.0">
+            <HBox fx:id="boxAbout" alignment="CENTER" style="-fx-cursor: hand;">
+               <Label alignment="CENTER" text="Hecho con"/>
+               <Label alignment="CENTER" style="-fx-text-fill: red;" text=" ♥ "/>
+               <Label alignment="CENTER" text="por ocielgp.com"/>
+            </HBox>
+         </HBox>
+         <JFXComboBox fx:id="comboBoxGyms" layoutX="9.0" layoutY="10.0" promptText="Gimnnasio" AnchorPane.bottomAnchor="-1.0" AnchorPane.leftAnchor="-1.0" AnchorPane.topAnchor="-1.0" />
+         <HBox fx:id="boxIcon" alignment="CENTER" layoutX="740.0" layoutY="9.0" style="-fx-background-color: transparent; -fx-background-radius: 20; -fx-border-color: -fx-color-text; -fx-border-radius: 20; -fx-cursor: hand;" AnchorPane.bottomAnchor="-1.0" AnchorPane.rightAnchor="-1.0" AnchorPane.topAnchor="-1.0">
+            <padding>
+               <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+            </padding>
+            <Label>
+               <graphic>
+                  <FontIcon iconLiteral="gmi-brightness-6" iconSize="25" />
+               </graphic>
+            </Label>
+         </HBox>
       </AnchorPane>
    </bottom>
 </BorderPane>

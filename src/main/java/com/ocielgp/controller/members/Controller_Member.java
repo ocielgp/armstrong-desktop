@@ -159,6 +159,23 @@ public class Controller_Member implements Initializable {
         this.style = style;
     }
 
+    private void checkIfMemberExists() {
+        if (!this.pi_fieldName.getText().isEmpty() && !this.pi_fieldLastName.getText().isEmpty()) {
+            JDBC_Member.ReadIsNewMember(
+                    InputProperties.capitalizeFirstLetterPerWord(this.pi_fieldName.getText()),
+                    InputProperties.capitalizeFirstLetterPerWord(this.pi_fieldLastName.getText())
+            ).thenAccept(idMember -> {
+                if (idMember > 0) {
+                    Platform.runLater(() -> {
+                        Popup popup = new Popup();
+                        popup.alert(Styles.DANGER, "Socio encontrado", "Socio con este nombre registrado (ID: " + idMember + ")");
+                        popup.showAndWait();
+                    });
+                }
+            });
+        }
+    }
+
     private void configureForm() {
         InputProperties.getScrollEvent(this.scrollPane);
 
@@ -167,6 +184,14 @@ public class Controller_Member implements Initializable {
         InputProperties.createMaxLengthEvent(this.pi_fieldLastName, Model_Member.lastNameLength);
         InputProperties.createMaxLengthEvent(this.pi_fieldNotes, Model_Member.notesLength);
         InputProperties.createComboBoxListener(this.pi_comboBoxGender, this.ms_comboBoxMemberships);
+
+        this.pi_fieldName.focusedProperty().addListener(((observableValue, oldValue, newValue) -> {
+            if (!newValue) checkIfMemberExists();
+        }));
+
+        this.pi_fieldLastName.focusedProperty().addListener(((observableValue, oldValue, newValue) -> {
+            if (!newValue) checkIfMemberExists();
+        }));
 
         // -> historical
         InputProperties.createVisibleEvent(this.boxHistorical, false);
@@ -295,7 +320,6 @@ public class Controller_Member implements Initializable {
             this.modelMember.setIdMember(idMember);
             this.modelMember.setStyle(style);
 
-            this.fingerprintCaptureBox.getFingerprints(this.idMember);
             JDBC_Payment_Membership.ReadLastPayment(idMember)
                     .thenAccept(model_payments_memberships -> {
                         this.modelMember.setModelPaymentMembership(model_payments_memberships);
@@ -341,11 +365,14 @@ public class Controller_Member implements Initializable {
             this.pi_comboBoxGender.setValue(this.modelMember.getGender());
             this.pi_fieldNotes.setText(this.modelMember.getNotes());
 
+            // fingerprint
+            this.fingerprintCaptureBox.getFingerprints(this.modelMember.getIdMember());
+
             // membership
             if (this.modelMember.getModelPaymentMembership() != null) {
                 this.h_labelAdmin.setText(this.modelAdmin.getName() + " " + this.modelAdmin.getLastName());
                 this.h_labelLastPayment.setText(
-                        DateTime.getDateWithDayName(
+                        DateTime.getDateTime(
                                 this.modelMember.getModelPaymentMembership().getStartDateTime()
                         )
                 );
@@ -582,7 +609,6 @@ public class Controller_Member implements Initializable {
             }
         }
         if (isOk && this.formChangeListener.isChanged("membershipChange")) {
-            System.out.println("months: " + this.totalMonths);
             this.modelMember.getModelPaymentMembership().setMonths(this.totalMonths);
             isOk = JDBC_Payment_Membership.UpdatePaymentMembership(modelMembership, this.modelMember.getModelPaymentMembership());
             if (modelDebt.getOwe() != null) {
@@ -653,26 +679,34 @@ public class Controller_Member implements Initializable {
     }
 
     private void eventMembershipChange() {
-        Popup popup = new Popup();
-        popup.password();
-        if (popup.showAndWait()) {
-            Notifications.Default("gmi-event", "Membresía", "Selecciona un nuevo plan");
-            this.ms_boxButtons.setDisable(true);
-            this.ms_comboBoxMemberships.setDisable(false);
-            this.ms_boxMonths.setVisible(true);
-            this.boxPayment.setVisible(true);
-            updateMembershipPrice(true);
-            formChangeListener.change("membershipChange", false);
+        if (Objects.equals(this.modelAdmin.getIdMember(), Application.GetModelAdmin().getIdAdmin()) || Application.GetModelAdmin().getIdAdmin() == 1) {
+            Popup popup = new Popup();
+            popup.password();
+            if (popup.showAndWait()) {
+                Notifications.Default("gmi-event", "Membresía", "Selecciona un nuevo plan");
+                this.ms_boxButtons.setDisable(true);
+                this.ms_comboBoxMemberships.setDisable(false);
+                this.ms_boxMonths.setVisible(true);
+                this.boxPayment.setVisible(true);
+                updateMembershipPrice(true);
+                formChangeListener.change("membershipChange", false);
+            }
+        } else {
+            Notifications.Danger("Sin permiso", "Solo el que registro el pago puede cambiar la mensualidad");
         }
     }
 
     private void eventMembershipDelete() {
-        Popup popup = new Popup();
-        popup.password();
-        if (popup.showAndWait()) {
-            this.ms_labelEndDate.getStyleClass().add("strikethrough");
-            formChangeListener.change("membershipDelete", false);
-            this.ms_boxButtons.setDisable(true);
+        if (Objects.equals(this.modelAdmin.getIdMember(), Application.GetModelAdmin().getIdAdmin()) || Application.GetModelAdmin().getIdAdmin() == 1) {
+            Popup popup = new Popup();
+            popup.password();
+            if (popup.showAndWait()) {
+                this.ms_labelEndDate.getStyleClass().add("strikethrough");
+                formChangeListener.change("membershipDelete", false);
+                this.ms_boxButtons.setDisable(true);
+            }
+        } else {
+            Notifications.Danger("Sin permiso", "Solo el que registro el pago puede quitar la mensualidad");
         }
     }
 
@@ -718,12 +752,12 @@ public class Controller_Member implements Initializable {
                 );
             }
             this.ms_labelMonth.setText(this.totalMonths + ((this.totalMonths == 1) ? " MES" : " MESES"));
+            this.membershipPrice.set(
+                    this.ms_comboBoxMemberships.getValue().getPrice().multiply(
+                            BigDecimal.valueOf(this.totalMonths)
+                    )
+            );
             if (this.boxPayment.isVisible()) {
-                this.membershipPrice.set(
-                        this.ms_comboBoxMemberships.getValue().getPrice().multiply(
-                                BigDecimal.valueOf(this.totalMonths)
-                        )
-                );
                 InputProperties.clearInputs(this.pym_fieldPaidOut);
                 this.pym_fieldOwe.setText(this.membershipPrice.get().toString());
             }

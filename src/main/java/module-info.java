@@ -20,6 +20,13 @@ module app {
     exports animatefx.animation;
     exports animatefx.util;
 
+    requires com.fazecast.jSerialComm;
+
+    requires java.net.http;
+    requires org.slf4j;
+    requires org.slf4j.simple;
+    requires mysql.connector.java;
+
     opens com.ocielgp;
     opens com.ocielgp.app;
     opens com.ocielgp.dao;
@@ -29,5 +36,6 @@ module app {
     opens com.ocielgp.utilities;
     opens com.ocielgp.controller.summary;
     opens com.ocielgp.controller.members;
+    opens com.ocielgp.controller.check_in;
     opens com.ocielgp.controller.admins;
 }

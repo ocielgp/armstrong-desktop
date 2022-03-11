@@ -26,7 +26,7 @@ public class JDBC_Gym {
                 rs = ps.executeQuery();
                 if (rs.next()) {
                     modelGym = new Model_Gym();
-                    modelGym.setIdGym(rs.getInt("idGym"));
+                    modelGym.setIdGym(rs.getShort("idGym"));
                     modelGym.setName(rs.getString("name"));
                     modelGym.setAddress(rs.getString("address"));
                 }
@@ -51,7 +51,7 @@ public class JDBC_Gym {
                 rs = ps.executeQuery();
                 while (rs.next()) {
                     Model_Gym modelGym = new Model_Gym();
-                    modelGym.setIdGym(rs.getInt("idGym"));
+                    modelGym.setIdGym(rs.getShort("idGym"));
                     modelGym.setName(rs.getString("name"));
                     modelGym.setAddress(rs.getString("address"));
                     modelGymsList.add(modelGym);

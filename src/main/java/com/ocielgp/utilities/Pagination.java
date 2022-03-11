@@ -1,11 +1,15 @@
 package com.ocielgp.utilities;
 
 import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXDatePicker;
 import com.jfoenix.controls.JFXTextField;
+import com.jfoenix.controls.JFXTimePicker;
 import com.ocielgp.app.UserPreferences;
 import com.ocielgp.dao.JDBC_Admin;
+import com.ocielgp.dao.JDBC_Check_In;
 import com.ocielgp.dao.JDBC_Member;
 import com.ocielgp.models.Model_Admin;
+import com.ocielgp.models.Model_Check_In;
 import com.ocielgp.models.Model_Member;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
@@ -23,8 +27,14 @@ public class Pagination {
 
     public enum Tables {
         MEMBERS,
-        ADMINS
+        ADMINS,
+        CHECK_IN,
     }
+
+    JFXDatePicker startDate;
+    JFXTimePicker startTime;
+    JFXDatePicker endDate;
+    JFXTimePicker endTime;
 
     private final JFXTextField fieldSearch;
     private final TableView tableView;
@@ -58,6 +68,14 @@ public class Pagination {
         iconPreviousPage.setOnMouseClicked(eventPreviousPage());
         iconNextPage.setOnMouseClicked(eventNextPage());
         this.rows = UserPreferences.GetPreferenceInt("PAGINATION_MAX_ROWS");
+    }
+
+    public Pagination(JFXDatePicker startDate, JFXTimePicker startTime, JFXDatePicker endDate, JFXTimePicker endTime, Tables tables, JFXTextField fieldSearch, JFXButton buttonSearch, Label labelTotalRows, TableView tableView, JFXTextField fieldRowsPerPage, FontIcon iconPreviousPage, Label labelCurrentPage, Label labelTotalPages, FontIcon iconNextPage) {
+        this(tables, fieldSearch, buttonSearch, labelTotalRows, tableView, fieldRowsPerPage, iconPreviousPage, labelCurrentPage, labelTotalPages, iconNextPage);
+        this.startDate = startDate;
+        this.startTime = startTime;
+        this.endDate = endDate;
+        this.endTime = endTime;
     }
 
     private void updateRowsPerPage() {
@@ -97,6 +115,8 @@ public class Pagination {
             refillMembers();
         } else if (tables == Tables.ADMINS) {
             refillAdmins();
+        } else if (tables == Tables.CHECK_IN) {
+            refillCheckIn();
         }
     }
 
@@ -162,6 +182,40 @@ public class Pagination {
             } else {
                 initialStateCounters();
             }
+            this.tableView.setDisable(false);
+        }));
+    }
+
+    private void refillCheckIn() {
+        JDBC_Check_In.ReadAllCheckIn(this.rows, this.page, this.fieldSearch.getText(), InputProperties.concatDateTime(this.startDate, this.startTime), InputProperties.concatDateTime(this.endDate, this.endTime)).thenAccept(queryRows -> Platform.runLater(() -> {
+            if (queryRows.getData().size() > 0) {
+                this.labelTotalPages.setText(queryRows.getPages().toString());
+                this.labelTotalRows.setText(queryRows.getRows().toString());
+                this.tableView.setRowFactory(row -> new TableRow<Model_Check_In>() {
+                    @Override
+                    public void updateItem(Model_Check_In modelCheckIn, boolean empty) {
+                        super.updateItem(modelCheckIn, empty);
+                        if (modelCheckIn != null) {
+                            String style = (modelCheckIn.isOpenedBySystem()) ? Styles.SUCCESS : Styles.WARN;
+                            if (getStyleClass().size() == 5) {
+                                getStyleClass().set(4, style); // replace color style
+                            } else {
+                                getStyleClass().addAll("member-cell", style);
+                            }
+                        } else {
+                            if (getStyleClass().size() == 5) {
+                                getStyleClass().remove(4); // remove member-cell
+                                getStyleClass().remove(3); // remove color style
+                            }
+                        }
+                    }
+                });
+                this.tableView.setItems(queryRows.getData());
+                this.labelCurrentPage.setText(this.page.toString());
+            } else {
+                initialStateCounters();
+            }
+            Loading.closeNow();
             this.tableView.setDisable(false);
         }));
     }

@@ -11,10 +11,12 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import java.lang.invoke.MethodHandles;
+import java.math.BigDecimal;
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class JDBC_Member {
     public static int CreateMember(Model_Member modelMember) {
@@ -69,6 +71,29 @@ public class JDBC_Member {
         }
     }
 
+    public static CompletableFuture<Integer> ReadIsNewMember(String firstName, String lastName) {
+        return CompletableFuture.supplyAsync(() -> {
+            Connection con = DataServer.GetConnection();
+            try {
+                PreparedStatement ps;
+                ResultSet rs;
+                assert con != null;
+                String fullName = firstName + " " + lastName;
+                ps = con.prepareStatement("SELECT idMember FROM MEMBERS WHERE  (CONCAT(name, ' ', lastName)) LIKE ? AND flag = 1");
+                ps.setString(1, fullName);
+                rs = ps.executeQuery();
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            } catch (SQLException sqlException) {
+                Notifications.CatchSqlException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], sqlException);
+            } finally {
+                DataServer.CloseConnection(con);
+            }
+            return 0;
+        });
+    }
+
     public static CompletableFuture<Model_Member> ReadMember(int idMember) {
         return CompletableFuture.supplyAsync(() -> {
             Connection con = DataServer.GetConnection();
@@ -77,17 +102,18 @@ public class JDBC_Member {
                 PreparedStatement ps;
                 ResultSet rs;
                 assert con != null;
-                ps = con.prepareStatement("SELECT name, lastName, gender, notes, createdAt, access, idGym FROM MEMBERS WHERE idMember = ? ORDER BY idMember DESC");
+                ps = con.prepareStatement("SELECT idMember, name, lastName, gender, notes, createdAt, access, idGym FROM MEMBERS WHERE idMember = ? ORDER BY idMember DESC");
                 ps.setInt(1, idMember);
                 rs = ps.executeQuery();
                 if (rs.next()) {
+                    modelMember.setIdMember(rs.getInt("idMember"));
                     modelMember.setName(rs.getString("name"));
                     modelMember.setLastName(rs.getString("lastName"));
                     modelMember.setGender(rs.getString("gender"));
                     modelMember.setNotes(rs.getString("notes") == null ? "" : rs.getString("notes"));
                     modelMember.setCreatedAt(DateTime.MySQLToJava(rs.getString("createdAt")));
                     modelMember.setAccess(rs.getBoolean("access"));
-                    modelMember.setIdGym(rs.getInt("idGym"));
+                    modelMember.setIdGym(rs.getShort("idGym"));
 
                     modelMember.setModelMemberPhoto(JDBC_Member_Photo.ReadPhoto(idMember));
                 }
@@ -107,15 +133,23 @@ public class JDBC_Member {
                 PreparedStatement statementLimited, statement;
                 ResultSet rs;
                 // query initial
-                String sqlQuery = "SELECT M.idMember, M.name, M.lastName, M.access, endDateTime, (SELECT COUNT(idDebt) > 0 FROM DEBTS WHERE idMember = M.idMember AND debtStatus = 1 AND flag = 1 ORDER BY updatedAt DESC) AS 'haveDebts', PM.flag AS 'flag', A.username FROM MEMBERS M LEFT JOIN PAYMENTS_MEMBERSHIPS PM ON PM.idPaymentMembership = (SELECT idPaymentMembership FROM PAYMENTS_MEMBERSHIPS WHERE idMember = M.idMember AND flag = 1 ORDER BY startDateTime DESC LIMIT 1) LEFT JOIN ADMINS A ON PM.createdBy = A.idAdmin WHERE M.idMember NOT IN (SELECT A.idAdmin FROM ADMINS A WHERE A.flag = 1) AND M.flag = 1 ";
+                String sqlQuery = "SELECT M.idMember, M.name, M.lastName, M.access, PM.price, PM.endDateTime, (SELECT COUNT(idDebt) > 0 FROM DEBTS WHERE idMember = M.idMember AND debtStatus = 1 AND flag = 1 ORDER BY updatedAt DESC) AS 'haveDebts', PM.flag AS 'flag', A.username FROM MEMBERS M LEFT JOIN PAYMENTS_MEMBERSHIPS PM ON PM.idPaymentMembership = (SELECT idPaymentMembership FROM PAYMENTS_MEMBERSHIPS WHERE idMember = M.idMember AND flag = 1 ORDER BY startDateTime DESC LIMIT 1) LEFT JOIN ADMINS A ON PM.createdBy = A.idAdmin WHERE M.idMember NOT IN (SELECT A.idAdmin FROM ADMINS A WHERE A.flag = 1) AND M.flag = 1 ";
 
                 // fieldSearchContent
-                if (query.length() > 0) {
+                final AtomicReference<String> queryReference = new AtomicReference<>(query);
+                if (queryReference.get().length() > 0) {
                     try {
-                        Integer.parseInt(query);
+                        Integer.parseInt(queryReference.get());
                         sqlQuery += "AND M.idMember = ? ";
                     } catch (NumberFormatException exception) {
-                        sqlQuery += "AND (M.name LIKE ? OR M.lastName LIKE ? OR A.username LIKE ?) ";
+                        if (queryReference.get().startsWith("/") && queryReference.get().endsWith("/")) {
+                            queryReference.set(
+                                    queryReference.get().substring(1, queryReference.get().length() - 1)
+                            );
+                            sqlQuery += "AND A.username LIKE ? ";
+                        } else {
+                            sqlQuery += "AND CONCAT(M.name, ' ', M.lastName) LIKE ? ";
+                        }
                     }
                 }
 
@@ -156,21 +190,16 @@ public class JDBC_Member {
                         statementLimited.setInt(1, maxRegisters - maxRows); // limit ?
                         statementLimited.setInt(2, maxRows); // limit ?,?
                     } else if (parameters.getParameterCount() == 3) {
-                        statementLimited.setInt(1, Integer.parseInt(query)); // idMember
+                        try {
+                            statementLimited.setInt(1, Integer.parseInt(queryReference.get())); // idMember
+                            statement.setInt(1, Integer.parseInt(queryReference.get())); // idMember
+                        } catch (Exception ignored) {
+                            statementLimited.setString(1, "%" + queryReference.get() + "%"); // name and lastName || username
+                            statement.setString(1, "%" + queryReference.get() + "%"); // name and lastName || username
+                        }
                         statementLimited.setInt(2, maxRegisters - maxRows); // limit ?
                         statementLimited.setInt(3, maxRows); // limit ?,?
 
-                        statement.setInt(1, Integer.parseInt(query)); // idMember
-                    } else if (parameters.getParameterCount() == 5) {
-                        statementLimited.setString(1, "%" + query + "%"); // name
-                        statementLimited.setString(2, "%" + query + "%"); // lastName
-                        statementLimited.setString(3, "%" + query + "%"); // username
-                        statementLimited.setInt(4, maxRegisters - maxRows); // limit ?
-                        statementLimited.setInt(5, maxRows); // limit ?,?
-
-                        statement.setString(1, "%" + query + "%"); // name
-                        statement.setString(2, "%" + query + "%"); // lastName
-                        statement.setString(3, "%" + query + "%"); // username
                     }
                 }
 
@@ -186,7 +215,8 @@ public class JDBC_Member {
                         modelMember.setLastName(rs.getString("lastName"));
                         modelMember.setAccess(rs.getBoolean("access"));
 
-                        LocalDateTime endDateTime = DateTime.MySQLToJava(rs.getString("endDateTime"));
+                        modelMember.setPayment((rs.getBigDecimal("PM.price")));
+                        LocalDateTime endDateTime = DateTime.MySQLToJava(rs.getString("PM.endDateTime"));
                         modelMember.setEndDate(DateTime.getDateShort(endDateTime));
                         long daysLeft = DateTime.getDaysLeft(endDateTime);
                         modelMember.setStyle(JDBC_Member.ReadStyle(modelMember.getAccess(), daysLeft, rs.getBoolean("haveDebts")));
@@ -194,6 +224,7 @@ public class JDBC_Member {
                         modelMember.setIdMember(rs.getInt("idMember"));
                         modelMember.setName(rs.getString("name"));
                         modelMember.setLastName(rs.getString("lastName"));
+                        modelMember.setPayment(BigDecimal.ZERO);
                         modelMember.setEndDate("-");
                         modelMember.setStyle(Styles.DANGER);
                     }

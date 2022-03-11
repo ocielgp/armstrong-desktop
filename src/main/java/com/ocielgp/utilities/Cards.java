@@ -17,7 +17,7 @@ public class Cards {
         Label description = new Label(descriptionText);
         description.getStyleClass().add("description");
         description.setWrapText(true);
-        description.setTextAlignment(TextAlignment.CENTER);
+        description.setTextAlignment(TextAlignment.LEFT);
         VBox info = new VBox(title, description);
 
         HBox icon = new HBox(new FontIcon(iconCode));

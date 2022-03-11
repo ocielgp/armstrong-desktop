@@ -39,7 +39,7 @@ public class Loading {
                     });
                     Router.DisableDashboard();
                 } else {
-                    Router.EnableDashboard();
+                    if (!Application.isSecureMode) Router.EnableDashboard();
                     Loading.isAnimationFinished.set(false);
                     Loading.isChildLoaded.set(false);
                 }

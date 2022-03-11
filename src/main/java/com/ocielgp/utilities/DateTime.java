@@ -9,6 +9,7 @@ import java.util.Locale;
 
 public class DateTime {
     private static final String DATETIME_MYSQL = "yyyy-MM-dd HH:mm:ss";
+    private static final String DATETIME_MX = "dd/MM/yyyy hh:mm a";
     private static final String DATE_MYSQL = "y-MM-dd";
     private static final String DATE_WITH_DAY_NAME = "EEEE, dd/MMMM/yyyy";
     private static final String DATE = "dd/MM/y";
@@ -19,6 +20,16 @@ public class DateTime {
         return LocalDateTime.parse(
                 dateTime,
                 DateTimeFormatter.ofPattern(DATETIME_MYSQL)
+        );
+    }
+
+    public static String MySQLToJavaMX(String dateTime) {
+        if (dateTime == null) return null;
+        return LocalDateTime.parse(
+                dateTime,
+                DateTimeFormatter.ofPattern(DATETIME_MYSQL)
+        ).format(
+                DateTimeFormatter.ofPattern(DATETIME_MX)
         );
     }
 
@@ -37,6 +48,11 @@ public class DateTime {
     public static String getDateWithDayName(LocalDateTime localDateTime) {
         if (localDateTime == null) return null;
         return localDateTime.format(DateTimeFormatter.ofPattern(DATE_WITH_DAY_NAME, Locale.getDefault()));
+    }
+
+    public static String getDateTime(LocalDateTime localDateTime) {
+        if (localDateTime == null) return null;
+        return localDateTime.format(DateTimeFormatter.ofPattern(DATETIME_MX, Locale.getDefault()));
     }
 
     public static String getDateShort(LocalDateTime localDateTime) {

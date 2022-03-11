@@ -37,13 +37,22 @@
                </graphic>
             </Label>
          </HBox>
-         <HBox fx:id="navMembers" styleClass="option">
-            <Label text="Socios">
-               <graphic>
-                  <FontIcon iconLiteral="gmi-assignment-ind" />
-               </graphic>
-            </Label>
-         </HBox>
+          <HBox fx:id="navMembers" styleClass="option">
+              <Label text="Socios">
+                  <graphic>
+                      <FontIcon iconLiteral="gmi-assignment-ind"/>
+                  </graphic>
+              </Label>
+          </HBox>
+          <HBox fx:id="navCheckIn" styleClass="option">
+              <children>
+                  <Label text="Entradas">
+                      <graphic>
+                          <FontIcon iconLiteral="gmi-fingerprint"/>
+                      </graphic>
+                  </Label>
+              </children>
+          </HBox>
           <HBox fx:id="navAdmins" styleClass="option">
               <Label text="Gerencia">
                   <graphic>
@@ -51,9 +60,9 @@
                   </graphic>
               </Label>
           </HBox>
-         <HBox fx:id="navSecureMode" style="-fx-background-color: -fx-color-background;">
-            <children>
-               <Label text="Modo seguro">
+          <HBox fx:id="navSecureMode" style="-fx-background-color: -fx-color-background;">
+              <children>
+                  <Label text="Modo seguro">
                   <graphic>
                       <FontIcon iconLiteral="gmi-security" />
                   </graphic>

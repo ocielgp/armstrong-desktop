@@ -205,7 +205,6 @@ public class Controller_Admin implements Initializable {
             this.modelAdmin.setIdMember(idMember);
             this.modelAdmin.setStyle(style);
 
-            this.fingerprintCaptureBox.getFingerprints(this.idMember);
             JDBC_Gym.ReadGym(this.modelAdmin.getIdGym())
                     .thenAccept(model_gym -> {
                         this.modelAdmin.setModelGym(model_gym);
@@ -258,12 +257,16 @@ public class Controller_Admin implements Initializable {
                     this.a_comboBoxRoles.setValue(model_admin_role);
                 }
             });
+            this.a_comboBoxRoles.setDisable(this.modelAdmin.getIdAdmin() == Application.GetModelAdmin().getIdAdmin());
 
             // personal information
             this.pi_fieldName.setText(this.modelAdmin.getName());
             this.pi_fieldLastName.setText(this.modelAdmin.getLastName());
             this.pi_comboBoxGender.setValue(this.modelAdmin.getGender());
             this.pi_fieldNotes.setText(this.modelAdmin.getNotes());
+
+            // fingerprint
+            this.fingerprintCaptureBox.getFingerprints(this.modelAdmin.getIdMember());
 
             // shortcut
             if (this.modelAdmin.getAccess()) {
@@ -350,7 +353,7 @@ public class Controller_Admin implements Initializable {
         ArrayList<Node> nodesRequired = new ArrayList<>();
         // administration
         nodesRequired.add(this.a_fieldUsername);
-        if (this.modelAdmin != null && this.modelAdmin.getIdAdmin() != 1) nodesRequired.add(this.a_comboBoxRoles);
+        if (this.modelAdmin != null && this.modelAdmin.getIdAdmin() != Application.GetModelAdmin().getIdAdmin()) nodesRequired.add(this.a_comboBoxRoles);
 
         // personal information
         nodesRequired.add(this.pi_fieldName);

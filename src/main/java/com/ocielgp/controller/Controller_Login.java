@@ -42,8 +42,6 @@ public class Controller_Login implements Initializable {
         this.buttonLogin.setOnAction(actionEvent -> auth());
 
         Platform.runLater(() -> {
-//            this.fieldUsername.setText("ocielgp");
-//            this.fieldPassword.setText("fsociety");
             this.fieldUsername.requestFocus();
         });
     }
@@ -86,6 +84,9 @@ public class Controller_Login implements Initializable {
                     }
                     Loading.closeNow();
                 }
+            }).exceptionally(throwable -> {
+                this.boxRoot.setDisable(false);
+                return null;
             });
         }
     }

@@ -138,7 +138,7 @@ public class JDBC_Admin {
                 PreparedStatement statementLimited, statement;
                 ResultSet rs;
                 // query initial
-                String sqlQuery = "SELECT M.idMember, M.name, M.access, A.username, AR.name AS 'roleName' FROM MEMBERS M JOIN ADMINS A ON M.idMember = A.idAdmin JOIN ADMINS_ROLES AR ON A.idRole = AR.idRole WHERE M.flag = 1 AND A.flag = 1 ";
+                String sqlQuery = "SELECT M.idMember, M.name, M.access, A.username, AR.idRole, AR.name AS 'roleName' FROM MEMBERS M JOIN ADMINS A ON M.idMember = A.idAdmin JOIN ADMINS_ROLES AR ON A.idRole = AR.idRole WHERE M.flag = 1 AND A.flag = 1 ";
 
                 // fieldSearchContent
                 if (query.length() > 0) {
@@ -209,6 +209,7 @@ public class JDBC_Admin {
                     modelAdmin.setName(rs.getString("name"));
                     modelAdmin.setAccess(rs.getBoolean("access"));
                     modelAdmin.setUsername(rs.getString("username"));
+                    modelAdmin.setIdRole(rs.getShort("idRole"));
                     modelAdmin.setRoleName(rs.getString("roleName"));
                     modelAdmin.setStyle((modelAdmin.getAccess()) ? Styles.SUCCESS : Styles.DANGER);
 

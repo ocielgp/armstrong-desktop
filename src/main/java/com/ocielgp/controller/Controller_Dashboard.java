@@ -1,7 +1,8 @@
 package com.ocielgp.controller;
 
 import animatefx.animation.FadeInUp;
-import animatefx.animation.ZoomInUp;
+import animatefx.animation.Shake;
+import animatefx.animation.ZoomIn;
 import com.ocielgp.app.Application;
 import com.ocielgp.app.Router;
 import com.ocielgp.app.UserPreferences;
@@ -55,6 +56,8 @@ public class Controller_Dashboard implements Initializable {
     @FXML
     private HBox navMembers;
     @FXML
+    private HBox navCheckIn;
+    @FXML
     private HBox navAdmins;
     @FXML
     private HBox navSecureMode;
@@ -84,6 +87,9 @@ public class Controller_Dashboard implements Initializable {
             Popup popup = new Popup();
             popup.confirm(Styles.WARN, "Cerrar sesión", "¿Estás seguro que deseas salir?");
             if (popup.showAndWait()) {
+                Router.EnableDashboard();
+                this.body.setEffect(null);
+                Application.isSecureMode = false;
                 Application.GetCurrentGymNode().setDisable(true);
                 Node loginView = Loader.Load(
                         "login.fxml",
@@ -101,9 +107,10 @@ public class Controller_Dashboard implements Initializable {
 
         /* Routing */
         HashMap<HBox, Pair<String, String>> routes = new HashMap<>();
-        routes.put(navSummary, new Pair<>(Router.SUMMARY, "Resumen"));
-        routes.put(navMembers, new Pair<>(Router.MEMBERS, "Socios"));
-        routes.put(navAdmins, new Pair<>(Router.ADMINS, "Gerencia"));
+        routes.put(this.navSummary, new Pair<>(Router.SUMMARY, "Resumen"));
+        routes.put(this.navMembers, new Pair<>(Router.MEMBERS, "Socios"));
+        routes.put(this.navCheckIn, new Pair<>(Router.CHECK_IN, "Entradas"));
+        routes.put(this.navAdmins, new Pair<>(Router.ADMINS, "Gerencia"));
         Router.InitRouter(
                 Router.SUMMARY,
                 labelSection,
@@ -120,6 +127,10 @@ public class Controller_Dashboard implements Initializable {
         Platform.runLater(() -> Application.GetCurrentGymNode().setDisable(false));
     }
 
+    public void shakeUserInfo() {
+        Platform.runLater(() -> new Shake(this.ci_box).play());
+    }
+
     public void showUserInfo(String style, Image photo, Integer idMember, String name, String gym, String membership) {
         Platform.runLater(() -> {
             this.ci_box.getStyleClass().setAll(UserPreferences.GetPreferenceString("THEME"), style);
@@ -128,7 +139,7 @@ public class Controller_Dashboard implements Initializable {
             this.ci_labelName.setText(name);
             this.ci_labelGym.setText(gym);
             this.ci_labelMembership.setText(membership);
-            new ZoomInUp(this.ci_box).play();
+            new ZoomIn(this.ci_box).play();
         });
     }
 

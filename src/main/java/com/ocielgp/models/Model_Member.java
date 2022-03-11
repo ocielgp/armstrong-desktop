@@ -5,6 +5,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public class Model_Member {
@@ -19,12 +20,13 @@ public class Model_Member {
     private final StringProperty gender = new SimpleStringProperty();
     private final StringProperty notes = new SimpleStringProperty();
     private final ObjectProperty<Boolean> access = new SimpleObjectProperty<>();
-    private final ObjectProperty<Integer> idGym = new SimpleObjectProperty<>();
+    private final ObjectProperty<Short> idGym = new SimpleObjectProperty<>();
     private final ObjectProperty<LocalDateTime> createdAt = new SimpleObjectProperty<>();
     private final ObjectProperty<Integer> createdBy = new SimpleObjectProperty<>();
     private final ObjectProperty<LocalDateTime> updatedAt = new SimpleObjectProperty<>();
     private final ObjectProperty<Integer> updatedBy = new SimpleObjectProperty<>();
 
+    private final ObjectProperty<BigDecimal> payment = new SimpleObjectProperty<>();
     private final StringProperty endDate = new SimpleStringProperty();
     private String style;
 
@@ -113,15 +115,15 @@ public class Model_Member {
         this.access.set(access);
     }
 
-    public Integer getIdGym() {
+    public Short getIdGym() {
         return idGym.get();
     }
 
-    public ObjectProperty<Integer> idGymProperty() {
+    public ObjectProperty<Short> idGymProperty() {
         return idGym;
     }
 
-    public void setIdGym(Integer idGym) {
+    public void setIdGym(Short idGym) {
         this.idGym.set(idGym);
     }
 
@@ -171,6 +173,18 @@ public class Model_Member {
 
     public void setUpdatedBy(Integer updatedBy) {
         this.updatedBy.set(updatedBy);
+    }
+
+    public BigDecimal getPayment() {
+        return payment.get();
+    }
+
+    public ObjectProperty<BigDecimal> paymentProperty() {
+        return payment;
+    }
+
+    public void setPayment(BigDecimal payment) {
+        this.payment.set(payment);
     }
 
     public String getEndDate() {
