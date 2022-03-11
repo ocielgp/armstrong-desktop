@@ -4,7 +4,6 @@ import com.jfoenix.controls.JFXComboBox;
 import com.ocielgp.controller.Controller_App;
 import com.ocielgp.controller.Controller_Dashboard;
 import com.ocielgp.controller.Controller_Door;
-import com.ocielgp.dao.JDBC_Member_Fingerprint;
 import com.ocielgp.models.Model_Admin;
 import com.ocielgp.models.Model_Gym;
 import com.ocielgp.utilities.Fingerprint_Log;
@@ -16,7 +15,7 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 public class Application {
-    public static final String version = "1.0";
+    public static final String version = "1.1";
     public static Controller_App controllerApp;
     public static Controller_Dashboard controllerDashboard;
     public static Stage STAGE_PRIMARY;
