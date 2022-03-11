@@ -87,6 +87,9 @@ public class Controller_Dashboard implements Initializable {
             Popup popup = new Popup();
             popup.confirm(Styles.WARN, "Cerrar sesión", "¿Estás seguro que deseas salir?");
             if (popup.showAndWait()) {
+                Router.EnableDashboard();
+                this.body.setEffect(null);
+                Application.isSecureMode = false;
                 Application.GetCurrentGymNode().setDisable(true);
                 Node loginView = Loader.Load(
                         "login.fxml",
@@ -125,9 +128,7 @@ public class Controller_Dashboard implements Initializable {
     }
 
     public void shakeUserInfo() {
-        Platform.runLater(() -> {
-            new Shake(this.ci_box).play();
-        });
+        Platform.runLater(() -> new Shake(this.ci_box).play());
     }
 
     public void showUserInfo(String style, Image photo, Integer idMember, String name, String gym, String membership) {
