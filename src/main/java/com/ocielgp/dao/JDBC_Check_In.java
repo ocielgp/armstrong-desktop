@@ -33,7 +33,7 @@ public class JDBC_Check_In {
                     Notifications.CatchSqlException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], sqlException);
                 }
             } finally {
-                Fingerprint_Log.generateLog("[Fingerprint]: Process finalized");
+//                Fingerprint_Log.generateLog("[Fingerprint]: Process finalized");
                 DataServer.CloseConnection(con);
             }
             return false;

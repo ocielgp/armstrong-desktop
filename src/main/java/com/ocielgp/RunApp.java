@@ -68,7 +68,7 @@ public class RunApp extends javafx.application.Application {
     }
 
     private void startComponents() {
-        CompletableFuture.runAsync(() -> {
+        /*CompletableFuture.runAsync(() -> {
             try {
                 File file = new File(Fingerprint_Log.logFileName + ".log");
                 if (file.exists()) {
@@ -83,7 +83,7 @@ public class RunApp extends javafx.application.Application {
             } catch (IOException exception) {
                 Notifications.CatchException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], exception);
             }
-        });
+        });*/
 
         Platform.runLater(() -> {
             Notifications.Start();

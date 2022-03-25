@@ -88,7 +88,7 @@ public class Application {
     }
 
     public static void ShakeUserInfo() {
-        Fingerprint_Log.generateLog("[Fingerprint]: Process finalized");
+//        Fingerprint_Log.generateLog("[Fingerprint]: Process finalized");
         Controller_Door.RED();
         if (Application.controllerDashboard != null)
             Application.controllerDashboard.shakeUserInfo();
