@@ -56,6 +56,8 @@ public class Controller_Member implements Initializable {
     @FXML
     private Label h_labelLastPayment;
     @FXML
+    private Label h_labelLastPaymentPrice;
+    @FXML
     private Label h_labelGym;
     @FXML
     private Label h_labelAdmin;
@@ -376,6 +378,9 @@ public class Controller_Member implements Initializable {
                                 this.modelMember.getModelPaymentMembership().getStartDateTime()
                         )
                 );
+                this.h_labelLastPaymentPrice.setText(
+                        this.modelMember.getModelPaymentMembership().getPrice().toString()
+                );
                 this.ms_comboBoxMemberships.setDisable(true);
                 this.ms_comboBoxMemberships.getItems().forEach(model_membership -> { // select current membership
                     if (model_membership.getIdMembership().equals(this.modelMember.getModelPaymentMembership().getIdMembership())) {
@@ -385,6 +390,7 @@ public class Controller_Member implements Initializable {
                 });
             } else {
                 this.h_labelLastPayment.setText("N / A");
+                this.h_labelLastPaymentPrice.setText("N / A");
                 Notifications.Warn("Pago no encontrado", "Último pago no encontrado");
             }
 
