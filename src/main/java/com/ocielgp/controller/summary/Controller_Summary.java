@@ -21,7 +21,6 @@ import java.math.BigDecimal;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.time.YearMonth;
 import java.util.ResourceBundle;
 
 public class Controller_Summary implements Initializable {
@@ -48,57 +47,79 @@ public class Controller_Summary implements Initializable {
     private BigDecimal totalMoney = new BigDecimal(0);
 
     private void generalCards() {
-        JDBC_Summary.ReadCheckIn(InputProperties.concatDateTime(this.startDate, this.startTime), InputProperties.concatDateTime(this.endDate, this.endTime)).thenAccept(membersObservableList -> membersObservableList.forEach(modelAdmin ->
-                addCardToSummary(
-                        this.generalCards,
-                        Cards.createCard("gmi-fingerprint", modelAdmin.getMetadata(), "Entradas", "#ffffff", Color.hsb(152, 0.81, 0.53), Color.hsb(152, 0.81, 0.43))
-                ))
-        ).thenRun(() -> {
-            JDBC_Summary.ReadNewMembers(InputProperties.concatDateTime(this.startDate, this.startTime), InputProperties.concatDateTime(this.endDate, this.endTime)).thenAccept(membersObservableList -> membersObservableList.forEach(modelAdmin ->
-                    addCardToSummary(
-                            this.generalCards,
-                            Cards.createCard("gmi-group-add", modelAdmin.getMetadata(), modelAdmin.getName() + " inscripciones", "#ffffff", Color.hsb(152, 0.81, 0.53), Color.hsb(152, 0.81, 0.43))
-                    ))
-            ).thenRun(() -> {
-                JDBC_Summary.ReadMembers(InputProperties.concatDateTime(this.startDate, this.startTime), InputProperties.concatDateTime(this.endDate, this.endTime)).thenAccept(membersObservableList -> membersObservableList.forEach(modelAdmin ->
-                        addCardToSummary(
-                                this.generalCards,
-                                Cards.createCard("gmi-group-add", modelAdmin.getMetadata(), modelAdmin.getName() + " mensualidades", "#ffffff", Color.hsb(152, 0.81, 0.53), Color.hsb(152, 0.81, 0.43))
-                        ))
-                );
-            });
-        });
+        JDBC_Summary.ReadCheckIn(InputProperties.concatDateTime(this.startDate, this.startTime), InputProperties.concatDateTime(this.endDate, this.endTime))
+                .thenAccept(membersObservableList -> membersObservableList
+                        .forEach(modelAdmin ->
+                                addCardToSummary(
+                                        this.generalCards,
+                                        Cards.createCard("gmi-fingerprint", (modelAdmin.getMetadata() == null) ? "0" : modelAdmin.getMetadata(), "Entradas", "#ffffff", Color.hsb(152, 0.81, 0.53), Color.hsb(152, 0.81, 0.43))
+                                )))
+                .thenRun(() -> JDBC_Summary.ReadNewMembers(InputProperties.concatDateTime(this.startDate, this.startTime), InputProperties.concatDateTime(this.endDate, this.endTime))
+                        .thenAccept(membersObservableList -> membersObservableList
+                                .forEach(modelAdmin ->
+                                        addCardToSummary(
+                                                this.generalCards,
+                                                Cards.createCard("gmi-group-add", modelAdmin.getMetadata(), modelAdmin.getName() + " inscripciones", "#ffffff", Color.hsb(152, 0.81, 0.53), Color.hsb(152, 0.81, 0.43))
+                                        )))
+                        .thenRun(() -> JDBC_Summary.ReadMembers(InputProperties.concatDateTime(this.startDate, this.startTime), InputProperties.concatDateTime(this.endDate, this.endTime))
+                                .thenAccept(membersObservableList -> membersObservableList
+                                        .forEach(modelAdmin ->
+                                                addCardToSummary(
+                                                        this.generalCards,
+                                                        Cards.createCard("gmi-group-add", modelAdmin.getMetadata(), modelAdmin.getName() + " mensualidades", "#ffffff", Color.hsb(152, 0.81, 0.53), Color.hsb(152, 0.81, 0.43))
+                                                )))
+                                .thenRun(() -> JDBC_Summary.ReadProducts(InputProperties.concatDateTime(this.startDate, this.startTime), InputProperties.concatDateTime(this.endDate, this.endTime)).thenAccept(membersObservableList -> membersObservableList
+                                        .forEach(modelAdmin ->
+                                                addCardToSummary(
+                                                        this.generalCards,
+                                                        Cards.createCard("gmi-add-shopping-cart", modelAdmin.getMetadata(), modelAdmin.getName() + " productos", "#ffffff", Color.hsb(152, 0.81, 0.53), Color.hsb(152, 0.81, 0.43))
+                                                ))
+                                ))));
     }
 
     private void paymentsCards() {
         this.totalMoney = new BigDecimal("0");
-        JDBC_Summary.ReadTotalPaymentsMembershipsFromNewMembers(InputProperties.concatDateTime(this.startDate, this.startTime), InputProperties.concatDateTime(this.endDate, this.endTime)).thenAccept(membersObservableList -> membersObservableList.forEach(modelAdmin -> {
-                    this.totalMoney = this.totalMoney.add(new BigDecimal(modelAdmin.getMetadata()));
-                    addCardToSummary(
-                            this.paymentsCards,
-                            Cards.createCard("gmi-monetization-on", "$ " + modelAdmin.getMetadata(), modelAdmin.getName() + " inscripciones", "#ffffff", Color.hsb(45, 0.97, 0.90), Color.hsb(45, 0.97, 0.90))
-                    );
-                })
-        ).thenRun(() -> JDBC_Summary.ReadTotalPaymentsMembershipsFromMembers(InputProperties.concatDateTime(this.startDate, this.startTime), InputProperties.concatDateTime(this.endDate, this.endTime)).thenAccept(membersObservableList -> membersObservableList.forEach(modelAdmin -> {
-                    this.totalMoney = this.totalMoney.add(new BigDecimal(modelAdmin.getMetadata()));
-                    addCardToSummary(
-                            this.paymentsCards,
-                            Cards.createCard("gmi-monetization-on", "$ " + modelAdmin.getMetadata(), modelAdmin.getName() + " mensualidades", "#ffffff", Color.hsb(45, 0.97, 0.90), Color.hsb(45, 0.97, 0.90))
-                    );
-                })
-        ).thenRun(() -> JDBC_Summary.ReadPaymentsVisits(InputProperties.concatDateTime(this.startDate, this.startTime), InputProperties.concatDateTime(this.endDate, this.endTime)).thenAccept(membersObservableList -> membersObservableList.forEach(modelAdmin -> {
-                    this.totalMoney = this.totalMoney.add(new BigDecimal(modelAdmin.getMetadata()));
-                    addCardToSummary(
-                            this.paymentsCards,
-                            Cards.createCard("gmi-local-play", "$ " + modelAdmin.getMetadata(), modelAdmin.getName() + " visitas", "#ffffff", Color.hsb(45, 0.97, 0.90), Color.hsb(45, 0.97, 0.90))
-                    );
-                })
-        ).thenRun(() -> {
-            addCardToSummary(
-                    this.paymentsCards,
-                    Cards.createCard("gmi-payment", "$ " + this.totalMoney, "Total generado", "#ffffff", Color.hsb(45, 0.97, 0.90), Color.hsb(45, 0.97, 0.90))
-            );
-        })));
+        JDBC_Summary.ReadTotalPaymentsMembershipsFromNewMembers(InputProperties.concatDateTime(this.startDate, this.startTime), InputProperties.concatDateTime(this.endDate, this.endTime))
+                .thenAccept(membersObservableList -> membersObservableList
+                        .forEach(modelAdmin -> {
+                            this.totalMoney = this.totalMoney.add(new BigDecimal(modelAdmin.getMetadata()));
+                            addCardToSummary(
+                                    this.paymentsCards,
+                                    Cards.createCard("gmi-monetization-on", "$ " + modelAdmin.getMetadata(), modelAdmin.getName() + " inscripciones", "#ffffff", Color.hsb(45, 0.97, 0.90), Color.hsb(45, 0.97, 0.90))
+                            );
+                        }))
+                .thenRun(() -> JDBC_Summary.ReadTotalPaymentsMembershipsFromMembers(InputProperties.concatDateTime(this.startDate, this.startTime), InputProperties.concatDateTime(this.endDate, this.endTime))
+                        .thenAccept(membersObservableList -> membersObservableList
+                                .forEach(modelAdmin -> {
+                                    this.totalMoney = this.totalMoney.add(new BigDecimal(modelAdmin.getMetadata()));
+                                    addCardToSummary(
+                                            this.paymentsCards,
+                                            Cards.createCard("gmi-monetization-on", "$ " + modelAdmin.getMetadata(), modelAdmin.getName() + " mensualidades", "#ffffff", Color.hsb(45, 0.97, 0.90), Color.hsb(45, 0.97, 0.90))
+                                    );
+                                }))
+                        .thenRun(() -> JDBC_Summary.ReadPaymentsVisits(InputProperties.concatDateTime(this.startDate, this.startTime), InputProperties.concatDateTime(this.endDate, this.endTime))
+                                .thenAccept(membersObservableList -> membersObservableList
+                                        .forEach(modelAdmin -> {
+                                            this.totalMoney = this.totalMoney.add(new BigDecimal(modelAdmin.getMetadata()));
+                                            addCardToSummary(
+                                                    this.paymentsCards,
+                                                    Cards.createCard("gmi-local-play", "$ " + modelAdmin.getMetadata(), modelAdmin.getName() + " visitas", "#ffffff", Color.hsb(45, 0.97, 0.90), Color.hsb(45, 0.97, 0.90))
+                                            );
+                                        }))
+                                .thenRun(() -> JDBC_Summary.ReadPaymentsProducts(InputProperties.concatDateTime(this.startDate, this.startTime), InputProperties.concatDateTime(this.endDate, this.endTime))
+                                        .thenAccept(membersObservableList -> membersObservableList
+                                                .forEach(modelAdmin -> {
+                                                    this.totalMoney = this.totalMoney.add(new BigDecimal(modelAdmin.getMetadata()));
+                                                    addCardToSummary(
+                                                            this.paymentsCards,
+                                                            Cards.createCard("gmi-shopping-cart", "$ " + modelAdmin.getMetadata(), modelAdmin.getName() + " productos", "#ffffff", Color.hsb(45, 0.97, 0.90), Color.hsb(45, 0.97, 0.90))
+                                                    );
+                                                }))
+                                        .thenRun(() -> addCardToSummary(
+                                                this.paymentsCards,
+                                                Cards.createCard("gmi-payment", "$ " + this.totalMoney, "Total generado", "#ffffff", Color.hsb(45, 0.97, 1), Color.hsb(45, 0.97, 0.90))
+                                        ))
+                                )));
     }
 
     private void membershipsCards() {
@@ -132,11 +153,8 @@ public class Controller_Summary implements Initializable {
     // Controls
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        YearMonth month = YearMonth.now();
-//        this.startDate.setValue(month.atDay(1));
         this.startDate.setValue(LocalDate.now());
         this.startTime.setValue(LocalTime.MIN);
-//        this.endDate.setValue(YearMonth.now().atEndOfMonth());
         this.endDate.setValue(LocalDate.now());
         this.endTime.setValue(LocalTime.MAX);
         InputProperties.autoShow(this.startTime, this.endDate, this.endTime);
@@ -144,15 +162,8 @@ public class Controller_Summary implements Initializable {
         this.endTime.set24HourView(true);
         createCards();
 
-
         this.buttonSearch.setOnAction(actionEvent -> createCards());
 
-        Platform.runLater(() -> {
-            new FadeIn(this.rootPane).play();
-//            FadeIn fadeIn = new FadeIn(this.rootPane);
-//            fadeIn.setOnFinished(actionEvent -> {
-//            });
-//            fadeIn.play();
-        });
+        Platform.runLater(() -> new FadeIn(this.rootPane).play());
     }
 }

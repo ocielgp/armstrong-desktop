@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXComboBox?>
+<?import com.jfoenix.controls.JFXTextField?>
+<?import java.lang.String?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<ScrollPane fx:id="scrollPane" fitToHeight="true" fitToWidth="true" maxWidth="412.0" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1">
+    <VBox fx:id="boxRoot" maxWidth="412.0" styleClass="form">
+        <HBox alignment="CENTER">
+            <VBox.margin>
+                <Insets/>
+            </VBox.margin>
+            <Label style="-fx-text-fill: -fx-color-text;" text="Productos"/>
+            <styleClass>
+                <String fx:value="default-style"/>
+                <String fx:value="form-header"/>
+            </styleClass>
+        </HBox>
+        <VBox>
+            <VBox.margin>
+                <Insets/>
+            </VBox.margin>
+            <VBox alignment="CENTER" styleClass="form-section">
+                <HBox alignment="CENTER" spacing="5.0">
+                    <JFXButton fx:id="buttonCreate" styleClass="btn-primary" text="Crear"/>
+                    <JFXButton fx:id="buttonEdit" styleClass="btn-secondary" text="Editar"/>
+                </HBox>
+            </VBox>
+            <VBox fx:id="boxProducts" styleClass="form-section">
+                <HBox alignment="CENTER" VBox.vgrow="ALWAYS"/>
+                <AnchorPane>
+                    <JFXComboBox fx:id="comboBoxProducts" promptText="Selecciona uno" AnchorPane.leftAnchor="-1.0" AnchorPane.rightAnchor="-1.0"/>
+                </AnchorPane>
+            </VBox>
+            <VBox fx:id="boxHistorical" styleClass="form-section">
+                <HBox alignment="CENTER">
+                    <Label styleClass="bold" text="Histórico">
+                        <graphic>
+                            <FontIcon iconLiteral="gmi-description"/>
+                        </graphic>
+                    </Label>
+                </HBox>
+                <Label fx:id="labelHistorical" styleClass="bold" text="Creado"/>
+                <HBox alignment="CENTER" spacing="5.0">
+                    <Label fx:id="labelDateTime" text="Label"/>
+                </HBox>
+                <VBox alignment="CENTER">
+                    <Label styleClass="bold" text="Por"/>
+                    <Label fx:id="labelAdmin" text="labelAdmin"/>
+                </VBox>
+            </VBox>
+            <VBox fx:id="boxProductDetail" styleClass="form-section">
+                <HBox alignment="CENTER">
+                    <Label styleClass="bold" text="Producto">
+                        <graphic>
+                            <FontIcon iconLiteral="gmi-shopping-cart"/>
+                        </graphic>
+                    </Label>
+                </HBox>
+                <VBox>
+                    <Label styleClass="form-input" text="Nombre *">
+                        <graphic>
+                            <FontIcon iconLiteral="gmi-create"/>
+                        </graphic>
+                    </Label>
+                    <JFXTextField fx:id="fieldName"/>
+                </VBox>
+                <VBox>
+                    <Label styleClass="form-input" text="Precio *">
+                        <graphic>
+                            <FontIcon iconLiteral="gmi-create"/>
+                        </graphic>
+                    </Label>
+                    <JFXTextField fx:id="fieldPrice"/>
+                </VBox>
+                <HBox fx:id="boxButtonDelete">
+                    <JFXButton fx:id="buttonDelete" text="Eliminar producto">
+                        <styleClass>
+                            <String fx:value="btn-colorful"/>
+                            <String fx:value="danger-style"/>
+                        </styleClass>
+                    </JFXButton>
+                </HBox>
+            </VBox>
+            <HBox fx:id="boxEndButtons" alignment="CENTER" spacing="10.0" styleClass="form-section">
+                <JFXButton fx:id="buttonSave" text="Crear">
+                    <styleClass>
+                        <String fx:value="btn-colorful"/>
+                        <String fx:value="success-style"/>
+                    </styleClass>
+                </JFXButton>
+                <JFXButton fx:id="buttonClear" text="Limpiar">
+                    <styleClass>
+                        <String fx:value="btn-colorful"/>
+                        <String fx:value="danger-style"/>
+                    </styleClass>
+                </JFXButton>
+            </HBox>
+        </VBox>
+    </VBox>
+</ScrollPane>

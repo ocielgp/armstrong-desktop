@@ -136,12 +136,26 @@ public class Controller_Members implements Initializable {
                     false,
                     "btn-colorful", Styles.SUCCESS
             );
+            createTabButton("gmi-add-shopping-cart",
+                    "Nueva venta",
+                    "product.fxml",
+                    new Controller_Product(),
+                    false,
+                    "btn-colorful", Styles.SUCCESS
+            );
             createTabButton("gmi-calendar-today",
                     "Membresias",
                     "memberships.fxml",
                     new Controller_Membership(),
                     true,
-                    "btn-colorful", Styles.WARN
+                    "btn-colorful", Styles.EPIC
+            );
+            createTabButton("gmi-shopping-cart",
+                    "Productos",
+                    "products.fxml",
+                    new Controller_Products(),
+                    true,
+                    "btn-colorful", Styles.EPIC
             );
         });
     }
