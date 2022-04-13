@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<BorderPane fx:id="borderPaneRoot" prefWidth="400.0" styleClass="day-theme" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<BorderPane fx:id="borderPaneRoot" prefWidth="400.0" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <bottom>
       <AnchorPane style="-fx-border-color: -fx-color-border; -fx-border-width: 1 0 0 0;" BorderPane.alignment="CENTER">
          <padding>
@@ -16,9 +16,9 @@
          </padding>
          <HBox alignment="CENTER" layoutX="9.0" layoutY="9.0" AnchorPane.bottomAnchor="-1.0" AnchorPane.leftAnchor="-1.0" AnchorPane.rightAnchor="-1.0" AnchorPane.topAnchor="-1.0">
             <HBox fx:id="boxAbout" alignment="CENTER" style="-fx-cursor: hand;">
-               <Label alignment="CENTER" text="Hecho con"/>
-               <Label alignment="CENTER" style="-fx-text-fill: red;" text=" ♥ "/>
-               <Label alignment="CENTER" text="por ocielgp.com"/>
+               <Label alignment="CENTER" text="Hecho con" />
+               <Label alignment="CENTER" style="-fx-text-fill: red;" text=" ♥ " />
+               <Label alignment="CENTER" text="por ocielgp.com" />
             </HBox>
          </HBox>
          <JFXComboBox fx:id="comboBoxGyms" layoutX="9.0" layoutY="10.0" promptText="Gimnnasio" AnchorPane.bottomAnchor="-1.0" AnchorPane.leftAnchor="-1.0" AnchorPane.topAnchor="-1.0" />
