@@ -22,7 +22,7 @@ import java.util.ListIterator;
 import java.util.concurrent.CompletableFuture;
 
 public class JDBC_Member_Fingerprint {
-    public static boolean isReaderAvailable = true;
+    public static int lastMemberIdFingerprint = 0;
 
     public static boolean CreateFingerprints(int idMember, ListIterator<Fmd> fingerprints) {
         Connection con = DataServer.GetConnection();
@@ -48,42 +48,40 @@ public class JDBC_Member_Fingerprint {
         }
     }
 
-    synchronized public static void ReadFindFingerprint(Fmd fingerprint) {
-//        Fingerprint_Log.generateLog("[Fingerprint]: Captured");
-        if (isReaderAvailable) {
-//            Fingerprint_Log.generateLog("[Fingerprint]: Process started");
-            Controller_Door.WHITE();
-            CompletableFuture.runAsync(() -> {
-                Connection con = DataServer.GetConnection();
-                try {
-                    PreparedStatement ps;
-                    ResultSet rs;
-                    assert con != null;
-                    ps = con.prepareStatement("SELECT idFingerprint, fingerprint, idMember, A.idAdmin IS NOT NULL as 'isAdmin' FROM MEMBERS_FINGERPRINTS MF LEFT JOIN ADMINS A ON MF.idMember = A.idAdmin WHERE MF.idMember = (SELECT idMember FROM PAYMENTS_MEMBERSHIPS WHERE flag = 1 AND idMember = MF.idMember AND DATEDIFF(NOW(), endDateTime) <= ? ORDER BY createdAt DESC LIMIT 1) OR A.idAdmin IS NOT NULL ORDER BY idFingerprint DESC");
-                    ps.setInt(1, UserPreferences.GetPreferenceInt("MAX_DAYS_FINGERPRINTS"));
-                    rs = ps.executeQuery();
+    public static void ReadFindFingerprint(Fmd fingerprint) {
+        Fingerprint_Log.generateLog("[Fingerprint]: Captured");
+        Fingerprint_Log.generateLog("[Fingerprint]: Process started");
+        Controller_Door.WHITE();
+        CompletableFuture.runAsync(() -> {
+            Connection con = DataServer.GetConnection();
+            try {
+                PreparedStatement ps;
+                ResultSet rs;
+                assert con != null;
+                ps = con.prepareStatement("SELECT idFingerprint, fingerprint, idMember, A.idAdmin IS NOT NULL as 'isAdmin' FROM MEMBERS_FINGERPRINTS MF LEFT JOIN ADMINS A ON MF.idMember = A.idAdmin WHERE MF.idMember = (SELECT idMember FROM PAYMENTS_MEMBERSHIPS WHERE flag = 1 AND idMember = MF.idMember AND DATEDIFF(NOW(), endDateTime) <= ? ORDER BY createdAt DESC LIMIT 1) OR A.idAdmin IS NOT NULL ORDER BY idFingerprint DESC");
+                ps.setInt(1, UserPreferences.GetPreferenceInt("MAX_DAYS_FINGERPRINTS"));
+                rs = ps.executeQuery();
 
-                    while (rs.next()) {
-                        if (Fingerprint_Controller.CompareFingerprints(fingerprint, rs.getBytes("fingerprint"))) {
-                            int idMember = rs.getInt("idMember");
-                            if (rs.getBoolean("isAdmin")) {
-                                JDBC_Check_In.ShowAdminInfo(idMember, 1);
-                            } else {
-                                JDBC_Check_In.ShowMemberInfo(idMember, 1);
-                            }
-                            return;
+                while (rs.next()) {
+                    if (Fingerprint_Controller.CompareFingerprints(fingerprint, rs.getBytes("fingerprint"))) {
+                        int idMember = rs.getInt("idMember");
+                        if (rs.getBoolean("isAdmin")) {
+                            JDBC_Check_In.ShowAdminInfo(idMember, 1);
+                        } else {
+                            JDBC_Check_In.ShowMemberInfo(idMember, 1);
                         }
+                        return;
                     }
-                    Application.ShakeUserInfo();
-//                    Notifications.Danger("gmi-fingerprint", "Lector de Huellas", "Huella no encontrada", 1.5);
-                    Loading.closeNow();
-                } catch (SQLException sqlException) {
-                    Notifications.CatchSqlException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], sqlException);
-                } finally {
-                    DataServer.CloseConnection(con);
                 }
-            });
-        }
+                Application.ShakeUserInfo();
+                Notifications.Danger("gmi-fingerprint", "Lector de Huellas", "Huella no encontrada", 1.5);
+                Loading.closeNow();
+            } catch (SQLException sqlException) {
+                Notifications.CatchSqlException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], sqlException);
+            } finally {
+                DataServer.CloseConnection(con);
+            }
+        });
     }
 
     public static CompletableFuture<Pair<Integer, LinkedList<Fmd>>> ReadFingerprints(int idMember) {

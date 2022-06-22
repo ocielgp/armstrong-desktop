@@ -67,54 +67,52 @@ public class Fingerprint_Capture implements ActionListener {
     }
 
     public void actionPerformed(ActionEvent e) {
-        if (JDBC_Member_Fingerprint.isReaderAvailable) {
-            if (e.getActionCommand().equals(Fingerprint_Capture_Thread.ACT_CAPTURE)) {
-                // event from capture thread
-                Fingerprint_Capture_Thread.CaptureEvent evt = (Fingerprint_Capture_Thread.CaptureEvent) e;
-                boolean bCanceled = false;
+        if (e.getActionCommand().equals(Fingerprint_Capture_Thread.ACT_CAPTURE)) {
+            // event from capture thread
+            Fingerprint_Capture_Thread.CaptureEvent evt = (Fingerprint_Capture_Thread.CaptureEvent) e;
+            boolean bCanceled = false;
 
-                if (evt.capture_result != null) {
-                    if (evt.capture_result.image != null && Reader.CaptureQuality.GOOD == evt.capture_result.quality) {
-                        if (this.fingerprintCaptureBox != null) {
-                            // display image
-                            this.showImage(evt.capture_result.image);
-                            ProcessCaptureResult(evt);
-                        } else {
-                            try {
-                                Loading.show();
-                                JDBC_Member_Fingerprint.ReadFindFingerprint(
-                                        UareUGlobal.GetEngine().CreateFmd(
-                                                evt.capture_result.image, Fmd.Format.ANSI_378_2004
-                                        )
-                                );
-                            } catch (UareUException uareUException) {
-                                Notifications.CatchException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], uareUException);
-                            }
-                        }
-                        System.out.println("[Fingerprint_Capture][Captured]");
-                    } else if (Reader.CaptureQuality.CANCELED == evt.capture_result.quality) {
-                        // capture or streaming was canceled, just quit
-                        bCanceled = true;
+            if (evt.capture_result != null) {
+                if (evt.capture_result.image != null && Reader.CaptureQuality.GOOD == evt.capture_result.quality) {
+                    if (this.fingerprintCaptureBox != null) {
+                        // display image
+                        this.showImage(evt.capture_result.image);
+                        ProcessCaptureResult(evt);
                     } else {
-                        // bad quality
-                        System.out.println("[Fingerprint_Capture][Bad Quality] " + evt.capture_result.quality);
+                        try {
+                            Loading.show();
+                            JDBC_Member_Fingerprint.ReadFindFingerprint(
+                                UareUGlobal.GetEngine().CreateFmd(
+                                    evt.capture_result.image, Fmd.Format.ANSI_378_2004
+                                )
+                            );
+                        } catch (UareUException uareUException) {
+                            Notifications.CatchException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], uareUException);
+                        }
                     }
-                } else if (evt.exception != null) {
-                    // exception during capture
-                    System.out.println("[Fingerprint_Capture][Disconnected]");
+                    System.out.println("[Fingerprint_Capture][Captured]");
+                } else if (Reader.CaptureQuality.CANCELED == evt.capture_result.quality) {
+                    // capture or streaming was canceled, just quit
                     bCanceled = true;
-                    Fingerprint_Controller.setStatusCode(0); // fingerprint off
-                    Notifications.Warn("gmi-fingerprint", "Lector de Huellas", "Lector de huellas desconectado", 3);
-                } else if (evt.reader_status != null) {
-                    System.out.println(evt.reader_status);
-                    bCanceled = true;
+                } else {
+                    // bad quality
+                    System.out.println("[Fingerprint_Capture][Bad Quality] " + evt.capture_result.quality);
                 }
+            } else if (evt.exception != null) {
+                // exception during capture
+                System.out.println("[Fingerprint_Capture][Disconnected]");
+                bCanceled = true;
+                Fingerprint_Controller.setStatusCode(0); // fingerprint off
+                Notifications.Warn("gmi-fingerprint", "Lector de Huellas", "Lector de huellas desconectado", 3);
+            } else if (evt.reader_status != null) {
+                System.out.println(evt.reader_status);
+                bCanceled = true;
+            }
 
-                if (!bCanceled) {
-                    // restart capture thread
-                    WaitForCaptureThread();
-                    StartCaptureThread();
-                }
+            if (!bCanceled) {
+                // restart capture thread
+                WaitForCaptureThread();
+                StartCaptureThread();
             }
         }
     }

@@ -7,6 +7,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.Objects;
 import java.util.concurrent.*;
 
 public class Controller_Door {
@@ -23,15 +24,18 @@ public class Controller_Door {
     private static final HttpClient httpClient = HttpClient.newHttpClient();
     private static final int WAITING_SECONDS = 4;
     private static ScheduledFuture<?> LAST_TASK;
-    private static final String EDNPOINT = "http://192.168.1.200:80";
+    private static final String END_POINT = "http://192.168.1.200:80";
+    private static Boolean isDoorConnected;
 
     public static void Start() {
-        Controller_Door.createRequest(Task.EMPTY).thenAccept(stringHttpResponse -> {
+        Objects.requireNonNull(Controller_Door.createRequest(Task.EMPTY)).thenAccept(stringHttpResponse -> {
             if (stringHttpResponse.statusCode() == 200) {
                 System.out.println("[Arduino][Connected][" + stringHttpResponse.statusCode() + "]");
                 Notifications.BuildNotification("gmi-meeting-room", "Puerta", "Puerta conectada", 3, Styles.EPIC);
+                Controller_Door.isDoorConnected = true;
             } else {
                 System.out.println("[Arduino][Disconnected][" + stringHttpResponse + "]");
+                Controller_Door.isDoorConnected = false;
             }
         }).exceptionally(throwable -> {
             Notifications.BuildNotification("gmi-no-meeting-room", "Puerta", "La puerta no se ha podido conectar", 10, Styles.DANGER);
@@ -70,12 +74,15 @@ public class Controller_Door {
     }
 
     private static CompletableFuture<HttpResponse<String>> createRequest(Task task) {
+        if (Controller_Door.isDoorConnected == null || Controller_Door.isDoorConnected) {
 //        System.out.println(task);
-        HttpRequest request = HttpRequest.newBuilder(URI.create(Controller_Door.EDNPOINT))
+            HttpRequest request = HttpRequest.newBuilder(URI.create(Controller_Door.END_POINT))
                 .headers("Color", task.name())
                 .PUT(HttpRequest.BodyPublishers.noBody())
 //                .PUT(HttpRequest.BodyPublishers.ofString(task.name()))
                 .build();
-        return httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString());
+            return httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString());
+        }
+        return null;
     }
 }
