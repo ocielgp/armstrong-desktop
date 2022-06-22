@@ -16,25 +16,30 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class JDBC_Check_In {
-    synchronized public static CompletableFuture<Boolean> CreateCheckIn(int idMember, int createdBy) {
+    public static CompletableFuture<Boolean> CreateCheckIn(int idMember, int createdBy) {
         return CompletableFuture.supplyAsync(() -> {
-            Connection con = DataServer.GetConnection();
-            try {
-                PreparedStatement ps;
-                assert con != null;
-                ps = con.prepareStatement("INSERT INTO CHECK_IN(createdBy, idMember, idGym) VALUE (?, ?, ?)");
-                ps.setInt(1, createdBy); // createdBy
-                ps.setInt(2, idMember); // idMember
-                ps.setInt(3, Application.GetCurrentGym().getIdGym()); // idGym
-                ps.executeUpdate();
+            if (JDBC_Member_Fingerprint.lastMemberIdFingerprint == idMember) { // same member fingerprint
                 return true;
-            } catch (SQLException sqlException) {
-                if (sqlException.getErrorCode() != 1062) { // ignore duplicate rows
-                    Notifications.CatchSqlException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], sqlException);
-                }
-            } finally {
+            } else {
+                Connection con = DataServer.GetConnection();
+                try {
+                    PreparedStatement ps;
+                    assert con != null;
+                    ps = con.prepareStatement("INSERT INTO CHECK_IN(createdBy, idMember, idGym) VALUE (?, ?, ?)");
+                    ps.setInt(1, createdBy); // createdBy
+                    ps.setInt(2, idMember); // idMember
+                    ps.setInt(3, Application.GetCurrentGym().getIdGym()); // idGym
+                    ps.executeUpdate();
+                    JDBC_Member_Fingerprint.lastMemberIdFingerprint = idMember;
+                    return true;
+                } catch (SQLException sqlException) {
+                    if (sqlException.getErrorCode() != 1062) { // ignore duplicate rows
+                        Notifications.CatchSqlException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], sqlException);
+                    }
+                } finally {
 //                Fingerprint_Log.generateLog("[Fingerprint]: Process finalized");
-                DataServer.CloseConnection(con);
+                    DataServer.CloseConnection(con);
+                }
             }
             return false;
         });
