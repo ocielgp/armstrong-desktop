@@ -85,6 +85,8 @@ public class Controller_Members implements Initializable {
     private JFXRadioButton radioButtonOrderBy0;
     @FXML
     private JFXRadioButton radioButtonOrderBy1;
+    @FXML
+    private JFXRadioButton radioButtonOrderBy2;
 
     // attributes
     private Pagination pagination;
@@ -223,6 +225,7 @@ public class Controller_Members implements Initializable {
         ToggleGroup toggleOrderBy = new ToggleGroup();
         this.radioButtonOrderBy0.setToggleGroup(toggleOrderBy);
         this.radioButtonOrderBy1.setToggleGroup(toggleOrderBy);
+        this.radioButtonOrderBy2.setToggleGroup(toggleOrderBy);
         UserPreferences.CreateSelectedToggleProperty(toggleOrderBy, "radioButtonOrderBy", "FILTER_MEMBER_ORDER_BY", pagination);
     }
 

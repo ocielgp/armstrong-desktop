@@ -133,7 +133,7 @@ public class JDBC_Member {
                 PreparedStatement statementLimited, statement;
                 ResultSet rs;
                 // query initial
-                String sqlQuery = "SELECT M.idMember, M.name, M.lastName, M.access, PM.price, PM.endDateTime, (SELECT COUNT(idDebt) > 0 FROM DEBTS WHERE idMember = M.idMember AND debtStatus = 1 AND flag = 1 ORDER BY updatedAt DESC) AS 'haveDebts', PM.flag AS 'flag', A.username FROM MEMBERS M LEFT JOIN PAYMENTS_MEMBERSHIPS PM ON PM.idPaymentMembership = (SELECT idPaymentMembership FROM PAYMENTS_MEMBERSHIPS WHERE idMember = M.idMember AND flag = 1 ORDER BY startDateTime DESC LIMIT 1) LEFT JOIN ADMINS A ON PM.createdBy = A.idAdmin WHERE M.idMember NOT IN (SELECT A.idAdmin FROM ADMINS A WHERE A.flag = 1) AND M.flag = 1 ";
+                String sqlQuery = "SELECT M.idMember, M.name, M.lastName, M.access, PM.price, PM.endDateTime, PM.createdAt, (SELECT COUNT(idDebt) > 0 FROM DEBTS WHERE idMember = M.idMember AND debtStatus = 1 AND flag = 1 ORDER BY updatedAt DESC) AS 'haveDebts', PM.flag AS 'flag', A.username FROM MEMBERS M LEFT JOIN PAYMENTS_MEMBERSHIPS PM ON PM.idPaymentMembership = (SELECT idPaymentMembership FROM PAYMENTS_MEMBERSHIPS WHERE idMember = M.idMember AND flag = 1 ORDER BY startDateTime DESC LIMIT 1) LEFT JOIN ADMINS A ON PM.createdBy = A.idAdmin WHERE M.idMember NOT IN (SELECT A.idAdmin FROM ADMINS A WHERE A.flag = 1) AND M.flag = 1 ";
 
                 // fieldSearchContent
                 final AtomicReference<String> queryReference = new AtomicReference<>(query);
@@ -155,7 +155,7 @@ public class JDBC_Member {
 
                 // filters
                 if (!UserPreferences.GetPreferenceBool("FILTER_MEMBER_ALL_GYMS")) {
-                    sqlQuery += "AND PM.idGym = " + Application.GetCurrentGym().getIdGym() + " ";
+                    sqlQuery += "AND (PM.idGym = " + Application.GetCurrentGym().getIdGym() + " OR M.idGym = " + Application.GetCurrentGym().getIdGym() + ") ";
                 }
                 if (UserPreferences.GetPreferenceBool("FILTER_MEMBER_ACTIVE_MEMBERS")) {
                     sqlQuery += "AND PM.endDateTime >= CURRENT_DATE ";
@@ -172,9 +172,11 @@ public class JDBC_Member {
                 }
 
                 if (UserPreferences.GetPreferenceInt("FILTER_MEMBER_ORDER_BY") == 0) {
-                    sqlQuery += "ORDER BY M.idMember DESC ";
-                } else { // 1
+                    sqlQuery += "ORDER BY PM.createdAt DESC ";
+                } else if (UserPreferences.GetPreferenceInt("FILTER_MEMBER_ORDER_BY") == 1){
                     sqlQuery += "ORDER BY M.idMember ";
+                } else if (UserPreferences.GetPreferenceInt("FILTER_MEMBER_ORDER_BY") == 2){
+                    sqlQuery += "ORDER BY M.idMember DESC ";
                 }
 
                 assert con != null;

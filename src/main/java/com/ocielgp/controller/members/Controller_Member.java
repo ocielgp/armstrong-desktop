@@ -507,7 +507,9 @@ public class Controller_Member implements Initializable {
         nodesRequired.add(Application.GetCurrentGymNode());
 
         // membership
-        nodesRequired.add(this.ms_comboBoxMemberships);
+        if (!this.formChangeListener.isListen()) { // on edit, the membership is optional
+            nodesRequired.add(this.ms_comboBoxMemberships);
+        }
 
         // payment
         if (!pym_togglePayment.isSelected()) {
@@ -555,7 +557,9 @@ public class Controller_Member implements Initializable {
 
     private Model_Membership prepareMembership() {
         Model_Membership modelMembership = new Model_Membership();
-        modelMembership.setIdMembership(this.ms_comboBoxMemberships.getValue().getIdMembership());
+        if (this.ms_comboBoxMemberships.getValue() != null) {
+            modelMembership.setIdMembership(this.ms_comboBoxMemberships.getValue().getIdMembership());
+        }
         modelMembership.setPrice(this.membershipPrice.get());
         return modelMembership;
     }
