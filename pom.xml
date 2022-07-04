@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.ocielgp</groupId>
-    <artifactId>gym</artifactId>
+    <artifactId>armstrong-desktop</artifactId>
     <version>1.0</version>
     <packaging>jar</packaging>
 
@@ -21,31 +21,31 @@
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
-            <version>17.0.0.1</version>
+            <version>18.0.1</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.openjfx/javafx-fxml -->
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-fxml</artifactId>
-            <version>17.0.0.1</version>
+            <version>18.0.1</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.openjfx/javafx-graphics -->
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-graphics</artifactId>
-            <version>17.0.0.1</version>
+            <version>18.0.1</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.openjfx/javafx-web -->
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-web</artifactId>
-            <version>17.0.0.1</version>
+            <version>18.0.1</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.openjfx/javafx-swing -->
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-swing</artifactId>
-            <version>17.0.0.1</version>
+            <version>18.0.1</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/com.jfoenix/jfoenix -->
@@ -59,20 +59,20 @@
         <dependency>
             <groupId>org.kordamp.ikonli</groupId>
             <artifactId>ikonli-javafx</artifactId>
-            <version>12.2.0</version>
+            <version>12.3.1</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.kordamp.ikonli/ikonli-material-pack -->
         <dependency>
             <groupId>org.kordamp.ikonli</groupId>
             <artifactId>ikonli-material-pack</artifactId>
-            <version>12.2.0</version>
+            <version>12.3.1</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>8.0.27</version>
+            <version>8.0.29</version>
             <exclusions>
                 <exclusion>
                     <groupId>com.google.protobuf</groupId>
@@ -84,7 +84,7 @@
         <dependency>
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>
-            <version>5.0.0</version>
+            <version>5.0.1</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-api -->
@@ -98,13 +98,6 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
             <version>2.0.0-alpha5</version>
-        </dependency>
-
-        <!-- https://mvnrepository.com/artifact/com.fazecast/jSerialComm -->
-        <dependency>
-            <groupId>com.fazecast</groupId>
-            <artifactId>jSerialComm</artifactId>
-            <version>2.7.0</version>
         </dependency>
     </dependencies>
 

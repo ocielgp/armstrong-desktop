@@ -15,13 +15,13 @@ public class UserPreferences {
 
     static {
         // database: 0 = local, 1 = remote
-        DEFAULT_PREFERENCES.put("DB_SOURCE", 1);
-        DEFAULT_PREFERENCES.put("DB_NAME", "gym");
+        DEFAULT_PREFERENCES.put("DB_SOURCE", 0);
+        DEFAULT_PREFERENCES.put("DB_NAME", "armstrong");
         // database: local
         DEFAULT_PREFERENCES.put("DB_HOST_0", "127.0.0.1");
         DEFAULT_PREFERENCES.put("DB_PORT_0", "3306");
         DEFAULT_PREFERENCES.put("DB_USER_0", "root");
-        DEFAULT_PREFERENCES.put("DB_PASSWORD_0", "280580");
+        DEFAULT_PREFERENCES.put("DB_PASSWORD_0", "");
         // database: remote
         DEFAULT_PREFERENCES.put("DB_HOST_1", "REMOTE_HOST");
         DEFAULT_PREFERENCES.put("DB_PORT_1", "REMOTE_PORT");
@@ -56,7 +56,6 @@ public class UserPreferences {
         DEFAULT_PREFERENCES.forEach((key, value) -> {
             if (value.getClass() == String.class) {
                 PREFERENCES.put(key, (String) value);
-
             } else if (value.getClass() == Integer.class) {
                 PREFERENCES.putInt(key, (int) value);
             } else {
