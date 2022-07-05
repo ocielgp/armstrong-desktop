@@ -10,11 +10,12 @@ _Made with love, made with **[JavaFX](https://openjfx.io/)**_
 - [Tecnologías](#tecnologías)
 - [Configuración inicial](#configuración-inicial)
 - [Corriendo el proyecto](#corriendo-el-proyecto)
-- [Documentación-general](#documentación-general)
+- [Documentación general](#documentación-general)
     - [Archivo inicial para construir la aplicación general](#archivo-inicial-para-construir-la-aplicación)
     - [Digitalpersona 4500U](#digitalpersona-4500U)
     - [Modelo de la base de datos 4500U](#modelo-de-la-base-de-datos)
     - [Vistas y controladores](#vistas-y-controladores)
+    - [Sistema de notificaciones personalizado](#sistema-de-notificaciones-personalizado)
 - [Pantallas de la aplicación](#pantallas-de-la-aplicación)
 
 # Características
@@ -24,6 +25,7 @@ _Made with love, made with **[JavaFX](https://openjfx.io/)**_
 - Soporte para el lector digitalpersona 4500U (lector de huellas) **(opcional)**.
 - Consultas asíncronas (puede trabajar con un servidor remoto sin congelar la interfaz) además de contar con un pooling de conexiones para correr varias consultas en paralelo.
 - Auditoría avanzada sobre la información y sus cambios.
+- Sistema de notificaciones altamente personalizable (títulos, contenido, colores, iconos)
 - Temas en blanco / negro.
 
 # Tecnologías
@@ -143,6 +145,24 @@ Todas las vistas de la aplicación se encuentran en [resources/views](src/main/r
 
 La aplicación cuenta con un [router](src/main/java/com/ocielgp/app/Router.java) creado desde cero para cambiar entre las diferentes pantallas, todos los controladores de las vistas se encuentran en el directorio [controller](src/main/java/com/ocielgp/controller).
 
+## Sistema de notificaciones personalizado
+
+Se creó un sistema de notificaciones desde cero, el cual trabaja como una pila, en donde se van mostrando las notificaciones una a una, se puede modificar el tiempo que durará la notificación, su contenido, ícono y colores.
+
+- El archivo de notificaciones se encuentra en [src/main/java/com/ocielgp/utilities/Notifications.java](src/main/java/com/ocielgp/utilities/Notifications.java).
+- Para crear una notificación personalizada desde cero, solo hace falta llamar el método **Notifications.BuildNotification()**.
+- El código para los íconos se encuentra [acá](https://kordamp.org/ikonli/cheat-sheet-material.html), solo se pasa como un string.
+- Los códigos de estilos se encuentran en el archivo [colors.css](src/main/resources/colors.css) en el directorio resources con una pequeña variación en el tema negro, donde están registrados los siguientes:
+    - 🟢success-style
+    - 🟠warn-style
+    - 🔴danger-style
+    - 🟣creative-style
+    - 🔵epic-style
+
+![Login](screenshots/notifications/notifications_1.jpg)
+![Login](screenshots/notifications/notifications_2.jpg)
+![Login](screenshots/notifications/notifications_3.jpg)
+
 # Pantallas de la aplicación
 
 ## Tema blanco
@@ -165,7 +185,7 @@ La aplicación cuenta con un [router](src/main/java/com/ocielgp/app/Router.java)
 
 ![Check-In](screenshots/day-theme/check_in.jpg)
 
-### Admins
+### Gerencia
 
 ![Admins](screenshots/day-theme/admins.jpg)
 
@@ -194,7 +214,7 @@ La aplicación cuenta con un [router](src/main/java/com/ocielgp/app/Router.java)
 
 ![Check-In](screenshots/night-theme/check_in.jpg)
 
-### Admins
+### Gerencia
 
 ![Admins](screenshots/night-theme/admins.jpg)
 
