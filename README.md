@@ -25,7 +25,7 @@ _Made with love, made with **[JavaFX](https://openjfx.io/)**_
 - Soporte para el lector digitalpersona 4500U (lector de huellas) **(opcional)**.
 - Consultas asíncronas (puede trabajar con un servidor remoto sin congelar la interfaz) además de contar con un pooling de conexiones para correr varias consultas en paralelo.
 - Auditoría avanzada sobre la información y sus cambios.
-- Sistema de notificaciones altamente personalizable (títulos, contenido, colores, iconos)
+- Sistema de notificaciones altamente personalizable (títulos, contenido, colores, iconos).
 - Temas en blanco / negro.
 
 # Tecnologías
@@ -110,7 +110,10 @@ Todo empieza creando un **stage**, cosas como el cargado de estilos, la pantalla
 ## Digitalpersona 4500U
 
 Ahora el proyecto se diseñó para trabajar con este lector en específico, el proyecto ya tiene la librería para trabajar con él, pero es importante tener los drivers instalados para que la aplicación lo reconozca, los drivers del lector los puedes descargar [aquí](https://www.bayometric.com/fingerprint-sensor-driver/) dependiendo de tu sistema operativo, una vez instalados reincia la computadora y corre la aplicación, el lector se conectara automáticamente.
+
 > **Nota:** La aplicación puede trabajar sin el lector, la diferencia es que se ocultará la opción de registrar huellas.
+
+> Los miembros pueden tener una o varias huellas, todas se guardan en **MEMBERS_FINGERPRINTS**.
 
 ## Modelo de la base de datos
 
