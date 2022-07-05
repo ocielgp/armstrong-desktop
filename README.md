@@ -153,7 +153,7 @@ La aplicación cuenta con un [router](src/main/java/com/ocielgp/app/Router.java)
 Se creó un sistema de notificaciones desde cero, el cual trabaja como una pila, en donde se van mostrando las notificaciones una a una, se puede modificar el tiempo que durará la notificación, su contenido, ícono y colores.
 
 - El archivo de notificaciones se encuentra en [src/main/java/com/ocielgp/utilities/Notifications.java](src/main/java/com/ocielgp/utilities/Notifications.java).
-- Para crear una notificación personalizada desde cero, solo hace falta llamar el método **Notifications.BuildNotification()**.
+- Para crear una notificación personalizada desde cero, solo hace falta llamar el método [**Notifications.BuildNotification()**](https://github.com/ocielgp/armstrong-desktop/blob/master/src/main/java/com/ocielgp/utilities/Notifications.java#L87).
 - El código para los íconos se encuentra [acá](https://kordamp.org/ikonli/cheat-sheet-material.html), solo se pasa como un string.
 - Los códigos de estilos se encuentran en el archivo [colors.css](src/main/resources/colors.css) en el directorio resources con una pequeña variación en el tema negro, donde están registrados los siguientes:
     - 🟢success-style
