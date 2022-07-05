@@ -47,7 +47,7 @@ _Made with love, made with **[JavaFX](https://openjfx.io/)**_
 
 ### Creando la base de datos
 
-Cargamos el archivo [armstrong.sql](database/armstrong.sql) en nuestro servidor, suponiendo que nuestro servidor es local y nuestro usuario es root (**no recomendado**) con mysql en las variables de entorno, los comandos son los siguientes
+Cargamos el archivo [armstrong.sql](database/armstrong.sql) en nuestro servidor, suponiendo que nuestro servidor es local y nuestro usuario es root (**no recomendado**) con mysql en las variables de entorno, los comandos son los siguientes:
 
 ```
 armstrong\database> mysql -u root -p --default-character-set=utf8mb4
@@ -58,7 +58,7 @@ También he dejado el modelo de la base de datos hecha en [workbench](database/a
 
 ### Configurando el entorno
 
-La aplicación puede trabajar en dos entornos, dichos entornos se encuentran en el archivo de [preferencias](src/main/java/com/ocielgp/app/UserPreferences.java) ubicado:
+La aplicación puede trabajar en dos entornos, dichos entornos se encuentran en el archivo de [preferencias](https://github.com/ocielgp/armstrong-desktop/blob/master/src/main/java/com/ocielgp/app/UserPreferences.java#L21) ubicado:
 
 ```
 # En el proyecto
@@ -67,7 +67,7 @@ src/main/java/com/ocielgp/app/UserPreferences.java
 Computer\HKEY_CURRENT_USER\Software\JavaSoft\Prefs\com\ocielgp\app
 ```
 
-> **DB_SOURCE** Determina a que servidor nos vamos a conectar (0 o 1), simplemente verificamos que las credenciales coincidan al entorno que nos vamos a conectar
+> **DB_SOURCE** Determina a que servidor nos vamos a conectar (0 o 1), simplemente verificamos que las credenciales coincidan al entorno que nos vamos a conectar.
 <!-- -->
 > Después de ejecutar el proyecto por primera vez las preferencias se guardarán en los registros, si realizamos alguna modificación en UserPreferences.java, tenemos que borrar la preferencia **THEME** en los registros del sistema, para que al volver a correr la aplicación se generen nuevamente las preferencias.
 
@@ -153,7 +153,7 @@ La aplicación cuenta con un [router](src/main/java/com/ocielgp/app/Router.java)
 Se creó un sistema de notificaciones desde cero, el cual trabaja como una pila, en donde se van mostrando las notificaciones una a una, se puede modificar el tiempo que durará la notificación, su contenido, ícono y colores.
 
 - El archivo de notificaciones se encuentra en [src/main/java/com/ocielgp/utilities/Notifications.java](src/main/java/com/ocielgp/utilities/Notifications.java).
-- Para crear una notificación personalizada desde cero, solo hace falta llamar el método **Notifications.BuildNotification()**.
+- Para crear una notificación personalizada desde cero, solo hace falta llamar el método [**Notifications.BuildNotification()**](https://github.com/ocielgp/armstrong-desktop/blob/master/src/main/java/com/ocielgp/utilities/Notifications.java#L87).
 - El código para los íconos se encuentra [acá](https://kordamp.org/ikonli/cheat-sheet-material.html), solo se pasa como un string.
 - Los códigos de estilos se encuentran en el archivo [colors.css](src/main/resources/colors.css) en el directorio resources con una pequeña variación en el tema negro, donde están registrados los siguientes:
     - 🟢success-style
