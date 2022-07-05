@@ -25,6 +25,8 @@ import javafx.util.Pair;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.net.URL;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.ResourceBundle;
 
@@ -73,6 +75,8 @@ public class Controller_Dashboard implements Initializable {
     private Label ci_labelName;
     @FXML
     private Label ci_labelGym;
+    @FXML
+    private Label ci_labelHour;
     @FXML
     private Label ci_labelMembership;
 
@@ -138,6 +142,7 @@ public class Controller_Dashboard implements Initializable {
             this.ci_labelId.setText(idMember.toString());
             this.ci_labelName.setText(name);
             this.ci_labelGym.setText(gym);
+            this.ci_labelHour.setText(LocalDateTime.now().format(DateTimeFormatter.ofPattern("hh:mm a")));
             this.ci_labelMembership.setText(membership);
             new ZoomIn(this.ci_box).play();
         });

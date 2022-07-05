@@ -44,7 +44,8 @@ public class JDBC_Summary {
         return JDBC_Summary.ReadHandler(
                 from,
                 to,
-                "SELECT 'name', COUNT(*) AS 'metadata' FROM CHECK_IN WHERE idMember > 1 AND createdAt BETWEEN ? AND ?"
+                "SELECT 'name', SUM(count) AS 'metadata' FROM (SELECT COUNT(DISTINCT idMember) AS 'count' FROM CHECK_IN WHERE idMember > 1 AND createdAt BETWEEN ? AND ? GROUP BY DATE(createdAt)) AS count"
+//                "SELECT 'name', COUNT(DISTINCT idMember) AS 'metadata' FROM CHECK_IN WHERE idMember > 1 AND createdAt BETWEEN ? AND ? GROUP BY DATE(createdAt)"
         );
     }
 
@@ -61,6 +62,14 @@ public class JDBC_Summary {
                 from,
                 to,
                 "SELECT M.name, COUNT(*) AS 'metadata' FROM ADMINS A JOIN MEMBERS M ON A.idAdmin = M.idMember JOIN PAYMENTS_MEMBERSHIPS PM ON A.idAdmin = PM.createdBy AND PM.flag = 1 AND PM.firstMembership = 1 AND PM.startDateTime BETWEEN ? AND ? JOIN MEMBERSHIPS MS ON PM.idMembership = MS.idMembership GROUP BY A.idAdmin ORDER BY metadata DESC"
+        );
+    }
+
+    public static CompletableFuture<ObservableList<Model_Admin>> ReadProducts(String from, String to) {
+        return JDBC_Summary.ReadHandler(
+                from,
+                to,
+                "SELECT M.name, COUNT(*) AS 'metadata' FROM ADMINS A JOIN MEMBERS M ON A.idAdmin = M.idMember JOIN PAYMENTS_PRODUCTS PD ON A.idAdmin = PD.createdBy AND PD.flag = 1 AND PD.createdAt BETWEEN ? AND ? JOIN PRODUCTS P ON PD.idProduct = P.idProduct GROUP BY A.idAdmin ORDER BY metadata DESC"
         );
     }
 
@@ -85,6 +94,14 @@ public class JDBC_Summary {
                 from,
                 to,
                 "SELECT M.name, SUM(PV.price) AS 'metadata' FROM ADMINS A JOIN MEMBERS M ON A.idAdmin = M.idMember JOIN PAYMENTS_VISITS PV ON A.idAdmin = PV.createdBy AND PV.flag = 1 JOIN MEMBERSHIPS MS ON PV.idMembership = MS.idMembership WHERE PV.createdAt BETWEEN ? AND ? GROUP BY A.idAdmin ORDER BY metadata DESC"
+        );
+    }
+
+    public static CompletableFuture<ObservableList<Model_Admin>> ReadPaymentsProducts(String from, String to) {
+        return JDBC_Summary.ReadHandler(
+                from,
+                to,
+                "SELECT M.name, SUM(PD.price) AS 'metadata' FROM ADMINS A JOIN MEMBERS M ON A.idAdmin = M.idMember JOIN PAYMENTS_PRODUCTS PD ON A.idAdmin = PD.createdBy AND PD.flag = 1 JOIN PRODUCTS P ON PD.idProduct = P.idProduct WHERE PD.createdAt BETWEEN ? AND ? GROUP BY A.idAdmin ORDER BY metadata DESC"
         );
     }
 

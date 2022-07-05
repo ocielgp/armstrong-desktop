@@ -85,6 +85,8 @@ public class Controller_Members implements Initializable {
     private JFXRadioButton radioButtonOrderBy0;
     @FXML
     private JFXRadioButton radioButtonOrderBy1;
+    @FXML
+    private JFXRadioButton radioButtonOrderBy2;
 
     // attributes
     private Pagination pagination;
@@ -136,12 +138,26 @@ public class Controller_Members implements Initializable {
                     false,
                     "btn-colorful", Styles.SUCCESS
             );
+            createTabButton("gmi-add-shopping-cart",
+                    "Nueva venta",
+                    "product.fxml",
+                    new Controller_Product(),
+                    false,
+                    "btn-colorful", Styles.SUCCESS
+            );
             createTabButton("gmi-calendar-today",
                     "Membresias",
                     "memberships.fxml",
                     new Controller_Membership(),
                     true,
-                    "btn-colorful", Styles.WARN
+                    "btn-colorful", Styles.EPIC
+            );
+            createTabButton("gmi-shopping-cart",
+                    "Productos",
+                    "products.fxml",
+                    new Controller_Products(),
+                    true,
+                    "btn-colorful", Styles.EPIC
             );
         });
     }
@@ -209,6 +225,7 @@ public class Controller_Members implements Initializable {
         ToggleGroup toggleOrderBy = new ToggleGroup();
         this.radioButtonOrderBy0.setToggleGroup(toggleOrderBy);
         this.radioButtonOrderBy1.setToggleGroup(toggleOrderBy);
+        this.radioButtonOrderBy2.setToggleGroup(toggleOrderBy);
         UserPreferences.CreateSelectedToggleProperty(toggleOrderBy, "radioButtonOrderBy", "FILTER_MEMBER_ORDER_BY", pagination);
     }
 

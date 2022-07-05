@@ -6,7 +6,6 @@ import com.ocielgp.controller.Controller_Dashboard;
 import com.ocielgp.controller.Controller_Door;
 import com.ocielgp.models.Model_Admin;
 import com.ocielgp.models.Model_Gym;
-import com.ocielgp.utilities.Fingerprint_Log;
 import javafx.application.Platform;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
@@ -15,7 +14,7 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 public class Application {
-    public static final String version = "1.1";
+    public static final String version = "1.2";
     public static Controller_App controllerApp;
     public static Controller_Dashboard controllerDashboard;
     public static Stage STAGE_PRIMARY;
@@ -88,7 +87,7 @@ public class Application {
     }
 
     public static void ShakeUserInfo() {
-        Fingerprint_Log.generateLog("[Fingerprint]: Process finalized");
+//        Fingerprint_Log.generateLog("[Fingerprint]: Process finalized");
         Controller_Door.RED();
         if (Application.controllerDashboard != null)
             Application.controllerDashboard.shakeUserInfo();

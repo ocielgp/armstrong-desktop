@@ -56,6 +56,8 @@ public class Controller_Member implements Initializable {
     @FXML
     private Label h_labelLastPayment;
     @FXML
+    private Label h_labelLastPaymentPrice;
+    @FXML
     private Label h_labelGym;
     @FXML
     private Label h_labelAdmin;
@@ -376,6 +378,9 @@ public class Controller_Member implements Initializable {
                                 this.modelMember.getModelPaymentMembership().getStartDateTime()
                         )
                 );
+                this.h_labelLastPaymentPrice.setText(
+                        this.modelMember.getModelPaymentMembership().getPrice().toString()
+                );
                 this.ms_comboBoxMemberships.setDisable(true);
                 this.ms_comboBoxMemberships.getItems().forEach(model_membership -> { // select current membership
                     if (model_membership.getIdMembership().equals(this.modelMember.getModelPaymentMembership().getIdMembership())) {
@@ -385,6 +390,7 @@ public class Controller_Member implements Initializable {
                 });
             } else {
                 this.h_labelLastPayment.setText("N / A");
+                this.h_labelLastPaymentPrice.setText("N / A");
                 Notifications.Warn("Pago no encontrado", "Último pago no encontrado");
             }
 
@@ -501,7 +507,9 @@ public class Controller_Member implements Initializable {
         nodesRequired.add(Application.GetCurrentGymNode());
 
         // membership
-        nodesRequired.add(this.ms_comboBoxMemberships);
+        if (!this.formChangeListener.isListen()) { // on edit, the membership is optional
+            nodesRequired.add(this.ms_comboBoxMemberships);
+        }
 
         // payment
         if (!pym_togglePayment.isSelected()) {
@@ -549,7 +557,9 @@ public class Controller_Member implements Initializable {
 
     private Model_Membership prepareMembership() {
         Model_Membership modelMembership = new Model_Membership();
-        modelMembership.setIdMembership(this.ms_comboBoxMemberships.getValue().getIdMembership());
+        if (this.ms_comboBoxMemberships.getValue() != null) {
+            modelMembership.setIdMembership(this.ms_comboBoxMemberships.getValue().getIdMembership());
+        }
         modelMembership.setPrice(this.membershipPrice.get());
         return modelMembership;
     }

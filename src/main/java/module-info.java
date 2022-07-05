@@ -20,8 +20,6 @@ module app {
     exports animatefx.animation;
     exports animatefx.util;
 
-    requires com.fazecast.jSerialComm;
-
     requires java.net.http;
     requires org.slf4j;
     requires org.slf4j.simple;
