@@ -49,8 +49,8 @@ public class JDBC_Member_Fingerprint {
     }
 
     public static void ReadFindFingerprint(Fmd fingerprint) {
-        Fingerprint_Log.generateLog("[Fingerprint]: Captured");
-        Fingerprint_Log.generateLog("[Fingerprint]: Process started");
+//        Fingerprint_Log.generateLog("[Fingerprint]: Captured");
+//        Fingerprint_Log.generateLog("[Fingerprint]: Process started");
         Controller_Door.WHITE();
         CompletableFuture.runAsync(() -> {
             Connection con = DataServer.GetConnection();
@@ -73,7 +73,7 @@ public class JDBC_Member_Fingerprint {
                         return;
                     }
                 }
-                Application.ShakeUserInfo();
+                Controller_Door.RED();
                 Notifications.Danger("gmi-fingerprint", "Lector de Huellas", "Huella no encontrada", 1.5);
                 Loading.closeNow();
             } catch (SQLException sqlException) {
