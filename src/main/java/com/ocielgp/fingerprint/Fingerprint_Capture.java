@@ -179,7 +179,7 @@ public class Fingerprint_Capture implements ActionListener {
 
     public void startCapture() {
         try {
-            reader.Open(Reader.Priority.COOPERATIVE);
+            reader.Open(Reader.Priority.EXCLUSIVE);
         } catch (UareUException uareUException) {
             Notifications.CatchException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], uareUException);
         }

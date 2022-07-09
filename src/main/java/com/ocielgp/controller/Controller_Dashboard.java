@@ -131,10 +131,6 @@ public class Controller_Dashboard implements Initializable {
         Platform.runLater(() -> Application.GetCurrentGymNode().setDisable(false));
     }
 
-    public void shakeUserInfo() {
-        Platform.runLater(() -> new Shake(this.ci_box).play());
-    }
-
     public void showUserInfo(String style, Image photo, Integer idMember, String name, String gym, String membership) {
         Platform.runLater(() -> {
             this.ci_box.getStyleClass().setAll(UserPreferences.GetPreferenceString("THEME"), style);
