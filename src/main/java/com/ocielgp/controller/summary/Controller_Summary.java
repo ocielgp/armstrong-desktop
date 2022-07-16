@@ -3,6 +3,7 @@ package com.ocielgp.controller.summary;
 import animatefx.animation.FadeIn;
 import animatefx.animation.FadeInUp;
 import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXDatePicker;
 import com.jfoenix.controls.JFXTimePicker;
 import com.ocielgp.dao.JDBC_Summary;
@@ -10,17 +11,22 @@ import com.ocielgp.utilities.Cards;
 import com.ocielgp.utilities.InputProperties;
 import com.ocielgp.utilities.Loading;
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.util.Pair;
 
 import java.math.BigDecimal;
 import java.net.URL;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Objects;
 import java.util.ResourceBundle;
 
 public class Controller_Summary implements Initializable {
@@ -43,8 +49,16 @@ public class Controller_Summary implements Initializable {
     private FlowPane paymentsCards;
     @FXML
     private FlowPane membershipsCards;
+    @FXML
+    private JFXComboBox<String> comboBoxShift;
 
     private BigDecimal totalMoney = new BigDecimal(0);
+    private final Pair<String, LocalTime[]>[] comboBoxShiftOptions = new Pair[]{
+            // string view | [startTime, endTime]
+            new Pair<>("Mañana", new LocalTime[]{LocalTime.MIN, LocalTime.of(14, 0)}),
+            new Pair<>("Tarde", new LocalTime[]{LocalTime.of(14, 0), LocalTime.MAX}),
+            new Pair<>("Todo el día", new LocalTime[]{LocalTime.MIN, LocalTime.MAX})
+    };
 
     private void generalCards() {
         JDBC_Summary.ReadCheckIn(InputProperties.concatDateTime(this.startDate, this.startTime), InputProperties.concatDateTime(this.endDate, this.endTime))
@@ -153,13 +167,34 @@ public class Controller_Summary implements Initializable {
     // Controls
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        ObservableList<String> comboBoxShiftOptionsString = FXCollections.observableArrayList();
+        for (Pair<String, LocalTime[]> comboBoxShiftOption : this.comboBoxShiftOptions) {
+            comboBoxShiftOptionsString.add(comboBoxShiftOption.getKey());
+        }
+        this.comboBoxShift.setItems(comboBoxShiftOptionsString);
+
+        this.comboBoxShift.valueProperty().addListener((observable, oldValue, newValue) -> {
+            for (Pair<String, LocalTime[]> comboBoxShiftOption : this.comboBoxShiftOptions) {
+                if (Objects.equals(newValue, comboBoxShiftOption.getKey())) {
+                    this.startTime.setValue(comboBoxShiftOption.getValue()[0]);
+                    this.endTime.setValue(comboBoxShiftOption.getValue()[1]);
+                    break;
+                }
+            }
+        });
+
+        LocalDateTime now = LocalDateTime.now();
+        if (now.getHour() < 14) { // morning shift
+            this.comboBoxShift.setValue("Mañana");
+        } else { // afternoon shift
+            this.comboBoxShift.setValue("Tarde");
+        }
         this.startDate.setValue(LocalDate.now());
-        this.startTime.setValue(LocalTime.MIN);
         this.endDate.setValue(LocalDate.now());
-        this.endTime.setValue(LocalTime.MAX);
-        InputProperties.autoShow(this.startTime, this.endDate, this.endTime);
         this.startTime.set24HourView(true);
         this.endTime.set24HourView(true);
+        InputProperties.autoShow(this.startTime, this.endDate, this.endTime);
+
         createCards();
 
         this.buttonSearch.setOnAction(actionEvent -> createCards());
