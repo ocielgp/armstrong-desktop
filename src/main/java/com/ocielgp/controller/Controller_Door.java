@@ -1,47 +1,36 @@
 package com.ocielgp.controller;
 
+import com.fazecast.jSerialComm.SerialPort;
 import com.ocielgp.utilities.Notifications;
 import com.ocielgp.utilities.Styles;
 
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.util.Objects;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.*;
 
 public class Controller_Door {
     enum Task {
-        EMPTY, // connection purpose
         WHITE, // led white
         GREEN, // led green and door open
         YELLOW, // led yellow and door open
         RED, // led red and door closes
-        CLOSE // led turn off and closes door
+        OFF // led turn off and closes door
     }
 
     private static final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
-    private static final HttpClient httpClient = HttpClient.newHttpClient();
     private static final int WAITING_SECONDS = 4;
     private static ScheduledFuture<?> LAST_TASK;
-    private static final String END_POINT = "http://192.168.1.200:80";
     private static Boolean isDoorConnected;
+    private static SerialPort serialPort;
 
     public static void Start() {
-        Objects.requireNonNull(Controller_Door.createRequest(Task.EMPTY)).thenAccept(stringHttpResponse -> {
-            if (stringHttpResponse.statusCode() == 200) {
-                System.out.println("[Arduino][Connected][" + stringHttpResponse.statusCode() + "]");
-                Notifications.BuildNotification("gmi-meeting-room", "Puerta", "Puerta conectada", 3, Styles.EPIC);
-                Controller_Door.isDoorConnected = true;
-            } else {
-                System.out.println("[Arduino][Disconnected][" + stringHttpResponse + "]");
-                Controller_Door.isDoorConnected = false;
-            }
-        }).exceptionally(throwable -> {
+        Controller_Door.serialPort = SerialPort.getCommPort("COM3");
+        Controller_Door.serialPort.openPort();
+        Controller_Door.isDoorConnected = Controller_Door.serialPort.isOpen();
+        if (Controller_Door.isDoorConnected) {
+            Notifications.BuildNotification("gmi-meeting-room", "Puerta", "Puerta conectada", 3, Styles.EPIC);
+        } else {
             Notifications.BuildNotification("gmi-no-meeting-room", "Puerta", "La puerta no se ha podido conectar", 10, Styles.DANGER);
-            System.out.println("[Arduino][Disconnected][" + throwable.getMessage() + "]");
-            return null;
-        });
+        }
     }
 
     private static void scheduleCloseDoor(int seconds) {
@@ -49,9 +38,7 @@ public class Controller_Door {
             Controller_Door.LAST_TASK.cancel(true);
         }
 
-        Controller_Door.LAST_TASK = Controller_Door.executorService.schedule(() -> {
-            Controller_Door.createRequest(Task.CLOSE);
-        }, seconds, TimeUnit.SECONDS);
+        Controller_Door.LAST_TASK = Controller_Door.executorService.schedule(() -> Controller_Door.createRequest(Task.OFF), seconds, TimeUnit.SECONDS);
     }
 
     public static void WHITE() {
@@ -73,16 +60,14 @@ public class Controller_Door {
         Controller_Door.scheduleCloseDoor(2);
     }
 
-    private static CompletableFuture<HttpResponse<String>> createRequest(Task task) {
-        if (Controller_Door.isDoorConnected == null || Controller_Door.isDoorConnected) {
-//        System.out.println(task);
-            HttpRequest request = HttpRequest.newBuilder(URI.create(Controller_Door.END_POINT))
-                .headers("Color", task.name())
-                .PUT(HttpRequest.BodyPublishers.noBody())
-//                .PUT(HttpRequest.BodyPublishers.ofString(task.name()))
-                .build();
-            return httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString());
+    public static void OFF() {
+        Controller_Door.createRequest(Task.OFF);
+    }
+
+    private static void createRequest(Task task) {
+        if (Controller_Door.isDoorConnected) {
+            serialPort.writeBytes(task.name().getBytes(StandardCharsets.UTF_8), task.name().length());
+            System.out.println(task.name());
         }
-        return null;
     }
 }

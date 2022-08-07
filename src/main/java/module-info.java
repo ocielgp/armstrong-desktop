@@ -24,6 +24,7 @@ module app {
     requires org.slf4j;
     requires org.slf4j.simple;
     requires mysql.connector.java;
+    requires com.fazecast.jSerialComm;
 
     opens com.ocielgp;
     opens com.ocielgp.app;
