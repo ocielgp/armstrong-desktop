@@ -51,7 +51,6 @@ public class JDBC_Member_Fingerprint {
     public static void ReadFindFingerprint(Fmd fingerprint) {
 //        Fingerprint_Log.generateLog("[Fingerprint]: Captured");
 //        Fingerprint_Log.generateLog("[Fingerprint]: Process started");
-        Controller_Door.WHITE();
         CompletableFuture.runAsync(() -> {
             Connection con = DataServer.GetConnection();
             try {

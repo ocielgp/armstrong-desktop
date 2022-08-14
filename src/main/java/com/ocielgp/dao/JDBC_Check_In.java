@@ -102,8 +102,10 @@ public class JDBC_Check_In {
                                 haveDebts
                         );
                         if (haveDebts) {
+                            Controller_Door.PURPLE();
                             Notifications.Danger("Deudor", "Este socio tiene adeudos pendientes");
                         } else if (!access) {
+                            Controller_Door.RED();
                             Notifications.Danger("Bloqueado", "Este socio no tiene acceso al los gimnasios");
                         } else if (style.equals(Styles.SUCCESS) || style.equals(Styles.WARN)) {
                             if (price.equals("0.00")) {
