@@ -23,12 +23,13 @@ void setup() {
 void loop() {
   if (digitalRead(pinButton) == HIGH) { // open door
     ledGreen();
-    isButtonPressed = true;
+    // isButtonPressed = true;
+    startTimer(4000);
   } else {
-    if (isButtonPressed) {
+    /* if (isButtonPressed) {
       ledOff();
       isButtonPressed = false;
-    }
+    } */
 
     if (interval > 0 && (millis() - doorOpenedMillis >= interval)) {
       ledOff();
