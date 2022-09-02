@@ -3,7 +3,6 @@ package com.ocielgp.app;
 import com.jfoenix.controls.JFXComboBox;
 import com.ocielgp.controller.Controller_App;
 import com.ocielgp.controller.Controller_Dashboard;
-import com.ocielgp.controller.Controller_Door;
 import com.ocielgp.models.Model_Admin;
 import com.ocielgp.models.Model_Gym;
 import javafx.application.Platform;
@@ -14,7 +13,7 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 public class Application {
-    public static final String version = "1.2";
+    public static final String version = "1.3";
     public static Controller_App controllerApp;
     public static Controller_Dashboard controllerDashboard;
     public static Stage STAGE_PRIMARY;

@@ -151,4 +151,9 @@ public class Model_Admin extends Model_Member {
     public void setRoleName(String roleName) {
         this.roleName.set(roleName);
     }
+
+    @Override
+    public String toString() {
+        return this.getName();
+    }
 }

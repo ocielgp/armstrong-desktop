@@ -6,27 +6,25 @@ import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXDatePicker;
 import com.jfoenix.controls.JFXTimePicker;
+import com.ocielgp.dao.JDBC_Admin;
 import com.ocielgp.dao.JDBC_Summary;
+import com.ocielgp.models.Model_Admin;
 import com.ocielgp.utilities.Cards;
 import com.ocielgp.utilities.InputProperties;
 import com.ocielgp.utilities.Loading;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.util.Pair;
 
 import java.math.BigDecimal;
 import java.net.URL;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.Objects;
 import java.util.ResourceBundle;
 
 public class Controller_Summary implements Initializable {
@@ -50,39 +48,33 @@ public class Controller_Summary implements Initializable {
     @FXML
     private FlowPane membershipsCards;
     @FXML
-    private JFXComboBox<String> comboBoxShift;
+    private JFXComboBox<Model_Admin> comboBoxAdmins;
 
     private BigDecimal totalMoney = new BigDecimal(0);
-    private final Pair<String, LocalTime[]>[] comboBoxShiftOptions = new Pair[]{
-            // string view | [startTime, endTime]
-            new Pair<>("Mañana", new LocalTime[]{LocalTime.MIN, LocalTime.of(14, 0)}),
-            new Pair<>("Tarde", new LocalTime[]{LocalTime.of(14, 0), LocalTime.MAX}),
-            new Pair<>("Todo el día", new LocalTime[]{LocalTime.MIN, LocalTime.MAX})
-    };
 
     private void generalCards() {
-        JDBC_Summary.ReadCheckIn(InputProperties.concatDateTime(this.startDate, this.startTime), InputProperties.concatDateTime(this.endDate, this.endTime))
+        JDBC_Summary.ReadCheckIn(InputProperties.concatDateTime(this.startDate, this.startTime), InputProperties.concatDateTime(this.endDate, this.endTime), this.comboBoxAdmins.getSelectionModel().getSelectedItem().getIdAdmin())
                 .thenAccept(membersObservableList -> membersObservableList
                         .forEach(modelAdmin ->
                                 addCardToSummary(
                                         this.generalCards,
                                         Cards.createCard("gmi-fingerprint", (modelAdmin.getMetadata() == null) ? "0" : modelAdmin.getMetadata(), "Entradas", "#ffffff", Color.hsb(152, 0.81, 0.53), Color.hsb(152, 0.81, 0.43))
                                 )))
-                .thenRun(() -> JDBC_Summary.ReadNewMembers(InputProperties.concatDateTime(this.startDate, this.startTime), InputProperties.concatDateTime(this.endDate, this.endTime))
+                .thenRun(() -> JDBC_Summary.ReadNewMembers(InputProperties.concatDateTime(this.startDate, this.startTime), InputProperties.concatDateTime(this.endDate, this.endTime), this.comboBoxAdmins.getSelectionModel().getSelectedItem().getIdAdmin())
                         .thenAccept(membersObservableList -> membersObservableList
                                 .forEach(modelAdmin ->
                                         addCardToSummary(
                                                 this.generalCards,
                                                 Cards.createCard("gmi-group-add", modelAdmin.getMetadata(), modelAdmin.getName() + " inscripciones", "#ffffff", Color.hsb(152, 0.81, 0.53), Color.hsb(152, 0.81, 0.43))
                                         )))
-                        .thenRun(() -> JDBC_Summary.ReadMembers(InputProperties.concatDateTime(this.startDate, this.startTime), InputProperties.concatDateTime(this.endDate, this.endTime))
+                        .thenRun(() -> JDBC_Summary.ReadMembers(InputProperties.concatDateTime(this.startDate, this.startTime), InputProperties.concatDateTime(this.endDate, this.endTime), this.comboBoxAdmins.getSelectionModel().getSelectedItem().getIdAdmin())
                                 .thenAccept(membersObservableList -> membersObservableList
                                         .forEach(modelAdmin ->
                                                 addCardToSummary(
                                                         this.generalCards,
                                                         Cards.createCard("gmi-group-add", modelAdmin.getMetadata(), modelAdmin.getName() + " mensualidades", "#ffffff", Color.hsb(152, 0.81, 0.53), Color.hsb(152, 0.81, 0.43))
                                                 )))
-                                .thenRun(() -> JDBC_Summary.ReadProducts(InputProperties.concatDateTime(this.startDate, this.startTime), InputProperties.concatDateTime(this.endDate, this.endTime)).thenAccept(membersObservableList -> membersObservableList
+                                .thenRun(() -> JDBC_Summary.ReadProducts(InputProperties.concatDateTime(this.startDate, this.startTime), InputProperties.concatDateTime(this.endDate, this.endTime), this.comboBoxAdmins.getSelectionModel().getSelectedItem().getIdAdmin()).thenAccept(membersObservableList -> membersObservableList
                                         .forEach(modelAdmin ->
                                                 addCardToSummary(
                                                         this.generalCards,
@@ -93,7 +85,7 @@ public class Controller_Summary implements Initializable {
 
     private void paymentsCards() {
         this.totalMoney = new BigDecimal("0");
-        JDBC_Summary.ReadTotalPaymentsMembershipsFromNewMembers(InputProperties.concatDateTime(this.startDate, this.startTime), InputProperties.concatDateTime(this.endDate, this.endTime))
+        JDBC_Summary.ReadTotalPaymentsMembershipsFromNewMembers(InputProperties.concatDateTime(this.startDate, this.startTime), InputProperties.concatDateTime(this.endDate, this.endTime), this.comboBoxAdmins.getSelectionModel().getSelectedItem().getIdAdmin())
                 .thenAccept(membersObservableList -> membersObservableList
                         .forEach(modelAdmin -> {
                             this.totalMoney = this.totalMoney.add(new BigDecimal(modelAdmin.getMetadata()));
@@ -102,7 +94,7 @@ public class Controller_Summary implements Initializable {
                                     Cards.createCard("gmi-monetization-on", "$ " + modelAdmin.getMetadata(), modelAdmin.getName() + " inscripciones", "#ffffff", Color.hsb(45, 0.97, 0.90), Color.hsb(45, 0.97, 0.90))
                             );
                         }))
-                .thenRun(() -> JDBC_Summary.ReadTotalPaymentsMembershipsFromMembers(InputProperties.concatDateTime(this.startDate, this.startTime), InputProperties.concatDateTime(this.endDate, this.endTime))
+                .thenRun(() -> JDBC_Summary.ReadTotalPaymentsMembershipsFromMembers(InputProperties.concatDateTime(this.startDate, this.startTime), InputProperties.concatDateTime(this.endDate, this.endTime), this.comboBoxAdmins.getSelectionModel().getSelectedItem().getIdAdmin())
                         .thenAccept(membersObservableList -> membersObservableList
                                 .forEach(modelAdmin -> {
                                     this.totalMoney = this.totalMoney.add(new BigDecimal(modelAdmin.getMetadata()));
@@ -111,7 +103,7 @@ public class Controller_Summary implements Initializable {
                                             Cards.createCard("gmi-monetization-on", "$ " + modelAdmin.getMetadata(), modelAdmin.getName() + " mensualidades", "#ffffff", Color.hsb(45, 0.97, 0.90), Color.hsb(45, 0.97, 0.90))
                                     );
                                 }))
-                        .thenRun(() -> JDBC_Summary.ReadPaymentsVisits(InputProperties.concatDateTime(this.startDate, this.startTime), InputProperties.concatDateTime(this.endDate, this.endTime))
+                        .thenRun(() -> JDBC_Summary.ReadPaymentsVisits(InputProperties.concatDateTime(this.startDate, this.startTime), InputProperties.concatDateTime(this.endDate, this.endTime), this.comboBoxAdmins.getSelectionModel().getSelectedItem().getIdAdmin())
                                 .thenAccept(membersObservableList -> membersObservableList
                                         .forEach(modelAdmin -> {
                                             this.totalMoney = this.totalMoney.add(new BigDecimal(modelAdmin.getMetadata()));
@@ -120,7 +112,7 @@ public class Controller_Summary implements Initializable {
                                                     Cards.createCard("gmi-local-play", "$ " + modelAdmin.getMetadata(), modelAdmin.getName() + " visitas", "#ffffff", Color.hsb(45, 0.97, 0.90), Color.hsb(45, 0.97, 0.90))
                                             );
                                         }))
-                                .thenRun(() -> JDBC_Summary.ReadPaymentsProducts(InputProperties.concatDateTime(this.startDate, this.startTime), InputProperties.concatDateTime(this.endDate, this.endTime))
+                                .thenRun(() -> JDBC_Summary.ReadPaymentsProducts(InputProperties.concatDateTime(this.startDate, this.startTime), InputProperties.concatDateTime(this.endDate, this.endTime), this.comboBoxAdmins.getSelectionModel().getSelectedItem().getIdAdmin())
                                         .thenAccept(membersObservableList -> membersObservableList
                                                 .forEach(modelAdmin -> {
                                                     this.totalMoney = this.totalMoney.add(new BigDecimal(modelAdmin.getMetadata()));
@@ -137,7 +129,7 @@ public class Controller_Summary implements Initializable {
     }
 
     private void membershipsCards() {
-        JDBC_Summary.ReadTotalMembersByMembership(InputProperties.concatDateTime(this.startDate, this.startTime), InputProperties.concatDateTime(this.endDate, this.endTime)).thenAccept(membersObservableList -> membersObservableList.forEach(modelAdmin ->
+        JDBC_Summary.ReadTotalMembersByMembership(InputProperties.concatDateTime(this.startDate, this.startTime), InputProperties.concatDateTime(this.endDate, this.endTime), this.comboBoxAdmins.getSelectionModel().getSelectedItem().getIdAdmin()).thenAccept(membersObservableList -> membersObservableList.forEach(modelAdmin ->
                 addCardToSummary(
                         this.membershipsCards,
                         Cards.createCard("gmi-fitness-center", modelAdmin.getMetadata(), modelAdmin.getName(), "#ffffff", Color.hsb(190, 0.95, 0.94), Color.hsb(190, 0.95, 0.94))
@@ -167,38 +159,32 @@ public class Controller_Summary implements Initializable {
     // Controls
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        ObservableList<String> comboBoxShiftOptionsString = FXCollections.observableArrayList();
-        for (Pair<String, LocalTime[]> comboBoxShiftOption : this.comboBoxShiftOptions) {
-            comboBoxShiftOptionsString.add(comboBoxShiftOption.getKey());
-        }
-        this.comboBoxShift.setItems(comboBoxShiftOptionsString);
-
-        this.comboBoxShift.valueProperty().addListener((observable, oldValue, newValue) -> {
-            for (Pair<String, LocalTime[]> comboBoxShiftOption : this.comboBoxShiftOptions) {
-                if (Objects.equals(newValue, comboBoxShiftOption.getKey())) {
-                    this.startTime.setValue(comboBoxShiftOption.getValue()[0]);
-                    this.endTime.setValue(comboBoxShiftOption.getValue()[1]);
-                    break;
-                }
-            }
-        });
-
-        LocalDateTime now = LocalDateTime.now();
-        if (now.getHour() < 14) { // morning shift
-            this.comboBoxShift.setValue("Mañana");
-        } else { // afternoon shift
-            this.comboBoxShift.setValue("Tarde");
-        }
         this.startDate.setValue(LocalDate.now());
         this.endDate.setValue(LocalDate.now());
+        this.startTime.setValue(LocalTime.of(0, 0));
         this.startTime.set24HourView(true);
+        this.endTime.setValue(LocalTime.of(23, 59));
         this.endTime.set24HourView(true);
-        InputProperties.autoShow(this.startTime, this.endDate, this.endTime);
 
-        createCards();
+        Model_Admin modelAdmin = new Model_Admin();
+        modelAdmin.setIdAdmin(0);
+        modelAdmin.setName("Todos");
+        JDBC_Admin.ReadAdminsByIdGym().thenAccept(admins -> {
+            admins.add(0, modelAdmin);
+            this.comboBoxAdmins.setItems(FXCollections.observableArrayList(admins));
+            this.comboBoxAdmins.getSelectionModel().select(0);
 
-        this.buttonSearch.setOnAction(actionEvent -> createCards());
+            this.startDate.setValue(LocalDate.now());
+            this.endDate.setValue(LocalDate.now());
+            this.startTime.set24HourView(true);
+            this.endTime.set24HourView(true);
+            InputProperties.autoShow(this.startTime, this.endDate, this.endTime);
 
-        Platform.runLater(() -> new FadeIn(this.rootPane).play());
+            createCards();
+
+            this.buttonSearch.setOnAction(actionEvent -> createCards());
+
+            Platform.runLater(() -> new FadeIn(this.rootPane).play());
+        });
     }
 }

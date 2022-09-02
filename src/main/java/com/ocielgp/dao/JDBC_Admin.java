@@ -131,6 +131,32 @@ public class JDBC_Admin {
         });
     }
 
+    public static CompletableFuture<ObservableList<Model_Admin>> ReadAdminsByIdGym() {
+        return CompletableFuture.supplyAsync(() -> {
+            Connection con = DataServer.GetConnection();
+            ObservableList<Model_Admin> adminsObservableList = FXCollections.observableArrayList();
+            try {
+                PreparedStatement ps;
+                ResultSet rs;
+                assert con != null;
+                ps = con.prepareStatement("SELECT idAdmin, name FROM ADMINS JOIN MEMBERS ON ADMINS.idAdmin = MEMBERS.idMember WHERE ADMINS.idAdmin > 1 AND ADMINS.flag = 1 AND MEMBERS.access = 1 AND MEMBERS.idGym = ? ORDER BY idAdmin DESC");
+                ps.setInt(1, Application.GetModelAdmin().getIdGym());
+                rs = ps.executeQuery();
+                while (rs.next()) {
+                    Model_Admin modelAdmin = new Model_Admin();
+                    modelAdmin.setIdAdmin(rs.getInt("idAdmin"));
+                    modelAdmin.setName(rs.getString("name"));
+                    adminsObservableList.add(modelAdmin);
+                }
+            } catch (SQLException sqlException) {
+                Notifications.CatchSqlException(MethodHandles.lookup().lookupClass().getSimpleName(), Thread.currentThread().getStackTrace()[1], sqlException);
+            } finally {
+                DataServer.CloseConnection(con);
+            }
+            return adminsObservableList;
+        });
+    }
+
     public static CompletableFuture<QueryRows> ReadAdmins(int maxRows, AtomicInteger page, String query) {
         return CompletableFuture.supplyAsync(() -> {
             Connection con = DataServer.GetConnection();
