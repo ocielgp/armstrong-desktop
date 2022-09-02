@@ -13,9 +13,10 @@ _Made with love, made with **[JavaFX](https://openjfx.io/)**_
 - [Documentación general](#documentación-general)
     - [Archivo inicial para construir la aplicación general](#archivo-inicial-para-construir-la-aplicación)
     - [Digitalpersona 4500U](#digitalpersona-4500U)
-    - [Modelo de la base de datos 4500U](#modelo-de-la-base-de-datos)
+    - [Modelo de la base de datos](#modelo-de-la-base-de-datos)
     - [Vistas y controladores](#vistas-y-controladores)
     - [Sistema de notificaciones personalizado](#sistema-de-notificaciones-personalizado)
+- [Generar fat jar del proyecto](#generar-fat-jar-del-proyecto)
 - [Pantallas de la aplicación](#pantallas-de-la-aplicación)
 
 # Características
@@ -31,7 +32,7 @@ _Made with love, made with **[JavaFX](https://openjfx.io/)**_
 # Tecnologías
 
 - Java 11 - Lenguaje de programación utilizado en todo el proyecto.
-- MySQL 8.0.29 - Base de datos.
+- MySQL 8.0.30 - Base de datos.
 - JavaFX - La cara bonita de la aplicación.
 - Workbench - Herramienta utilizada para crear el modelo de la base de datos.
 - SceneBuilder - Herramienta utilizada para crear las pantallas de la aplicación.
@@ -77,6 +78,8 @@ Parar correr el proyecto necesitaremos las siguientes cosas:
 
 - Los **bin**arios de Java 11 (o superior) en las variables de entorno.
     - Puede ser el JDK proporcionado por Oracle, en este proyecto se utilizó el [JDK proporcionado por Amazon](https://docs.aws.amazon.com/corretto/latest/corretto-11-ug/downloads-list.html).
+- Crear una variable de entorno llamada **JAVA_HOME** (opcional para correr el proyecto, obligatoria para generar un [fat jar ejecutable](#generar-fat-jar-del-proyecto)).
+    - Usamos el mismo JDK anterior, pero apuntando a la carpeta raíz del JDK, no a los binarios.
 - Los **bin**arios de Maven en las variables de entorno.
     - Se pueden descargar desde el siguiente [link](https://maven.apache.org/download.cgi) (**verificar que sean los binarios**).
 - Realizar la configuración inicial.
@@ -165,6 +168,15 @@ Se creó un sistema de notificaciones desde cero, el cual trabaja como una pila,
 ![Login](screenshots/notifications/notifications_1.jpg)
 ![Login](screenshots/notifications/notifications_2.jpg)
 ![Login](screenshots/notifications/notifications_3.jpg)
+
+# Generar fat jar del proyecto
+
+Es importante completar los requisitos previamente mencionados en [corriendo el proyecto](#corriendo-el-proyecto), de lo contrario no se podrá generar el jar.
+Una vez completados, simplemente corremos el siguiente comando en la raíz del proyecto
+```mvn package``` y se generará el jar en la carpeta **build**.
+> Para correr el ejecutable desde la misma consola, se debe ejecutar el siguiente comando: **java -jar build/armstrong-desktop-version.jar**
+<!-- -->
+> Para correr el ejecutable en una nueva ventana: **javaw -jar build/armstrong-desktop-version.jar**
 
 # Pantallas de la aplicación
 

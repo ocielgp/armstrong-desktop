@@ -1,1 +1,1 @@
-start cmd.exe /k mvn javafx:dorun
+start cmd.exe /k mvn javafx:run

@@ -1,4 +1,6 @@
 target/
+build/
 .idea/
 libs/
 *.log
+dependency-reduced-pom.xml
