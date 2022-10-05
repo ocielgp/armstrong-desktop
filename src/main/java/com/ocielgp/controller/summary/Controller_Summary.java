@@ -165,26 +165,21 @@ public class Controller_Summary implements Initializable {
         this.startTime.set24HourView(true);
         this.endTime.setValue(LocalTime.of(23, 59));
         this.endTime.set24HourView(true);
+        this.buttonSearch.setOnAction(actionEvent -> createCards());
+        InputProperties.autoShow(this.startTime, this.endDate, this.endTime);
 
-        Model_Admin modelAdmin = new Model_Admin();
-        modelAdmin.setIdAdmin(0);
-        modelAdmin.setName("Todos");
-        JDBC_Admin.ReadAdminsByIdGym().thenAccept(admins -> {
+        JDBC_Admin.ReadAdminsByIdGym().thenAccept(admins -> Platform.runLater(() -> {
+            Model_Admin modelAdmin = new Model_Admin();
+            modelAdmin.setIdAdmin(0);
+            modelAdmin.setName("Todos");
             admins.add(0, modelAdmin);
+
             this.comboBoxAdmins.setItems(FXCollections.observableArrayList(admins));
             this.comboBoxAdmins.getSelectionModel().select(0);
 
-            this.startDate.setValue(LocalDate.now());
-            this.endDate.setValue(LocalDate.now());
-            this.startTime.set24HourView(true);
-            this.endTime.set24HourView(true);
-            InputProperties.autoShow(this.startTime, this.endDate, this.endTime);
-
             createCards();
 
-            this.buttonSearch.setOnAction(actionEvent -> createCards());
-
-            Platform.runLater(() -> new FadeIn(this.rootPane).play());
-        });
+            new FadeIn(this.rootPane).play();
+        }));
     }
 }
