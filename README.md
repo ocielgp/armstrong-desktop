@@ -92,7 +92,7 @@ Para correr el proyecto, tenemos las siguientes opciones:
 - [Opción 2]: En una terminal situada en la carpeta raíz del proyecto donde se encuentra el [pom.xml](pom.xml), corremos el siguiente comando:
 
 ```
-armstrong> mvn javafx:dorun
+armstrong> mvn javafx:run
 ```
 
 Si todo sale bien, saldrá la pantalla del login de la aplicación con una notificación diciendo conexión establecida, las siguientes son las credenciales para entrar:
