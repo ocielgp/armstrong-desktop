@@ -58,6 +58,10 @@
                     <Label fx:id="h_labelLastPaymentPrice" text="N / A"/>
                 </HBox>
                 <HBox spacing="5.0">
+                    <Label styleClass="bold" text="Meses pagados"/>
+                    <Label fx:id="h_labelLastPaymentMonths" text="N / A"/>
+                </HBox>
+                <HBox spacing="5.0">
                     <Label styleClass="bold" text="Gimnasio" />
                     <Label fx:id="h_labelGym" text="gymName" />
                 </HBox>
