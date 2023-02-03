@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Controller_Member implements Initializable {
     @FXML
@@ -226,7 +227,10 @@ public class Controller_Member implements Initializable {
         // -> membership
         this.ms_comboBoxMemberships.valueProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
-                Platform.runLater(() -> updateMembershipPrice(true));
+                Platform.runLater(() -> {
+                    this.updateMembershipPrice(true);
+                    this.ms_boxButtons.setDisable(false); // useful when last membership was deleted
+                });
             } else {
                 Platform.runLater(() -> {
                     this.ms_boxEndDate.setVisible(false);
@@ -382,12 +386,19 @@ public class Controller_Member implements Initializable {
                         this.modelMember.getModelPaymentMembership().getPrice().toString()
                 );
                 this.ms_comboBoxMemberships.setDisable(true);
+                AtomicBoolean hasMembership = new AtomicBoolean(false);
                 this.ms_comboBoxMemberships.getItems().forEach(model_membership -> { // select current membership
                     if (model_membership.getIdMembership().equals(this.modelMember.getModelPaymentMembership().getIdMembership())) {
                         this.ms_comboBoxMemberships.setValue(model_membership);
-                        createMembershipButtons();
+                        createMembershipButtons(false);
+                        hasMembership.set(true);
                     }
                 });
+                if (!hasMembership.get()) {
+                    Notifications.Warn("Membresía no encontrada", "La membresía fue borrada");
+                    this.ms_comboBoxMemberships.setDisable(false);
+                    createMembershipButtons(true);
+                }
             } else {
                 this.h_labelLastPayment.setText("N / A");
                 this.h_labelLastPaymentPrice.setText("N / A");
@@ -660,7 +671,7 @@ public class Controller_Member implements Initializable {
     }
 
 
-    private void createMembershipButtons() {
+    private void createMembershipButtons(boolean disableRenewButton) {
         if (DateTime.isToday(this.modelMember.getModelPaymentMembership().getStartDateTime())) { // today's payment
             JFXButton buttonChangeMembership = new JFXButton("Cambiar");
             buttonChangeMembership.getStyleClass().addAll("btn-colorful", "warn-style");
@@ -676,6 +687,7 @@ public class Controller_Member implements Initializable {
             buttonRenewMembership.setOnAction(actionEvent -> eventMembershipRenew());
             this.ms_boxButtons.getChildren().setAll(buttonRenewMembership);
             this.ms_boxButtons.setVisible(true);
+            this.ms_boxButtons.setDisable(disableRenewButton);
         }
     }
 
